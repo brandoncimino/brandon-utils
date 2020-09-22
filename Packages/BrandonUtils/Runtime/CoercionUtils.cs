@@ -96,14 +96,14 @@ namespace Packages.BrandonUtils.Runtime {
                         return a_vector3 + (Vector3) b * sign;
                     }
                     catch (InvalidCastException e) {
-                        throw new InvalidCastException($"Unable to cast {nameof(b)} ({b}) to a {nameof(Vector3)} to add it to {nameof(a)} ({a_vector3})!");
+                        throw new InvalidCastException($"Unable to cast {nameof(b)} ({b}) to a {nameof(Vector3)} to add it to {nameof(a)} ({a_vector3})!", e);
                     }
                 case Vector4 a_vector4:
                     try {
                         return a_vector4 + (Vector4) b * sign;
                     }
                     catch (InvalidCastException e) {
-                        throw new InvalidCastException($"Unable to cast {nameof(b)} ({b}) to a {nameof(Vector4)} to add it to {nameof(a)} ({a_vector4})!");
+                        throw new InvalidCastException($"Unable to cast {nameof(b)} ({b}) to a {nameof(Vector4)} to add it to {nameof(a)} ({a_vector4})!", e);
                     }
                 default:
                     throw new InvalidCastException($"Unable to coerce {nameof(a)} ({a}) and {nameof(b)} ({b}) into types compatible with addition!");

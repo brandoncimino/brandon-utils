@@ -187,7 +187,7 @@ namespace Packages.BrandonUtils.Runtime.Saving {
                 return File.ReadAllText(saveFilePath);
             }
             catch (FileNotFoundException e) {
-                throw new SaveDataException<T>($"No save file exists at the path {saveFilePath}");
+                throw new SaveDataException<T>($"No save file exists at the path {saveFilePath}", e);
             }
         }
 
