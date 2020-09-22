@@ -2,4 +2,4 @@
  
  # Usage
  
- URL: https://github.com/brandoncimino/brandon-utils.git/Packages/BrandonUtils
+ URL: https://github.com/brandoncimino/brandon-utils.git?path=/Packages/BrandonUtils
