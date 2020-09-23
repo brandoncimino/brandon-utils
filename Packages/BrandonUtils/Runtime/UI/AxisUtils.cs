@@ -42,7 +42,7 @@ namespace Packages.BrandonUtils.Runtime.UI {
         /// <param name="axis"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public static RectTransform.Axis Invert(this RectTransform.Axis axis) {
+        public static RectTransform.Axis Inverse(this RectTransform.Axis axis) {
             switch (axis) {
                 case RectTransform.Axis.Horizontal:
                     return RectTransform.Axis.Vertical;

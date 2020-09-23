@@ -15,7 +15,7 @@ namespace Packages.BrandonUtils.Runtime.UI {
             var oldParent = me.parent;
             me.SetParent(target);
             var size = me.GetAxisSize(myEdge.Axis()) + padding;
-            me.SetInsetAndSizeFromParentEdge(myEdge.Invert(), -size, size);
+            me.SetInsetAndSizeFromParentEdge(myEdge.Inverse(), -size, size);
             me.SetParent(oldParent);
 
             //post-conditions
@@ -81,7 +81,7 @@ namespace Packages.BrandonUtils.Runtime.UI {
         ) {
             var previousInLine = leader;
             foreach (var nextInLine in followers) {
-                nextInLine.Sidle(direction.Invert(), previousInLine, padding);
+                nextInLine.Sidle(direction.Inverse(), previousInLine, padding);
                 previousInLine = nextInLine;
             }
         }

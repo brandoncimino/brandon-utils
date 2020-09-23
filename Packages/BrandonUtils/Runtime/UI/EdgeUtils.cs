@@ -17,7 +17,7 @@ namespace Packages.BrandonUtils.Runtime.UI {
             }
         }
 
-        public static RectTransform.Edge Invert(this RectTransform.Edge edge) {
+        public static RectTransform.Edge Inverse(this RectTransform.Edge edge) {
             switch (edge) {
                 case RectTransform.Edge.Left:
                     return RectTransform.Edge.Right;
