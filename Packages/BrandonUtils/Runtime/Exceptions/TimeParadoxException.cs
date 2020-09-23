@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Runtime.Serialization;
-using JetBrains.Annotations;
 
 namespace Packages.BrandonUtils.Runtime.Exceptions {
     public class TimeParadoxException : BrandonException {
+        public override string BaseMessage { get; } = "\t\tWhen am I?";
         public TimeParadoxException() { }
-        protected TimeParadoxException([NotNull] SerializationInfo info, StreamingContext context) : base(info, context) { }
-        public TimeParadoxException(string message) : base(message) { }
-        public TimeParadoxException(string message, Exception innerException) : base(message, innerException) { }
+        public TimeParadoxException(string message, Exception innerException = null) : base(message, innerException) { }
     }
 }
