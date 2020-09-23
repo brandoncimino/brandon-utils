@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Packages.BrandonUtils.Runtime.Exceptions;
+
 using UnityEngine;
 
 namespace Packages.BrandonUtils.Runtime.UI {
@@ -29,7 +31,7 @@ namespace Packages.BrandonUtils.Runtime.UI {
                 case RectTransform.Axis.Vertical:
                     return 1;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
+                    throw UnknownAxisException(nameof(axis), axis);
             }
         }
 
@@ -46,8 +48,13 @@ namespace Packages.BrandonUtils.Runtime.UI {
                 case RectTransform.Axis.Vertical:
                     return RectTransform.Axis.Horizontal;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(axis), axis, "null");
+                    throw UnknownAxisException(nameof(axis), axis);
             }
+        }
+
+        private static TransDimensionalException UnknownAxisException(string paramName, RectTransform.Axis axis) {
+            var traditionalException = new ArgumentOutOfRangeException(paramName, axis, $"Unknown {nameof(RectTransform.Axis)} enum value.");
+            return new TransDimensionalException($"Which direction is {axis}? What dimension are we in?! I only know about {RectTransform.Axis.Vertical} and {RectTransform.Axis.Horizontal}!", traditionalException);
         }
     }
 }
