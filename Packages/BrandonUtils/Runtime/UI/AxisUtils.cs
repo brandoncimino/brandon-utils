@@ -1,6 +1,6 @@
 ﻿using System;
 
-using Packages.BrandonUtils.Runtime.Exceptions;
+using Packages.BrandonUtils.Runtime.Enums;
 
 using UnityEngine;
 
@@ -14,6 +14,7 @@ namespace Packages.BrandonUtils.Runtime.UI {
     /// We may consider creating an "Extension" of the <see cref="RectTransform.Axis"/> enum <i>(can <see cref="Enum"/>s inherit each other...?)</i> that adds in an additional "<b>Depth</b>" axis, though this adds an additional enum to convert between which may just increase confusion too much.
     /// </remarks>
     /// <seealso cref="RectTransform.Axis"/>
+    /// <seealso cref="EdgeUtils"/>
     public static class AxisUtils {
         /// <summary>
         /// Converts an <see cref="RectTransform.Axis"/> into an index for use with a <see cref="Vector2"/> (or <see cref="Vector3">3</see>, or <see cref="Vector4">4</see>)'s <see cref="Vector2.this"/> accessor.
@@ -31,7 +32,7 @@ namespace Packages.BrandonUtils.Runtime.UI {
                 case RectTransform.Axis.Vertical:
                     return 1;
                 default:
-                    throw UnknownAxisException(nameof(axis), axis);
+                    throw EnumUtils.InvalidEnumArgumentException(nameof(axis), axis);
             }
         }
 
@@ -48,13 +49,8 @@ namespace Packages.BrandonUtils.Runtime.UI {
                 case RectTransform.Axis.Vertical:
                     return RectTransform.Axis.Horizontal;
                 default:
-                    throw UnknownAxisException(nameof(axis), axis);
+                    throw EnumUtils.InvalidEnumArgumentException(nameof(axis), axis);
             }
-        }
-
-        private static TransDimensionalException UnknownAxisException(string paramName, RectTransform.Axis axis) {
-            var traditionalException = new ArgumentOutOfRangeException(paramName, axis, $"Unknown {nameof(RectTransform.Axis)} enum value.");
-            return new TransDimensionalException($"Which direction is {axis}? What dimension are we in?! I only know about {RectTransform.Axis.Vertical} and {RectTransform.Axis.Horizontal}!", traditionalException);
         }
     }
 }

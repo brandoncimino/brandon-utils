@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace Packages.BrandonUtils.Runtime.Enums {
     public static class EnumUtils {
@@ -23,6 +24,17 @@ namespace Packages.BrandonUtils.Runtime.Enums {
 
         public static T Previous<T>(this T currentEnumValue) where T : Enum {
             return currentEnumValue.Step(-1);
+        }
+
+        /// <summary>
+        /// Creates an <see cref="System.ComponentModel.InvalidEnumArgumentException"/> using generics to infer the enum's <see cref="Type"/>.
+        /// </summary>
+        /// <param name="argumentName"></param>
+        /// <param name="enumValue"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(string argumentName, T enumValue) where T : Enum {
+            return new InvalidEnumArgumentException(argumentName, (int) (object) enumValue, typeof(T));
         }
     }
 }

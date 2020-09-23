@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Packages.BrandonUtils.Runtime.Enums;
 
 using UnityEngine;
 
@@ -13,7 +13,7 @@ namespace Packages.BrandonUtils.Runtime.UI {
                 case RectTransform.Edge.Bottom:
                     return RectTransform.Axis.Vertical;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(edge), $"I have no idea what edge {edge} is!");
+                    throw EnumUtils.InvalidEnumArgumentException(nameof(edge), edge);
             }
         }
 
@@ -28,7 +28,7 @@ namespace Packages.BrandonUtils.Runtime.UI {
                 case RectTransform.Edge.Bottom:
                     return RectTransform.Edge.Top;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(edge), edge, $"What even is {edge}?!");
+                    throw EnumUtils.InvalidEnumArgumentException(nameof(edge), edge);
             }
         }
 
@@ -43,7 +43,7 @@ namespace Packages.BrandonUtils.Runtime.UI {
                 case RectTransform.Edge.Bottom:
                     return -1;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(edge), edge, null);
+                    throw EnumUtils.InvalidEnumArgumentException(nameof(edge), edge);
             }
         }
     }
