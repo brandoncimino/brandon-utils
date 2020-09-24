@@ -115,5 +115,29 @@ namespace Packages.BrandonUtils.Runtime.Collections {
         public static string JoinString<T>(this IEnumerable<T> enumerable, string separator = "") {
             return string.Join(separator, enumerable);
         }
+
+        /// <summary>
+        /// Returns true if <paramref name="enumerable"/> contains only unique elements, as determined via <see cref="Enumerable.Distinct{TSource}(System.Collections.Generic.IEnumerable{TSource})"/>
+        /// </summary>
+        /// <param name="enumerable"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static bool Singleton<T>(this IEnumerable<T> enumerable) {
+            var enumerable1 = enumerable as T[] ?? enumerable.ToArray();
+            return enumerable1.Length == enumerable1.Distinct().Count();
+        }
+
+        public static Dictionary<TValue_Original, TKey_Original> Invert<TKey_Original, TValue_Original>(this Dictionary<TKey_Original, TValue_Original> dictionary) {
+            //to make for specific and explicit error messages, we check for known failures conditions ahead of time - specifically, duplicate keys results in an "ArgumentException" which is the parent class of lots of other things, making it not very clear when we catch it...
+            if (!dictionary.Values.Singleton()) {
+                throw new ArgumentException($"The provided {dictionary.GetType().Name}'s {nameof(dictionary.Values)} contained one or more duplicates, so they couldn't be used as keys!");
+            }
+
+            if (dictionary.Any(pair => pair.Value == null)) {
+                throw new ArgumentNullException($"The provided {dictionary.GetType().Name} contained a null {nameof(KeyValuePair<object, object>.Value)}, which can't be used as a {nameof(KeyValuePair<object, object>.Key)}!");
+            }
+
+            return dictionary.ToDictionary(pair => pair.Value, pair => pair.Key);
+        }
     }
 }
