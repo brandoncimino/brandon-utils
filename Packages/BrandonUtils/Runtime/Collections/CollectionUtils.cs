@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+
+using JetBrains.Annotations;
 
 namespace Packages.BrandonUtils.Runtime.Collections {
     /// <summary>
@@ -127,7 +130,8 @@ namespace Packages.BrandonUtils.Runtime.Collections {
             return enumerable1.Length == enumerable1.Distinct().Count();
         }
 
-        public static Dictionary<TValue_Original, TKey_Original> Invert<TKey_Original, TValue_Original>(this Dictionary<TKey_Original, TValue_Original> dictionary) {
+        [NotNull]
+        public static IDictionary<TValue_Original, TKey_Original> Inverse_Internal<TKey_Original, TValue_Original>(IDictionary<TKey_Original, TValue_Original> dictionary) {
             //to make for specific and explicit error messages, we check for known failures conditions ahead of time - specifically, duplicate keys results in an "ArgumentException" which is the parent class of lots of other things, making it not very clear when we catch it...
             if (!dictionary.Values.IsSingleton()) {
                 throw new ArgumentException($"The provided {dictionary.GetType().Name}'s {nameof(dictionary.Values)} contained one or more duplicates, so they couldn't be used as keys!");
@@ -137,7 +141,26 @@ namespace Packages.BrandonUtils.Runtime.Collections {
                 throw new ArgumentNullException($"The provided {dictionary.GetType().Name} contained a null {nameof(KeyValuePair<object, object>.Value)}, which can't be used as a {nameof(KeyValuePair<object, object>.Key)}!");
             }
 
-            return dictionary.ToDictionary(pair => pair.Value, pair => pair.Key);
+            var inverted = dictionary.ToDictionary(pair => pair.Value, pair => pair.Key);
+
+            if (dictionary is ReadOnlyDictionary<TKey_Original, TValue_Original>) {
+                return new ReadOnlyDictionary<TValue_Original, TKey_Original>(inverted);
+            }
+            else {
+                return new Dictionary<TValue_Original, TKey_Original>(inverted);
+            }
+        }
+
+        /// <inheritdoc cref="Inverse_Internal{TKey_Original,TValue_Original}"/>
+        [NotNull]
+        public static Dictionary<TValue_Original, TKey_Original> Inverse<TKey_Original, TValue_Original>(this Dictionary<TKey_Original, TValue_Original> dictionary) {
+            return (Dictionary<TValue_Original, TKey_Original>) Inverse_Internal(dictionary);
+        }
+
+        /// <inheritdoc cref="Inverse_Internal{TKey_Original,TValue_Original}"/>
+        [NotNull]
+        public static ReadOnlyDictionary<TValue_Original, TKey_Original> Inverse<TKey_Original, TValue_Original>(this ReadOnlyDictionary<TKey_Original, TValue_Original> readOnlyDictionary) {
+            return (ReadOnlyDictionary<TValue_Original, TKey_Original>) Inverse_Internal(readOnlyDictionary);
         }
     }
 }
