@@ -7,6 +7,17 @@ using System.Linq;
 using Packages.BrandonUtils.Runtime.Exceptions;
 
 namespace Packages.BrandonUtils.Runtime.Enums {
+    /// <summary>
+    /// A wrapper around a <see cref="IList{T}"/> of <see cref="Enum"/> <typeparamref name="T"/> values.
+    /// <br/>
+    /// Use this to "restrict" an existing <see cref="Enum"/>.
+    /// </summary>
+    /// <example>
+    /// <see cref="EnumSubset{T}"/> Weekends = new <see cref="EnumSubset{T}"/>(<see cref="DayOfWeek.Saturday"/>, <see cref="DayOfWeek.Sunday"/>);
+    /// <p/>
+    /// Weekends.<see cref="Validate"/>(<see cref="DayOfWeek.Monday"/>); //this throws an <see cref="EnumNotInSubsetException{T}"/>
+    /// </example>
+    /// <typeparam name="T"></typeparam>
     public class EnumSubset<T> : ICollection<T> where T : Enum {
         /// <summary>
         /// The backing <see cref="IList{T}"/> for the <see cref="EnumSubset{T}"/>.
