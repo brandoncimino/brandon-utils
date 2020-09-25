@@ -1,78 +1,78 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
-
-using JetBrains.Annotations;
 
 using Packages.BrandonUtils.Runtime.Exceptions;
 
 namespace Packages.BrandonUtils.Runtime.Enums {
-    public class EnumSubset<T> : IList<T> where T : Enum {
+    public class EnumSubset<T> : ICollection<T> where T : Enum {
         /// <summary>
-        /// The backing <see cref="List{T}"/> for the <see cref="EnumSubset{T}"/>.
+        /// The backing <see cref="IList{T}"/> for the <see cref="EnumSubset{T}"/>.
         /// </summary>
-        private readonly List<T> _values;
+        private readonly IList<T> Subset;
 
         #region Constructors
 
-        [UsedImplicitly]
-        public EnumSubset(IEnumerable<T> values) {
-            _values = values.ToList();
+        public EnumSubset(IList<T> values, bool isReadOnly = false) {
+            Subset = isReadOnly ? new ReadOnlyCollection<T>(values) : values;
         }
 
-        public EnumSubset(params T[] values) : this((IEnumerable<T>) values) { }
+        public EnumSubset(params T[] values) : this(values, false) { }
+
+        public EnumSubset(IEnumerable<IEnumerable<T>> values, bool isReadOnly = false) : this(values.SelectMany(it => it).ToList(), isReadOnly) { }
 
         #endregion
 
         #region IList Delegated Implementation
 
         public IEnumerator<T> GetEnumerator() {
-            return _values.GetEnumerator();
+            return Subset.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator() {
-            return _values.GetEnumerator();
+            return Subset.GetEnumerator();
         }
 
         public void Add(T item) {
-            _values.Add(item);
+            Subset.Add(item);
         }
 
         public void Clear() {
-            _values.Clear();
+            Subset.Clear();
         }
 
         public bool Contains(T item) {
-            return _values.Contains(item);
+            return Subset.Contains(item);
         }
 
         public void CopyTo(T[] array, int arrayIndex) {
-            _values.CopyTo(array, arrayIndex);
+            Subset.CopyTo(array, arrayIndex);
         }
 
         public bool Remove(T item) {
-            return _values.Remove(item);
+            return Subset.Remove(item);
         }
 
-        public int  Count      => _values.Count;
-        public bool IsReadOnly { get; } = false;
+        public int  Count      => Subset.Count;
+        public bool IsReadOnly => Subset.IsReadOnly;
 
         public int IndexOf(T item) {
-            return _values.IndexOf(item);
+            return Subset.IndexOf(item);
         }
 
         public void Insert(int index, T item) {
-            _values.Insert(index, item);
+            Subset.Insert(index, item);
         }
 
         public void RemoveAt(int index) {
-            _values.RemoveAt(index);
+            Subset.RemoveAt(index);
         }
 
         public T this[int index] {
-            get => _values[index];
-            set => _values[index] = value;
+            get => Subset[index];
+            set => Subset[index] = value;
         }
 
         #endregion
@@ -80,7 +80,7 @@ namespace Packages.BrandonUtils.Runtime.Enums {
         #region Meaningful Stuff
 
         /// <summary>
-        /// Checks if <see cref="_values"/> <see cref="Contains"/> <paramref name="valuesToValidate"/>.
+        /// Checks if <see cref="Subset"/> <see cref="Contains"/> <paramref name="valuesToValidate"/>.
         /// </summary>
         /// <remarks>
         /// This should only be used when you want strict validation that throws an <see cref="Exception"/> on failure.
