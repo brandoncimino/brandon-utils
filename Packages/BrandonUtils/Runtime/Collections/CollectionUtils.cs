@@ -165,7 +165,7 @@ namespace Packages.BrandonUtils.Runtime.Collections {
         /// <param name="collection">The original <see cref="ICollection{T}"/></param>
         /// <param name="subGroups">The size of each resulting <see cref="List{T}"/>, in order</param>
         /// <typeparam name="T">The <see cref="Type"/> <typeparamref name="T"/> of <paramref name="collection"/></typeparam>
-        /// <returns></returns>
+        /// <returns>A jagged <see cref="List{T}"/> of <see cref="List{T}"/>s, containing all of the elements of <paramref name="collection"/>, in order.</returns>
         /// <exception cref="ArgumentOutOfRangeException">if the <see cref="Enumerable.Sum(System.Collections.Generic.IEnumerable{int})"/> of <paramref name="subGroups"/> does not equal the <see cref="ICollection{T}.Count"/> of <paramref name="collection"/></exception>
         public static List<List<T>> SplitCollection<T>(this ICollection<T> collection, ICollection<int> subGroups) {
             if (subGroups.Sum() != collection.Count) {
