@@ -48,10 +48,6 @@ namespace Packages.BrandonUtils.Runtime.Collections {
             return oldList.Select(it => it).ToList();
         }
 
-        public static string Pretty<T>(this IEnumerable<T> toPrint, string separator = "\n") {
-            return string.Join(separator, toPrint.Select(it => $"[{it}]").ToList());
-        }
-
         /// <summary>
         ///     Similarly to <see cref="List{T}.ForEach" />, this performs <paramref name="action" /> against each
         ///     <b>
@@ -161,6 +157,54 @@ namespace Packages.BrandonUtils.Runtime.Collections {
         [NotNull]
         public static ReadOnlyDictionary<TValue_Original, TKey_Original> Inverse<TKey_Original, TValue_Original>(this ReadOnlyDictionary<TKey_Original, TValue_Original> readOnlyDictionary) {
             return (ReadOnlyDictionary<TValue_Original, TKey_Original>) Inverse_Internal(readOnlyDictionary);
+        }
+
+        /// <summary>
+        /// Splits <paramref name="collection"/> into multiple <see cref="List{T}"/>s, whose sizes are determined by <paramref name="subGroups"/>.
+        /// </summary>
+        /// <param name="collection">The original <see cref="ICollection{T}"/></param>
+        /// <param name="subGroups">The size of each resulting <see cref="List{T}"/>, in order</param>
+        /// <typeparam name="T">The <see cref="Type"/> <typeparamref name="T"/> of <paramref name="collection"/></typeparam>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException">if the <see cref="Enumerable.Sum(System.Collections.Generic.IEnumerable{int})"/> of <paramref name="subGroups"/> does not equal the <see cref="ICollection{T}.Count"/> of <paramref name="collection"/></exception>
+        public static List<List<T>> SplitCollection<T>(this ICollection<T> collection, ICollection<int> subGroups) {
+            if (subGroups.Sum() != collection.Count) {
+                throw new ArgumentOutOfRangeException(
+                    nameof(subGroups),
+                    $"The provided sub-groups do not total ({subGroups.Sum()}) the length of the collection ({collection.Count})!"
+                );
+            }
+
+            var splitGroups  = new List<List<T>>();
+            int currentIndex = 0;
+            foreach (var subGroupSize in subGroups) {
+                splitGroups.Add(collection.ToList().GetRange(currentIndex, subGroupSize));
+                currentIndex += subGroupSize;
+            }
+
+            return splitGroups;
+        }
+
+        /// <summary>
+        /// Computes the element-wise difference between each element of <paramref name="listToCompute"/>.
+        /// </summary>
+        /// <remarks>
+        /// Each element in <paramref name="listToCompute"/> is subtracted from the element <b>following it</b>, i.e.:
+        /// <code><![CDATA[
+        /// Input:             [3, 1, 4]
+        /// Calculations:      1-3   4-1
+        /// Result:             [2, 3]
+        /// ]]></code>
+        /// </remarks>
+        /// <param name="listToCompute"></param>
+        /// <returns></returns>
+        public static List<int> GetListDiff(this List<int> listToCompute) {
+            var diff = new List<int>();
+            for (int i = 0; i < listToCompute.Count - 1; i++) {
+                diff.Add(listToCompute[i + 1] - listToCompute[i]);
+            }
+
+            return diff;
         }
     }
 }
