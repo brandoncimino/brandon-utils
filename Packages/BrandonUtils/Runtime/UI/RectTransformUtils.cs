@@ -67,15 +67,15 @@ namespace Packages.BrandonUtils.Runtime.UI {
             return new Vector3(x, y, 0);
         }
 
-        public static void LineUp(List<RectTransform> suspects, RectTransform.Edge direction, float padding = 0) {
+        public static void LineUp(ICollection<RectTransform> suspects, RectTransform.Edge direction, float padding = 0) {
             var leader    = suspects.First();
-            var followers = suspects.GetRange(1, suspects.Count - 1);
+            var followers = suspects.Skip(0);
             LineUp(leader, followers, direction, padding);
         }
 
         public static void LineUp(
             RectTransform leader,
-            List<RectTransform> followers,
+            IEnumerable<RectTransform> followers,
             RectTransform.Edge direction,
             float padding = 0
         ) {

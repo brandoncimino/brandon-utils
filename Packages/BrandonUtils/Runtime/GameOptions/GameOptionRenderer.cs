@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 
 namespace Packages.BrandonUtils.Runtime.GameOptions {
-    public abstract class GameOptionRenderer<TOption, TValue> : MonoBehaviour where TOption : GameOption<TValue> {
+    public abstract class GameOptionRenderer<TOption> : MonoBehaviour where TOption : GameOption {
         public TOption GameOption;
         public Text    Label;
 
