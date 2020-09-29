@@ -18,10 +18,12 @@ namespace Packages.BrandonUtils.Runtime.GameOptions {
                     var sliderObject = Instantiate(SliderPrefab, parent);
                     sliderObject.GetComponent<SliderOptionRenderer>().GameOption = sliderOption;
                     return sliderObject.GetComponent<RectTransform>();
+
                 case ToggleOption toggleOption:
                     var toggleObject = Instantiate(TogglePrefab, parent);
                     toggleObject.GetComponent<ToggleOptionRenderer>().GameOption = toggleOption;
                     return toggleObject.GetComponent<RectTransform>();
+
                 default:
                     throw new InvalidOperationException("WHAT DID YOU DOOOOOOOO");
             }
