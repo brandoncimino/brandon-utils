@@ -1,24 +1,64 @@
 ﻿using System;
 using System.Linq;
 
+using Newtonsoft.Json;
+
+using UnityEngine;
+using UnityEngine.Events;
+
 namespace Packages.BrandonUtils.Runtime.GameOptions {
     public abstract class GameOption {
+        [JsonProperty]
         public object InitialValue { get; }
-        public object Value        { get; set; }
 
+        [JsonProperty]
+        private object _value;
+        [JsonIgnore]
+        public object Value {
+            get => _value;
+            set {
+                var changed = _value != value;
+
+                _value = value;
+
+                if (changed) {
+                    ValueChangedEvent.Invoke();
+                }
+            }
+        }
+
+        [JsonProperty]
         public abstract Type ValueType { get; }
 
-        public string Description  { get; }
-        public string DisplayName  { get; }
-        public string DisplayValue => ValueDisplayFunction(this);
+        [JsonProperty]
+        public string Description { get; }
+
+        [JsonProperty]
+        public string DisplayName { get; }
+
+        [JsonIgnore]
+        public string DisplayValue => ValueDisplayFunction(this).Stylize(ValueDisplayStyle);
+
+        [JsonIgnore]
         public string DisplayLabel => LabelDisplayFunction(this);
 
+        [JsonIgnore]
         public readonly Func<GameOption, string> LabelDisplayFunction;
+
+        [JsonIgnore]
         public readonly Func<GameOption, string> ValueDisplayFunction;
 
+        [JsonIgnore]
         private const string Separators = "?:";
 
+        [JsonIgnore]
         private const char Separator_Default = ':';
+
+        [JsonProperty]
+        public FontStyle ValueDisplayStyle = FontStyle.Bold;
+
+        [JsonIgnore]
+        public readonly UnityEvent ValueChangedEvent = new UnityEvent();
 
         protected GameOption(
             string displayName,
@@ -46,9 +86,14 @@ namespace Packages.BrandonUtils.Runtime.GameOptions {
 
         #region Specific Type Returns
 
+        [JsonIgnore]
         public string ValueAsString => ValueType == typeof(string) ? (string) Value : throw RequestedIncorrectValueType(typeof(string));
-        public int    ValueAsInt    => ValueType == typeof(int) ? (int) Value : throw RequestedIncorrectValueType(typeof(int));
-        public bool   ValueAsBool   => ValueType == typeof(bool) ? (bool) Value : throw RequestedIncorrectValueType(typeof(bool));
+
+        [JsonIgnore]
+        public int ValueAsInt => ValueType == typeof(int) ? (int) Value : throw RequestedIncorrectValueType(typeof(int));
+
+        [JsonIgnore]
+        public bool ValueAsBool => ValueType == typeof(bool) ? (bool) Value : throw RequestedIncorrectValueType(typeof(bool));
 
         private InvalidCastException RequestedIncorrectValueType(Type requestedType) {
             return new InvalidCastException($"The {nameof(GameOption)} {DisplayName} has the value {Value} of type {ValueType.Name}, but was requested as a {requestedType.Name}!");
