@@ -500,6 +500,7 @@ MonoBehaviour:
   OptionHolderPanel: {fileID: 1921495507}
   SimpleImage: {fileID: 281580919328075753, guid: 85718bd0d6935cf4a898432306fb9c27, type: 3}
   SimpleImages: []
+  ImagesToCreate: 0
 --- !u!224 &1921495507
 RectTransform:
   m_ObjectHideFlags: 0
@@ -516,8 +517,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -50, y: 50}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchoredPosition: {x: -411, y: 198.5}
+  m_SizeDelta: {x: 283.60602, y: 100}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1921495508
 MonoBehaviour:
