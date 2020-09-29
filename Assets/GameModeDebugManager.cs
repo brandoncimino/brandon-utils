@@ -7,6 +7,7 @@ using Packages.BrandonUtils.Runtime.GameOptions;
 using Packages.BrandonUtils.Runtime.UI;
 
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameModeDebugManager : GameOptionRenderManager {
     public  RectTransform       OptionHolderPanel;
@@ -18,6 +19,8 @@ public class GameModeDebugManager : GameOptionRenderManager {
     public List<RectTransform> SimpleImages;
 
     public int ImagesToCreate;
+
+    public Text DebugDisplay;
 
     // Start is called before the first frame update
     void Start() {
@@ -32,7 +35,9 @@ public class GameModeDebugManager : GameOptionRenderManager {
     }
 
     // Update is called once per frame
-    void Update() { }
+    void Update() {
+        DebugDisplay.text = GameMode.ToString();
+    }
 
     private List<RectTransform> CreateImages(GameObject image, int count) {
         return Enumerable.Repeat(0, count).Select(it => Instantiate(image, transform)).Select(it => it.GetComponent<RectTransform>()).ToList();
