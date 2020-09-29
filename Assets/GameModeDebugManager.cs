@@ -22,7 +22,8 @@ public class GameModeDebugManager : GameOptionRenderManager {
     // Start is called before the first frame update
     void Start() {
         RenderedOptions = Render(GameMode);
-        RectTransformUtils.LineUp(OptionHolderPanel, RenderedOptions, RectTransform.Edge.Bottom);
+        RenderedOptions.First().Align(RectTransform.Edge.Top, OptionHolderPanel.GetEdgePosition_AsFloat(RectTransform.Edge.Top));
+        RectTransformUtils.LineUp(RenderedOptions, RectTransform.Edge.Bottom);
         RenderedOptions.ForEach(it => it.Align(RectTransform.Edge.Left, OptionHolderPanel.GetEdgePosition_AsFloat(RectTransform.Edge.Left)));
 
         SimpleImages = CreateImages(SimpleImage, ImagesToCreate);
