@@ -6,26 +6,6 @@ using UnityEngine;
 
 namespace Packages.BrandonUtils.Runtime.UI {
     public static class RectTransformUtils {
-        public static RectTransform Sidle(
-            this RectTransform me,
-            RectTransform.Edge myEdge,
-            RectTransform target,
-            float padding = 0
-        ) {
-            var oldParent = me.parent;
-            me.SetParent(target);
-            var size = me.GetAxisSize(myEdge.Axis()) + padding;
-            me.SetInsetAndSizeFromParentEdge(myEdge.Inverse(), -size, size);
-            me.SetParent(oldParent);
-
-            //post-conditions
-            if (me.parent != oldParent) {
-                throw new Exception("We didn't get back to our original parent!!");
-            }
-
-            return me;
-        }
-
         public static RectTransform Align(this RectTransform me, RectTransform.Edge edge, float target) {
             var edgePosition = me.GetEdgePosition_AsFloat(edge);
             var offset       = target - edgePosition;
@@ -69,7 +49,7 @@ namespace Packages.BrandonUtils.Runtime.UI {
 
         public static void LineUp(ICollection<RectTransform> suspects, RectTransform.Edge direction, float padding = 0) {
             var leader    = suspects.First();
-            var followers = suspects.Skip(0);
+            var followers = suspects.Skip(1);
             LineUp(leader, followers, direction, padding);
         }
 
@@ -81,7 +61,7 @@ namespace Packages.BrandonUtils.Runtime.UI {
         ) {
             var previousInLine = leader;
             foreach (var nextInLine in followers) {
-                nextInLine.Sidle(direction.Inverse(), previousInLine, padding);
+                nextInLine.Align(direction.Inverse(), previousInLine.GetEdgePosition_AsFloat(direction) + direction.Direction() * padding);
                 previousInLine = nextInLine;
             }
         }
