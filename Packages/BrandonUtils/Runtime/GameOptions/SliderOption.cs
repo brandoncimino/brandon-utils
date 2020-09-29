@@ -1,10 +1,15 @@
 ﻿using System;
 
+using Newtonsoft.Json;
+
 namespace Packages.BrandonUtils.Runtime.GameOptions {
     public class SliderOption : GameOption {
+        [JsonProperty]
         public readonly int Min;
+        [JsonProperty]
         public readonly int Max;
 
+        [JsonProperty]
         public override Type ValueType { get; } = typeof(int);
 
         public SliderOption(

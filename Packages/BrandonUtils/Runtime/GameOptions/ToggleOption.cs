@@ -1,7 +1,10 @@
 ﻿using System;
 
+using Newtonsoft.Json;
+
 namespace Packages.BrandonUtils.Runtime.GameOptions {
     public class ToggleOption : GameOption {
+        [JsonProperty]
         public override Type ValueType { get; } = typeof(bool);
 
         public ToggleOption(
@@ -18,6 +21,8 @@ namespace Packages.BrandonUtils.Runtime.GameOptions {
             labelDisplayFunction
         ) { }
 
-        protected override string RenderDisplayValue_Default(GameOption gameOption) => "";
+        protected override string RenderDisplayLabel_Default(GameOption gameOption) {
+            return DisplayName;
+        }
     }
 }
