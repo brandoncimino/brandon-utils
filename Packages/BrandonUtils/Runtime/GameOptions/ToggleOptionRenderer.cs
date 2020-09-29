@@ -5,7 +5,11 @@ namespace Packages.BrandonUtils.Runtime.GameOptions {
         public Toggle Toggle;
 
         protected override void UpdateDisplay() {
-            // Toggle.value = GameOption.ValueAsBool;
+            Toggle.SetIsOnWithoutNotify(GameOption.ValueAsBool);
+        }
+
+        public void OnToggleValueChanged(bool value) {
+            GameOption.Value = value;
         }
     }
 }
