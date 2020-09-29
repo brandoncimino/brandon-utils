@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+
 using UnityEngine;
 
 namespace Packages.BrandonUtils.Runtime {
@@ -162,6 +163,21 @@ namespace Packages.BrandonUtils.Runtime {
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Formats <paramref name="toStylize"/> according to <paramref name="style"/>.
+        /// </summary>
+        /// <example>
+        /// "yolo".<see cref="Stylize">Stylize</see>(<see cref="FontStyle.Bold"/>) == <![CDATA["<b>yolo</b>"]]>;
+        /// </example>
+        /// <param name="toStylize"></param>
+        /// <param name="style"></param>
+        /// <returns></returns>
+        /// <seealso cref="RichTextUtils.Stylize"/>
+        /// <a href="https://docs.unity3d.com/2018.3/Documentation/Manual/StyledText.html">Unity Manual - Rich Text</a>
+        public static string Stylize(this string toStylize, FontStyle style) {
+            return style.Stylize(toStylize);
         }
     }
 }
