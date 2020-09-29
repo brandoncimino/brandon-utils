@@ -7,16 +7,15 @@ namespace Packages.BrandonUtils.Runtime.GameOptions {
         public Text    Label;
 
         protected virtual void Start() {
-            UpdateDisplay();
+            GameOption.ValueChangedEvent.AddListener(UpdateDisplay_Privately);
+            UpdateDisplay_Privately();
         }
 
-        protected virtual void Update() {
-            UpdateDisplay_Privately();
-            UpdateDisplay();
-        }
+        protected virtual void Update() { }
 
         private void UpdateDisplay_Privately() {
             Label.text = GameOption.DisplayLabel;
+            UpdateDisplay();
         }
 
         protected abstract void UpdateDisplay();
