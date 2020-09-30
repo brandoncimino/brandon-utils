@@ -3,6 +3,9 @@
 using Newtonsoft.Json;
 
 namespace Packages.BrandonUtils.Runtime.GameOptions {
+    /// <summary>
+    /// A boolean <see cref="GameOption"/>.
+    /// </summary>
     public class ToggleOption : GameOption {
         [JsonProperty]
         public override Type ValueType { get; } = typeof(bool);

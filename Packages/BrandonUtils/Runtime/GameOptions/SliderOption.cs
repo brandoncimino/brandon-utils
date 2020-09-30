@@ -3,6 +3,12 @@
 using Newtonsoft.Json;
 
 namespace Packages.BrandonUtils.Runtime.GameOptions {
+    /// <summary>
+    /// A <see cref="GameOption"/> that allows for a range of <b>contiguous integer values</b>.
+    /// </summary>
+    /// <remarks>
+    /// Though Unity's UI Sliders store their values as floats by default, <see cref="SliderOption"/> is restricted to <see cref="int"/>s as they are much more convenient for sliders.
+    /// </remarks>
     public class SliderOption : GameOption {
         [JsonProperty]
         public readonly int Min;
