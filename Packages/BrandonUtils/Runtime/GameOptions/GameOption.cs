@@ -69,31 +69,31 @@ namespace Packages.BrandonUtils.Runtime.GameOptions {
         /// A user-friendly representation of <see cref="Value"/>.
         /// </summary>
         /// <remarks>
-        /// This can be "overridden" by individual instances of <see cref="GameOption"/>s by assigning a new method to <see cref="ValueDisplayFunction"/>.
+        /// This can be "overridden" by individual instances of <see cref="GameOption"/>s by assigning a new method to <see cref="DisplayValue_RenderFunction"/>.
         /// </remarks>
         [JsonIgnore]
-        public string DisplayValue => ValueDisplayFunction(this).Stylize(ValueDisplayStyle);
+        public string DisplayValue => DisplayValue_RenderFunction(this).Stylize(DisplayValue_Style);
 
         /// <summary>
         /// A user-friendly combination of <see cref="DisplayName"/> and <see cref="DisplayValue"/>.
         /// </summary>
         /// <remarks>
-        /// This can be "overridden" by individual instances of <see cref="GameOption"/>s by assigning a new method to <see cref="LabelDisplayFunction"/>.
+        /// This can be "overridden" by individual instances of <see cref="GameOption"/>s by assigning a new method to <see cref="DisplayLabel_RenderFunction"/>.
         /// </remarks>
         [JsonIgnore]
-        public string DisplayLabel => LabelDisplayFunction(this);
+        public string DisplayLabel => DisplayLabel_RenderFunction(this);
 
         /// <summary>
         /// The method that renders the <see cref="DisplayLabel"/>.
         /// </summary>
         [JsonIgnore]
-        public readonly Func<GameOption, string> LabelDisplayFunction;
+        public readonly Func<GameOption, string> DisplayLabel_RenderFunction;
 
         /// <summary>
         /// The method that renders the <see cref="DisplayValue"/>.
         /// </summary>
         [JsonIgnore]
-        public readonly Func<GameOption, string> ValueDisplayFunction;
+        public readonly Func<GameOption, string> DisplayValue_RenderFunction;
 
         /// <summary>
         /// Strings that can be considered as valid separators between the <see cref="DisplayName"/> and <see cref="DisplayValue"/> when building the <see cref="DisplayLabel"/>.
@@ -111,7 +111,7 @@ namespace Packages.BrandonUtils.Runtime.GameOptions {
         /// The <see cref="FontStyle"/> to use for the <see cref="DisplayValue"/>, if any.
         /// </summary>
         [JsonProperty]
-        public FontStyle ValueDisplayStyle = FontStyle.Bold;
+        public FontStyle DisplayValue_Style = FontStyle.Bold;
 
         /// <summary>
         /// The <see cref="UnityEvent"/> triggered whenever <see cref="Value"/> <b>changes</b>.
@@ -129,16 +129,16 @@ namespace Packages.BrandonUtils.Runtime.GameOptions {
             Func<GameOption, string> valueDisplayFunction,
             Func<GameOption, string> labelDisplayFunction
         ) {
-            DisplayName          = displayName;
-            InitialValue         = initialValue;
-            Value                = initialValue;
-            Description          = description;
-            ValueDisplayFunction = valueDisplayFunction ?? RenderDisplayValue_Default;
-            LabelDisplayFunction = labelDisplayFunction ?? RenderDisplayLabel_Default;
+            DisplayName                 = displayName;
+            InitialValue                = initialValue;
+            Value                       = initialValue;
+            Description                 = description;
+            DisplayValue_RenderFunction = valueDisplayFunction ?? DisplayValue_RenderFunction_Default;
+            DisplayLabel_RenderFunction = labelDisplayFunction ?? DisplayLabel_RenderFunction_Default;
         }
 
         /// <summary>
-        /// The default <see cref="LabelDisplayFunction"/> for <see cref="DisplayLabel"/>.
+        /// The default <see cref="DisplayLabel_RenderFunction"/> for <see cref="DisplayLabel"/>.
         /// </summary>
         /// <remarks>
         /// Joins <see cref="DisplayName"/> and <see cref="DisplayValue"/> together.
@@ -152,20 +152,20 @@ namespace Packages.BrandonUtils.Runtime.GameOptions {
         /// </example>
         /// <param name="gameOption"></param>
         /// <returns></returns>
-        protected virtual string RenderDisplayLabel_Default(GameOption gameOption) {
+        private static string DisplayLabel_RenderFunction_Default(GameOption gameOption) {
             var separator = Separators.Contains(gameOption.DisplayName.Last()) ? (char?) null : Separator_Default;
             return $"{gameOption.DisplayName}{separator} {gameOption.DisplayValue}";
         }
 
         /// <summary>
-        /// The default <see cref="ValueDisplayFunction"/> for <see cref="DisplayValue"/>.
+        /// The default <see cref="DisplayValue_RenderFunction"/> for <see cref="DisplayValue"/>.
         /// </summary>
         /// <remarks>
-        /// Does <b>not</b> apply <see cref="ValueDisplayStyle"/>.
+        /// Does <b>not</b> apply <see cref="DisplayValue_Style"/>.
         /// </remarks>
         /// <param name="gameOption"></param>
         /// <returns></returns>
-        private static string RenderDisplayValue_Default(GameOption gameOption) {
+        private static string DisplayValue_RenderFunction_Default(GameOption gameOption) {
             return gameOption.Value.ToString();
         }
 

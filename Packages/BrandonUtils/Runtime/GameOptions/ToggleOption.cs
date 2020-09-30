@@ -21,11 +21,14 @@ namespace Packages.BrandonUtils.Runtime.GameOptions {
             description,
             initialValue,
             valueDisplayFunction,
-            labelDisplayFunction
+            labelDisplayFunction ?? DisplayLabel_RenderFunction_ToggleOverride
         ) { }
 
-        protected override string RenderDisplayLabel_Default(GameOption gameOption) {
-            return DisplayName;
-        }
+        /// <summary>
+        /// A method to be used as <see cref="GameOption.DisplayLabel_RenderFunction"/> if the user does not pass a new function to the <see cref="ToggleOption"/> constructor.
+        /// </summary>
+        /// <param name="gameOption"></param>
+        /// <returns></returns>
+        private static string DisplayLabel_RenderFunction_ToggleOverride(GameOption gameOption) => gameOption.DisplayName;
     }
 }
