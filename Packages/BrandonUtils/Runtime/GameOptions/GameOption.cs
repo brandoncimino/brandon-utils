@@ -146,8 +146,12 @@ namespace Packages.BrandonUtils.Runtime.GameOptions {
         /// <see cref="Separator_Default"/> placed between them, unless <see cref="DisplayName"/> ends with one of the <see cref="Separators"/>.
         /// </remarks>
         /// <example>
+        /// When <see cref="DisplayName"/> does <b>not</b> end with any of the <see cref="Separators"/>:
+        /// <br/>
         /// <see cref="DisplayName"/> = "Size" -> "Size: 5"
         /// <p/>
+        /// When <see cref="DisplayName"/> <b>does</b> end with one of the <see cref="Separators"/>:
+        /// <br/>
         /// <see cref="DisplayName"/> = "DTF?" -> "DTF? True"
         /// </example>
         /// <param name="gameOption"></param>
