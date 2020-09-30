@@ -11,8 +11,6 @@ namespace Packages.BrandonUtils.Runtime.GameOptions {
             UpdateDisplay_Privately();
         }
 
-        protected virtual void Update() { }
-
         private void UpdateDisplay_Privately() {
             Label.text = GameOption.DisplayLabel;
             UpdateDisplay();
