@@ -10,7 +10,7 @@ namespace Packages.BrandonUtils.Runtime.GameOptions {
             Slider.minValue     = GameOption.Min;
             Slider.maxValue     = GameOption.Max;
             Slider.wholeNumbers = true;
-            Slider.value        = GameOption.ValueAsInt;
+            Slider.value        = GameOption.ValueAs<int>();
             MinLabel.text       = GameOption.Min.ToString();
             MaxLabel.text       = GameOption.Max.ToString();
         }

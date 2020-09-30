@@ -137,30 +137,49 @@ namespace Packages.BrandonUtils.Runtime.GameOptions {
             LabelDisplayFunction = labelDisplayFunction ?? RenderDisplayLabel_Default;
         }
 
+        /// <summary>
+        /// The default <see cref="LabelDisplayFunction"/> for <see cref="DisplayLabel"/>.
+        /// </summary>
+        /// <remarks>
+        /// Joins <see cref="DisplayName"/> and <see cref="DisplayValue"/> together.
+        /// <p/>
+        /// <see cref="Separator_Default"/> placed between them, unless <see cref="DisplayName"/> ends with one of the <see cref="Separators"/>.
+        /// </remarks>
+        /// <example>
+        /// <see cref="DisplayName"/> = "Size" -> "Size: 5"
+        /// <p/>
+        /// <see cref="DisplayName"/> = "DTF?" -> "DTF? True"
+        /// </example>
+        /// <param name="gameOption"></param>
+        /// <returns></returns>
         protected virtual string RenderDisplayLabel_Default(GameOption gameOption) {
             var separator = Separators.Contains(gameOption.DisplayName.Last()) ? (char?) null : Separator_Default;
             return $"{gameOption.DisplayName}{separator} {gameOption.DisplayValue}";
         }
 
-        protected virtual string RenderDisplayValue_Default(GameOption gameOption) {
+        /// <summary>
+        /// The default <see cref="ValueDisplayFunction"/> for <see cref="DisplayValue"/>.
+        /// </summary>
+        /// <remarks>
+        /// Does <b>not</b> apply <see cref="ValueDisplayStyle"/>.
+        /// </remarks>
+        /// <param name="gameOption"></param>
+        /// <returns></returns>
+        private static string RenderDisplayValue_Default(GameOption gameOption) {
             return gameOption.Value.ToString();
         }
 
-        #region Specific Type Returns
-
-        [JsonIgnore]
-        public string ValueAsString => ValueType == typeof(string) ? (string) Value : throw RequestedIncorrectValueType(typeof(string));
-
-        [JsonIgnore]
-        public int ValueAsInt => ValueType == typeof(int) ? (int) Value : throw RequestedIncorrectValueType(typeof(int));
-
-        [JsonIgnore]
-        public bool ValueAsBool => ValueType == typeof(bool) ? (bool) Value : throw RequestedIncorrectValueType(typeof(bool));
-
-        private InvalidCastException RequestedIncorrectValueType(Type requestedType) {
-            return new InvalidCastException($"The {nameof(GameOption)} {DisplayName} has the value {Value} of type {ValueType.Name}, but was requested as a {requestedType.Name}!");
+        /// <summary>
+        /// Returns <see cref="Value"/> as <typeparamref name="T"/> <b>if and only if</b> <see cref="ValueType"/> is <typeparamref name="T"/>.
+        /// </summary>
+        /// <remarks>
+        /// This will <b>not</b> perform <b>any</b> coercion - not even from <see cref="long"/> to <see cref="int"/>!
+        /// </remarks>
+        /// <typeparam name="T">The expected <see cref="ValueType"/>.</typeparam>
+        /// <returns></returns>
+        public T ValueAs<T>() {
+            Type requestedType = typeof(T);
+            return ValueType == requestedType ? (T) Value : throw new InvalidCastException($"The {nameof(GameOption)} {DisplayName} has the value {Value} of type {ValueType.Name}, but was requested as a {requestedType.Name}!");
         }
-
-        #endregion
     }
 }

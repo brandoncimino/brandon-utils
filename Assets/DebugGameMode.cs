@@ -41,7 +41,7 @@ namespace DefaultNamespace {
             5,
             Alphabet.Length,
             8,
-            option => Alphabet.Substring(0, option.ValueAsInt)
+            option => Alphabet.Substring(0, option.ValueAs<int>())
         );
 
         public GameOption[] GameOptions => new GameOption[] {

@@ -5,7 +5,7 @@ namespace Packages.BrandonUtils.Runtime.GameOptions {
         public Toggle Toggle;
 
         protected override void UpdateDisplay() {
-            Toggle.SetIsOnWithoutNotify(GameOption.ValueAsBool);
+            Toggle.SetIsOnWithoutNotify(GameOption.ValueAs<bool>());
         }
 
         public void OnToggleValueChanged(bool value) {
