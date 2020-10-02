@@ -179,5 +179,17 @@ namespace Packages.BrandonUtils.Runtime {
         public static string Stylize(this string toStylize, FontStyle style) {
             return style.Stylize(toStylize);
         }
+
+        /// <summary>
+        /// Formats <paramref name="toColorize"/> according to <paramref name="color"/>.
+        /// <p/>
+        /// Is a no-op if <paramref name="color"/> is <c>null</c>.
+        /// </summary>
+        /// <param name="toColorize"></param>
+        /// <param name="color"></param>
+        /// <returns></returns>
+        public static string Colorize(this string toColorize, Color? color) {
+            return color == null ? $"{toColorize}" : color.Value.Colorize(toColorize);
+        }
     }
 }

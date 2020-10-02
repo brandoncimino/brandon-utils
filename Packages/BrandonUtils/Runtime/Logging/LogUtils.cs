@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -42,7 +43,7 @@ namespace Packages.BrandonUtils.Runtime.Logging {
 
         public static void Log(Color? color, params object[] stuffToLog) {
             foreach (var thing in stuffToLog) {
-                lines.Add(Colorize(thing, color));
+                lines.Add(thing.ToString().Colorize(color));
             }
 
             var joinedLines = string.Join("\n", stuffToLog);
@@ -54,10 +55,6 @@ namespace Packages.BrandonUtils.Runtime.Logging {
             if (locations.HasFlag(Locations.Unity)) {
                 Debug.Log(joinedLines);
             }
-        }
-
-        public static string Colorize(object thing, Color? color) {
-            return color == null ? $"{thing}" : $"<color=#{ColorUtility.ToHtmlStringRGB(color.Value)}>{thing}</color>";
         }
 
         public void Update() {

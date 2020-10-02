@@ -4,6 +4,8 @@ using UnityEngine;
 
 namespace Packages.BrandonUtils.Runtime {
     public static class RichTextUtils {
+        #region FontStyle
+
         public static string Begin(this FontStyle fontStyle) {
             switch (fontStyle) {
                 case FontStyle.Normal:
@@ -45,5 +47,24 @@ namespace Packages.BrandonUtils.Runtime {
         public static string Stylize(this FontStyle fontStyle, string toStylize) {
             return $"{fontStyle.Begin()}{toStylize}{fontStyle.End()}";
         }
+
+        #endregion
+
+        #region Colors
+
+        public static string Begin(this Color color) {
+            var htmlString = ColorUtility.ToHtmlStringRGB(color);
+            return $"<color=#{htmlString}>";
+        }
+
+        public static string End(this Color color) {
+            return "</color>";
+        }
+
+        public static string Colorize(this Color color, string thing) {
+            return $"{color.Begin()}{thing}{color.End()}";
+        }
+
+        #endregion
     }
 }
