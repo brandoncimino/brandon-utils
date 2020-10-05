@@ -4,7 +4,7 @@ using System.Threading;
 
 using NUnit.Framework;
 
-using Packages.BrandonUtils.Runtime.Testing;
+using Packages.BrandonUtils.Editor.Testing;
 using Packages.BrandonUtils.Runtime.Timing;
 
 using UnityEngine;

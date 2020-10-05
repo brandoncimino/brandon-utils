@@ -10,7 +10,7 @@ using UnityEngine.Assertions;
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace Packages.BrandonUtils.Runtime.Testing {
+namespace Packages.BrandonUtils.Editor.Testing {
     public static class TestUtils {
         public const           double   ApproximationThreshold       = 0.001;
         public const           double   ApproximationThreshold_Loose = 0.005;
