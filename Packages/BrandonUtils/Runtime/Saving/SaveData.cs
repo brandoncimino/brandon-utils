@@ -7,8 +7,6 @@ using JetBrains.Annotations;
 
 using Newtonsoft.Json;
 
-using NUnit.Framework;
-
 using Packages.BrandonUtils.Runtime.Logging;
 using Packages.BrandonUtils.Runtime.Timing;
 
@@ -316,7 +314,11 @@ namespace Packages.BrandonUtils.Runtime.Saving {
 
             //Write to the new save file
             File.WriteAllText(newFilePath, saveData.ToJson());
-            FileAssert.Exists(newFilePath);
+            if (!File.Exists(newFilePath)) {
+                throw new FileNotFoundException("Couldn't create the new save file!", newFilePath);
+            }
+
+            ;
 
             if (saveData.AllSaveFilePaths.Length <= previousFileCount) {
                 throw new SaveDataException<T>(
