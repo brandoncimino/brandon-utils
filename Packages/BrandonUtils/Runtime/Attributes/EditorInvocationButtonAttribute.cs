@@ -17,15 +17,14 @@ namespace Packages.BrandonUtils.Runtime {
     /// <li><see cref="ValidateMethodInfo"/> will throw an exception if the given <c>"MonoBehaviourEditor"</c> is invalid - which in this case would be anything that contains parameters.</li>
     /// </remarks>
     [AttributeUsage(AttributeTargets.Method)]
-    public class EditorInvocationButtonAttribute : Attribute {
-        public static void ValidateMethodInfo(MethodInfo methodInfo) {
+    public class EditorInvocationButtonAttribute : BrandonAttribute {
+        public override void ValidateMethodInfo(MethodInfo methodInfo) {
             if (methodInfo.GetParameters().Length != 0) {
-                throw new BrandonException($"Methods annotated with {nameof(EditorInvocationButtonAttribute)} must have exactly 0 parameters, but {methodInfo.Name} has {methodInfo.GetParameters().Length}!");
+                throw new InvalidAttributeTargetException<EditorInvocationButtonAttribute>(
+                    $"Methods annotated with {nameof(EditorInvocationButtonAttribute)} must have exactly 0 parameters, but {methodInfo.Name} has {methodInfo.GetParameters().Length}!",
+                    methodInfo
+                );
             }
-        }
-
-        public void ValidateMethod(MethodInfo methodInfo) {
-            ValidateMethodInfo(methodInfo);
         }
     }
 }
