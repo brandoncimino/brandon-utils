@@ -13,5 +13,10 @@ namespace Packages.BrandonUtils.Runtime {
         public string Citation(Hyperlink.MarkupLanguage markupLanguage = Hyperlink.MarkupLanguage.HTML) {
             return $"{FullName} ({Website.ToString(markupLanguage)})";
         }
+
+        public Author(string firstName, string lastName, string websiteDisplay, string websiteUrl) {
+            NameParts = new List<string> {firstName, lastName};
+            Website   = new Hyperlink(websiteDisplay, websiteUrl);
+        }
     }
 }

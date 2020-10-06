@@ -17,6 +17,11 @@ namespace Packages.BrandonUtils.Runtime {
         public string DisplayText;
         public string URL;
 
+        public Hyperlink(string displayText, string url) {
+            DisplayText = displayText;
+            URL         = url;
+        }
+
         //TODO: a variable to store an icon (like the twitter logo or something)
 
         public string ToString(MarkupLanguage markupLanguage) {
