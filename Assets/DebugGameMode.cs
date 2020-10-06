@@ -1,7 +1,10 @@
 ﻿using System.Linq;
 
+using Packages.BrandonUtils.Runtime;
 using Packages.BrandonUtils.Runtime.Collections;
 using Packages.BrandonUtils.Runtime.GameOptions;
+
+using UnityEngine;
 
 namespace DefaultNamespace {
     public class DebugGameMode : IGameMode {
@@ -43,6 +46,28 @@ namespace DefaultNamespace {
             8,
             option => Alphabet.Substring(0, option.ValueAs<int>())
         );
+
+        public readonly ToggleOption PurpleMode = new ToggleOption(
+            "Enable Purple Mode",
+            "This enables the arbitrarily-named \"Purple Mode\" options",
+            false
+        );
+
+        public readonly ToggleOption PurpleToggle = new ToggleOption(
+            "Hardcore Purple Mode",
+            $"This is an option that can ONLY be enabled alongside {nameof(PurpleMode)}!",
+            false
+        );
+
+        public readonly SliderOption PurpleSlider = new SliderOption(
+            "Purpleness",
+            $"This is an option that can ONLY be enabled alongside {nameof(PurpleMode)}!",
+            0,
+            int.MaxValue,
+            255
+        ) {
+            DisplayMin_RenderFunction = option => StringUtils.Colorize("Red", Color.red)
+        };
 
         public GameOption[] GameOptions => new GameOption[] {
             Slider_1,
