@@ -15,6 +15,19 @@ namespace Packages.BrandonUtils.Runtime.GameOptions {
         [JsonProperty]
         public readonly int Max;
 
+        [JsonIgnore]
+        public string DisplayMin => DisplayMin_RenderFunction(this);
+
+        [JsonIgnore]
+        public string DisplayMax => DisplayMax_RenderFunction(this);
+
+        [JsonIgnore]
+        public Func<SliderOption, string> DisplayMin_RenderFunction = DisplayMin_RenderFunction_Default;
+
+        //TODO: Create a special variable type that includes this whole "render function" and "render function default" and "value" and "display value" and stuff
+        [JsonIgnore]
+        public Func<SliderOption, string> DisplayMax_RenderFunction = DisplayMax_RenderFunction_Default;
+
         [JsonProperty]
         public override Type ValueType { get; } = typeof(int);
 
@@ -35,6 +48,14 @@ namespace Packages.BrandonUtils.Runtime.GameOptions {
         ) {
             Min = min;
             Max = max;
+        }
+
+        private static string DisplayMin_RenderFunction_Default(SliderOption sliderOption) {
+            return sliderOption.Min.ToString();
+        }
+
+        private static string DisplayMax_RenderFunction_Default(SliderOption sliderOption) {
+            return sliderOption.Max.ToString();
         }
     }
 }
