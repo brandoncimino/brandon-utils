@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Packages.BrandonUtils.Editor {
     [CustomEditor(typeof(MonoBehaviour), true)]
-    public class MonoBehaviorEditor : UnityEditor.Editor {
+    public class MonoBehaviourEditor : UnityEditor.Editor {
         public override void OnInspectorGUI() {
             base.OnInspectorGUI();
 
