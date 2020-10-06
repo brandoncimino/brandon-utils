@@ -2,8 +2,6 @@
 
 using UnityEngine;
 
-using Vector2 = System.Numerics.Vector2;
-
 namespace Packages.BrandonUtils.Runtime.UI {
     public static class TextAnchorUtils {
         public static Vector2 Anchor(this TextAnchor textAnchor) {
