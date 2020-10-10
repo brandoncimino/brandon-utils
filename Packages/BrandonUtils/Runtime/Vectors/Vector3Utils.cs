@@ -15,6 +15,7 @@ namespace Packages.BrandonUtils.Runtime.Vectors {
         /// <param name="original"></param>
         /// <param name="scale"></param>
         /// <returns></returns>
+        /// <seealso cref="Vector2Utils.Scaled"/>
         public static Vector3 Scaled(this Vector3 original, Vector3 scale) {
             return Vector3.Scale(original, scale);
         }
