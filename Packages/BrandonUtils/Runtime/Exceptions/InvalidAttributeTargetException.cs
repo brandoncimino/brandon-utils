@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Reflection;
 
+using Packages.BrandonUtils.Runtime.Strings;
+
 namespace Packages.BrandonUtils.Runtime.Exceptions {
     public class InvalidAttributeTargetException<T> : BrandonException {
         private readonly MemberInfo BadTarget;

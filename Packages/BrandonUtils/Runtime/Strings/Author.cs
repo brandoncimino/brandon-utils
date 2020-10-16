@@ -4,7 +4,7 @@ using System.Linq;
 
 using Packages.BrandonUtils.Runtime.Collections;
 
-namespace Packages.BrandonUtils.Runtime {
+namespace Packages.BrandonUtils.Runtime.Strings {
     [Serializable]
     public class Author {
         public List<string> NameParts;

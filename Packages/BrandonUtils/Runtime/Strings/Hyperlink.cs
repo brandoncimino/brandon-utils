@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Packages.BrandonUtils.Runtime {
+namespace Packages.BrandonUtils.Runtime.Strings {
     /// <summary>
     /// A class for storing hyperlinks in a "url / display text" style.
     /// </summary>

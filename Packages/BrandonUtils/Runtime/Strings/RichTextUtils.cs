@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-namespace Packages.BrandonUtils.Runtime {
+namespace Packages.BrandonUtils.Runtime.Strings {
     public static class RichTextUtils {
         #region FontStyle
 
