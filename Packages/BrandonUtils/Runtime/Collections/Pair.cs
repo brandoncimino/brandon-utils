@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using UnityEngine;
 
@@ -61,6 +62,10 @@ namespace Packages.BrandonUtils.Runtime.Collections {
 
         public static Vector2 ToVector2(this Pair<float, float> pair) {
             return new Vector2(pair.X, pair.Y);
+        }
+
+        public static Dictionary<TX, TY> ToDictionary<TX, TY>(this IEnumerable<Pair<TX, TY>> pairCollection) {
+            return pairCollection.ToDictionary(pair => pair.X, pair => pair.Y);
         }
     }
 }
