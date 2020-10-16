@@ -9,7 +9,7 @@ namespace Packages.BrandonUtils.Runtime.Enums {
     [Serializable]
     public class EnumMap<TEnum, TValue> where TEnum : Enum {
         public EnumMap() {
-            throw new NotImplementedException();
+            throw new NotImplementedException($"I plan for this to be a special collection that will enforce that all values of {nameof(TEnum)} ({typeof(TEnum).Name}) be assigned values of {nameof(TValue)} ({typeof(TValue).Name})");
         }
     }
 }
