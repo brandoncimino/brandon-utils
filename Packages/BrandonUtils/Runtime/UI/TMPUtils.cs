@@ -18,6 +18,15 @@ namespace Packages.BrandonUtils.Runtime.UI {
     /// <summary>
     /// Contains extensions and utilities for <see cref="TextMeshPro"/>.
     /// </summary>
+    /// <remarks>
+    /// Many of these methods refer to "words", which in this context, are <see cref="ICollection{T}"/>s of <see cref="TMP_CharacterInfo"/>s.
+    /// <ul>
+    ///     For example:
+    ///     <li><see cref="WordHeight"/></li>
+    ///     <li><see cref="WordSizeDelta"/></li>
+    /// </ul>
+    /// "words" are usually returned <i>by</i> <see cref="TMPUtils"/> as <see cref="List{T}"/>s (see <see cref="FirstSubstring"/>)
+    /// </remarks>
     public static class TMPUtils {
         #region Parsing "words"
 
@@ -64,7 +73,7 @@ namespace Packages.BrandonUtils.Runtime.UI {
 
         #endregion
 
-        #region Measuring "words" for UI RectTransform stuff
+        #region Measuring "word" dimensions
 
         [Pure]
         public static float WordEdge(this IEnumerable<TMP_CharacterInfo> word, RectTransform.Edge edge) {
@@ -79,6 +88,17 @@ namespace Packages.BrandonUtils.Runtime.UI {
                     return word.Min(letter => letter.bottomLeft.y);
                 default:
                     throw EnumUtils.InvalidEnumArgumentException(nameof(edge), edge);
+            }
+        }
+
+        public static float WordDimension(this ICollection<TMP_CharacterInfo> word, RectTransform.Axis dimension) {
+            switch (dimension) {
+                case RectTransform.Axis.Horizontal:
+                    return word.WordWidth();
+                case RectTransform.Axis.Vertical:
+                    return word.WordHeight();
+                default:
+                    throw EnumUtils.InvalidEnumArgumentException(nameof(dimension), dimension);
             }
         }
 
@@ -110,6 +130,53 @@ namespace Packages.BrandonUtils.Runtime.UI {
         /// <exception cref="NotImplementedException"></exception>
         public static Vector2 WordSizeDelta(this ICollection<TMP_CharacterInfo> word) {
             return new Vector2(word.WordWidth(), word.WordHeight());
+        }
+
+        #endregion
+
+        #region Retrieving "word" TextAnchor positions
+
+        /// <summary>
+        /// Returns the <see cref="WordAnchorPosition"/> converted to a <b>proportion</b> (<see cref="Mathf.Clamp01"/>ed) of <paramref name="parent"/>'s <see cref="RectTransform.sizeDelta"/>, for use as an <see cref="RectTransform.anchorMin"/> or <see cref="RectTransform.anchorMax"/>.
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="word"></param>
+        /// <param name="textAnchor"></param>
+        /// <returns></returns>
+        public static Vector2 WordAnchor(RectTransform parent, ICollection<TMP_CharacterInfo> word, TextAnchor textAnchor) {
+            var anchorPos = word.WordAnchorPosition(textAnchor);
+            var sizeDelta = parent.sizeDelta;
+            return new Vector2(
+                anchorPos.x / sizeDelta.x,
+                anchorPos.y / sizeDelta.y
+            );
+        }
+
+        /// <summary>
+        /// Returns the local position of <paramref name="word"/>'s <paramref name="textAnchor"/>, e.g. <see cref="TextAnchor.MiddleLeft"/>.
+        /// </summary>
+        /// <param name="word"></param>
+        /// <param name="textAnchor"></param>
+        /// <returns></returns>
+        public static Vector2 WordAnchorPosition(this ICollection<TMP_CharacterInfo> word, TextAnchor textAnchor) {
+            var leftPos = word.WordEdge(Left);
+            var width   = word.WordWidth();
+            var x       = leftPos + (textAnchor.Anchor().x * width);
+
+            var bottomPos = word.WordEdge(Bottom);
+            var height    = word.WordHeight();
+            var y         = bottomPos + (textAnchor.Anchor().y * height);
+
+            return new Vector2(x, y);
+        }
+
+        #endregion
+
+        #region Manipulating "words"
+
+        public static RectTransform HighlightWord(ICollection<CharacterInfo> word, RectTransform highlight) {
+            // highlight.anchormi
+            throw new NotImplementedException();
         }
 
         #endregion
