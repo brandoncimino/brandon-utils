@@ -7,6 +7,7 @@ namespace Packages.BrandonUtils.Runtime {
     /// <remarks>
     /// TODO: Add a custom editor for this!
     /// </remarks>
+    [Serializable]
     public class Hyperlink {
         public enum MarkupLanguage {
             Markdown,

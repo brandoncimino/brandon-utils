@@ -1,10 +1,13 @@
-﻿namespace Packages.BrandonUtils.Runtime {
+﻿using System;
+
+namespace Packages.BrandonUtils.Runtime {
     /// <summary>
     /// A class for handling noun conjugations consistently.
     /// </summary>
+    [Serializable]
     public class Noun {
-        public readonly string Singular;
-        public readonly string Plural;
+        public string Singular;
+        public string Plural;
 
         public Noun(string singular, string plural = null) {
             this.Singular = singular;

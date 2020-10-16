@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Packages.BrandonUtils.Runtime.Collections;
 
 namespace Packages.BrandonUtils.Runtime {
+    [Serializable]
     public class Author {
         public List<string> NameParts;
         public Hyperlink    Website;
