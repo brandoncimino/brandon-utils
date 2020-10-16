@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 using Newtonsoft.Json;
+
+using Packages.BrandonUtils.Runtime.Enums;
 
 // ReSharper disable MemberCanBePrivate.Global
 
@@ -20,12 +23,57 @@ namespace Packages.BrandonUtils.Runtime.Timing {
         ///     <li>Specifically for use in <see cref="TimeUtils.NormalizePrecision" />.</li>
         ///     <li>These should have parity with the <see cref="TimeSpan" /> methods like <see cref="TimeSpan.FromDays" />.</li>
         /// </remarks>
-        public enum IntervalType {
+        public enum DateTimeIntervalType {
             Milliseconds,
             Seconds,
             Minutes,
             Hours,
             Days
+        }
+
+        /// <summary>
+        /// Creates a <see cref="TimeSpan"/> from any of the valid <see cref="DateTimeIntervalType"/>s.
+        /// </summary>
+        /// <param name="timeDateTimeIntervalType"></param>
+        /// <param name="amount"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidEnumArgumentException"></exception>
+        public static TimeSpan TimeSpanFromInterval(DateTimeIntervalType timeDateTimeIntervalType, double amount) {
+            switch (timeDateTimeIntervalType) {
+                case DateTimeIntervalType.Milliseconds:
+                    return TimeSpan.FromMilliseconds(amount);
+                case DateTimeIntervalType.Seconds:
+                    return TimeSpan.FromSeconds(amount);
+                case DateTimeIntervalType.Minutes:
+                    return TimeSpan.FromMinutes(amount);
+                case DateTimeIntervalType.Hours:
+                    return TimeSpan.FromHours(amount);
+                case DateTimeIntervalType.Days:
+                    return TimeSpan.FromDays(amount);
+                default:
+                    throw EnumUtils.InvalidEnumArgumentException(nameof(timeDateTimeIntervalType), timeDateTimeIntervalType);
+            }
+        }
+
+        public static TimeSpan GetTimeSpan(this DateTimeIntervalType timeDateTimeIntervalType, double amount) {
+            return TimeSpanFromInterval(timeDateTimeIntervalType, amount);
+        }
+
+        public static double TotalOfInterval(this TimeSpan timeSpan, DateTimeIntervalType dateTimeIntervalType) {
+            switch (dateTimeIntervalType) {
+                case DateTimeIntervalType.Milliseconds:
+                    return timeSpan.TotalMilliseconds;
+                case DateTimeIntervalType.Seconds:
+                    return timeSpan.TotalSeconds;
+                case DateTimeIntervalType.Minutes:
+                    return timeSpan.Minutes;
+                case DateTimeIntervalType.Hours:
+                    return timeSpan.TotalHours;
+                case DateTimeIntervalType.Days:
+                    return timeSpan.TotalDays;
+                default:
+                    throw EnumUtils.InvalidEnumArgumentException(nameof(dateTimeIntervalType), dateTimeIntervalType);
+            }
         }
 
         /// <summary>
@@ -128,7 +176,7 @@ namespace Packages.BrandonUtils.Runtime.Timing {
         /// <remarks>
         ///     <li>Converts <paramref name="value" /> into a <see cref="TimeSpan" /> via the given <paramref name="unit" />, then returns the total <paramref name="unit" />s of the new <see cref="TimeSpan" />.</li>
         ///     <li>
-        ///         Joins together the multiple "Normalize" methods, e.g. <see cref="NormalizeMinutes" />, into one method, via <see cref="IntervalType" />.
+        ///         Joins together the multiple "Normalize" methods, e.g. <see cref="NormalizeMinutes" />, into one method, via <see cref="DateTimeIntervalType" />.
         ///         <ul>
         ///             <li>
         ///                 The individual methods such as <see cref="NormalizeDays" /> are maintained for parity with <see cref="TimeSpan" /> methods such as <see cref="TimeSpan.FromDays" />.
@@ -143,17 +191,17 @@ namespace Packages.BrandonUtils.Runtime.Timing {
         /// <param name="unit"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public static double NormalizePrecision(double value, IntervalType unit) {
+        public static double NormalizePrecision(double value, DateTimeIntervalType unit) {
             switch (unit) {
-                case IntervalType.Milliseconds:
+                case DateTimeIntervalType.Milliseconds:
                     return NormalizeMilliseconds(value);
-                case IntervalType.Seconds:
+                case DateTimeIntervalType.Seconds:
                     return NormalizeSeconds(value);
-                case IntervalType.Minutes:
+                case DateTimeIntervalType.Minutes:
                     return NormalizeMinutes(value);
-                case IntervalType.Hours:
+                case DateTimeIntervalType.Hours:
                     return NormalizeHours(value);
-                case IntervalType.Days:
+                case DateTimeIntervalType.Days:
                     return NormalizeDays(value);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(unit), unit, $"I don't know how to make a {nameof(TimeSpan)} out of {unit}s!");
