@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 using Packages.BrandonUtils.Runtime;
 using Packages.BrandonUtils.Runtime.Collections;
-using Packages.BrandonUtils.Runtime.Enums;
 using Packages.BrandonUtils.Runtime.Logging;
 using Packages.BrandonUtils.Runtime.Strings;
 
@@ -20,7 +19,7 @@ public class TestPropertyDrawer : MonoBehaviour {
 
     public List<Pair<DayOfWeek, Color>> DayColorList;
 
-    public EnumMap<DayOfWeek, Color> DayMap;
+    //public EnumMap<DayOfWeek, Color> DayMap;
 
     // Start is called before the first frame update
     void Start() { }
