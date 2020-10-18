@@ -77,5 +77,84 @@ namespace Packages.BrandonUtils.Tests {
         private static void PrintDictionary<TKey, TValue>(IDictionary<TKey, TValue> dictionary) {
             LogUtils.Log(JsonConvert.SerializeObject(dictionary, Formatting.Indented));
         }
+
+        #region Dictionary Joining
+
+        [Test]
+        public void JoinWithoutOverlap() {
+            var dic1 = new Dictionary<int, int> {
+                {1, 1},
+                {2, 1}
+            };
+
+            var dic2 = new Dictionary<int, int> {
+                {3, 2},
+                {4, 2}
+            };
+
+            var expected = new Dictionary<int, int> {
+                {1, 1},
+                {2, 1},
+                {3, 2},
+                {4, 2}
+            };
+
+            Assert.That(dic1.JoinDictionaries(dic2), Is.EqualTo(expected));
+        }
+
+        private static Dictionary<int, int> DicOrigin = new Dictionary<int, int> {
+            {1, 1},
+            {2, 1},
+            {3, 1}
+        };
+
+        private static Dictionary<int, int> DicOverlap = new Dictionary<int, int> {
+            {3, 2},
+            {4, 2},
+            {5, 2}
+        };
+
+        private static Dictionary<int, int> ResultFavoringOriginal = new Dictionary<int, int> {
+            {1, 1},
+            {2, 1},
+            {3, 1},
+            {4, 2},
+            {5, 2}
+        };
+
+        private static Dictionary<int, int> ResultFavoringNew = new Dictionary<int, int> {
+            {1, 1},
+            {2, 1},
+            {3, 2},
+            {4, 2},
+            {5, 2}
+        };
+
+        [Test]
+        public void JoinPreferOriginal() {
+            var jointDic = DicOrigin.JoinDictionaries(DicOverlap, CollectionUtils.ConflictResolution.FavorOriginal);
+            LogUtils.Log(
+                $"Actual:   {JsonConvert.SerializeObject(jointDic)}",
+                $"Expected: {JsonConvert.SerializeObject(ResultFavoringOriginal)}"
+            );
+            Assert.That(jointDic, Is.EqualTo(ResultFavoringOriginal));
+        }
+
+        [Test]
+        public void JoinPreferNew() {
+            var jointDic = DicOrigin.JoinDictionaries(DicOverlap, CollectionUtils.ConflictResolution.FavorNew);
+            LogUtils.Log(
+                $"Actual:   {JsonConvert.SerializeObject(jointDic)}",
+                $"Expected: {JsonConvert.SerializeObject(ResultFavoringNew)}"
+            );
+            Assert.That(jointDic, Is.EqualTo(ResultFavoringNew));
+        }
+
+        [Test]
+        public void JoinFailure() {
+            Assert.Throws<ArgumentException>(() => DicOrigin.JoinDictionaries(DicOverlap, CollectionUtils.ConflictResolution.Fail));
+        }
+
+        #endregion
     }
 }

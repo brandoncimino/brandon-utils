@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 
 using JetBrains.Annotations;
+
+using Packages.BrandonUtils.Runtime.Enums;
 
 namespace Packages.BrandonUtils.Runtime.Collections {
     /// <summary>
     ///     Contains utility and extension methods for collections, such as <see cref="IList{T}" /> and <see cref="IDictionary{TKey,TValue}" />.
     /// </summary>
     public static class CollectionUtils {
+        #region Randomization
+
         public static T Random<T>(this IEnumerable<T> enumerable) {
             var array = enumerable as T[] ?? enumerable.ToArray();
             return array.ElementAt(new System.Random().Next(0, array.Length));
@@ -36,6 +41,10 @@ namespace Packages.BrandonUtils.Runtime.Collections {
             return oldList.Copy().Randomize();
         }
 
+        #endregion
+
+        #region Copying
+
         public static IList<T> Copy<T>(this IList<T> oldCollection) {
             return oldCollection.Select(it => it).ToList();
         }
@@ -47,6 +56,68 @@ namespace Packages.BrandonUtils.Runtime.Collections {
         public static IEnumerable<T> Copy<T>(this IEnumerable<T> oldList) {
             return oldList.Select(it => it).ToList();
         }
+
+        /// <summary>
+        /// Splits <paramref name="collection"/> into multiple <see cref="List{T}"/>s, whose sizes are determined by <paramref name="subGroups"/>.
+        /// </summary>
+        /// <param name="collection">The original <see cref="ICollection{T}"/></param>
+        /// <param name="subGroups">The size of each resulting <see cref="List{T}"/>, in order</param>
+        /// <typeparam name="T">The <see cref="Type"/> <typeparamref name="T"/> of <paramref name="collection"/></typeparam>
+        /// <returns>A jagged <see cref="List{T}"/> of <see cref="List{T}"/>s, containing all of the elements of <paramref name="collection"/>, in order.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">if the <see cref="Enumerable.Sum(System.Collections.Generic.IEnumerable{int})"/> of <paramref name="subGroups"/> does not equal the <see cref="ICollection{T}.Count"/> of <paramref name="collection"/></exception>
+        public static List<List<T>> SplitCollection<T>(this ICollection<T> collection, ICollection<int> subGroups) {
+            if (subGroups.Sum() != collection.Count) {
+                throw new ArgumentOutOfRangeException(
+                    nameof(subGroups),
+                    $"The provided sub-groups do not total ({subGroups.Sum()}) the length of the collection ({collection.Count})!"
+                );
+            }
+
+            var splitGroups  = new List<List<T>>();
+            int currentIndex = 0;
+            foreach (var subGroupSize in subGroups) {
+                splitGroups.Add(collection.ToList().GetRange(currentIndex, subGroupSize));
+                currentIndex += subGroupSize;
+            }
+
+            return splitGroups;
+        }
+
+        #region Dictionary Inversion
+
+        public static IDictionary<TValue_Original, TKey_Original> Inverse_Internal<TKey_Original, TValue_Original>(IDictionary<TKey_Original, TValue_Original> dictionary) {
+            //to make for specific and explicit error messages, we check for known failures conditions ahead of time - specifically, duplicate keys results in an "ArgumentException" which is the parent class of lots of other things, making it not very clear when we catch it...
+            if (!dictionary.Values.IsSingleton()) {
+                throw new ArgumentException($"The provided {dictionary.GetType().Name}'s {nameof(dictionary.Values)} contained one or more duplicates, so they couldn't be used as keys!");
+            }
+
+            if (dictionary.Any(pair => pair.Value == null)) {
+                throw new ArgumentNullException($"The provided {dictionary.GetType().Name} contained a null {nameof(KeyValuePair<object, object>.Value)}, which can't be used as a {nameof(KeyValuePair<object, object>.Key)}!");
+            }
+
+            var inverted = dictionary.ToDictionary(pair => pair.Value, pair => pair.Key);
+
+            if (dictionary is ReadOnlyDictionary<TKey_Original, TValue_Original>) {
+                return new ReadOnlyDictionary<TValue_Original, TKey_Original>(inverted);
+            }
+            else {
+                return new Dictionary<TValue_Original, TKey_Original>(inverted);
+            }
+        }
+
+        /// <inheritdoc cref="Inverse_Internal{TKey_Original,TValue_Original}"/>
+        public static Dictionary<TValue_Original, TKey_Original> Inverse<TKey_Original, TValue_Original>(this Dictionary<TKey_Original, TValue_Original> dictionary) {
+            return (Dictionary<TValue_Original, TKey_Original>) Inverse_Internal(dictionary);
+        }
+
+        /// <inheritdoc cref="Inverse_Internal{TKey_Original,TValue_Original}"/>
+        public static ReadOnlyDictionary<TValue_Original, TKey_Original> Inverse<TKey_Original, TValue_Original>(this ReadOnlyDictionary<TKey_Original, TValue_Original> readOnlyDictionary) {
+            return (ReadOnlyDictionary<TValue_Original, TKey_Original>) Inverse_Internal(readOnlyDictionary);
+        }
+
+        #endregion
+
+        #endregion
 
         /// <summary>
         ///     Similarly to <see cref="List{T}.ForEach" />, this performs <paramref name="action" /> against each
@@ -126,65 +197,6 @@ namespace Packages.BrandonUtils.Runtime.Collections {
             return enumerable1.Length == enumerable1.Distinct().Count();
         }
 
-        [NotNull]
-        public static IDictionary<TValue_Original, TKey_Original> Inverse_Internal<TKey_Original, TValue_Original>(IDictionary<TKey_Original, TValue_Original> dictionary) {
-            //to make for specific and explicit error messages, we check for known failures conditions ahead of time - specifically, duplicate keys results in an "ArgumentException" which is the parent class of lots of other things, making it not very clear when we catch it...
-            if (!dictionary.Values.IsSingleton()) {
-                throw new ArgumentException($"The provided {dictionary.GetType().Name}'s {nameof(dictionary.Values)} contained one or more duplicates, so they couldn't be used as keys!");
-            }
-
-            if (dictionary.Any(pair => pair.Value == null)) {
-                throw new ArgumentNullException($"The provided {dictionary.GetType().Name} contained a null {nameof(KeyValuePair<object, object>.Value)}, which can't be used as a {nameof(KeyValuePair<object, object>.Key)}!");
-            }
-
-            var inverted = dictionary.ToDictionary(pair => pair.Value, pair => pair.Key);
-
-            if (dictionary is ReadOnlyDictionary<TKey_Original, TValue_Original>) {
-                return new ReadOnlyDictionary<TValue_Original, TKey_Original>(inverted);
-            }
-            else {
-                return new Dictionary<TValue_Original, TKey_Original>(inverted);
-            }
-        }
-
-        /// <inheritdoc cref="Inverse_Internal{TKey_Original,TValue_Original}"/>
-        [NotNull]
-        public static Dictionary<TValue_Original, TKey_Original> Inverse<TKey_Original, TValue_Original>(this Dictionary<TKey_Original, TValue_Original> dictionary) {
-            return (Dictionary<TValue_Original, TKey_Original>) Inverse_Internal(dictionary);
-        }
-
-        /// <inheritdoc cref="Inverse_Internal{TKey_Original,TValue_Original}"/>
-        [NotNull]
-        public static ReadOnlyDictionary<TValue_Original, TKey_Original> Inverse<TKey_Original, TValue_Original>(this ReadOnlyDictionary<TKey_Original, TValue_Original> readOnlyDictionary) {
-            return (ReadOnlyDictionary<TValue_Original, TKey_Original>) Inverse_Internal(readOnlyDictionary);
-        }
-
-        /// <summary>
-        /// Splits <paramref name="collection"/> into multiple <see cref="List{T}"/>s, whose sizes are determined by <paramref name="subGroups"/>.
-        /// </summary>
-        /// <param name="collection">The original <see cref="ICollection{T}"/></param>
-        /// <param name="subGroups">The size of each resulting <see cref="List{T}"/>, in order</param>
-        /// <typeparam name="T">The <see cref="Type"/> <typeparamref name="T"/> of <paramref name="collection"/></typeparam>
-        /// <returns>A jagged <see cref="List{T}"/> of <see cref="List{T}"/>s, containing all of the elements of <paramref name="collection"/>, in order.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">if the <see cref="Enumerable.Sum(System.Collections.Generic.IEnumerable{int})"/> of <paramref name="subGroups"/> does not equal the <see cref="ICollection{T}.Count"/> of <paramref name="collection"/></exception>
-        public static List<List<T>> SplitCollection<T>(this ICollection<T> collection, ICollection<int> subGroups) {
-            if (subGroups.Sum() != collection.Count) {
-                throw new ArgumentOutOfRangeException(
-                    nameof(subGroups),
-                    $"The provided sub-groups do not total ({subGroups.Sum()}) the length of the collection ({collection.Count})!"
-                );
-            }
-
-            var splitGroups  = new List<List<T>>();
-            int currentIndex = 0;
-            foreach (var subGroupSize in subGroups) {
-                splitGroups.Add(collection.ToList().GetRange(currentIndex, subGroupSize));
-                currentIndex += subGroupSize;
-            }
-
-            return splitGroups;
-        }
-
         /// <summary>
         /// Computes the element-wise difference between each element of <paramref name="listToCompute"/>.
         /// </summary>
@@ -206,5 +218,152 @@ namespace Packages.BrandonUtils.Runtime.Collections {
 
             return diff;
         }
+
+        #region Dictionary Joining
+
+        /// <summary>
+        /// Removes all of the <paramref name="keysToRemove"/> from <paramref name="original"/> via <see cref="Dictionary{TKey,TValue}.Remove"/>.
+        /// </summary>
+        /// <remarks>
+        /// An error is <b>not</b> thrown when a key from <paramref name="keysToRemove"/> isn't found in <paramref name="original"/>.
+        /// </remarks>
+        /// <param name="original"></param>
+        /// <param name="keysToRemove"></param>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <returns></returns>
+        public static Dictionary<TKey, TValue> RemoveAll<TKey, TValue>(this Dictionary<TKey, TValue> original, IEnumerable<TKey> keysToRemove) {
+            foreach (var key in keysToRemove) {
+                original.Remove(key);
+            }
+
+            return original;
+        }
+
+        /// <summary>
+        /// Calls <see cref="RemoveAll{TKey,TValue}(System.Collections.Generic.Dictionary{TKey,TValue},System.Collections.Generic.IEnumerable{TKey})"/> using <paramref name="dictionaryWithKeysToRemove"/>'s <see cref="Dictionary{TKey,TValue}.Keys"/>.
+        /// </summary>
+        /// <param name="original"></param>
+        /// <param name="dictionaryWithKeysToRemove"></param>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <returns></returns>
+        public static Dictionary<TKey, TValue> RemoveAll<TKey, TValue>(this Dictionary<TKey, TValue> original, IDictionary<TKey, TValue> dictionaryWithKeysToRemove) {
+            return RemoveAll(original, dictionaryWithKeysToRemove.Keys);
+        }
+
+        /// <summary>
+        /// The method by which <see cref="CollectionUtils.JoinDictionaries{TKey,TValue}"/> will handle conflicts caused by duplicate <see cref="Dictionary{TKey,TValue}.Keys"/>.
+        /// </summary>
+        public enum ConflictResolution {
+            /// <summary>
+            /// If a duplicate <see cref="KeyValuePair{TKey,TValue}.Key"/> is found, an exception will be thrown.
+            /// </summary>
+            Fail,
+            /// <summary>
+            /// If a duplicate <see cref="KeyValuePair{TKey,TValue}.Key"/> is found, prefer to use the original's <see cref="KeyValuePair{TKey,TValue}.Value"/>.
+            /// </summary>
+            FavorOriginal,
+            /// <summary>
+            /// If a duplicate <see cref="KeyValuePair{TKey,TValue}.Key"/> is found, prefer to use the new <see cref="KeyValuePair{TKey,TValue}.Value"/>.
+            /// </summary>
+            FavorNew
+        }
+
+        /// <summary>
+        /// Returns a <see cref="Dictionary{TKey,TValue}"/> containing:
+        /// <li>The <see cref="Dictionary{TKey,TValue}.Keys"/> that exist in both <paramref name="original"/> and <paramref name="additional"/>.</li>
+        /// <li>The <see cref="Dictionary{TKey,TValue}.Values"/> for those keys from either <paramref name="original"/> or <paramref name="additional"/>, depending on <paramref name="conflictResolution"/>.</li>
+        /// </summary>
+        /// <remarks>
+        /// The <see cref="Dictionary{TKey,TValue}.Keys"/> of the result will always be in the order they appeared <b>inside of <paramref name="original"/></b>, regardless of <paramref name="conflictResolution"/>.
+        /// </remarks>
+        /// <param name="original"></param>
+        /// <param name="additional"></param>
+        /// <param name="conflictResolution">The <see cref="ConflictResolution"/> to decide which <see cref="Dictionary{TKey,TValue}.Values"/> are returned.</param>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <returns></returns>
+        /// <exception cref="InvalidEnumArgumentException">If <see cref="ConflictResolution.Fail"/> or an unknown <see cref="ConflictResolution"/> is passed.</exception>
+        [Pure]
+        public static Dictionary<TKey, TValue> Overlap<TKey, TValue>(this IDictionary<TKey, TValue> original, IDictionary<TKey, TValue> additional, ConflictResolution conflictResolution) {
+            var overlappingKeys = original.Keys.Where(additional.ContainsKey);
+
+            switch (conflictResolution) {
+                case ConflictResolution.Fail:
+                    throw new InvalidEnumArgumentException($"When specifically requesting {nameof(Overlap)}, you can't have a {nameof(ConflictResolution)} method of {ConflictResolution.Fail}! How would that make any sense?");
+                case ConflictResolution.FavorOriginal:
+                    return overlappingKeys.ToDictionary(key => key, key => original[key]);
+                case ConflictResolution.FavorNew:
+                    return overlappingKeys.ToDictionary(key => key, key => additional[key]);
+                default:
+                    throw EnumUtils.InvalidEnumArgumentException(nameof(ConflictResolution), conflictResolution);
+            }
+        }
+
+        /// <summary>
+        /// Updates any <see cref="Dictionary{TKey,TValue}.Keys"/> in <paramref name="original"/> with their <see cref="KeyValuePair{TKey,TValue}.Value"/> from <paramref name="newValues"/>.
+        /// <p/>
+        /// <see cref="Dictionary{TKey,TValue}.Keys"/> found in <paramref name="newValues"/> but <b>not</b> in <paramref name="original"/> are ignored.
+        /// </summary>
+        /// <param name="original"></param>
+        /// <param name="newValues"></param>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <returns></returns>
+        public static Dictionary<TKey, TValue> UpdateFrom<TKey, TValue>(this Dictionary<TKey, TValue> original, IDictionary<TKey, TValue> newValues) {
+            newValues.ForEach(
+                pair => {
+                    if (original.ContainsKey(pair.Key)) {
+                        original[pair.Key] = pair.Value;
+                    }
+                }
+            );
+            return original;
+        }
+
+        /// <summary>
+        /// Joins <paramref name="original"/> and <paramref name="additional"/> together via the given <see cref="ConflictResolution"/> method, returning a <b>new <see cref="Dictionary{TKey,TValue}"/></b>.
+        /// </summary>
+        /// <remarks>
+        /// The order of the <see cref="Dictionary{TKey,TValue}.Keys"/> in the result will always be:
+        /// <li><b>All</b> of the <see cref="Dictionary{TKey,TValue}.Keys"/> from <paramref name="original"/> (including any overlap).</li>
+        /// <li>The <b>unique</b> <see cref="Dictionary{TKey,TValue}.Keys"/> from <see cref="additional"/>.</li>
+        /// </remarks>
+        /// <param name="original"></param>
+        /// <param name="additional"></param>
+        /// <param name="conflictResolution"></param>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException">If <paramref name="conflictResolution"/> is <see cref="ConflictResolution.Fail"/> and there are duplicate <see cref="Dictionary{TKey,TValue}.Keys"/> between <paramref name="original"/> and <paramref name="additional"/>.</exception>
+        /// <exception cref="InvalidEnumArgumentException"></exception>
+        [Pure]
+        public static Dictionary<TKey, TValue> JoinDictionaries<TKey, TValue>(
+            this Dictionary<TKey, TValue> original,
+            Dictionary<TKey, TValue> additional,
+            ConflictResolution conflictResolution = ConflictResolution.Fail
+        ) {
+            switch (conflictResolution) {
+                case ConflictResolution.Fail:
+                    break;
+                case ConflictResolution.FavorOriginal:
+                    additional.RemoveAll(original);
+                    break;
+                case ConflictResolution.FavorNew:
+                    //set the overlapping values in original to match those in additional
+                    original.UpdateFrom(additional);
+
+                    //remove the overlapping values from additional, so that there are no more conflicts
+                    additional.RemoveAll(original);
+                    break;
+                default:
+                    throw EnumUtils.InvalidEnumArgumentException(nameof(conflictResolution), conflictResolution);
+            }
+
+            return original.Concat(additional).ToDictionary(pair => pair.Key, pair => pair.Value);
+        }
+
+        #endregion
     }
 }
