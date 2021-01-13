@@ -12,13 +12,13 @@ using Packages.BrandonUtils.Runtime.Logging;
 namespace Packages.BrandonUtils.Tests {
     [TestOf(typeof(CollectionUtils))]
     public class CollectionUtilsTests {
-        private static Dictionary<int, string> ValidDictionary = new Dictionary<int, string> {
+        private static readonly Dictionary<int, string> ValidDictionary = new Dictionary<int, string> {
             {1, "one"},
             {2, "two"},
             {3, "three"}
         };
 
-        private static Dictionary<string, int> ValidDictionary_Inverse = new Dictionary<string, int> {
+        private static readonly Dictionary<string, int> ValidDictionary_Inverse = new Dictionary<string, int> {
             {"one", 1},
             {"two", 2},
             {"three", 3}
@@ -102,19 +102,19 @@ namespace Packages.BrandonUtils.Tests {
             Assert.That(dic1.JoinDictionaries(dic2), Is.EqualTo(expected));
         }
 
-        private static Dictionary<int, int> DicOrigin = new Dictionary<int, int> {
+        private static readonly Dictionary<int, int> DicOrigin = new Dictionary<int, int> {
             {1, 1},
             {2, 1},
             {3, 1}
         };
 
-        private static Dictionary<int, int> DicOverlap = new Dictionary<int, int> {
+        private static readonly Dictionary<int, int> DicOverlap = new Dictionary<int, int> {
             {3, 2},
             {4, 2},
             {5, 2}
         };
 
-        private static Dictionary<int, int> ResultFavoringOriginal = new Dictionary<int, int> {
+        private static readonly Dictionary<int, int> ResultFavoringOriginal = new Dictionary<int, int> {
             {1, 1},
             {2, 1},
             {3, 1},
@@ -122,7 +122,7 @@ namespace Packages.BrandonUtils.Tests {
             {5, 2}
         };
 
-        private static Dictionary<int, int> ResultFavoringNew = new Dictionary<int, int> {
+        private static readonly Dictionary<int, int> ResultFavoringNew = new Dictionary<int, int> {
             {1, 1},
             {2, 1},
             {3, 2},
