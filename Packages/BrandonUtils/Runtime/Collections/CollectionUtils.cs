@@ -127,7 +127,7 @@ namespace Packages.BrandonUtils.Runtime.Collections {
         ///     in <paramref name="dictionary" />.
         /// </summary>
         /// <example>
-        ///     Which variation of <see cref="ForEach{T,T2}(System.Collections.Generic.Dictionary{T,T2},System.Action{System.Collections.Generic.KeyValuePair{T,T2}})">ForEach</see> is called depends on the first time the <paramref name="action" />'s <see cref="Delegate.Target" /> parameter is accessed.
+        ///     Which variation of <see cref="ForEach{T,T2}(System.Collections.Generic.IDictionary{T,T2},System.Action{System.Collections.Generic.KeyValuePair{T,T2}})">ForEach</see> is called depends on the first time the <paramref name="action" />'s <see cref="Delegate.Target" /> parameter is accessed.
         /// <p />For example, given:
         /// <code><![CDATA[
         /// Dictionary dictionary = new Dictionary<string, string>();
@@ -149,10 +149,10 @@ namespace Packages.BrandonUtils.Runtime.Collections {
         /// dictionary.ForEach(it => Console.WriteLine(it));
         /// ]]></code>
         /// </example>
-        /// <param name="dictionary">The <see cref="Dictionary{TKey,TValue}" /> you would like to iterate over.</param>
+        /// <param name="dictionary">The <see cref="IDictionary{TKey,TValue}" /> you would like to iterate over.</param>
         /// <param name="action">The <see cref="Action" /> that will be performed against each <see cref="KeyValuePair{TKey,TValue}" /> in <paramref name="dictionary" />.</param>
-        /// <typeparam name="T">The type of <paramref name="dictionary" />'s <see cref="Dictionary{TKey,TValue}.Keys" /></typeparam>
-        /// <typeparam name="T2">The type of <paramref name="dictionary" />'s <see cref="Dictionary{TKey,TValue}.Values" /></typeparam>
+        /// <typeparam name="T">The type of <paramref name="dictionary" />'s <see cref="IDictionary{TKey,TValue}.Keys" /></typeparam>
+        /// <typeparam name="T2">The type of <paramref name="dictionary" />'s <see cref="IDictionary{TKey,TValue}.Values" /></typeparam>
         /// <seealso cref="ForEach{T,T2}(System.Collections.Generic.IDictionary{T,T2},System.Action{T2})" />
         /// <seealso cref="List{T}.ForEach" />
         public static void ForEach<T, T2>(this IDictionary<T, T2> dictionary, Action<KeyValuePair<T, T2>> action) {
@@ -161,7 +161,7 @@ namespace Packages.BrandonUtils.Runtime.Collections {
             }
         }
 
-        /// <inheritdoc cref="ForEach{T,T2}(System.Collections.Generic.Dictionary{T,T2},System.Action{System.Collections.Generic.KeyValuePair{T,T2}})" />
+        /// <inheritdoc cref="ForEach{T,T2}(System.Collections.Generic.IDictionary{T,T2},System.Action{System.Collections.Generic.KeyValuePair{T,T2}})"/>
         /// <summary>
         ///     Similarly to <see cref="List{T}.ForEach" />, this performs <paramref name="action" /> against each
         ///     <b>
@@ -222,7 +222,7 @@ namespace Packages.BrandonUtils.Runtime.Collections {
         #region Dictionary Joining
 
         /// <summary>
-        /// Removes all of the <paramref name="keysToRemove"/> from <paramref name="original"/> via <see cref="Dictionary{TKey,TValue}.Remove"/>.
+        /// Removes all of the <paramref name="keysToRemove"/> from <paramref name="original"/> via <see cref="IDictionary{TKey,TValue}.Remove(TKey)"/>.
         /// </summary>
         /// <remarks>
         /// An error is <b>not</b> thrown when a key from <paramref name="keysToRemove"/> isn't found in <paramref name="original"/>.
@@ -232,7 +232,7 @@ namespace Packages.BrandonUtils.Runtime.Collections {
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <returns></returns>
-        public static Dictionary<TKey, TValue> RemoveAll<TKey, TValue>(this Dictionary<TKey, TValue> original, IEnumerable<TKey> keysToRemove) {
+        public static IDictionary<TKey, TValue> RemoveAll<TKey, TValue>(this IDictionary<TKey, TValue> original, IEnumerable<TKey> keysToRemove) {
             foreach (var key in keysToRemove) {
                 original.Remove(key);
             }
@@ -241,19 +241,19 @@ namespace Packages.BrandonUtils.Runtime.Collections {
         }
 
         /// <summary>
-        /// Calls <see cref="RemoveAll{TKey,TValue}(System.Collections.Generic.Dictionary{TKey,TValue},System.Collections.Generic.IEnumerable{TKey})"/> using <paramref name="dictionaryWithKeysToRemove"/>'s <see cref="Dictionary{TKey,TValue}.Keys"/>.
+        /// Calls <see cref="RemoveAll{TKey,TValue}(System.Collections.Generic.IDictionary{TKey,TValue},System.Collections.Generic.IEnumerable{TKey})"/> using <paramref name="IDictionaryWithKeysToRemove"/>'s <see cref="IDictionary{TKey,TValue}.Keys"/>.
         /// </summary>
         /// <param name="original"></param>
         /// <param name="dictionaryWithKeysToRemove"></param>
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <returns></returns>
-        public static Dictionary<TKey, TValue> RemoveAll<TKey, TValue>(this Dictionary<TKey, TValue> original, IDictionary<TKey, TValue> dictionaryWithKeysToRemove) {
+        public static IDictionary<TKey, TValue> RemoveAll<TKey, TValue>(this IDictionary<TKey, TValue> original, IDictionary<TKey, TValue> dictionaryWithKeysToRemove) {
             return RemoveAll(original, dictionaryWithKeysToRemove.Keys);
         }
 
         /// <summary>
-        /// The method by which <see cref="CollectionUtils.JoinDictionaries{TKey,TValue}"/> will handle conflicts caused by duplicate <see cref="Dictionary{TKey,TValue}.Keys"/>.
+        /// The method by which <see cref="CollectionUtils.JoinDictionaries{TKey,TValue}"/> will handle conflicts caused by duplicate <see cref="IDictionary{TKey,TValue}.Keys"/>.
         /// </summary>
         public enum ConflictResolution {
             /// <summary>
@@ -271,16 +271,16 @@ namespace Packages.BrandonUtils.Runtime.Collections {
         }
 
         /// <summary>
-        /// Returns a <see cref="Dictionary{TKey,TValue}"/> containing:
-        /// <li>The <see cref="Dictionary{TKey,TValue}.Keys"/> that exist in both <paramref name="original"/> and <paramref name="additional"/>.</li>
-        /// <li>The <see cref="Dictionary{TKey,TValue}.Values"/> for those keys from either <paramref name="original"/> or <paramref name="additional"/>, depending on <paramref name="conflictResolution"/>.</li>
+        /// Returns a <see cref="IDictionary{TKey,TValue}"/> containing:
+        /// <li>The <see cref="IDictionary{TKey,TValue}.Keys"/> that exist in both <paramref name="original"/> and <paramref name="additional"/>.</li>
+        /// <li>The <see cref="IDictionary{TKey,TValue}.Values"/> for those keys from either <paramref name="original"/> or <paramref name="additional"/>, depending on <paramref name="conflictResolution"/>.</li>
         /// </summary>
         /// <remarks>
-        /// The <see cref="Dictionary{TKey,TValue}.Keys"/> of the result will always be in the order they appeared <b>inside of <paramref name="original"/></b>, regardless of <paramref name="conflictResolution"/>.
+        /// The <see cref="IDictionary{TKey,TValue}.Keys"/> of the result will always be in the order they appeared <b>inside of <paramref name="original"/></b>, regardless of <paramref name="conflictResolution"/>.
         /// </remarks>
         /// <param name="original"></param>
         /// <param name="additional"></param>
-        /// <param name="conflictResolution">The <see cref="ConflictResolution"/> to decide which <see cref="Dictionary{TKey,TValue}.Values"/> are returned.</param>
+        /// <param name="conflictResolution">The <see cref="ConflictResolution"/> to decide which <see cref="IDictionary{TKey,TValue}.Values"/> are returned.</param>
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <returns></returns>
@@ -302,16 +302,16 @@ namespace Packages.BrandonUtils.Runtime.Collections {
         }
 
         /// <summary>
-        /// Updates any <see cref="Dictionary{TKey,TValue}.Keys"/> in <paramref name="original"/> with their <see cref="KeyValuePair{TKey,TValue}.Value"/> from <paramref name="newValues"/>.
+        /// Updates any <see cref="IDictionary{TKey,TValue}.Keys"/> in <paramref name="original"/> with their <see cref="KeyValuePair{TKey,TValue}.Value"/> from <paramref name="newValues"/>.
         /// <p/>
-        /// <see cref="Dictionary{TKey,TValue}.Keys"/> found in <paramref name="newValues"/> but <b>not</b> in <paramref name="original"/> are ignored.
+        /// <see cref="IDictionary{TKey,TValue}.Keys"/> found in <paramref name="newValues"/> but <b>not</b> in <paramref name="original"/> are ignored.
         /// </summary>
         /// <param name="original"></param>
         /// <param name="newValues"></param>
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <returns></returns>
-        public static Dictionary<TKey, TValue> UpdateFrom<TKey, TValue>(this Dictionary<TKey, TValue> original, IDictionary<TKey, TValue> newValues) {
+        public static IDictionary<TKey, TValue> UpdateFrom<TKey, TValue>(this IDictionary<TKey, TValue> original, IDictionary<TKey, TValue> newValues) {
             newValues.ForEach(
                 pair => {
                     if (original.ContainsKey(pair.Key)) {
@@ -323,12 +323,47 @@ namespace Packages.BrandonUtils.Runtime.Collections {
         }
 
         /// <summary>
-        /// Joins <paramref name="original"/> and <paramref name="additional"/> together via the given <see cref="ConflictResolution"/> method, returning a <b>new <see cref="Dictionary{TKey,TValue}"/></b>.
+        /// Joins <b>all</b> of the given <paramref name="dictionaries"/> together via the given <see cref="ConflictResolution"/> method, returning a <b>new <see cref="IDictionary{TKey,TValue}"/></b>.
+        /// </summary>
+        /// <param name="dictionaries"></param>
+        /// <param name="conflictResolution"></param>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException">If <paramref name="conflictResolution"/> is <see cref="ConflictResolution.Fail"/> and there are duplicate <see cref="IDictionary{TKey,TValue}.Keys"/> in the <paramref name="dictionaries"/>.</exception>
+        /// <exception cref="InvalidEnumArgumentException"></exception>
+        [Pure]
+        public static Dictionary<TKey, TValue> JoinDictionaries<TKey, TValue>(
+            IEnumerable<IDictionary<TKey, TValue>> dictionaries,
+            ConflictResolution conflictResolution = ConflictResolution.Fail
+        ) {
+            var allKeys = dictionaries.SelectMany(dic => dic.Keys);
+
+            if (!allKeys.IsSingleton()) {
+                switch (conflictResolution) {
+                    case ConflictResolution.Fail:
+                        throw new ArgumentException($"Could not join the dictionaries because they had duplicate keys and the {nameof(conflictResolution)} method was set to {ConflictResolution.Fail}");
+                    case ConflictResolution.FavorNew:
+                        dictionaries = dictionaries.Reverse();
+                        break;
+                    case ConflictResolution.FavorOriginal:
+                        //don't need to do nu'n
+                        break;
+                    default:
+                        throw EnumUtils.InvalidEnumArgumentException(nameof(conflictResolution), conflictResolution);
+                }
+            }
+
+            return allKeys.Distinct().ToDictionary(key => key, dictionaries.FirstNonEmptyValue);
+        }
+
+        /// <summary>
+        /// Joins <paramref name="original"/> and <paramref name="additional"/> together via the given <see cref="ConflictResolution"/> method, returning a <b>new <see cref="IDictionary{TKey,TValue}"/></b>.
         /// </summary>
         /// <remarks>
-        /// The order of the <see cref="Dictionary{TKey,TValue}.Keys"/> in the result will always be:
-        /// <li><b>All</b> of the <see cref="Dictionary{TKey,TValue}.Keys"/> from <paramref name="original"/> (including any overlap).</li>
-        /// <li>The <b>unique</b> <see cref="Dictionary{TKey,TValue}.Keys"/> from <see cref="additional"/>.</li>
+        /// The order of the <see cref="IDictionary{TKey,TValue}.Keys"/> in the result will always be:
+        /// <li><b>All</b> of the <see cref="IDictionary{TKey,TValue}.Keys"/> from <paramref name="original"/> (including any overlap).</li>
+        /// <li>The <b>unique</b> <see cref="IDictionary{TKey,TValue}.Keys"/> from <see cref="additional"/>.</li>
         /// </remarks>
         /// <param name="original"></param>
         /// <param name="additional"></param>
@@ -336,32 +371,39 @@ namespace Packages.BrandonUtils.Runtime.Collections {
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <returns></returns>
-        /// <exception cref="ArgumentException">If <paramref name="conflictResolution"/> is <see cref="ConflictResolution.Fail"/> and there are duplicate <see cref="Dictionary{TKey,TValue}.Keys"/> between <paramref name="original"/> and <paramref name="additional"/>.</exception>
+        /// <exception cref="ArgumentException">If <paramref name="conflictResolution"/> is <see cref="ConflictResolution.Fail"/> and there are duplicate <see cref="IDictionary{TKey,TValue}.Keys"/> between <paramref name="original"/> and <paramref name="additional"/>.</exception>
         /// <exception cref="InvalidEnumArgumentException"></exception>
         [Pure]
-        public static Dictionary<TKey, TValue> JoinDictionaries<TKey, TValue>(
-            this Dictionary<TKey, TValue> original,
-            Dictionary<TKey, TValue> additional,
+        public static IDictionary<TKey, TValue> JoinDictionaries<TKey, TValue>(
+            this IDictionary<TKey, TValue> original,
+            IDictionary<TKey, TValue> additional,
             ConflictResolution conflictResolution = ConflictResolution.Fail
         ) {
-            switch (conflictResolution) {
-                case ConflictResolution.Fail:
-                    break;
-                case ConflictResolution.FavorOriginal:
-                    additional.RemoveAll(original);
-                    break;
-                case ConflictResolution.FavorNew:
-                    //set the overlapping values in original to match those in additional
-                    original.UpdateFrom(additional);
+            return JoinDictionaries(new[] {original, additional}, conflictResolution);
+        }
 
-                    //remove the overlapping values from additional, so that there are no more conflicts
-                    additional.RemoveAll(original);
-                    break;
-                default:
-                    throw EnumUtils.InvalidEnumArgumentException(nameof(conflictResolution), conflictResolution);
-            }
+        [Pure]
+        public static IDictionary<TKey, TValue> JoinDictionaries<TKey, TValue>(
+            this IDictionary<TKey, TValue> original,
+            params IDictionary<TKey, TValue>[] additional
+        ) {
+            return JoinDictionaries(additional.Prepend(original));
+        }
 
-            return original.Concat(additional).ToDictionary(pair => pair.Key, pair => pair.Value);
+        [Pure]
+        public static TValue FirstValue<TKey, TValue>(
+            this IEnumerable<Dictionary<TKey, TValue>> dictionaries,
+            TKey key
+        ) {
+            return dictionaries.First(dic => dic.ContainsKey(key))[key];
+        }
+
+        [Pure]
+        public static TValue FirstNonEmptyValue<TKey, TValue>(
+            this IEnumerable<IDictionary<TKey, TValue>> dictionaries,
+            TKey key
+        ) {
+            return dictionaries.First(dic => dic.ContainsKey(key) && ReflectionUtils.IsNotEmpty(dic[key]))[key];
         }
 
         #endregion

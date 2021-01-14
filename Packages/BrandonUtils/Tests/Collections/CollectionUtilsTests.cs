@@ -9,16 +9,18 @@ using NUnit.Framework;
 using Packages.BrandonUtils.Runtime.Collections;
 using Packages.BrandonUtils.Runtime.Logging;
 
+// ReSharper disable ReturnValueOfPureMethodIsNotUsed
+
 namespace Packages.BrandonUtils.Tests {
     [TestOf(typeof(CollectionUtils))]
     public class CollectionUtilsTests {
-        private static readonly Dictionary<int, string> ValidDictionary = new Dictionary<int, string> {
+        private static Dictionary<int, string> ValidDictionary => new Dictionary<int, string> {
             {1, "one"},
             {2, "two"},
             {3, "three"}
         };
 
-        private static readonly Dictionary<string, int> ValidDictionary_Inverse = new Dictionary<string, int> {
+        private static Dictionary<string, int> ValidDictionary_Inverse => new Dictionary<string, int> {
             {"one", 1},
             {"two", 2},
             {"three", 3}
@@ -102,19 +104,19 @@ namespace Packages.BrandonUtils.Tests {
             Assert.That(dic1.JoinDictionaries(dic2), Is.EqualTo(expected));
         }
 
-        private static readonly Dictionary<int, int> DicOrigin = new Dictionary<int, int> {
+        private static Dictionary<int, int> DicOrigin => new Dictionary<int, int> {
             {1, 1},
             {2, 1},
             {3, 1}
         };
 
-        private static readonly Dictionary<int, int> DicOverlap = new Dictionary<int, int> {
+        private static Dictionary<int, int> DicOverlap => new Dictionary<int, int> {
             {3, 2},
             {4, 2},
             {5, 2}
         };
 
-        private static readonly Dictionary<int, int> ResultFavoringOriginal = new Dictionary<int, int> {
+        private static Dictionary<int, int> ResultFavoringOriginal => new Dictionary<int, int> {
             {1, 1},
             {2, 1},
             {3, 1},
@@ -122,7 +124,7 @@ namespace Packages.BrandonUtils.Tests {
             {5, 2}
         };
 
-        private static readonly Dictionary<int, int> ResultFavoringNew = new Dictionary<int, int> {
+        private static Dictionary<int, int> ResultFavoringNew => new Dictionary<int, int> {
             {1, 1},
             {2, 1},
             {3, 2},
@@ -131,9 +133,11 @@ namespace Packages.BrandonUtils.Tests {
         };
 
         [Test]
-        public void JoinPreferOriginal() {
+        public void JoinPreferOriginal_Extension() {
             var jointDic = DicOrigin.JoinDictionaries(DicOverlap, CollectionUtils.ConflictResolution.FavorOriginal);
             LogUtils.Log(
+                $"Original: {JsonConvert.SerializeObject(DicOrigin)}",
+                $"Overlap:  {JsonConvert.SerializeObject(DicOverlap)}",
                 $"Actual:   {JsonConvert.SerializeObject(jointDic)}",
                 $"Expected: {JsonConvert.SerializeObject(ResultFavoringOriginal)}"
             );
@@ -141,7 +145,19 @@ namespace Packages.BrandonUtils.Tests {
         }
 
         [Test]
-        public void JoinPreferNew() {
+        public void JoinPreferOriginal_Collection() {
+            var jointDic = CollectionUtils.JoinDictionaries(new[] {DicOrigin, DicOverlap}, CollectionUtils.ConflictResolution.FavorOriginal);
+            Assert.That(jointDic, Is.EqualTo(ResultFavoringOriginal));
+        }
+
+        [Test]
+        public void JoinPreferNew_Collection() {
+            var jointDic = CollectionUtils.JoinDictionaries(new[] {DicOrigin, DicOverlap}, CollectionUtils.ConflictResolution.FavorNew);
+            Assert.That(jointDic, Is.EqualTo(ResultFavoringNew));
+        }
+
+        [Test]
+        public void JoinPreferNew_Extension() {
             var jointDic = DicOrigin.JoinDictionaries(DicOverlap, CollectionUtils.ConflictResolution.FavorNew);
             LogUtils.Log(
                 $"Actual:   {JsonConvert.SerializeObject(jointDic)}",
@@ -151,8 +167,53 @@ namespace Packages.BrandonUtils.Tests {
         }
 
         [Test]
-        public void JoinFailure() {
+        public void JoinFailure_Extension() {
             Assert.Throws<ArgumentException>(() => DicOrigin.JoinDictionaries(DicOverlap, CollectionUtils.ConflictResolution.Fail));
+        }
+
+        [Test]
+        public void JoinFailure_Collection() {
+            Assert.Throws<ArgumentException>(() => CollectionUtils.JoinDictionaries(new[] {DicOrigin, DicOverlap}, CollectionUtils.ConflictResolution.Fail));
+        }
+
+        [TestCase(CollectionUtils.ConflictResolution.FavorNew)]
+        [TestCase(CollectionUtils.ConflictResolution.FavorOriginal)]
+        public void JoiningDoesNotModify_Extension(CollectionUtils.ConflictResolution conflictResolution) {
+            //calling "new Dictionary<>" isn't strictly required but I'm including it because I keep confusing myself with whether these things like DicOrigin are properties or methods or auto-properties or whatever so this way it won't break when I inevitable change them
+            var dicOrigin  = new Dictionary<int, int>(DicOrigin);
+            var dicOverlap = new Dictionary<int, int>(DicOverlap);
+
+            dicOrigin.JoinDictionaries(dicOverlap, conflictResolution);
+
+            LogUtils.Log(
+                $"{nameof(dicOrigin)}:  {dicOrigin.JoinString()}",
+                $"{nameof(DicOrigin)}:  {DicOrigin.JoinString()}",
+                $"{nameof(dicOverlap)}: {dicOverlap.JoinString()}",
+                $"{nameof(DicOverlap)}: {DicOverlap.JoinString()}"
+            );
+
+            Assert.That(dicOrigin,  Is.EqualTo(DicOrigin));
+            Assert.That(dicOverlap, Is.EqualTo(DicOverlap));
+        }
+
+        [TestCase(CollectionUtils.ConflictResolution.FavorNew)]
+        [TestCase(CollectionUtils.ConflictResolution.FavorOriginal)]
+        public void JoiningDoesNotModify_Collection(CollectionUtils.ConflictResolution conflictResolution) {
+            //calling "new Dictionary<>" isn't strictly required but I'm including it because I keep confusing myself with whether these things like DicOrigin are properties or methods or auto-properties or whatever so this way it won't break when I inevitable change them
+            var dicOrigin  = new Dictionary<int, int>(DicOrigin);
+            var dicOverlap = new Dictionary<int, int>(DicOverlap);
+
+            CollectionUtils.JoinDictionaries(new[] {dicOrigin, dicOverlap}, conflictResolution);
+
+            LogUtils.Log(
+                $"{nameof(dicOrigin)}:  {dicOrigin.JoinString()}",
+                $"{nameof(DicOrigin)}:  {DicOrigin.JoinString()}",
+                $"{nameof(dicOverlap)}: {dicOverlap.JoinString()}",
+                $"{nameof(DicOverlap)}: {DicOverlap.JoinString()}"
+            );
+
+            Assert.That(dicOrigin,  Is.EqualTo(DicOrigin));
+            Assert.That(dicOverlap, Is.EqualTo(DicOverlap));
         }
 
         #endregion

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 using JetBrains.Annotations;
@@ -92,6 +94,27 @@ namespace Packages.BrandonUtils.Runtime {
                 default:
                     throw new BrandonException($"Couldn't find a field or property named {variableName} for the type {obj.GetType()}!");
             }
+        }
+
+        [Pure]
+        public static bool IsEmpty(object thing) {
+            if (null == thing) {
+                return true;
+            }
+
+            switch (thing) {
+                case string str:
+                    return string.IsNullOrWhiteSpace(str);
+                case IEnumerable<object> enumerable:
+                    return !enumerable.Any();
+                default:
+                    return false;
+            }
+        }
+
+        [Pure]
+        public static bool IsNotEmpty(object thing) {
+            return !IsEmpty(thing);
         }
     }
 }
