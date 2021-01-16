@@ -42,8 +42,8 @@ namespace Packages.BrandonUtils.Tests {
 
         [TestCase(W, UpArrow)]
         [TestCase(A, LeftArrow)]
-        [TestCase(S, RightArrow)]
-        [TestCase(D, DownArrow)]
+        [TestCase(S, DownArrow)]
+        [TestCase(D, RightArrow)]
         public void ValidWASDToArrowKey(
             KeyCode wasd,
             KeyCode arrow
@@ -55,8 +55,8 @@ namespace Packages.BrandonUtils.Tests {
 
         [TestCase(UpArrow,    W)]
         [TestCase(LeftArrow,  A)]
-        [TestCase(RightArrow, S)]
-        [TestCase(DownArrow,  D)]
+        [TestCase(DownArrow,  S)]
+        [TestCase(RightArrow, D)]
         public void ValidArrowToWASD(KeyCode arrow, KeyCode wasd) {
             Assume.That(ArrowKeys, Contains.Item(arrow));
             Assume.That(WASD,      Contains.Item(wasd));
