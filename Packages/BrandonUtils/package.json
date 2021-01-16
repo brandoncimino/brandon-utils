@@ -1,11 +1,12 @@
 {
   "name": "com.fowlfever.brandonutils",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "displayName": "Brandon Utils",
   "description": "Stuff Brandon wants in every Unity project.",
   "dependencies": {
     "com.unity.nuget.newtonsoft-json": "2.0.0",
     "com.unity.textmeshpro": "3.0.1"
   },
-  "type": "library"
+  "type": "library",
+  "hideInEditor": false
 }
