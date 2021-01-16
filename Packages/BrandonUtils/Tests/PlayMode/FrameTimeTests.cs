@@ -10,7 +10,7 @@ using Packages.BrandonUtils.Runtime.Timing;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace Packages.BrandonUtils.Tests {
+namespace Packages.BrandonUtils.Tests.PlayMode {
     public class FrameTimeTests {
         private static float[] RealTimes = {
             0.00000001f,

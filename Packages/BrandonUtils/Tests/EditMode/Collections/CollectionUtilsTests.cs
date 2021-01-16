@@ -11,7 +11,7 @@ using Packages.BrandonUtils.Runtime.Logging;
 
 // ReSharper disable ReturnValueOfPureMethodIsNotUsed
 
-namespace Packages.BrandonUtils.Tests {
+namespace Packages.BrandonUtils.Tests.EditMode {
     [TestOf(typeof(CollectionUtils))]
     public class CollectionUtilsTests {
         private static Dictionary<int, string> ValidDictionary => new Dictionary<int, string> {

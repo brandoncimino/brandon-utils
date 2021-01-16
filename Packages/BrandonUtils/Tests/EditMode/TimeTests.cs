@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using NUnit.Framework;
+
 using Packages.BrandonUtils.Runtime.Timing;
 
-namespace Packages.BrandonUtils.Tests {
+namespace Packages.BrandonUtils.Tests.EditMode {
     public class TimeTests {
         private static double[] valuesInSeconds = {
             5d,

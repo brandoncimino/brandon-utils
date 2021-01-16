@@ -6,7 +6,7 @@ using Packages.BrandonUtils.Runtime.Timing;
 
 using static Packages.BrandonUtils.Runtime.CoercionUtils;
 
-namespace Packages.BrandonUtils.Tests {
+namespace Packages.BrandonUtils.Tests.EditMode {
     public class CoercionUtilsTests {
         [Test]
         public void CoerciveAddition_int() {

@@ -15,7 +15,7 @@ using UnityEngine.TestTools;
 
 using static Packages.BrandonUtils.Runtime.Logging.LogUtils;
 
-namespace Packages.BrandonUtils.Tests {
+namespace Packages.BrandonUtils.Tests.PlayMode {
     public class SaveDataTests {
         private const  string       DummyNickName = "DummySaveFile";
         private static List<string> DummySaveFiles;

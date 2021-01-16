@@ -8,7 +8,7 @@ using Packages.BrandonUtils.Runtime;
 // ReSharper disable UnusedAutoPropertyAccessor.Local
 // ReSharper disable AutoPropertyCanBeMadeGetOnly.Local
 
-namespace Packages.BrandonUtils.Tests {
+namespace Packages.BrandonUtils.Tests.EditMode {
     public class ReflectionUtilsTests {
         private class Privacy<T> {
             public    T Field_Public;
