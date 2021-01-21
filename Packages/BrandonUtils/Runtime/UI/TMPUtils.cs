@@ -4,7 +4,9 @@ using System.Linq;
 
 using JetBrains.Annotations;
 
+using Packages.BrandonUtils.Runtime.Collections;
 using Packages.BrandonUtils.Runtime.Enums;
+using Packages.BrandonUtils.Runtime.Logging;
 
 using TMPro;
 
@@ -39,15 +41,19 @@ namespace Packages.BrandonUtils.Runtime.UI {
         /// <returns>The <see cref="TMP_CharacterInfo"/>s corresponding to the first instance of <paramref name="substring"/>.</returns>
         /// <seealso cref="LastSubstring"/>
         public static List<TMP_CharacterInfo> FirstSubstring(this TMP_Text text, string substring, StringComparison stringComparisonMode = StringComparison.Ordinal) {
-            return text.textInfo.characterInfo.ToList()
-                       .GetRange(
-                           text.text.IndexOf(
-                               substring,
-                               stringComparisonMode
-                           ),
-                           substring.Length
-                       )
-                       .ToList();
+            var foundIndex = text.text.IndexOf(substring, stringComparisonMode);
+            if (foundIndex < 0) {
+                return null;
+            }
+            else {
+                return text.textInfo.VisibleCharacterInfo()
+                           .ToList()
+                           .GetRange(
+                               foundIndex,
+                               substring.Length
+                           )
+                           .ToList();
+            }
         }
 
         /// <summary>
@@ -60,12 +66,23 @@ namespace Packages.BrandonUtils.Runtime.UI {
         /// <seealso cref="FirstSubstring"/>
         [Pure]
         public static List<TMP_CharacterInfo> LastSubstring(this TMP_Text text, string substring, StringComparison stringComparisonMode = StringComparison.Ordinal) {
+            var lastIndexOf = text.text.LastIndexOf(substring, stringComparisonMode);
+
+            if (lastIndexOf < 0) {
+                return null;
+            }
+
+            LogUtils.Log(
+                $"Content: {text.text}",
+                $"Length: {text.text.Length}",
+                $"C.Info: {text.textInfo.characterInfo.JoinString()}",
+                $"Chars: {text.textInfo.characterInfo.Select(ci => ci.character).JoinString()}"
+            );
+
+            Debug.Log($"{nameof(lastIndexOf)}: {lastIndexOf}");
             return text.textInfo.characterInfo.ToList()
                        .GetRange(
-                           text.text.LastIndexOf(
-                               substring,
-                               stringComparisonMode
-                           ),
+                           lastIndexOf,
                            substring.Length
                        )
                        .ToList();
@@ -177,6 +194,22 @@ namespace Packages.BrandonUtils.Runtime.UI {
         public static RectTransform HighlightWord(ICollection<CharacterInfo> word, RectTransform highlight) {
             // highlight.anchormi
             throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region Other
+
+        public static string VisibleText(this TMP_Text text) {
+            // return text.textInfo.characterInfo.Where(ch => ch.isVisible).Select(ch => ch.character).JoinString();
+            // return text.textInfo.characterInfo.ToList().GetRange(0, text.textInfo.characterCount).Select(ch => ch.character).JoinString();
+            // return text.textInfo.characterInfo.Select(ch => ch.character).JoinString();
+            // return string.Join("",text.textInfo.characterInfo.Select(ch => ch.character));
+            return text.textInfo.VisibleCharacterInfo().Select(ci => ci.character).JoinString();
+        }
+
+        public static IEnumerable<TMP_CharacterInfo> VisibleCharacterInfo(this TMP_TextInfo textInfo) {
+            return textInfo.characterInfo.ToList().GetRange(0, textInfo.characterCount);
         }
 
         #endregion
