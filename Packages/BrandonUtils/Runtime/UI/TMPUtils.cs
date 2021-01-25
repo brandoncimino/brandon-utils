@@ -201,10 +201,6 @@ namespace Packages.BrandonUtils.Runtime.UI {
         #region Other
 
         public static string VisibleText(this TMP_Text text) {
-            // return text.textInfo.characterInfo.Where(ch => ch.isVisible).Select(ch => ch.character).JoinString();
-            // return text.textInfo.characterInfo.ToList().GetRange(0, text.textInfo.characterCount).Select(ch => ch.character).JoinString();
-            // return text.textInfo.characterInfo.Select(ch => ch.character).JoinString();
-            // return string.Join("",text.textInfo.characterInfo.Select(ch => ch.character));
             return text.textInfo.VisibleCharacterInfo().Select(ci => ci.character).JoinString();
         }
 
