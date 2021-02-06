@@ -5,7 +5,7 @@
 [attr]lfs -text filter=lfs diff=lfs merge=lfs
 
 # Default to auto-normalized line endings.
-* text=auto
+* text eol=lf
 
 # Code
 *.cs text diff=csharp
