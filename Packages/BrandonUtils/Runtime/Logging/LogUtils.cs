@@ -39,6 +39,24 @@ namespace Packages.BrandonUtils.Runtime.Logging {
             Log($"Started at: {DateTime.Now} with locations {locations}");
         }
 
+        public static void Log(IDictionary<object, object> stuffToLog, string separator = "|") {
+            var col1 = stuffToLog.Keys.Select(it => it.ToString()).ToList();
+            var col2 = stuffToLog.Values.Select(it => it.ToString()).ToList();
+
+            var w1 = col1.Max(it => it.Length);
+            var w2 = col2.Max(it => it.Length);
+
+            var rows = new string[stuffToLog.Count];
+
+            for (int row = 0; row < stuffToLog.Count; row++) {
+                var cell1 = col1[row].PadRight(w1);
+                var cell2 = col2[row].PadRight(w2);
+                rows[row] = ($"{cell1}{separator}{cell2}");
+            }
+
+            Log(rows);
+        }
+
         public static void Log(params object[] stuffToLog) {
             Log(null, stuffToLog);
         }
@@ -62,7 +80,7 @@ namespace Packages.BrandonUtils.Runtime.Logging {
         public void Update() {
             _text.enabled = locations.HasFlag(Locations.UI);
 
-            //TODO: Is it necessary to check if _text.text needs to be changed before setting it, or is Unity smart enough to not do anything in that case?
+            //TODO: Is it necessary to check if _text.text needs to be changed before setting it (for efficiency), or is Unity smart enough to not do anything in that case?
             string newText = string.Join("\n", LimitedLines);
             if (_text.text != newText) {
                 _text.text = newText;
