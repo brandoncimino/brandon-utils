@@ -9,7 +9,7 @@ using UnityEngine;
 namespace Packages.BrandonUtils.Runtime {
     public static class CoercionUtils {
         /// <summary>
-        /// Attempts to add <paramref name="a"/> and <paramref name="b"/> together by coercing them into compatible types
+        /// Attempts to add <paramref name="a"/> and <paramref name="b"/> together by coercing them into compatible types.
         /// <p/>
         /// If <paramref name="sign"/> is negative, subtraction is performed instead.
         /// <p/>
@@ -33,6 +33,8 @@ namespace Packages.BrandonUtils.Runtime {
         /// (dynamic)a + (dynamic)b;
         /// ]]></code>
         /// as that is extremely slow (upwards of 0.3 seconds!!)
+        /// <br/>
+        /// This uses <see cref="Convert"/> methods in place of (cast) operators in some locations due to runtime exceptions when casting <see cref="object"/>s around as different types. See <a href="https://ericlippert.com/2009/03/03/representation-and-identity/">Representation and Identity</a>
         /// </remarks>
         /// <param name="a"></param>
         /// <param name="b"></param>
@@ -75,15 +77,15 @@ namespace Packages.BrandonUtils.Runtime {
                     }
                 }
                 case int a_int:
-                    return a_int + ((int) b * sign);
+                    return a_int + (Convert.ToInt32(b) * sign);
                 case long a_long:
-                    return a_long + ((long) b * sign);
+                    return a_long + (Convert.ToInt64(b) * sign);
                 case float a_float:
-                    return a_float + ((float) b * sign);
+                    return a_float + (Convert.ToSingle(b) * sign);
                 case double a_double:
-                    return a_double + ((double) b * sign);
+                    return a_double + (Convert.ToDouble(b) * sign);
                 case decimal a_decimal:
-                    return a_decimal + ((decimal) b * sign);
+                    return a_decimal + (Convert.ToDecimal(b) * sign);
                 case Vector2 a_vector2:
                     try {
                         return a_vector2 + (Vector2) b * sign;
