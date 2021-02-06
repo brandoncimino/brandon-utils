@@ -173,8 +173,8 @@ namespace Packages.BrandonUtils.Tests.PlayMode {
         [UnityTest]
         public IEnumerator TestLoadMostRecentSaveFile() {
             //save a few files
-            int    saveCount = 3;
-            string nickName  = nameof(TestLoadMostRecentSaveFile);
+            const int    saveCount = 3;
+            const string nickName  = nameof(TestLoadMostRecentSaveFile);
 
             //create a new save file with the desired nickname
             SaveDataTestImpl saveData = SaveDataTestImpl.NewSaveFile(nickName);
