@@ -1,4 +1,4 @@
-﻿Stuff Brandon wants in every Unity Project - now properly in it's own repo!
+﻿Stuff Brandon wants in every Unity Project - now properly in its own repo!
  
  # Usage
  
