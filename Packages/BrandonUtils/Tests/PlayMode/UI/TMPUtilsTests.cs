@@ -3,6 +3,7 @@ using System.Linq;
 
 using NUnit.Framework;
 
+using Packages.BrandonUtils.Editor.Testing;
 using Packages.BrandonUtils.Runtime.Collections;
 using Packages.BrandonUtils.Runtime.Strings;
 using Packages.BrandonUtils.Runtime.UI;
@@ -15,7 +16,10 @@ using Object = UnityEngine.Object;
 
 namespace Packages.BrandonUtils.Tests.PlayMode.UI {
     public class TMPUtilsTests {
-        private const string CanvasPath = "TestMeshProCanvas";
+        #region Resources
+
+        private const string CanvasPath    = "TestMeshProCanvas";
+        private const string HighlightPath = "TestImage";
 
         public static TMP_Text InstantiateTextMeshPro(string content = null) {
             var canvasResource = Resources.Load<GameObject>(CanvasPath);
@@ -43,6 +47,13 @@ namespace Packages.BrandonUtils.Tests.PlayMode.UI {
             );
             return textMesh;
         }
+
+        public static RectTransform InstantiateHighlight() {
+            var highlightResource = Resources.Load<GameObject>(HighlightPath);
+            return Object.Instantiate(highlightResource).GetComponent<RectTransform>();
+        }
+
+        #endregion
 
         [Test]
         public void TestVisibleText() {
@@ -78,12 +89,9 @@ namespace Packages.BrandonUtils.Tests.PlayMode.UI {
                 text.ForceMeshUpdate();
 
                 Assert.That(text.VisibleText(), Is.EqualTo(word));
-                Assert.That(FullText(text),     Is.EqualTo(fullText));
-            }
-        }
 
-        private static string FullText(TMP_Text text) {
-            return text.textInfo.characterInfo.Select(it => it.character).JoinString();
+                Assert.That(text.textInfo.characterInfo.Select(it => it.character).JoinString(), Is.EqualTo(fullText));
+            }
         }
 
         public enum Find {
@@ -107,7 +115,38 @@ namespace Packages.BrandonUtils.Tests.PlayMode.UI {
 
             Assert.That(foundStr, Is.EqualTo(textMesh.textInfo.VisibleCharacterInfo().ToList().GetRange(expectedIndex, searchFor.Length)));
 
-            Assert.That(foundStr.Select(it => it.character).JoinString(), Is.EqualTo(searchFor));
+            Assert.That(foundStr.ToString(), Is.EqualTo(searchFor));
+        }
+
+        [Test]
+        public void TestWordEdge() { }
+
+        [TestCase("butts'n'stuff")]
+        public void TestHighlight(
+            string searchIn
+        ) {
+            Assume.That(searchIn, Has.Length.GreaterThan(1));
+
+            var textMesh  = InstantiateTextMeshPro(searchIn);
+            var highlight = InstantiateHighlight();
+
+            var word = new TMP_Word(textMesh, textMesh.textInfo.characterInfo.Take(searchIn.Length / 2).ToList());
+
+            Assert.That(
+                word.ToString(),
+                Is.EqualTo(searchIn.Substring(0, searchIn.Length / 2))
+            );
+
+            word.HighlightWord(highlight);
+
+            foreach (var e in (RectTransform.Edge[]) Enum.GetValues(typeof(RectTransform.Edge))) {
+                float actual = word.GetEdgePosition_AsFloat(e);
+                float expect = highlight.GetEdgePosition_AsFloat(e);
+                Assert.That(
+                    actual,
+                    new ApproximationConstraint(expect, TestUtils.ApproximationThreshold)
+                );
+            }
         }
     }
 }
