@@ -3,13 +3,42 @@
 :json-net: https://github.com/jilleJr/Newtonsoft.Json-for-Unity[Json.NET]
 :source-linenums-option:
 
+//links
+:naming-convention: https://en.wikipedia.org/wiki/Naming_convention_(programming)
+:naming-strategy: https://www.newtonsoft.com/json/help/html/T_Newtonsoft_Json_Serialization_NamingStrategy.htm[`NamingStrategy`]
+:json: https://en.wikipedia.org/wiki/JSON[JSON]
+:douglas-crockford: https://en.wikipedia.org/wiki/Douglas_Crockford[Douglas Crockford]
+
+// longer footnotes
+:fn-json: https://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf[ECMA standard 404] and http://www.iso.org/cms/render/live/en/sites/isoorg/contents/data/standard/07/16/71616.html[ISO/IEC 21778:2017] say that the name is pronounced The creator of {json}, https://en.wikipedia.org/wiki/Douglas_Crockford[Douglas Crockford], said that "There's a lot of argument about how you pronounce that, but I strictly don't care.
+:fn-dumb-linux-book: pass:n[Nemeth, Evi; Snyder, Garth; Hein, Trent R.; Whaley, Ben; Mackin, Dan (2017). https://books.google.com/books?id=f7M1DwAAQBAJ&pg=PT1125["19: Web Hosting"]. _UNIX and Linux System Administration Handbook_ (5th ed.). Addison-Wesley Professional. https://en.wikipedia.org/wiki/ISBN_(identifier)[ISBN] https://en.wikipedia.org/wiki/Special:BookSources/9780134278292[9780134278292]. Retrieved 29 October 2019.]
+
 == Enum Dictionary Keys with {json-net}
 
 See also: https://stackoverflow.com/a/19768223[Can't get enum to convert to json properly using Json.NET]
 
-=== The Problem
+=== The "Usual" Problem
 
 WARNING: I wound up writing a bunch of stuff about the <<_google_json_style_guide>> instead of the actual stuff regarding the solution to the problem.
+
+
+{json}{wj}footnote:[https://en.wikipedia.org/wiki/JSON#cite_note-9] is often used to https://en.wikipedia.org/wiki/Serialization[serialize] data for transfer between
+
+.Pronunciation
+[sidebar]
+--
+https://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf[ECMA standard 404] and http://www.iso.org/cms/render/live/en/sites/isoorg/contents/data/standard/07/16/71616.html[ISO/IEC 21778:2017] say "Pronounced https://en.wikipedia.org/wiki/Help:IPA/English[/ˈdʒeɪ.sən/], as in 'https://en.wikipedia.org/wiki/Jason[Jason] and The https://en.wikipedia.org/wiki/Argonauts[Argonauts]'".
+
+The _UNIX and Linux System Administration Handbook_ says "{douglas-crockford}...says it's pronounced like the name Jason. But somehow, 'JAY-sawn' seems to have become more common in the technical community."{wj}footnote:[{fn-dumb-linux-book}]
+
+https://en.wikipedia.org/wiki/The_Real_Slim_Shady[The real] {douglas-crockford} said in 2011, "There's a lot of argument about how you pronounce that, but I strictly don't care."{wj}footnote:[http://transcriptvids.com/v/-C-JoyNuQJs.html["Douglas Crockford: The JSON Saga - Transcript Vids"]. _transcriptvids.com_. Retrieved 29 October 2019.]
+
+WARNING: They are all https://en.wiktionary.org/wiki/patently[patently] wrong. It is `JAY-SAHN`, and this _matters_.
+--
+
+<<_real_world_json_based_rest_apis>>, like <<api-scryfall, Scryfall>> and <<api-github, Github>>, almost exclusively use `snake_case` as their {naming-convention}[naming convention].
+
+C#'s standard is https://www.newtonsoft.com/json/help/html/T_Newtonsoft_Json_Serialization_NamingStrategy.htm[`PascalCase`]{sp}footnote:[Unity suggests using `camelCase` in confusing cases (CITATION NEEDED),{sp}which is annoying.].
 
 [#_google_json_style_guide]
 === https://google.github.io/styleguide/jsoncstyleguide.xml[Google JSON Style Guide]
@@ -176,7 +205,7 @@ However, a counter-example from work{wj}footnote:[The names of variables have be
 
 [cols="a,a,a",opts="autowidth"]
 |===
-|API |Naming Strategy |Example JSON
+|API |{naming-convention}[Naming Convention] |Example JSON
 
 |
 [#api-scryfall]
