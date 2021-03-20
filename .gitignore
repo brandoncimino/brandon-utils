@@ -136,5 +136,8 @@ fabric.properties
 # Update from Brandon on 8/21/2020 - this includes settings like "Use experimental .NET features." When / why we'd want that, I'm still not sure of.
 /com.fowlfever.fortunefountaing.runtime.csproj.DotSettings
 
-# Use this folder for things you want to play with locally but not commit
-Assets/Scripts/Runtime/Sketchbook/
+# Use these folders for things you want to play with locally but not commit
+# Ignore anything IN A FOLDER named "sketchbook" (case-insensitive)
+sketchbook/
+# Ignore anything whose name starts with "sketchbook" (sketchbook_1.cs, sketchbookCOOL.ps1)
+sketchbook*
