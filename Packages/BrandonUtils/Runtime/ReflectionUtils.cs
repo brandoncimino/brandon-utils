@@ -40,6 +40,7 @@ namespace Packages.BrandonUtils.Runtime {
                 return field;
             }
 
+            //TODO: I'm reasonably sure that this is the wrong type of exception to throw here.
             throw new NotImplementedException($"The {nameof(type)} {type} did not have a field or property named {variableName}!");
         }
 
