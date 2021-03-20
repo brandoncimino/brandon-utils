@@ -1,4 +1,4 @@
-﻿%YAML 1.1
+%YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!1 &3435348200193218145
 GameObject:
@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5964740797577492958}
   - component: {fileID: 6625346201040012863}
   m_Layer: 0
-  m_Name: SimpleImage
+  m_Name: TestImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
