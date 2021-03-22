@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 using NUnit.Framework;
 
 using Packages.BrandonUtils.Runtime;
+using Packages.BrandonUtils.Runtime.Collections;
 
 // ReSharper disable MemberCanBePrivate.Local
 // ReSharper disable UnusedAutoPropertyAccessor.Local
@@ -10,6 +14,43 @@ using Packages.BrandonUtils.Runtime;
 
 namespace Packages.BrandonUtils.Tests.EditMode {
     public class ReflectionUtilsTests {
+        public const int Prop_Static_Get_Only_Default_Value = 5;
+
+        public class VariableInfo {
+            public string      Name;
+            public MemberTypes MemberType;
+
+            private bool _gettable;
+            public bool Gettable {
+                get => MemberType == MemberTypes.Field || _gettable;
+                set => _gettable = value;
+            }
+
+            private bool _settable;
+            public bool Settable {
+                get => MemberType == MemberTypes.Field || _settable;
+                set => _settable = value;
+            }
+
+            private bool _isBackingField;
+            public bool IsBackingField {
+                get => MemberType == MemberTypes.Field || _isBackingField;
+                set => _isBackingField = value;
+            }
+
+            private string _backedPropertyName;
+            public string BackedPropertyName {
+                get => (MemberType != MemberTypes.Field || !IsBackingField) ? null : _backedPropertyName;
+                set => _backedPropertyName = value;
+            }
+
+            public string BackingFieldName => MemberType != MemberTypes.Property ? null : $"<{Name}>k__BackingField";
+
+            public override string ToString() {
+                return Name;
+            }
+        }
+
         private class Privacy<T> {
             public    T Field_Public;
             private   T Field_Private;
@@ -20,18 +61,18 @@ namespace Packages.BrandonUtils.Tests.EditMode {
             protected T Prop_Protected            { get;         set; }
             public    T Prop_Mixed_Private_Getter { private get; set; }
             public    T Prop_Mixed_Private_Setter { get;         private set; }
-            public    T Prop_Get_Only             => Prop_Public;
+            public    T Prop_Get_Only             { get; }
 
             public static    T Field_Static_Public;
             private static   T Field_Static_Private;
             protected static T Field_Static_Protected;
 
-            public static    T Prop_Static_Public               { get;         set; }
-            private static   T Prop_Static_Private              { get;         set; }
-            protected static T Prop_Static_Protected            { get;         set; }
-            public static    T Prop_Static_Mixed_Private_Getter { private get; set; }
-            public static    T Prop_Static_Mixed_Private_Setter { get;         private set; }
-            public static    T Prop_Static_Get_Only             => Prop_Static_Public;
+            public static    T   Prop_Static_Public               { get;         set; }
+            private static   T   Prop_Static_Private              { get;         set; }
+            protected static T   Prop_Static_Protected            { get;         set; }
+            public static    T   Prop_Static_Mixed_Private_Getter { private get; set; }
+            public static    T   Prop_Static_Mixed_Private_Setter { get;         private set; }
+            public static    int Prop_Static_Get_Only             { get; } = Prop_Static_Get_Only_Default_Value;
 
 
             public Privacy(T value) {
@@ -44,6 +85,7 @@ namespace Packages.BrandonUtils.Tests.EditMode {
                 Prop_Protected            = value;
                 Prop_Mixed_Private_Getter = value;
                 Prop_Mixed_Private_Setter = value;
+                Prop_Get_Only             = value;
 
                 Field_Static_Public    = value;
                 Field_Static_Private   = value;
@@ -56,60 +98,176 @@ namespace Packages.BrandonUtils.Tests.EditMode {
                 Prop_Static_Mixed_Private_Setter = value;
             }
 
-            public static string[] VariableNames = {
-                nameof(Field_Public),
-                nameof(Field_Private),
-                nameof(Field_Protected),
-                nameof(Prop_Public),
-                nameof(Prop_Private),
-                nameof(Prop_Protected),
-                nameof(Prop_Mixed_Private_Getter),
-                nameof(Prop_Mixed_Private_Setter),
-                nameof(Field_Static_Public),
-                nameof(Field_Static_Private),
-                nameof(Field_Static_Protected),
-                nameof(Prop_Static_Public),
-                nameof(Prop_Static_Private),
-                nameof(Prop_Static_Protected),
-                nameof(Prop_Static_Mixed_Private_Getter),
-                nameof(Prop_Static_Mixed_Private_Setter),
+            public static List<VariableInfo> VariableInfos() => new List<VariableInfo>() {
+                #region Instance Variables
+
+                #region Instance Fields
+
+                new VariableInfo() {Name = nameof(Field_Public), MemberType    = MemberTypes.Field, IsBackingField = false},
+                new VariableInfo() {Name = nameof(Field_Private), MemberType   = MemberTypes.Field, IsBackingField = false},
+                new VariableInfo() {Name = nameof(Field_Protected), MemberType = MemberTypes.Field, IsBackingField = false},
+
+                #endregion
+
+                #region Instance Properties
+
+                new VariableInfo() {Name = nameof(Prop_Public), MemberType               = MemberTypes.Property, Gettable = true, Settable = true},
+                new VariableInfo() {Name = nameof(Prop_Private), MemberType              = MemberTypes.Property, Gettable = true, Settable = true},
+                new VariableInfo() {Name = nameof(Prop_Protected), MemberType            = MemberTypes.Property, Gettable = true, Settable = true},
+                new VariableInfo() {Name = nameof(Prop_Mixed_Private_Getter), MemberType = MemberTypes.Property, Gettable = true, Settable = true},
+                new VariableInfo() {Name = nameof(Prop_Mixed_Private_Setter), MemberType = MemberTypes.Property, Gettable = true, Settable = true},
+                new VariableInfo() {Name = nameof(Prop_Get_Only), MemberType             = MemberTypes.Property, Gettable = true, Settable = false},
+
+                #endregion
+
+                #endregion
+
+                #region Static Variables
+
+                #region Static Fields
+
+                new VariableInfo() {Name = nameof(Field_Static_Public), MemberType    = MemberTypes.Field, IsBackingField = false},
+                new VariableInfo() {Name = nameof(Field_Static_Private), MemberType   = MemberTypes.Field, IsBackingField = false},
+                new VariableInfo() {Name = nameof(Field_Static_Protected), MemberType = MemberTypes.Field, IsBackingField = false},
+
+                #endregion
+
+                #region Static Properties
+
+                new VariableInfo() {Name = nameof(Prop_Static_Public), MemberType               = MemberTypes.Property, Gettable = true, Settable = true},
+                new VariableInfo() {Name = nameof(Prop_Static_Private), MemberType              = MemberTypes.Property, Gettable = true, Settable = true},
+                new VariableInfo() {Name = nameof(Prop_Static_Protected), MemberType            = MemberTypes.Property, Gettable = true, Settable = true},
+                new VariableInfo() {Name = nameof(Prop_Static_Mixed_Private_Getter), MemberType = MemberTypes.Property, Gettable = true, Settable = true},
+                new VariableInfo() {Name = nameof(Prop_Static_Mixed_Private_Setter), MemberType = MemberTypes.Property, Gettable = true, Settable = true},
+                new VariableInfo() {Name = nameof(Prop_Static_Get_Only), MemberType             = MemberTypes.Property, Gettable = true, Settable = false},
+
+                #endregion
+
+                #endregion
             };
         }
 
-        public static string[] VariableNames = Privacy<int>.VariableNames;
+        /// <summary>
+        /// Allows access to <see cref="Privacy{T}._settableVariableNames"/> from outside of <see cref="Privacy{T}"/> conveniently.
+        /// </summary>
+        /// <seealso cref="AllVariables"/>
+        public static List<VariableInfo> SettableVariables => Privacy<int>.VariableInfos().Where(it => it.Settable).ToList();
+
+        /// <summary>
+        /// Allows access to <see cref="Privacy{T}._allVariableNames"/> from outside of <see cref="Privacy{T}"/> conveniently.
+        /// </summary>
+        /// <seealso cref="SettableVariables"/>
+        public static List<VariableInfo> AllVariables => Privacy<int>.VariableInfos();
+
+        public static List<VariableInfo> AllProperties => Privacy<int>.VariableInfos().Where(it => it.MemberType == MemberTypes.Property).ToList();
+
 
         [Test]
         public void GetVariable(
-            [ValueSource(
-                nameof(VariableNames)
-            )]
-            [Values(
-                nameof(Privacy<object>.Prop_Get_Only),
-                nameof(Privacy<object>.Prop_Static_Get_Only)
-            )]
-            string variableName
+            [ValueSource(nameof(AllVariables))]
+            VariableInfo expectedGettableVariable
         ) {
-            var randomInt = new Random().Next();
+            var setInt = expectedGettableVariable.Name == nameof(Privacy<int>.Prop_Static_Get_Only) ? Prop_Static_Get_Only_Default_Value : new Random().Next();
 
-            var privacy = new Privacy<int>(randomInt);
+            var privacy = new Privacy<int>(setInt);
 
-            var val = ReflectionUtils.GetVariable<int>(privacy, variableName);
-            Assert.That(val, Is.EqualTo(randomInt));
+            var val = ReflectionUtils.GetVariable<int>(privacy, expectedGettableVariable.Name);
+            Assert.That(val, Is.EqualTo(setInt));
         }
 
         [Test]
         public void SetVariable(
-            [ValueSource(nameof(VariableNames))]
-            string variableName
+            [ValueSource(nameof(SettableVariables))]
+            VariableInfo expectedSettableVariable
         ) {
-            var randomInt = new Random().Next();
-            var setInt    = randomInt + 1;
+            Assume.That(expectedSettableVariable, Has.Property(nameof(expectedSettableVariable.Settable)).True);
 
-            var privacy = new Privacy<int>(randomInt);
+            var initialInt = new Random().Next();
+            var updatedInt = initialInt + 1;
 
-            ReflectionUtils.SetVariable(privacy, variableName, setInt);
-            Assert.That(ReflectionUtils.GetVariable(privacy, variableName), Is.EqualTo(setInt));
-            Assert.That(ReflectionUtils.GetVariable(privacy, variableName), Is.Not.EqualTo(randomInt));
+            var privacy = new Privacy<int>(initialInt);
+
+            ReflectionUtils.SetVariable(privacy, expectedSettableVariable.Name, updatedInt);
+            Assert.That(ReflectionUtils.GetVariable(privacy, expectedSettableVariable.Name), Is.EqualTo(updatedInt));
+            Assert.That(ReflectionUtils.GetVariable(privacy, expectedSettableVariable.Name), Is.Not.EqualTo(initialInt));
         }
+
+        [Test]
+        public void GetVariablesHasSpecificVariable(
+            [ValueSource(nameof(AllVariables))]
+            string expectedVariableName
+        ) {
+            var actualVariableNames = typeof(Privacy<int>).GetVariables().Select(it => it.Name).ToList();
+
+            Assert.That(actualVariableNames, Contains.Item(expectedVariableName));
+        }
+
+        [Test]
+        public void GetVariablesHasOnlyExpectedVariables() {
+            Console.WriteLine($"{nameof(AllVariables)}: {AllVariables.JoinString(", ")}");
+            Console.WriteLine($"{nameof(SettableVariables)}: {SettableVariables.JoinString(", ")}");
+            var actualVariableNames = typeof(Privacy<int>).GetVariables().Select(it => it.Name);
+
+            foreach (var vn in actualVariableNames) {
+                Console.WriteLine($"Checking {vn}");
+                Assert.That(AllVariables, Contains.Item(vn));
+            }
+        }
+
+        [Test]
+        public void GetVariables() {
+            Assert.That(
+                typeof(Privacy<int>).GetVariables().Select(it => it.Name),
+                Is.EquivalentTo(AllVariables.Select(it => it.Name))
+            );
+        }
+
+        #region Backing Fields
+
+        [Test]
+        public void GetBackedPropertyName(
+            [ValueSource(nameof(AllVariables))]
+            VariableInfo propertyWithBackingField
+        ) {
+            Assume.That(propertyWithBackingField.MemberType, Is.EqualTo(MemberTypes.Property), "This is not a property!");
+            var backingFieldInfo = typeof(Privacy<int>).GetField(propertyWithBackingField.BackingFieldName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+
+            Assert.That(backingFieldInfo, Is.Not.Null, $"Unable to retrieve a field named {propertyWithBackingField.BackingFieldName}");
+
+            Console.WriteLine($"propInfo: {backingFieldInfo}");
+            Console.WriteLine(backingFieldInfo.Name);
+            Assert.That(backingFieldInfo.GetBackedPropertyName(), Is.EqualTo(propertyWithBackingField.Name));
+        }
+
+        [Test]
+        public void BackingField(
+            [ValueSource(nameof(AllProperties))]
+            VariableInfo propertyWithBackingField
+        ) {
+            Assume.That(propertyWithBackingField.MemberType, Is.EqualTo(MemberTypes.Property));
+            var propertyInfo = typeof(Privacy<int>).GetProperty(propertyWithBackingField.Name, BindingFlags.Default | BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static | BindingFlags.NonPublic);
+
+            Assert.That(propertyInfo, Is.Not.Null, $"Couldn't retrieve a property info for {propertyWithBackingField}");
+
+            var backingField = propertyInfo.BackingField();
+
+            Assert.That(backingField, Is.Not.Null, $"Couldn't retrieve a backing field for {propertyWithBackingField}");
+
+            Assert.That(backingField, Has.Property(nameof(MemberInfo.Name)).EqualTo(propertyWithBackingField.BackingFieldName), $"Found a backing field for {propertyWithBackingField}, but it wasn't named {propertyWithBackingField.BackingFieldName}");
+        }
+
+        [Test]
+        public void IsBackingField(
+            [ValueSource(nameof(AllProperties))]
+            VariableInfo propertyWithBackingField
+        ) {
+            Assume.That(propertyWithBackingField.MemberType, Is.EqualTo(MemberTypes.Property));
+            var backingFieldInfo = typeof(Privacy<int>).GetField(propertyWithBackingField.BackingFieldName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+
+            Assert.That(backingFieldInfo,                Is.Not.Null);
+            Assert.That(backingFieldInfo.IsBackingField, Is.True);
+        }
+
+        #endregion
     }
 }
