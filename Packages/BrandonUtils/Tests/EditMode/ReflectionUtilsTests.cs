@@ -159,7 +159,7 @@ namespace Packages.BrandonUtils.Tests.EditMode {
 
             var privacy = new Privacy<int>(setInt);
 
-            var val = ReflectionUtils.GetVariable<int>(privacy, expectedGettableVariable.Name);
+            var val = ReflectionUtils.GetVariableValue<int>(privacy, expectedGettableVariable.Name);
             Assert.That(val, Is.EqualTo(setInt));
         }
 
@@ -175,9 +175,9 @@ namespace Packages.BrandonUtils.Tests.EditMode {
 
             var privacy = new Privacy<int>(initialInt);
 
-            ReflectionUtils.SetVariable(privacy, expectedSettableVariable.Name, updatedInt);
-            Assert.That(ReflectionUtils.GetVariable(privacy, expectedSettableVariable.Name), Is.EqualTo(updatedInt));
-            Assert.That(ReflectionUtils.GetVariable(privacy, expectedSettableVariable.Name), Is.Not.EqualTo(initialInt));
+            ReflectionUtils.SetVariableValue(privacy, expectedSettableVariable.Name, updatedInt);
+            Assert.That(ReflectionUtils.GetVariableValue(privacy, expectedSettableVariable.Name), Is.EqualTo(updatedInt));
+            Assert.That(ReflectionUtils.GetVariableValue(privacy, expectedSettableVariable.Name), Is.Not.EqualTo(initialInt));
         }
 
         [Test]

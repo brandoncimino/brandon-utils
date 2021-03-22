@@ -117,7 +117,7 @@ namespace Packages.BrandonUtils.Runtime {
         /// <exception cref="InvalidCastException">If the retrieved value cannot be cast to <typeparamref name="T"/></exception>
         /// <exception cref="MissingMemberException"><inheritdoc cref="GetVariableInfo"/></exception>
         [Pure]
-        public static T GetVariable<T>(object obj, string variableName) {
+        public static T GetVariableValue<T>(object obj, string variableName) {
             var v = obj.GetType().GetVariableInfo(variableName);
             switch (v) {
                 case PropertyInfo prop:
@@ -140,17 +140,17 @@ namespace Packages.BrandonUtils.Runtime {
         }
 
         /// <summary>
-        /// <inheritdoc cref="GetVariable{T}"/>
+        /// <inheritdoc cref="GetVariableValue{T}"/>
         /// </summary>
-        /// <param name="obj"><inheritdoc cref="GetVariable{T}"/></param>
-        /// <param name="variableName"><inheritdoc cref="GetVariable{T}"/></param>
-        /// <returns><inheritdoc cref="GetVariable{T}"/></returns>
+        /// <param name="obj"><inheritdoc cref="GetVariableValue{T}"/></param>
+        /// <param name="variableName"><inheritdoc cref="GetVariableValue{T}"/></param>
+        /// <returns><inheritdoc cref="GetVariableValue{T}"/></returns>
         [Pure]
-        public static object GetVariable(object obj, string variableName) {
-            return GetVariable<object>(obj, variableName);
+        public static object GetVariableValue(object obj, string variableName) {
+            return GetVariableValue<object>(obj, variableName);
         }
 
-        public static void SetVariable<T>(object obj, string variableName, T value) {
+        public static void SetVariableValue<T>(object obj, string variableName, T value) {
             var v = obj.GetType().GetVariableInfo(variableName);
             switch (v) {
                 case PropertyInfo prop:
