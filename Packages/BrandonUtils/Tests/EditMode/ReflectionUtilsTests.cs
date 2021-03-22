@@ -14,7 +14,7 @@ using Packages.BrandonUtils.Runtime.Collections;
 
 namespace Packages.BrandonUtils.Tests.EditMode {
     public class ReflectionUtilsTests {
-        public const int Prop_Static_Get_Only_Default_Value = 5;
+        private const int Prop_Static_Get_Only_Default_Value = 5;
 
         public class VariableInfo {
             public string      Name;
@@ -30,18 +30,6 @@ namespace Packages.BrandonUtils.Tests.EditMode {
             public bool Settable {
                 get => MemberType == MemberTypes.Field || _settable;
                 set => _settable = value;
-            }
-
-            private bool _isBackingField;
-            public bool IsBackingField {
-                get => MemberType == MemberTypes.Field || _isBackingField;
-                set => _isBackingField = value;
-            }
-
-            private string _backedPropertyName;
-            public string BackedPropertyName {
-                get => (MemberType != MemberTypes.Field || !IsBackingField) ? null : _backedPropertyName;
-                set => _backedPropertyName = value;
             }
 
             public string BackingFieldName => MemberType != MemberTypes.Property ? null : $"<{Name}>k__BackingField";
@@ -103,9 +91,9 @@ namespace Packages.BrandonUtils.Tests.EditMode {
 
                 #region Instance Fields
 
-                new VariableInfo() {Name = nameof(Field_Public), MemberType    = MemberTypes.Field, IsBackingField = false},
-                new VariableInfo() {Name = nameof(Field_Private), MemberType   = MemberTypes.Field, IsBackingField = false},
-                new VariableInfo() {Name = nameof(Field_Protected), MemberType = MemberTypes.Field, IsBackingField = false},
+                new VariableInfo() {Name = nameof(Field_Public), MemberType    = MemberTypes.Field},
+                new VariableInfo() {Name = nameof(Field_Private), MemberType   = MemberTypes.Field},
+                new VariableInfo() {Name = nameof(Field_Protected), MemberType = MemberTypes.Field},
 
                 #endregion
 
@@ -126,9 +114,9 @@ namespace Packages.BrandonUtils.Tests.EditMode {
 
                 #region Static Fields
 
-                new VariableInfo() {Name = nameof(Field_Static_Public), MemberType    = MemberTypes.Field, IsBackingField = false},
-                new VariableInfo() {Name = nameof(Field_Static_Private), MemberType   = MemberTypes.Field, IsBackingField = false},
-                new VariableInfo() {Name = nameof(Field_Static_Protected), MemberType = MemberTypes.Field, IsBackingField = false},
+                new VariableInfo() {Name = nameof(Field_Static_Public), MemberType    = MemberTypes.Field},
+                new VariableInfo() {Name = nameof(Field_Static_Private), MemberType   = MemberTypes.Field},
+                new VariableInfo() {Name = nameof(Field_Static_Protected), MemberType = MemberTypes.Field},
 
                 #endregion
 
