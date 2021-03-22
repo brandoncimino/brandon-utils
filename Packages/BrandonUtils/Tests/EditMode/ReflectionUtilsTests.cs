@@ -148,19 +148,19 @@ namespace Packages.BrandonUtils.Tests.EditMode {
         }
 
         /// <summary>
-        /// Allows access to <see cref="Privacy{T}._settableVariableNames"/> from outside of <see cref="Privacy{T}"/> conveniently.
+        /// Returns the settable entries from <see cref="AllVariables"/>
         /// </summary>
-        /// <seealso cref="AllVariables"/>
         public static List<VariableInfo> SettableVariables => Privacy<int>.VariableInfos().Where(it => it.Settable).ToList();
 
         /// <summary>
-        /// Allows access to <see cref="Privacy{T}._allVariableNames"/> from outside of <see cref="Privacy{T}"/> conveniently.
+        /// Allows access to <see cref="Privacy{T}.VariableInfos"/> cleanly in <see cref="ValueSourceAttribute"/>s
         /// </summary>
-        /// <seealso cref="SettableVariables"/>
         public static List<VariableInfo> AllVariables => Privacy<int>.VariableInfos();
 
+        /// <summary>
+        /// Returns the <see cref="MemberTypes.Property"/> entries from <see cref="AllVariables"/>
+        /// </summary>
         public static List<VariableInfo> AllProperties => Privacy<int>.VariableInfos().Where(it => it.MemberType == MemberTypes.Property).ToList();
-
 
         [Test]
         public void GetVariable(
