@@ -4,6 +4,75 @@
 == Small
 
 - [ ] Update `LogUtils` so that it can work when executing tests in the "Standalone NUnit Launcher" mode
+- [ ] Would it be OK to exclude link:Packages/packages-lock.json[] from source control?
+** I feel that lock files complete undermine the purpose of a link:Packages/manifest.json[]...
++
+."Lock" files{wj}footnote:[In the context of package managers, like the https://docs.unity3d.com/Manual/CustomPackages.html[Unity Package Manager], https://en.wikipedia.org/wiki/RubyGems[RubyGems], etc. Not to be confused with https://en.wikipedia.org/wiki/File_locking#Lock_files[operating system lock files].]
+[sidebar]
+--
+I think they're absurdly stupid.
+
+Theoretically, they "ensure that you got the exact same version of your dependencies as somebody else."{wj}footnote:[Dale Myers, https://myers.io/2019/01/13/what-is-the-purpose-of-a-lock-file-for-package-managers/[_What is the purpose of a Lock File for Package Managers?_] January 13, 2019]
+
+Here's the problem..._that's what a https://en.wikipedia.org/wiki/Manifest_file[manifest] does_! https://bundler.io/v2.2/man/gemfile.5.html#NAME
+
+It seems to me that if you want an _exact version_, then you should specify it explicitly!
+
+If I declare this dependency (using Gemfile as an example):
+
+[source,ruby]
+----
+gem 'json', '1.0'
+----
+
+Then that means "I want version 1.0" - and that's what I'll get!
+Perfect!
+
+If I declare:
+
+[source,ruby]
+----
+gem 'json', '>1.0'
+----
+
+Then that _should_ mean "I want at least version `1.0`"!
+When version `2.0` comes out, I want it!
+
+But then there's some stupid lock file that says "I know you _said_ `>1.0`, and I know you _meant_ `>1.0`, but I snuck in there and I changed it to `1.1`!
+_Suck it, nerd!_"
+
+And the justification is supposedly, "This way when you give it to Michael, he gets version `1.1`, same as you!"
+
+To which I would reply:
+
+CAUTION: *What makes you think I want that?!*
+
+CAUTION: I don't want Michael to have version `1.1`, I want him to have _at least version `1.0`!_
+
+I should clarify that I understand the value of https://guides.rubygems.org/patterns/#pessimistic-version-constraint[pessimistic versioning]{wj}footnote:[Gemfile.org says that Ruby's "pessimistic constraint operator", `~>`, is called a twiddle-wakka. I have attempted to find a sou].
+But here's the problem:
+
+CAUTION: If I wanted Michael to have version `1.1`, I would've written `gem 'json', '1.1'`!
+
+.Twiddle-Wakka
+****
+Gemfile.org says that Ruby's "pessimistic constraint operator", `~>`, is called a twiddle-wakka.
+
+I have attempted to find a scholarly resource that corroborates this claim, and the best I have found is a https://github.com/rubygems/rubygems/pull/123[debate from 2011] in which the relative merits of "twiddle-wakka" vs. "spermy" are debated.{wj}footnote:[Apparently, they went with https://github.com/rubygems/rubygems/pull/124["approximate"], which is https://en.wikipedia.org/wiki/Objectivity_(philosophy)[objectively] wrong, because there already is an https://en.wikipedia.org/wiki/Approximation#Unicode[approximation symbol]!]
+
+Other sources include:
+
+. https://github.com/JuanitoFatas/what-do-you-call-this-in-ruby[what-do-you-call-this-in-ruby], which is good but https://en.wikipedia.org/wiki/Template:No_footnotes[lacks inline citations].
+. https://alerner1st.medium.com/the-strange-case-of-the-twiddle-wakka-5a70a0f5a509[The strange case of the twiddle-wakka], which does a good job of documenting the origin of https://en.wiktionary.org/wiki/twiddle[twiddle]{wj}footnote:[Not that this was at all ambiguous...] but appears to be completely unaware of the existence of https://en.wikipedia.org/wiki/Pac-Man[Pac-Man]{wj}footnote:[Though, for some _absurd_ reason, the only dictionary I could find with an entry for "wakka" is https://www.urbandictionary.com/define.php?term=wakka[Urban Dictionary]!].
+
+Research is ongoing.
+****
+
+
+--
+
+*** This goes for other lock files!
+I https://myers.io/2019/01/13/what-is-the-purpose-of-a-lock-file-for-package-managers/[disagree with their purpose]!
 
 == Really Big
 
