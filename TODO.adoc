@@ -1,0 +1,35 @@
+﻿= icon:list[] To-do's
+:icons: font
+
+== Small
+
+- [ ] Update `LogUtils` so that it can work when executing tests in the "Standalone NUnit Launcher" mode
+
+== Really Big
+
+Things that each need their _own section_
+
+=== Create `B#`
+
+This would be "normal" `C#` package (maybe it's called a `dll`?) built by a *separate project* that would contain the things that Brandon likes that are *independent of Unity*.
+
+This package could then be shared by both https://github.com/brandoncimino/brandon-utils[brandon-utils] and https://github.com/brandoncimino/PowerSharp[PowerSharp].
+
+.The Name `B#` ("bsharp")
+[WARNING]
+--
+Is `B#` _too cute_?
+
+It starts to sound like https://en.wikipedia.org/wiki/Make_(software)#Derivatives[`make`] -> https://en.wikipedia.org/wiki/Rake_(software)[`rake`] -> https://en.wikipedia.org/wiki/Psake[`psake`]...
+--
+
+- Probably would be distributed via https://www.nuget.org/[NuGet]
+** Is there a way to pull "packages" directly from Git URLs, https://docs.unity3d.com/Manual/upm-ui-giturl.html#:~:text=The%20Package%20Manager%20can%20load%20a%20package%20from,as%20an%20entry%20point%20for%20the%20Package%20Manager[like Unity can]?
+- Would be able to use the most up-to-date version of `NUnit`, which means https://docs.nunit.org/articles/nunit/writing-tests/assertions/multiple-asserts.html[`Assert.Multiple()`]!
++
+> The test will be terminated immediately if any exception is thrown that is not handled.
+An unexpected exception is often an indication that the test itself is in error, so it must be terminated.
+If the exception occurs after one or more assertion failures have been recorded, *those failures will be reported along with the terminating exception itself*.
+> -- https://docs.nunit.org/articles/nunit/writing-tests/assertions/multiple-asserts.html#notes[Multiple Asserts / Notes]
+
+** Could this cause transient-dependency issues with Unity's version of `NUnit`?
