@@ -6,3 +6,25 @@
 .Regarding Namespaces
 NOTE: For some reason, `Runtime` seems to be omitted.
 I'm going to trust Rider on this one.
+
+[NOTE]
+====
+This package uses `com.unity.nuget.newtonsoft-json` as a dependency (rather than https://github.com/jilleJr/Newtonsoft.Json-for-Unity[Newtonsoft.Json for Unity]) because https://docs.unity3d.com/Manual/upm-git.html[git dependencies are not supported for packages].
+
+It may be possible to move to https://github.com/jilleJr/Newtonsoft.Json-for-Unity[Newtonsoft.Json for Unity] using the package's newer methods of dependency inclusion.
+====
+
+== To-Do's
+
+- [ ] Improve link:Runtime/Logging/LogUtils.cs[] so that it can be referenced from _any_ assembly
+** I don't think conditional compiling will work, because the `.asmdef` isn't conditional in that way...
+** I might have to go _real_ hard, and use https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/partial-classes-and-methods[partial classes]!
+- [ ] Fix usage of JetBrains attributes (e.g. `[UsedImplicitly]`)
+** https://blog.jetbrains.com/dotnet/2018/05/03/what-are-jetbrains-annotations/[This article] references a https://www.nuget.org/packages/JetBrains.Annotations/[`JetBrains.Annotations` NuGet package]
+*** That article is from `2018`, but it looks like the settings it references still exist
+*** I don't understand why I would have to get a NuGet package, though - aren't these annotations built-in to Rider?
+*** It looks like they do get packaged along with a "Unity Core" reference, but I don't want that in the standalone code
+*** It might be better for the standalone code to just bite the bullet and use the NuGet package, anyways
+*** Actually I think the `package.json` file might work with NuGet anyways
+*** [x] [.line-through]#Attempt via `com.unity.ide.rider` dependency#
+**** Didn't work at all
