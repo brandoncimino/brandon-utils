@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Packages.BrandonUtils.Runtime.Collections;
-using Packages.BrandonUtils.Runtime.Enums;
-using Packages.BrandonUtils.Runtime.Logging;
+using BrandonUtils.Collections;
+using BrandonUtils.Enums;
+using BrandonUtils.Logging;
 
 using TMPro;
 
@@ -12,7 +12,7 @@ using UnityEngine;
 
 using static UnityEngine.RectTransform.Edge;
 
-namespace Packages.BrandonUtils.Runtime.UI {
+namespace BrandonUtils.UI {
     // ReSharper disable once InconsistentNaming
     public class TMP_Word {
         public TMP_Text TextMesh;

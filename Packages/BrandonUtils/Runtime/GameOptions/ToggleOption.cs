@@ -2,7 +2,7 @@
 
 using Newtonsoft.Json;
 
-namespace Packages.BrandonUtils.Runtime.GameOptions {
+namespace BrandonUtils.GameOptions {
     /// <summary>
     /// A boolean <see cref="GameOption"/>.
     /// </summary>

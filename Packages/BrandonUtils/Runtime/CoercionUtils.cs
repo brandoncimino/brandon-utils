@@ -1,12 +1,12 @@
 ﻿using System;
 
-using JetBrains.Annotations;
+using BrandonUtils.Timing;
 
-using Packages.BrandonUtils.Runtime.Timing;
+using JetBrains.Annotations;
 
 using UnityEngine;
 
-namespace Packages.BrandonUtils.Runtime {
+namespace BrandonUtils {
     public static class CoercionUtils {
         /// <summary>
         /// Attempts to add <paramref name="a"/> and <paramref name="b"/> together by coercing them into compatible types.

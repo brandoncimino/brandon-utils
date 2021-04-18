@@ -2,12 +2,11 @@ using System;
 using System.Collections;
 using System.Linq;
 
+using BrandonUtils.Exceptions;
+
 using NUnit.Framework.Constraints;
 
-using Packages.BrandonUtils.Runtime;
-using Packages.BrandonUtils.Runtime.Exceptions;
-
-namespace Packages.BrandonUtils.Editor.Testing {
+namespace BrandonUtils.Editor.Testing {
     /// <summary>
     /// TODO: Add tests, after I refactor the project (again)!
     /// </summary>

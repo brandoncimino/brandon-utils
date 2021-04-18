@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-using Packages.BrandonUtils.Runtime.Collections;
+using BrandonUtils.Collections;
 
-namespace Packages.BrandonUtils.Runtime.Exceptions {
+namespace BrandonUtils.Exceptions {
     public class EnumNotInSubsetException<T> : InvalidEnumArgumentException where T : Enum {
         public override string Message { get; }
 

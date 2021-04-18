@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace Packages.BrandonUtils.Runtime.Enums {
+namespace BrandonUtils.Enums {
     public static class EnumUtils {
         public static T Step<T>(this T currentEnumValue, int step) where T : Enum {
             if (step < 0) {

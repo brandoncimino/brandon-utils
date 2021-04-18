@@ -1,6 +1,6 @@
 ﻿using UnityEngine.UI;
 
-namespace Packages.BrandonUtils.Runtime.GameOptions {
+namespace BrandonUtils.GameOptions {
     public class SliderOptionRenderer : GameOptionRenderer<SliderOption> {
         public Slider Slider;
         public Text   MinLabel;

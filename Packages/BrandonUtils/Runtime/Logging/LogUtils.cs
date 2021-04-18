@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-using Packages.BrandonUtils.Runtime.Strings;
+using BrandonUtils.Strings;
 
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Packages.BrandonUtils.Runtime.Logging {
+namespace BrandonUtils.Logging {
     [RequireComponent(typeof(Text))]
     public class LogUtils : MonoBehaviour {
         [Flags]

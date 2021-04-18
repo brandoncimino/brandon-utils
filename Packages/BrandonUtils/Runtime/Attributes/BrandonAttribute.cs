@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Reflection;
 
-using Packages.BrandonUtils.Runtime.Exceptions;
+using BrandonUtils.Exceptions;
 
-namespace Packages.BrandonUtils.Runtime {
+namespace BrandonUtils.Attributes {
     /// <summary>
     /// The parent class for <see cref="BrandonUtils"/> <see cref="Attribute"/>s like <see cref="EditorInvocationButtonAttribute"/>.
     /// </summary>

@@ -1,0 +1,8 @@
+﻿= brandon-utils
+:note-caption: 📰
+
+> Stuff link:https://brandoncimino.com[Brandon] wants in every Unity project.
+
+.Regarding Namespaces
+NOTE: For some reason, `Runtime` seems to be omitted.
+I'm going to trust Rider on this one.

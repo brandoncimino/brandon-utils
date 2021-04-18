@@ -4,7 +4,7 @@ using System.Linq;
 
 using UnityEngine;
 
-namespace Packages.BrandonUtils.Runtime.UI {
+namespace BrandonUtils.UI {
     public static class RectTransformUtils {
         public static RectTransform Align(this RectTransform me, RectTransform.Edge edge, float target) {
             var edgePosition = me.GetEdgePosition_AsFloat(edge);

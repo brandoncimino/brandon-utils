@@ -2,15 +2,15 @@
 using System.Collections;
 using System.Threading;
 
-using NUnit.Framework;
+using BrandonUtils.Editor.Testing;
+using BrandonUtils.Timing;
 
-using Packages.BrandonUtils.Editor.Testing;
-using Packages.BrandonUtils.Runtime.Timing;
+using NUnit.Framework;
 
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace Packages.BrandonUtils.Tests.PlayMode {
+namespace BrandonUtils.Tests.PlayMode {
     public class FrameTimeTests {
         private static float[] RealTimes = {
             0.00000001f,

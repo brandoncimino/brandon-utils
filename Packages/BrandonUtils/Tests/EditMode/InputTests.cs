@@ -1,13 +1,13 @@
-﻿using NUnit.Framework;
+﻿using BrandonUtils.Exceptions;
+using BrandonUtils.Input;
 
-using Packages.BrandonUtils.Runtime.Exceptions;
-using Packages.BrandonUtils.Runtime.Input;
+using NUnit.Framework;
 
 using UnityEngine;
 
 using static UnityEngine.KeyCode;
 
-namespace Packages.BrandonUtils.Tests.EditMode {
+namespace BrandonUtils.Tests.EditMode {
     public class InputTests {
         private static KeyCode[] NonDirectionalKeys = {
             Comma,

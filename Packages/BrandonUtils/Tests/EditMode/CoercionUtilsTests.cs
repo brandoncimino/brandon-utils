@@ -1,12 +1,12 @@
 ﻿using System;
 
+using BrandonUtils.Timing;
+
 using NUnit.Framework;
 
-using Packages.BrandonUtils.Runtime.Timing;
+using static BrandonUtils.CoercionUtils;
 
-using static Packages.BrandonUtils.Runtime.CoercionUtils;
-
-namespace Packages.BrandonUtils.Tests.EditMode {
+namespace BrandonUtils.Tests.EditMode {
     public class CoercionUtilsTests {
         [Test]
         public void CoerciveAddition_int() {

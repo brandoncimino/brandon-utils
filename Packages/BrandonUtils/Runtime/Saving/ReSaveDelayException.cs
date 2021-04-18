@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Packages.BrandonUtils.Runtime.Saving {
+namespace BrandonUtils.Saving {
     /// <summary>
-    /// A special <see cref="SaveDataException{T}"/> thrown when a <see cref="SaveData{T}"/> is <see cref="SaveData{T}.Save(Packages.BrandonUtils.Runtime.Saving.SaveData{T},string,bool)"/>-ed before <see cref="SaveData{T}.ReSaveDelay"/> has elapsed.
+    /// A special <see cref="SaveDataException{T}"/> thrown when a <see cref="SaveData{T}"/> is <see cref="SaveData{T}.Save(BrandonUtils.Saving.SaveData{T},string,bool)"/>-ed before <see cref="SaveData{T}.ReSaveDelay"/> has elapsed.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class ReSaveDelayException<T> : SaveDataException<T> where T : SaveData<T>, new() {

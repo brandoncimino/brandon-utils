@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
 
-using NUnit.Framework;
+using BrandonUtils.Collections;
+using BrandonUtils.Editor.Testing;
+using BrandonUtils.Strings;
+using BrandonUtils.UI;
 
-using Packages.BrandonUtils.Editor.Testing;
-using Packages.BrandonUtils.Runtime.Collections;
-using Packages.BrandonUtils.Runtime.Strings;
-using Packages.BrandonUtils.Runtime.UI;
+using NUnit.Framework;
 
 using TMPro;
 
@@ -14,7 +14,7 @@ using UnityEngine;
 
 using Object = UnityEngine.Object;
 
-namespace Packages.BrandonUtils.Tests.PlayMode.UI {
+namespace BrandonUtils.Tests.PlayMode.UI {
     public class TMPUtilsTests {
         #region Resources
 

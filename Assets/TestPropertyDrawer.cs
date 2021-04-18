@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Packages.BrandonUtils.Runtime;
-using Packages.BrandonUtils.Runtime.Collections;
-using Packages.BrandonUtils.Runtime.Logging;
-using Packages.BrandonUtils.Runtime.Strings;
+using BrandonUtils.Attributes;
+using BrandonUtils.Collections;
+using BrandonUtils.Logging;
+using BrandonUtils.Strings;
 
 using UnityEngine;
 

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-using Packages.BrandonUtils.Runtime;
-using Packages.BrandonUtils.Runtime.Logging;
-using Packages.BrandonUtils.Runtime.UI;
+using BrandonUtils.Attributes;
+using BrandonUtils.Logging;
+using BrandonUtils.UI;
 
 using TMPro;
 

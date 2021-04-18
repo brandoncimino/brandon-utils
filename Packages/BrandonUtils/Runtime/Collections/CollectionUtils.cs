@@ -4,11 +4,11 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 
+using BrandonUtils.Enums;
+
 using JetBrains.Annotations;
 
-using Packages.BrandonUtils.Runtime.Enums;
-
-namespace Packages.BrandonUtils.Runtime.Collections {
+namespace BrandonUtils.Collections {
     /// <summary>
     ///     Contains utility and extension methods for collections, such as <see cref="IList{T}" /> and <see cref="IDictionary{TKey,TValue}" />.
     /// </summary>

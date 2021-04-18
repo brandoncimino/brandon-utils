@@ -1,10 +1,10 @@
-﻿using Packages.BrandonUtils.Runtime.Collections;
+﻿using BrandonUtils.Collections;
 
 using UnityEditor;
 
 using UnityEngine;
 
-namespace Packages.BrandonUtils.Editor {
+namespace BrandonUtils.Editor {
     [CustomPropertyDrawer(typeof(Pair<,>))]
     public class PairDrawer : PropertyDrawer {
         // Draw the property inside the given rect

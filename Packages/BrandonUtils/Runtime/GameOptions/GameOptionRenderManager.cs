@@ -4,7 +4,7 @@ using System.Linq;
 
 using UnityEngine;
 
-namespace Packages.BrandonUtils.Runtime.GameOptions {
+namespace BrandonUtils.GameOptions {
     public class GameOptionRenderManager : MonoBehaviour {
         public  GameObject          SliderPrefab;
         public  GameObject          TogglePrefab;

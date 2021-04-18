@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Reflection;
 
-using Packages.BrandonUtils.Runtime.Exceptions;
+using BrandonUtils.Exceptions;
 
-namespace Packages.BrandonUtils.Runtime {
+namespace BrandonUtils.Attributes {
     /// <summary>
     /// Creates a button in the Unity editor that will execute the annotated <see cref="AttributeTargets.Method"/>.
     /// </summary>

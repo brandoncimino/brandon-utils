@@ -1,3 +1,3 @@
-﻿namespace Packages.BrandonUtils.Tests.EditMode.UI {
+﻿namespace BrandonUtils.Tests.PlayMode.UI {
     public class GameOptionTests { }
 }

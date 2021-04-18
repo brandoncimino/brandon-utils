@@ -1,4 +1,4 @@
-﻿namespace Packages.BrandonUtils.Runtime.GameOptions {
+﻿namespace BrandonUtils.GameOptions {
     public interface IGameMode {
         /// <summary>
         /// This should return an array containing all of the <see cref="GameOption"/>s specifically declared within the implementer.

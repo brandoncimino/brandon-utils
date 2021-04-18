@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Packages.BrandonUtils.Runtime.Vectors {
+namespace BrandonUtils.Vectors {
     public static class Vector3Utils {
         public static Vector3 Copy(this Vector3 original) {
             return new Vector3(original.x, original.y, original.z);

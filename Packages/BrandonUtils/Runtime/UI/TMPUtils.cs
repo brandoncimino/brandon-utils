@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using JetBrains.Annotations;
+using BrandonUtils.Collections;
 
-using Packages.BrandonUtils.Runtime.Collections;
+using JetBrains.Annotations;
 
 using TMPro;
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace Packages.BrandonUtils.Runtime.UI {
+namespace BrandonUtils.UI {
     /// <summary>
     /// Contains extensions and utilities for <see cref="TextMeshPro"/>.
     /// </summary>

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Packages.BrandonUtils.Runtime.Vectors {
+namespace BrandonUtils.Vectors {
     static internal class Vector2Utils {
         /// <summary>
         /// Multiplies each component of <paramref name="original"/> by the corresponding component of <paramref name="scale"/>.

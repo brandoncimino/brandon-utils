@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Packages.BrandonUtils.Runtime.Exceptions {
+namespace BrandonUtils.Exceptions {
     /// <summary>
     /// An <see cref="System.Exception"/> to be thrown at corporeal ontology, which will hit it from behind.
     /// </summary>

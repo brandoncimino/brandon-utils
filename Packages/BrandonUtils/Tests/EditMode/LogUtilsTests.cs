@@ -1,8 +1,8 @@
-﻿using NUnit.Framework;
+﻿using BrandonUtils.Logging;
 
-using Packages.BrandonUtils.Runtime.Logging;
+using NUnit.Framework;
 
-namespace Packages.BrandonUtils.Tests.EditMode {
+namespace BrandonUtils.Tests.EditMode {
     public class LogUtilsTests {
         [Test]
         public void CanLogInEditMode() {

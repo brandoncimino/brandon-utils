@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
 
-using Newtonsoft.Json;
+using BrandonUtils.Strings;
 
-using Packages.BrandonUtils.Runtime.Strings;
+using Newtonsoft.Json;
 
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Packages.BrandonUtils.Runtime.GameOptions {
+namespace BrandonUtils.GameOptions {
     public abstract class GameOption {
         /// <summary>
         /// The initial value for this <see cref="GameOption"/>.

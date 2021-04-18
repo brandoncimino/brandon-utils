@@ -1,10 +1,10 @@
 ﻿using System;
 
-using Packages.BrandonUtils.Runtime.Enums;
+using BrandonUtils.Enums;
 
 using UnityEngine;
 
-namespace Packages.BrandonUtils.Runtime.UI {
+namespace BrandonUtils.UI {
     /// <summary>
     /// Utilities for managing the <see cref="RectTransform.Axis"/> enum, such as converting between <see cref="RectTransform.Axis"/> and <see cref="RectTransform.Edge"/>.
     /// </summary>

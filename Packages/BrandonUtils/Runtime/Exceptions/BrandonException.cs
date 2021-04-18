@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Packages.BrandonUtils.Runtime.Exceptions {
+namespace BrandonUtils.Exceptions {
     public class BrandonException : SystemException {
         public virtual  string BaseMessage   { get; } = "This was probably Brandon's fault. For support, call 203-481-1845.";
         public          string CustomMessage { get; }

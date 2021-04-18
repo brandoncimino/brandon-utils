@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-using Packages.BrandonUtils.Runtime.Exceptions;
+using BrandonUtils.Exceptions;
 
-namespace Packages.BrandonUtils.Runtime.Enums {
+namespace BrandonUtils.Enums {
     /// <summary>
     /// A wrapper around a <see cref="IList{T}"/> of <see cref="Enum"/> <typeparamref name="T"/> values.
     /// <br/>

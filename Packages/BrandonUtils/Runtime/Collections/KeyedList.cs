@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.Serialization;
+
 using Newtonsoft.Json;
 
-namespace Packages.BrandonUtils.Runtime.Collections {
+namespace BrandonUtils.Collections {
     /// <summary>
     /// A simple implementation of <see cref="KeyedCollection{TKey,TItem}"/>.
     /// </summary>

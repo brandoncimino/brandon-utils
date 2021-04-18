@@ -4,7 +4,7 @@ using System.Linq;
 
 using NUnit.Framework.Constraints;
 
-namespace Packages.BrandonUtils.Editor.Testing {
+namespace BrandonUtils.Editor.Testing {
     /// <summary>
     /// A convenient shortcut for a <see cref="PropertyConstraint"/> with the <see cref="PropertyConstraint.name"/> "Value".
     /// </summary>

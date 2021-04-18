@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-using Packages.BrandonUtils.Runtime.Collections;
-using Packages.BrandonUtils.Runtime.Enums;
+using BrandonUtils.Collections;
+using BrandonUtils.Enums;
 
 using UnityEngine;
 
 using static UnityEngine.KeyCode;
 
-namespace Packages.BrandonUtils.Runtime.Input {
+namespace BrandonUtils.Input {
     public static class KeyboardUtils {
         public static readonly EnumSubset<KeyCode> ArrowKeys = new EnumSubset<KeyCode>(
             new[] {

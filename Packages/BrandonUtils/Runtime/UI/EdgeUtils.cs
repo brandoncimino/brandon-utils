@@ -1,11 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
 
-using Packages.BrandonUtils.Runtime.Enums;
+using BrandonUtils.Enums;
 
 using UnityEngine;
 
-namespace Packages.BrandonUtils.Runtime.UI {
+namespace BrandonUtils.UI {
     public static class EdgeUtils {
         /// <summary>
         /// Gets the relevant <see cref="RectTransform.Axis"/> for <paramref name="edge"/>, i.e. <see cref="RectTransform.Edge.Bottom"/> -> <see cref="RectTransform.Axis.Vertical"/>.

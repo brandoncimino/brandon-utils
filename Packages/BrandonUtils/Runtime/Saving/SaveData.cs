@@ -3,18 +3,18 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
+using BrandonUtils.Logging;
+using BrandonUtils.Timing;
+
 using JetBrains.Annotations;
 
 using Newtonsoft.Json;
 
-using Packages.BrandonUtils.Runtime.Logging;
-using Packages.BrandonUtils.Runtime.Timing;
-
 using UnityEngine;
 
-using static Packages.BrandonUtils.Runtime.Logging.LogUtils;
+using static BrandonUtils.Logging.LogUtils;
 
-namespace Packages.BrandonUtils.Runtime.Saving {
+namespace BrandonUtils.Saving {
     /// <summary>
     ///     A single "Save File", containing data
     /// </summary>
@@ -236,7 +236,7 @@ namespace Packages.BrandonUtils.Runtime.Saving {
         }
 
         /// <summary>
-        ///     Creates a new, blank <see cref="SaveData{T}" /> of type <see cref="T" />, and <see cref="Save(Packages.BrandonUtils.Runtime.Saving.SaveData{T},string,bool)" />s it as a new file with the <see cref="nickName" /> <paramref name="nickname" />.
+        ///     Creates a new, blank <see cref="SaveData{T}" /> of type <see cref="T" />, and <see cref="Save(BrandonUtils.Saving.SaveData{T},string,bool)" />s it as a new file with the <see cref="nickName" /> <paramref name="nickname" />.
         /// </summary>
         /// <param name="nickname"></param>
         /// <returns>the newly created <see cref="SaveData{T}" /></returns>
@@ -336,7 +336,7 @@ namespace Packages.BrandonUtils.Runtime.Saving {
         }
 
         /// <summary>
-        ///     Calls the static <see cref="Save(Packages.BrandonUtils.Runtime.Saving.SaveData{T},string,bool)" /> with this <see cref="SaveData{T}" />'s <see cref="nickName" />.
+        ///     Calls the static <see cref="Save(BrandonUtils.Saving.SaveData{T},string,bool)" /> with this <see cref="SaveData{T}" />'s <see cref="nickName" />.
         ///     <br />
         /// </summary>
         /// <param name="useReSaveDelay">If <c>true</c>, check if <see cref="ReSaveDelay" /> has elapsed since <see cref="LastSaveTime" />.</param>
@@ -346,7 +346,7 @@ namespace Packages.BrandonUtils.Runtime.Saving {
         }
 
         /// <summary>
-        /// Overrideable method called whenever the file is <see cref="Save(Packages.BrandonUtils.Runtime.Saving.SaveData{T},string,bool)"/>ed.
+        /// Overrideable method called whenever the file is <see cref="Save(BrandonUtils.Saving.SaveData{T},string,bool)"/>ed.
         /// </summary>
         protected virtual void OnSave() {
             //no-op

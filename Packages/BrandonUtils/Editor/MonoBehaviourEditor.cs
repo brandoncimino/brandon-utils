@@ -1,13 +1,13 @@
 ﻿using System.Reflection;
 
-using Packages.BrandonUtils.Runtime;
-using Packages.BrandonUtils.Runtime.Logging;
+using BrandonUtils.Attributes;
+using BrandonUtils.Logging;
 
 using UnityEditor;
 
 using UnityEngine;
 
-namespace Packages.BrandonUtils.Editor {
+namespace BrandonUtils.Editor {
     /// <summary>
     /// A <see cref="CustomEditor"/> for rendering special <see cref="BrandonUtils"/> component extensions, such as <see cref="EditorInvocationButtonAttribute"/>.
     /// </summary>

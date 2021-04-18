@@ -2,9 +2,7 @@
 
 using NUnit.Framework.Constraints;
 
-using Packages.BrandonUtils.Runtime;
-
-namespace Packages.BrandonUtils.Editor.Testing {
+namespace BrandonUtils.Editor.Testing {
     public class ApproximationConstraint : RangeConstraint {
         private readonly object ExpectedValue;
         private readonly object Threshold;

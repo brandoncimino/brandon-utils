@@ -2,7 +2,7 @@
 
 using Newtonsoft.Json;
 
-namespace Packages.BrandonUtils.Runtime.GameOptions {
+namespace BrandonUtils.GameOptions {
     /// <summary>
     /// A <see cref="GameOption"/> that allows for a range of <b>contiguous integer values</b>.
     /// </summary>

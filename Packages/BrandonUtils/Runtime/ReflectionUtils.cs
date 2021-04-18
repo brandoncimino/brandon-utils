@@ -4,11 +4,11 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
+using BrandonUtils.Exceptions;
+
 using JetBrains.Annotations;
 
-using Packages.BrandonUtils.Runtime.Exceptions;
-
-namespace Packages.BrandonUtils.Runtime {
+namespace BrandonUtils {
     /// <summary>
     /// Contains utilities for <see cref="System.Reflection"/>.
     /// </summary>

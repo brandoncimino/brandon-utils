@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace Packages.BrandonUtils.Runtime.GameOptions {
+namespace BrandonUtils.GameOptions {
     /// <summary>
     /// A <see cref="MonoBehaviour"/> that manages the UI components for a <see cref="GameOption"/>.
     /// </summary>

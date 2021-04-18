@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Reflection;
 
-using Packages.BrandonUtils.Runtime.Strings;
+using BrandonUtils.Strings;
 
-namespace Packages.BrandonUtils.Runtime.Exceptions {
+namespace BrandonUtils.Exceptions {
     public class InvalidAttributeTargetException<T> : BrandonException {
         private readonly MemberInfo BadTarget;
         public override  string     BaseMessage => $"The custom attribute {typeof(T).Name} was set to an invalid target, {StringUtils.FormatMember(BadTarget)}!";

@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using NUnit.Framework.Constraints;
+using BrandonUtils.Timing;
 
-using Packages.BrandonUtils.Runtime.Timing;
+using NUnit.Framework.Constraints;
 
 using UnityEngine;
 using UnityEngine.Assertions;
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace Packages.BrandonUtils.Editor.Testing {
+namespace BrandonUtils.Editor.Testing {
     public static class TestUtils {
         public const           double   ApproximationThreshold       = 0.001;
         public const           double   ApproximationThreshold_Loose = 0.005;

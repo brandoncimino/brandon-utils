@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Packages.BrandonUtils.Runtime.Collections;
-using Packages.BrandonUtils.Runtime.Exceptions;
 
-namespace Packages.BrandonUtils.Runtime.Saving {
+using BrandonUtils.Collections;
+using BrandonUtils.Exceptions;
+
+namespace BrandonUtils.Saving {
     /// <summary>
     /// A special <see cref="BrandonException"/> for exceptions caused by <see cref="SaveData{t}"/>.
     /// </summary>
@@ -36,7 +37,8 @@ namespace Packages.BrandonUtils.Runtime.Saving {
         public SaveDataException(string message) : base(GetMessage(message: message)) { }
 
         public SaveDataException(SaveData<T> saveData, string message, Exception innerException) : base(
-            GetMessage(saveData, message), innerException
+            GetMessage(saveData, message),
+            innerException
         ) {
             this.saveData = saveData;
         }

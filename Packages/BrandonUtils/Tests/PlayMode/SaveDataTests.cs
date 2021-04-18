@@ -5,17 +5,17 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using NUnit.Framework;
+using BrandonUtils.Editor.Testing;
+using BrandonUtils.Saving;
 
-using Packages.BrandonUtils.Editor.Testing;
-using Packages.BrandonUtils.Runtime.Saving;
+using NUnit.Framework;
 
 using UnityEngine;
 using UnityEngine.TestTools;
 
-using static Packages.BrandonUtils.Runtime.Logging.LogUtils;
+using static BrandonUtils.Logging.LogUtils;
 
-namespace Packages.BrandonUtils.Tests.PlayMode {
+namespace BrandonUtils.Tests.PlayMode {
     public class SaveDataTests {
         private const  string       DummyNickName = "DummySaveFile";
         private static List<string> DummySaveFiles;

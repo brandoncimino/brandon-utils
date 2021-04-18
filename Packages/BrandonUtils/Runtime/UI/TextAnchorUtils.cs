@@ -1,8 +1,8 @@
-﻿using Packages.BrandonUtils.Runtime.Enums;
+﻿using BrandonUtils.Enums;
 
 using UnityEngine;
 
-namespace Packages.BrandonUtils.Runtime.UI {
+namespace BrandonUtils.UI {
     public static class TextAnchorUtils {
         public static Vector2 Anchor(this TextAnchor textAnchor) {
             switch (textAnchor) {

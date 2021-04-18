@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using NUnit.Framework;
+using BrandonUtils.Collections;
 
-using Packages.BrandonUtils.Runtime;
-using Packages.BrandonUtils.Runtime.Collections;
+using NUnit.Framework;
 
 // ReSharper disable MemberCanBePrivate.Local
 // ReSharper disable UnusedAutoPropertyAccessor.Local
 // ReSharper disable AutoPropertyCanBeMadeGetOnly.Local
 
-namespace Packages.BrandonUtils.Tests.EditMode {
+namespace BrandonUtils.Tests.EditMode {
     public class ReflectionUtilsTests {
         private const int Prop_Static_Get_Only_Default_Value = 5;
 

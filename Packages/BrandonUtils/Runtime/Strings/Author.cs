@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Packages.BrandonUtils.Runtime.Collections;
+using BrandonUtils.Collections;
 
-namespace Packages.BrandonUtils.Runtime.Strings {
+namespace BrandonUtils.Strings {
     [Serializable]
     public class Author {
         public List<string> NameParts;

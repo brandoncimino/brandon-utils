@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Packages.BrandonUtils.Runtime.Strings {
+namespace BrandonUtils.Strings {
     /// <summary>
     /// A class for handling noun conjugations consistently.
     /// </summary>

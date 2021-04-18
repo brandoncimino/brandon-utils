@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 
-using Packages.BrandonUtils.Runtime.Collections;
-using Packages.BrandonUtils.Runtime.GameOptions;
-using Packages.BrandonUtils.Runtime.Strings;
+using BrandonUtils.Collections;
+using BrandonUtils.GameOptions;
+using BrandonUtils.Strings;
 
 using UnityEngine;
 

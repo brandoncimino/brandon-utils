@@ -4,7 +4,7 @@ using System.Linq;
 
 using UnityEngine;
 
-namespace Packages.BrandonUtils.Runtime.Collections {
+namespace BrandonUtils.Collections {
     /// <summary>
     /// Represents an pair of arbitrary, strongly-typed values.
     /// <p/>

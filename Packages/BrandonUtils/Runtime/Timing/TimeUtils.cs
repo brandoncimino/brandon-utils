@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-using Newtonsoft.Json;
+using BrandonUtils.Enums;
 
-using Packages.BrandonUtils.Runtime.Enums;
+using Newtonsoft.Json;
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace Packages.BrandonUtils.Runtime.Timing {
+namespace BrandonUtils.Timing {
     /// <summary>
     /// Contains utility methods that manipulate or extend <see cref="DateTime" />, <see cref="TimeSpan" />, etc.
     ///

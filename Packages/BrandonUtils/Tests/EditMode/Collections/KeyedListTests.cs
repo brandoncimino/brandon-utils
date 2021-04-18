@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using BrandonUtils.Collections;
+using BrandonUtils.Logging;
+
 using Newtonsoft.Json;
 
 using NUnit.Framework;
 
-using Packages.BrandonUtils.Runtime.Collections;
-using Packages.BrandonUtils.Runtime.Logging;
-
-namespace Packages.BrandonUtils.Tests.EditMode {
+namespace BrandonUtils.Tests.EditMode.Collections {
     public class KeyedListTests {
         private class NoInterface : IEquatable<NoInterface> {
             public DayOfWeek DayOfWeek;

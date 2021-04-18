@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Packages.BrandonUtils.Runtime.Enums {
+namespace BrandonUtils.Enums {
     /// <summary>
     /// I plan for this to be a special collection that will enforce that all values of <typeparamref name="TEnum"/> be assigned values of <typeparamref name="TValue"/>.
     /// </summary>

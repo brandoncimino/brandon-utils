@@ -6,7 +6,7 @@ using System.Reflection;
 
 using UnityEngine;
 
-namespace Packages.BrandonUtils.Runtime.Strings {
+namespace BrandonUtils.Strings {
     public static class StringUtils {
         /// <summary>
         ///     Prepends <paramref name="toIndent" />.

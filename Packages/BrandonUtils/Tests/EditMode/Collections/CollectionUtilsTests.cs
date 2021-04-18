@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
+using BrandonUtils.Collections;
+using BrandonUtils.Logging;
+
 using Newtonsoft.Json;
 
 using NUnit.Framework;
 
-using Packages.BrandonUtils.Runtime.Collections;
-using Packages.BrandonUtils.Runtime.Logging;
-
 // ReSharper disable ReturnValueOfPureMethodIsNotUsed
 
-namespace Packages.BrandonUtils.Tests.EditMode {
+namespace BrandonUtils.Tests.EditMode.Collections {
     [TestOf(typeof(CollectionUtils))]
     public class CollectionUtilsTests {
         private static Dictionary<int, string> ValidDictionary => new Dictionary<int, string> {
