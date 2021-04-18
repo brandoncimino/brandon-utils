@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using BrandonUtils.Exceptions;
 using BrandonUtils.Logging;
+using BrandonUtils.Standalone.Exceptions;
 
 using UnityEngine;
 

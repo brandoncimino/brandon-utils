@@ -1,4 +1,4 @@
-﻿using BrandonUtils.Collections;
+﻿using BrandonUtils.Standalone.Collections;
 
 using UnityEditor;
 

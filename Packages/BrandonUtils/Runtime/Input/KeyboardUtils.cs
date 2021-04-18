@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-using BrandonUtils.Collections;
-using BrandonUtils.Enums;
+using BrandonUtils.Standalone.Collections;
+using BrandonUtils.Standalone.Enums;
 
 using UnityEngine;
 

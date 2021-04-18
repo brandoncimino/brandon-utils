@@ -1,10 +1,10 @@
 ﻿using System;
 
-using BrandonUtils.Timing;
+using BrandonUtils.Standalone;
 
 using NUnit.Framework;
 
-using static BrandonUtils.CoercionUtils;
+using static BrandonUtils.Standalone.CoercionUtils;
 
 namespace BrandonUtils.Tests.EditMode {
     public class CoercionUtilsTests {

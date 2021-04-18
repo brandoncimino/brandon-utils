@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 
-using BrandonUtils.Collections;
-using BrandonUtils.Editor.Testing;
-using BrandonUtils.Strings;
+using BrandonUtils.Standalone.Collections;
+using BrandonUtils.Standalone.Strings;
+using BrandonUtils.Testing;
 using BrandonUtils.UI;
 
 using NUnit.Framework;

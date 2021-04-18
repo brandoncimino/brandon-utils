@@ -1,6 +1,6 @@
 ﻿using System;
 
-using BrandonUtils.Enums;
+using BrandonUtils.Standalone.Enums;
 
 using UnityEngine;
 

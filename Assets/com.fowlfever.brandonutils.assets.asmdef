@@ -1,10 +1,12 @@
 {
   "name": "com.fowlfever.brandonutils.assets",
+  "rootNamespace": "",
   "references": [
     "GUID:e2ec7f5c6db56fe41b07b13f1531f007",
     "GUID:85dab32679ada7b4e936135d374fb966",
     "GUID:dc9966fa6b085fa40a88a7cf32ece1c8",
-    "GUID:6055be8ebefd69e48b49212b09b47b2f"
+    "GUID:6055be8ebefd69e48b49212b09b47b2f",
+    "GUID:1169f6a8ec7e0e04696415220c6aafd5"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

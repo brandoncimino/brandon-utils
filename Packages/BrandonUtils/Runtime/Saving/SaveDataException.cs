@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using BrandonUtils.Collections;
-using BrandonUtils.Exceptions;
+using BrandonUtils.Standalone.Collections;
+using BrandonUtils.Standalone.Exceptions;
 
 namespace BrandonUtils.Saving {
     /// <summary>

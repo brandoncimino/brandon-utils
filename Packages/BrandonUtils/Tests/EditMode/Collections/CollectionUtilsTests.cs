@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-using BrandonUtils.Collections;
 using BrandonUtils.Logging;
+using BrandonUtils.Standalone.Collections;
 
 using Newtonsoft.Json;
 

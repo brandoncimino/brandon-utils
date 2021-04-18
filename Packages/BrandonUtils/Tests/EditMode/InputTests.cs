@@ -1,5 +1,5 @@
-﻿using BrandonUtils.Exceptions;
-using BrandonUtils.Input;
+﻿using BrandonUtils.Input;
+using BrandonUtils.Standalone.Exceptions;
 
 using NUnit.Framework;
 

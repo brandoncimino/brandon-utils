@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-using BrandonUtils.Enums;
+using BrandonUtils.Standalone.Enums;
 
 using UnityEngine;
 

@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Threading;
 
-using BrandonUtils.Editor.Testing;
+using BrandonUtils.Testing;
 using BrandonUtils.Timing;
 
 using NUnit.Framework;

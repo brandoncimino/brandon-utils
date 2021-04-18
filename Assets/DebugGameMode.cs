@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 
-using BrandonUtils.Collections;
 using BrandonUtils.GameOptions;
+using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Strings;
 
 using UnityEngine;
@@ -66,7 +66,7 @@ namespace DefaultNamespace {
             int.MaxValue,
             255
         ) {
-            DisplayMin_RenderFunction = option => StringUtils.Colorize("Red", Color.red)
+            DisplayMin_RenderFunction = option => RichTextUtils.Colorize("Red", Color.red)
         };
 
         public GameOption[] GameOptions => new GameOption[] {

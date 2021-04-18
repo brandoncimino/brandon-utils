@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-using BrandonUtils.Attributes;
 using BrandonUtils.Logging;
+using BrandonUtils.Standalone.Attributes;
 using BrandonUtils.UI;
 
 using TMPro;

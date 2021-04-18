@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using BrandonUtils.Collections;
+using BrandonUtils.Standalone.Collections;
 
 using JetBrains.Annotations;
 

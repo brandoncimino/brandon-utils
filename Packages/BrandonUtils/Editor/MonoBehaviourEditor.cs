@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 
-using BrandonUtils.Attributes;
 using BrandonUtils.Logging;
+using BrandonUtils.Standalone.Attributes;
 
 using UnityEditor;
 

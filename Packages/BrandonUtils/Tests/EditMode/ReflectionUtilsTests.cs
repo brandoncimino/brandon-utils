@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using BrandonUtils.Collections;
+using BrandonUtils.Standalone;
+using BrandonUtils.Standalone.Collections;
 
 using NUnit.Framework;
 

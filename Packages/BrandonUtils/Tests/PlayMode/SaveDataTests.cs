@@ -5,8 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using BrandonUtils.Editor.Testing;
 using BrandonUtils.Saving;
+using BrandonUtils.Testing;
 
 using NUnit.Framework;
 
