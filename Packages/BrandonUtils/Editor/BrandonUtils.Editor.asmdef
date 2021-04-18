@@ -1,5 +1,6 @@
 {
-  "name": "com.fowlfever.brandonutils.editor",
+  "name": "BrandonUtils.Editor",
+  "rootNamespace": "BrandonUtils",
   "references": [
     "GUID:e2ec7f5c6db56fe41b07b13f1531f007"
   ],
