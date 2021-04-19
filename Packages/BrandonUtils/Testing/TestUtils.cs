@@ -48,7 +48,8 @@ namespace BrandonUtils.Testing {
         }
 
         public static ApproximationConstraint Approximately<T>(this ConstraintExpression constraintExpression, T expectedValue) {
-            return Approximately(constraintExpression, expectedValue, (dynamic) expectedValue * ApproximationThreshold);
+            // return Approximately(constraintExpression, expectedValue, (dynamic) expectedValue * ApproximationThreshold);
+            throw new NotImplementedException("The usage of `(dynamic)` here is causing issues, I believe based on the .NET vs .NET Core vs .NET Framework version that other projects are targeting for their API compatibility. It should be removed if possible. Plus, coming back and looking at it...what does `dynamic` even do?!");
         }
 
         public static ApproximationConstraint Approximately(this ConstraintExpression constraintExpression, DateTime expectedValue, TimeSpan threshold) {
