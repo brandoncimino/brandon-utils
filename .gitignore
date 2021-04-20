@@ -141,3 +141,7 @@ fabric.properties
 sketchbook/
 # Ignore anything whose name starts with "sketchbook" (sketchbook_1.cs, sketchbookCOOL.ps1)
 sketchbook*
+
+# Build Automation
+Butler/
+Builds/
