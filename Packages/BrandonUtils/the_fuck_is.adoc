@@ -1,0 +1,103 @@
+﻿= The fuck is `.NET`
+:pro: ✔
+:con: ✘
+
+:link-net4x-unity: https://docs.microsoft.com/en-us/visualstudio/gamedev/unity/unity-scripting-upgrade[Using .NET 4.x in Unity]
+:link-java-analogy: https://stackoverflow.com/questions/24830931/c-sharp-is-to-net-as-java-is-to[C# is to .NET as Java is to?]
+:link-aeronautics-analogy: link:https://stackoverflow.com/questions/2724864/what-is-the-difference-between-c-sharp-and-net#:~:text=C%23%20is%20a%20strong%20Object%20Oriented%20programming%20language,the%20CLR%20can%20also%20use%20the%20.NET%20libraries.[What is the difference between C# and .NET?]
+:link-intro-to-dotnet: https://abdelrahmanhosny.wordpress.com/2012/07/24/introduction-to-microsoft-net-framework-solution/[Introduction to Microsoft .NET - Solution]
+:link-unity-dotnet-profiles: pass:n[https://docs.unity3d.com/2019.1/Documentation/Manual/dotnetProfileSupport.html[.NET profile support]footnote:[Out-of-date!]]
+
+== Links
+
+- {link-net4x-unity}
+- {link-java-analogy}
+- {link-aeronautics-analogy}
+- {link-intro-to-dotnet}
+- {link-unity-dotnet-profiles}
+
+== `C#` vs. `.NET`
+
+[cols='h,a,a']
+|===
+||`C#`|`.NET`
+
+|
+|*"language"*
+|*"framework"*
+
+|Depends on the other?
+|{con}
+|{pro}
+
+|{link-aeronautics-analogy}
+|"the airplane"
+|"the runway"
+
+|{link-java-analogy}
+|
+https://en.wikipedia.org/wiki/List_of_JVM_languages[List of JVM languages]::
+- https://en.wikipedia.org/wiki/Java_(programming_language)[Java]
+- https://en.wikipedia.org/wiki/Apache_Groovy[Groovy]
+- https://en.wikipedia.org/wiki/Kotlin_(programming_language)[Kotlin]
+
+|https://en.wikipedia.org/wiki/Java_virtual_machine[Java virtual machine (JVM)]
+
+a|
+[source,c#]
+class Brandon {
+    long ticks = System.DateTime.Now().Ticks;
+}
+|
+[source,c#]
+class Brandon { }
+
+|
+[source,c#]
+System.DateTime.Now().Ticks;
+
+|
+|The *syntax*
+|The *libraries*
+
+|
+|
+|
+|===
+
+== `.NET 4.x` vs. `.NET Standard 2.0`
+
+[cols="a,a"]
+|===
+|`.NET 4.x`|`.NET Standard 2.0`
+
+|> *.NET 4.x.* This profile provides access to the latest .NET 4 API.
+It includes all of the code available in the .NET Framework class libraries *and supports .NET Standard 2.0 profiles as well.* Use the .NET 4.x profile if your project requires part of the API not included in the .NET Standard 2.0 profile.
+
+|> *.NET Standard 2.0.* This profile matches the .NET Standard 2.0 profile published by the .NET Foundation.
+*Unity recommends .NET Standard 2.0 for new projects.* It's smaller than .NET 4.x, which is advantageous for size-constrained platforms.
+
+|> ...some parts of this API may not be supported on all of Unity's platforms.
+
+|> ...Unity has committed to supporting this profile across all platforms that Unity supports.
+
+|*Superset* of `.NET Standard 2.0`
+|*Subset* of `.NET 4.x`
+
+|Bigger
+|Smaller
+
+|_Might_ be Windows-only
+|Works on _every_ platform
+
+|Must be _explicitly set_
+|Default for new projects
+|===
+
+== The fuck is `Mono`
+
+=== The fuck is https://github.com/Unity-Technologies/mono["Unity Mono"]
+
+== The fuck is `MSBuild`
+
+- https://www.jetbrains.com/help/rider/Settings_Toolset_and_Build.html#toolset[Rider: Toolset and Build]
