@@ -7,6 +7,7 @@
 :link-aeronautics-analogy: link:https://stackoverflow.com/questions/2724864/what-is-the-difference-between-c-sharp-and-net#:~:text=C%23%20is%20a%20strong%20Object%20Oriented%20programming%20language,the%20CLR%20can%20also%20use%20the%20.NET%20libraries.[What is the difference between C# and .NET?]
 :link-intro-to-dotnet: https://abdelrahmanhosny.wordpress.com/2012/07/24/introduction-to-microsoft-net-framework-solution/[Introduction to Microsoft .NET - Solution]
 :link-unity-dotnet-profiles: pass:n[https://docs.unity3d.com/2019.1/Documentation/Manual/dotnetProfileSupport.html[.NET profile support]footnote:[Out-of-date!]]
+:link-referencing-assemblies: https://docs.unity3d.com/2021.1/Documentation/Manual/dotnetProfileAssemblies.html[Referencing additional class library assemblies]
 
 == Links
 
@@ -15,6 +16,7 @@
 - {link-aeronautics-analogy}
 - {link-intro-to-dotnet}
 - {link-unity-dotnet-profiles}
+- {link-referencing-assemblies}
 
 == `C#` vs. `.NET`
 
@@ -92,6 +94,9 @@ It includes all of the code available in the .NET Framework class libraries *and
 
 |Must be _explicitly set_
 |Default for new projects
+
+|Includes `System.IO.Compression.ZipFile`
+|Doesn't include `System.IO.Compression.ZipFile`
 |===
 
 == The fuck is `Mono`
