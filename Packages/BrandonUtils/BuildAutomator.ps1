@@ -3,7 +3,29 @@
 
     .SYNOPSIS
     Butler is downloaded to & expanded in $butler_dir
+
+    Uses the UnitySetup module: https://github.com/microsoft/unitysetup.powershell
  #>
+
+# check if UnitySetup is installed
+if (!(Get-Module UnitySetup -ListAvailable)) {
+    Write-Host -ForegroundColor DarkGray "Installing the dependency, UnitySetup."
+    Install-Module UnitySetup -Scope CurrentUser -AllowClobber -Force -Verbose
+}
+else {
+    Write-Host -ForegroundColor DarkGray "UnitySetup was already installed."
+}
+
+# exit if we aren't actually in a Unity project
+$unity_project_folder = Find-UnityPackageRoot
+$unity_project = Get-UnityProjectInstance $unity_project_folder
+
+if (!$unity_project) {
+    throw "The current directory is not inside of a Unity project! `$PWD: $PWD"
+}
+
+Write-Host -ForegroundColor DarkGray "Discovered Unity project:`n$($unity_project | Format-List | Out-String)"
+
 function Find-ParentFolder($Path, $ParentName) {
     if (Split-Path $Path -Leaf -eq $ParentName) {
         return $Path
@@ -14,10 +36,9 @@ function Find-ParentFolder($Path, $ParentName) {
 
 function Find-UnityPackageRoot($Path = $PWD) {
     if (!$Path) {
-        Write-Host -ForegroundColor darkmagenta "path [$path] aint 'gun work"
         return $null
     }
-    Write-Host -ForegroundColor magenta "checking if $Path or its parent is a the package root"
+    
     try {
         return Join-Path $Path ".." "package.json" -Resolve | Split-Path -Parent
     }
@@ -126,14 +147,14 @@ function Get-UnityCredentials() {
         
         $creds_obj = Get-Content $creds_file_path | ConvertFrom-Json
         
-        if(!$creds_obj.password -or !$creds_obj.username){
-            throw [System.MissingFieldException]::new("You must provide both a password and a username in [$creds_file_name]! Actual content: $($creds_obj | out-string)",$_.exception)
+        if (!$creds_obj.password -or !$creds_obj.username) {
+            throw [System.MissingFieldException]::new("You must provide both a password and a username in [$creds_file_name]! Actual content: $($creds_obj | Out-String)", $_.exception)
         }
 
         return $creds_obj
     }
     catch {
-        throw [System.UnauthorizedAccessException]::new("Unable to retrieve Unity credentials from [$creds_file_name], which should be located *next to the project root folder*, at [$creds_file_path]",$_.Exception)
+        throw [System.UnauthorizedAccessException]::new("Unable to retrieve Unity credentials from [$creds_file_name], which should be located *next to the project root folder*, at [$creds_file_path]", $_.Exception)
     }
 
     # I'm so tired...but I just can't bring myself to delete this...because it lines up so nicely and the colors are so nice...
@@ -144,14 +165,18 @@ function Get-UnityCredentials() {
     # }
 }
 
-function Build-Unity() {
-    # $unity_executable_path = "C:\Program Files\Unity\Editor\Unity.exe"
-    # "C:\Program Files\Unity\Editor\Unity.exe" -batchmode -username name@example.edu.uk -password XXXXXXXXXXXXX -serial E3-XXXX-XXXX-XXXX-XXXX-XXXX –quit
-    $creds_obj = Get-UnityCredentials
+<# 
+    See: https://docs.unity3d.com/Manual/CommandLineArguments.html
 
-    $unity_command = "'$unity_executable_path' -batchmode -quit -nographics -executeMethod '$unity_method' -username '$($creds_obj.username)' -password '$($creds_obj.password)'"
-    &$unity_command
-    # "C:\Program Files\Unity\Editor\Unity.exe" -batchmode -quit -nographics -batchmode -executeMethod BuildAutomator.WebGL
+    Start-UnityEditor -ExecuteMethod Build.Invoke -BatchMode -Quit -LogFile .\build.log -Wait -AdditionalArguments "-BuildArg1 -BuildArg2"
+ #>
+function Build-Unity() {
+    Start-UnityEditor -Project $unity_project -ExecuteMethod "BrandonUtils.Editor.CommandLine.BuildAutomator.WebGL" -BatchMode -Quit -Wait -LogFile Logs/build.txt
+    Write-Host -ForegroundColor Green "Succesfully built Unity! WOOH!"
+}
+
+function Compress-Unity(){
+    # compress the webgl folder into a .zip file
 }
 
 function Deploy-Unity() {
