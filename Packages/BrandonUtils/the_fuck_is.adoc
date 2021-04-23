@@ -8,6 +8,7 @@
 :link-intro-to-dotnet: https://abdelrahmanhosny.wordpress.com/2012/07/24/introduction-to-microsoft-net-framework-solution/[Introduction to Microsoft .NET - Solution]
 :link-unity-dotnet-profiles: pass:n[https://docs.unity3d.com/2019.1/Documentation/Manual/dotnetProfileSupport.html[.NET profile support]footnote:[Out-of-date!]]
 :link-referencing-assemblies: https://docs.unity3d.com/2021.1/Documentation/Manual/dotnetProfileAssemblies.html[Referencing additional class library assemblies]
+:link-demystifying-dotnet: https://docs.microsoft.com/en-us/archive/msdn-magazine/2017/september/net-standard-demystifying-net-core-and-net-standard[Demystifying .NET Core and .NET Standard]
 
 == Links
 
@@ -17,6 +18,7 @@
 - {link-intro-to-dotnet}
 - {link-unity-dotnet-profiles}
 - {link-referencing-assemblies}
+- {link-demystifying-dotnet}
 
 == `C#` vs. `.NET`
 
@@ -106,3 +108,16 @@ It includes all of the code available in the .NET Framework class libraries *and
 == The fuck is `MSBuild`
 
 - https://www.jetbrains.com/help/rider/Settings_Toolset_and_Build.html#toolset[Rider: Toolset and Build]
+
+== The fuck is `IL2CPP`
+
+- https://docs.unity3d.com/2021.1/Documentation/Manual/ScriptingRestrictions.html
+
+.`IL2CPP` vs. `Mono`
+[%autowidth]
+|===
+|`IL2CPP`|`Mono`
+
+|"Ahead-of-time"|"Just-in-time"
+| |*Not supported for iOS*
+|===
