@@ -138,10 +138,17 @@ fabric.properties
 
 # Use these folders for things you want to play with locally but not commit
 # Ignore anything IN A FOLDER named "sketchbook" (case-insensitive)
-sketchbook/
+[Ss]ketchbook/
 # Ignore anything whose name starts with "sketchbook" (sketchbook_1.cs, sketchbookCOOL.ps1)
-sketchbook*
+[Ss]ketchbook*
 
 # Build Automation
-Butler/
+[Bb]utler/
 Builds/
+
+# > ...parts of editor settings were in Library/EditorUserSettings.asset file (things like user's perforce connection settings etc.).
+# > So now it's in [{root}/UserSettings].
+# > The folder should not be put into version control, since it's per-user things there.
+# >
+# > -- https://forum.unity.com/threads/whats-the-usersettings-directory.754436/#post-5029937
+UserSettings/
