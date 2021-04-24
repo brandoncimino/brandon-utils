@@ -1,7 +1,16 @@
 ﻿using UnityEngine;
 
 namespace BrandonUtils.Vectors {
-    static internal class Vector2Utils {
+    public static class Vector2Utils {
+        /// <summary>
+        /// Returns a new <see cref="Vector2"/> that is a copy of <paramref name="original"/>.
+        /// </summary>
+        /// <param name="original"></param>
+        /// <returns></returns>
+        public static Vector2 Copy(this Vector2 original) {
+            return new Vector2(original.x, original.y);
+        }
+
         /// <summary>
         /// Multiplies each component of <paramref name="original"/> by the corresponding component of <paramref name="scale"/>.
         /// </summary>
