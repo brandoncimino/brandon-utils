@@ -14,16 +14,13 @@ namespace BrandonUtils.UI {
         /// <returns></returns>
         /// <exception cref="InvalidEnumArgumentException"></exception>
         public static RectTransform.Axis Axis(this RectTransform.Edge edge) {
-            switch (edge) {
-                case RectTransform.Edge.Left:
-                case RectTransform.Edge.Right:
-                    return RectTransform.Axis.Horizontal;
-                case RectTransform.Edge.Top:
-                case RectTransform.Edge.Bottom:
-                    return RectTransform.Axis.Vertical;
-                default:
-                    throw EnumUtils.InvalidEnumArgumentException(nameof(edge), edge);
-            }
+            return edge switch {
+                RectTransform.Edge.Left   => RectTransform.Axis.Horizontal,
+                RectTransform.Edge.Right  => RectTransform.Axis.Horizontal,
+                RectTransform.Edge.Top    => RectTransform.Axis.Vertical,
+                RectTransform.Edge.Bottom => RectTransform.Axis.Vertical,
+                _                         => throw EnumUtils.InvalidEnumArgumentException(nameof(edge), edge)
+            };
         }
 
         /// <summary>
@@ -33,18 +30,13 @@ namespace BrandonUtils.UI {
         /// <returns></returns>
         /// <exception cref="InvalidEnumArgumentException"></exception>
         public static RectTransform.Edge Inverse(this RectTransform.Edge edge) {
-            switch (edge) {
-                case RectTransform.Edge.Left:
-                    return RectTransform.Edge.Right;
-                case RectTransform.Edge.Right:
-                    return RectTransform.Edge.Left;
-                case RectTransform.Edge.Top:
-                    return RectTransform.Edge.Bottom;
-                case RectTransform.Edge.Bottom:
-                    return RectTransform.Edge.Top;
-                default:
-                    throw EnumUtils.InvalidEnumArgumentException(nameof(edge), edge);
-            }
+            return edge switch {
+                RectTransform.Edge.Left   => RectTransform.Edge.Right,
+                RectTransform.Edge.Right  => RectTransform.Edge.Left,
+                RectTransform.Edge.Top    => RectTransform.Edge.Bottom,
+                RectTransform.Edge.Bottom => RectTransform.Edge.Top,
+                _                         => throw EnumUtils.InvalidEnumArgumentException(nameof(edge), edge)
+            };
         }
 
         /// <summary>
@@ -54,18 +46,13 @@ namespace BrandonUtils.UI {
         /// <returns></returns>
         /// <exception cref="InvalidEnumArgumentException"></exception>
         public static int Direction(this RectTransform.Edge edge) {
-            switch (edge) {
-                case RectTransform.Edge.Left:
-                    return -1;
-                case RectTransform.Edge.Right:
-                    return 1;
-                case RectTransform.Edge.Top:
-                    return 1;
-                case RectTransform.Edge.Bottom:
-                    return -1;
-                default:
-                    throw EnumUtils.InvalidEnumArgumentException(nameof(edge), edge);
-            }
+            return edge switch {
+                RectTransform.Edge.Left   => -1,
+                RectTransform.Edge.Right  => 1,
+                RectTransform.Edge.Top    => 1,
+                RectTransform.Edge.Bottom => -1,
+                _                         => throw EnumUtils.InvalidEnumArgumentException(nameof(edge), edge)
+            };
         }
     }
 }
