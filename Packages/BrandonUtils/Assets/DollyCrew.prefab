@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bfedc0b60c94f2e8c380ba7875fe39a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DollyLerp_X: 0.465
+  DollyLerp_X: 0.889
   DollyLerp_Y: 0
   DollyLerp_Z: 0
 --- !u!1 &6909130124409574786
@@ -93,7 +93,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Subject: {fileID: 0}
   DollyGrip: {fileID: 6909130123827270536}
-  Cameraman: {fileID: 0}
+  Cameraman: {fileID: 6909130124522701827}
 --- !u!1 &6909130124522701825
 GameObject:
   m_ObjectHideFlags: 0
@@ -190,7 +190,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2683d8393434df294d8cb2da6b3472b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LookStyle: 1
+  LookStyle: 0
   MiddleDistanceLerp_X: 0.274
   MiddleDistanceLerp_Y: 0.295
   MiddleDistanceLerp_Z: 0.327

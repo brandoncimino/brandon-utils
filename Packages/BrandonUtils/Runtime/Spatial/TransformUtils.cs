@@ -1,9 +1,13 @@
 ﻿using BrandonUtils.Standalone.Enums;
 using BrandonUtils.Standalone.Exceptions;
+using BrandonUtils.Vectors;
 
 using UnityEngine;
 
 namespace BrandonUtils.Spatial {
+    /// <summary>
+    /// TODO: Rename this from TransformUtils, because that already exists in Unity
+    /// </summary>
     public static class TransformUtils {
         public static Vector3 GetFace(this Transform self, Cube.Face face) {
             // Rider suggests storing these values rather than repeatedly accessing them. I'm pretty sure they're only accessed once, but whatever.
@@ -66,6 +70,22 @@ namespace BrandonUtils.Spatial {
 
         public static Transform LookAt(this Transform self, Vector3 target_world, Cube.Face upwardFace) {
             return self.PointFaceAt(target_world, Cube.Face.Forward, upwardFace);
+        }
+
+        /// <summary>
+        /// Performs a <see cref="Vector3Utils.Verp"/> - style function between <paramref name="origin"/>.<see cref="Transform.position"/>
+        /// and <see cref="destination_world"/>, but uses <paramref name="origin"/>'s local axes.
+        /// </summary>
+        /// <remarks>TODO: Write a lot more documentation on this!</remarks>
+        /// <param name="origin"></param>
+        /// <param name="destination_world"></param>
+        /// <param name="lerpAmounts"></param>
+        /// <returns></returns>
+        public static Vector3 LocalVerp(this Transform origin, Vector3 destination_world, Vector3 lerpAmounts) {
+            var subject_local = origin.transform.InverseTransformPoint(destination_world);
+            var mark_local    = Vector3.zero.Verp(subject_local, lerpAmounts);
+            var mark_world    = origin.transform.TransformPoint(mark_local);
+            return mark_world;
         }
     }
 }

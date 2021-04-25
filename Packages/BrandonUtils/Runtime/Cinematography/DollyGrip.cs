@@ -1,4 +1,4 @@
-﻿using BrandonUtils.Vectors;
+﻿using BrandonUtils.Spatial;
 
 using UnityEngine;
 
@@ -16,10 +16,9 @@ namespace BrandonUtils.Cinematography {
 
         private Vector3 DollyLerp => new Vector3(DollyLerp_X, DollyLerp_Y, DollyLerp_Z);
 
-        public void MoveDolly() {
-            var subject_local = Origin.transform.TransformPoint(Subject.position);
-            var mark_local    = Vector3.zero.Verp(subject_local, DollyLerp);
-            transform.position = mark_local;
+        private void MoveDolly() {
+            var mark_world = Origin.LocalVerp(Subject.position, DollyLerp);
+            transform.position = mark_world;
         }
 
         private void Update() {
