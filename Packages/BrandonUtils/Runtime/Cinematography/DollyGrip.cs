@@ -3,10 +3,7 @@
 using UnityEngine;
 
 namespace BrandonUtils.Cinematography {
-    public class DollyGrip : MonoBehaviour, IDollyCrew {
-        public Transform Subject { get; set; }
-        public Transform Origin  { get; set; }
-
+    public class DollyGrip : DollyCrewman {
         [Range(0, 1)]
         public float DollyLerp_X;
         [Range(0, 1)]

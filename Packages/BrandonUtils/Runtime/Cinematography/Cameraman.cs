@@ -5,10 +5,7 @@ using UnityEngine;
 
 namespace BrandonUtils.Cinematography {
     [RequireComponent(typeof(Camera))]
-    public class Cameraman : MonoBehaviour, IDollyCrew {
-        public Transform Subject { get; set; }
-        public Transform Origin  { get; set; }
-
+    public class Cameraman : DollyCrewman {
         /// <summary>
         /// The <see cref="FocusOn"/> style that the <see cref="DollyGrip"/> uses, which determines how they will point their camera.
         /// </summary>
