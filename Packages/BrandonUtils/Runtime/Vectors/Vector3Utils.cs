@@ -50,5 +50,39 @@ namespace BrandonUtils.Vectors {
         }
 
         #endregion
+
+        /// <summary>
+        /// "Vectorally Interpolates" two <see cref="Vector3"/>s, i.e., <see cref="Mathf.Lerp"/>s each corresponding
+        /// axis pair by the corresponding <paramref name="lerpAmounts"/> value.
+        /// </summary>
+        /// <example>
+        /// <p>
+        /// Example #1
+        /// <br/>
+        /// <c>result</c>.<see cref="Vector3.x"/> == <see cref="Mathf.Lerp">Mathf.Lerp</see>(<paramref name="original"/>.<see cref="Vector3.x"/>, <paramref name="destination"/>.<see cref="Vector3.x"/>, <see cref="lerpAmounts"/>.<see cref="Vector3.x"/>)
+        /// </p>
+        /// <br/>
+        /// <p>
+        /// Example #2
+        /// <code>
+        /// var orig = Vector3.zero;
+        /// var dest = Vector3.one * 10;
+        /// var lerp = new Vector3(0, 0.3, 99);
+        ///
+        /// Verp(orig, dest, lerp) == new Vector3(0, 3, 10);
+        /// </code>
+        /// </p>
+        /// </example>
+        /// <param name="original"></param>
+        /// <param name="destination"></param>
+        /// <param name="lerpAmounts"></param>
+        /// <returns>a new <see cref="Vector3"/></returns>
+        public static Vector3 Verp(this Vector3 original, Vector3 destination, Vector3 lerpAmounts) {
+            return new Vector3(
+                Mathf.Lerp(original.x, destination.x, lerpAmounts.x),
+                Mathf.Lerp(original.y, destination.y, lerpAmounts.y),
+                Mathf.Lerp(original.z, destination.z, lerpAmounts.z)
+            );
+        }
     }
 }
