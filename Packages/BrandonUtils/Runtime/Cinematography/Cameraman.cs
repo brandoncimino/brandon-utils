@@ -31,7 +31,7 @@ namespace BrandonUtils.Cinematography {
                     transform.LookAt(Subject, Origin.up);
                     return;
                 case FocusOn.MiddleDistance:
-                    transform.LookAt(TransformUtils.LocalVerp(Origin, Subject.position, MiddleDistanceLerp), Origin.up);
+                    transform.LookAt(Origin.LocalVerp(Subject.position, MiddleDistanceLerp), Origin.up);
                     return;
                 default:
                     throw EnumUtils.InvalidEnumArgumentException(nameof(LookStyle), LookStyle);
