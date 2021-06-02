@@ -6,6 +6,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 
 using BrandonUtils.Standalone.Enums;
+using BrandonUtils.Standalone.Randomization;
 
 namespace BrandonUtils.Standalone.Collections {
     /// <summary>
@@ -14,18 +15,50 @@ namespace BrandonUtils.Standalone.Collections {
     public static class CollectionUtils {
         #region Randomization
 
-        public static T Random<T>(this IEnumerable<T> enumerable) {
-            var array = enumerable as T[] ?? enumerable.ToArray();
-            return array.ElementAt(new System.Random().Next(0, array.Length));
+        /// <param name="collection"></param>
+        /// <typeparam name="T">The type of the <see cref="Collection{T}"/></typeparam>
+        /// <returns>a random <see cref="Enumerable.ElementAt{TSource}"/> from the given <paramref name="collection"/>.</returns>
+        [Pure]
+        public static T Random<T>(this ICollection<T> collection) {
+            return collection.Count switch {
+                1 => collection.Single(),
+                0 => throw new IndexOutOfRangeException($"Attempted to select a {nameof(Random)} element, but the given collection was empty!"),
+                _ => collection.ElementAt(BRandom.Gen.Next(0, collection.Count))
+            };
         }
 
-        public static T GrabRandom<T>(this ICollection<T> list) {
-            var random = list.Random();
-            list.Remove(random);
+        /// <summary>
+        /// Similar to <see cref="Random{T}"/>, but <b><see cref="Collection{T}.Remove"/>s the item</b>.
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>a <see cref="Random{T}"/> entry from <paramref name="collection"/></returns>
+        public static T GrabRandom<T>(this ICollection<T> collection) {
+            var random = collection.Random();
+            collection.Remove(random);
             return random;
         }
 
-        public static ICollection<T> Randomize<T>(this ICollection<T> oldList) {
+        /// <summary>
+        /// Retrieves and <see cref="ICollection{T}.Remove"/>s the <see cref="Enumerable.ElementAt{TSource}"/> <paramref name="index"/>
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="index"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T Grab<T>(this ICollection<T> collection, int index) {
+            var item = collection.ElementAt(index);
+            collection.Remove(item);
+            return item;
+        }
+
+        /// <summary>
+        /// Randomizes all of the entries in <see cref="oldList"/>.
+        /// </summary>
+        /// <param name="oldList"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static void Randomize<T>(this ICollection<T> oldList) {
             var backupList = oldList.Copy();
             oldList.Clear();
 
@@ -33,11 +66,28 @@ namespace BrandonUtils.Standalone.Collections {
                 oldList.Add(GrabRandom(backupList));
             }
 
-            return oldList;
+            // Previously, I was returning the collection, for method chaining; but I couldn't get the generics to be happy about that :(
+            // Having this be void makes me sad, but it's the same as .Sort() :(
+            // return oldList;
         }
 
-        public static ICollection<T> RandomCopy<T>(this ICollection<T> oldList) {
-            return oldList.Copy().Randomize();
+        /// <summary>
+        /// TODO: I would like it if this wasn't limited to <see cref="List{T}"/>, but that would require 2 type parameters...
+        /// </summary>
+        /// <param name="oldList"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        [Pure]
+        public static IList<T> RandomCopy<T>(this List<T> oldList) {
+            var copy = oldList.Copy();
+            copy.Randomize();
+            return copy;
+        }
+
+        [Pure]
+        // ReSharper disable once ReturnTypeCanBeEnumerable.Global
+        public static List<T> ListOf<T>(params T[] stuff) {
+            return new List<T>(stuff);
         }
 
         #endregion
@@ -49,11 +99,11 @@ namespace BrandonUtils.Standalone.Collections {
         }
 
         public static ICollection<T> Copy<T>(this ICollection<T> oldCollection) {
-            return (ICollection<T>) oldCollection.Select(it => it);
+            return oldCollection.Select(it => it).ToList();
         }
 
         public static IEnumerable<T> Copy<T>(this IEnumerable<T> oldList) {
-            return oldList.Select(it => it).ToList();
+            return oldList.Select(it => it);
         }
 
         /// <summary>
