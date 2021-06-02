@@ -3,37 +3,31 @@ using System.Collections.Generic;
 
 namespace BrandonUtils.Standalone.Collections {
     /// <summary>
-    /// Represents an pair of arbitrary, strongly-typed values.
+    /// Represents a pair of arbitrary, strongly-typed values.
     /// <p/>
+    /// <code>
     /// TODO: Create an annotation to remove the label. (Maybe this works with existing attributes?)
     /// TODO: Create an annotation to set custom labels to either of the 2 pairs.
     /// TODO: Create an annotation to make the "primary" value read-only in the editor.
-    /// TODO: Make a special kind of collection for Pairs, OR a custom renderer for Lists of pairs
+    /// TODO: Make a special kind of collection for Pairs, OR a custom renderer for Lists of pairs - UPDATE 6/1/2021: List{Pair{TX,TY}} already seems to work, so I don't think this is needed anymore
+    ///
+    /// 6/1/21:
+    /// TODO: Should TX and TY be restricted to ISerializable?
+    /// TODO: Should this be changed from a `struct` to an interface + concrete class? (That would allow for implicit conversion to Vector2)
+    /// </code>
     /// </summary>
     /// <remarks>
-    /// This is essentially a <see cref="KeyValuePair{TKey,TValue}"/> version of <see cref="Vector2"/>. (We cannot extend <see cref="UnityEngine"/> directly because it is <see langword="sealed"/>)
+    /// This is essentially a <see cref="KeyValuePair{TKey,TValue}"/> version of Unity's Vector2. (We cannot extend the "UnityEngine" class directly because it is <see langword="sealed"/>)
     /// </remarks>
     /// <example>
-    /// This can be used to specify things like ranges of values as single variables:
-    /// <code><![CDATA[
-    /// public int minPlayers;
-    /// public int maxPlayers;
-    /// ]]></code>
+    /// <see cref="Pair{TX,TY}"/>s are primarily useful when you'd like to take advantage of <see cref="SerializableAttribute"/> fields in the Unity editor.
     ///
-    /// You could use a <see cref="Pair{TX,TY}"/>, but that would allow floats, and this should be restricted to ints:
-    /// <code><![CDATA[
-    /// public Vector2 playerRange;
-    /// ]]></code>
-    ///
-    /// By using a <see cref="Pair{T1,T2}"/>, you can restrict the values to ints:
-    /// <code><![CDATA[
-    /// public Pair<int,int> playerRange;
-    /// ]]></code>
-    ///
-    /// This also lets you take advantage of other <see cref="SerializableAttribute"/> fields in the Unity editor:
+    /// For example:
     /// <code><![CDATA[
     /// public Pair<DayOfWeek,Color> MondayColor;
     /// ]]></code>
+    ///
+    /// Will render inspector UI buttons for a <see cref="DayOfWeek"/> dropdown and a color picker.
     /// </example>
     /// <typeparam name="TX"></typeparam>
     /// <typeparam name="TY"></typeparam>
