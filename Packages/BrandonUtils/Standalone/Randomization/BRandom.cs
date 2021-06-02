@@ -4,10 +4,7 @@ namespace BrandonUtils.Standalone.Randomization {
     public static class BRandom {
         public static readonly Random Gen = new Random();
 
-        /// <summary>
-        /// Returns a random sign (either 1 or -1)
-        /// </summary>
-        /// <returns></returns>
+        /// <returns>a random sign (either 1 or -1)</returns>
         public static int Sign() {
             return Gen.Next(2) == 0 ? -1 : 1;
         }
