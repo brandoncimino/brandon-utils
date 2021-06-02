@@ -69,6 +69,8 @@ crashlytics-build.properties
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+
+# NOTE from Brandon on 6/2/2021: I am trying so desperately to ignore this file
 .idea/**/indexLayout.xml
 .idea/indexLayout.xml
 
