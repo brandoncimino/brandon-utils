@@ -10,7 +10,7 @@ namespace BrandonUtils.Standalone.Collections {
     /// <summary>
     /// A simple implementation of <see cref="KeyedCollection{TKey,TItem}"/>.
     /// </summary>
-    /// <typeparam name="TValue"></typeparam>
+    /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
     [Serializable]
     public class KeyedList<TKey, TValue> : KeyedCollection<TKey, TValue> where TValue : class, IPrimaryKeyed<TKey> {
