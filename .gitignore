@@ -70,6 +70,7 @@ crashlytics-build.properties
 .idea/**/dictionaries
 .idea/**/shelf
 .idea/**/indexLayout.xml
+.idea/indexLayout.xml
 
 # Generated files
 .idea/**/contentModel.xml
