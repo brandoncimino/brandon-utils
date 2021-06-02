@@ -18,6 +18,8 @@ namespace BrandonUtils.Standalone.Collections {
     /// </summary>
     /// <remarks>
     /// This is essentially a <see cref="KeyValuePair{TKey,TValue}"/> version of Unity's Vector2. (We cannot extend the "UnityEngine" class directly because it is <see langword="sealed"/>)
+    ///
+    /// It also implements <see cref="IPrimaryKeyed{T}"/>, where <see cref="X"/> is the <see cref="PrimaryKey"/>.
     /// </remarks>
     /// <example>
     /// <see cref="Pair{TX,TY}"/>s are primarily useful when you'd like to take advantage of <see cref="SerializableAttribute"/> fields in the Unity editor.
@@ -32,7 +34,7 @@ namespace BrandonUtils.Standalone.Collections {
     /// <typeparam name="TX"></typeparam>
     /// <typeparam name="TY"></typeparam>
     [Serializable]
-    public struct Pair<TX, TY> {
+    public struct Pair<TX, TY> : IPrimaryKeyed<TX> {
         public TX X;
         public TY Y;
 
@@ -44,5 +46,7 @@ namespace BrandonUtils.Standalone.Collections {
         public override string ToString() {
             return $"[{X},{Y}]";
         }
+
+        public TX PrimaryKey => X;
     }
 }
