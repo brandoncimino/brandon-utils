@@ -13,10 +13,17 @@ namespace BrandonUtils.Standalone.Randomization {
             return Gen.Next(2) == 0 ? -1 : 1;
         }
 
+        /// <returns>a random <see cref="bool"/> (true or false)</returns>
         public static bool Bool() {
             return Gen.Next(2) == 0;
         }
 
+        /// <summary>
+        /// Returns a random value within <see cref="center"/> +- <see cref="radius"/>, <b>inclusive</b>.
+        /// </summary>
+        /// <param name="center">the center of the random range</param>
+        /// <param name="radius">the size +- <see cref="center"/> to select a value from, <b>inclusively</b></param>
+        /// <returns></returns>
         public static double Near(double center, double radius) {
             return center + Gen.NextDouble() * radius * Sign();
         }
