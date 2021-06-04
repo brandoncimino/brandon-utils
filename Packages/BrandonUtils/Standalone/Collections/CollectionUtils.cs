@@ -23,7 +23,7 @@ namespace BrandonUtils.Standalone.Collections {
             return collection.Count switch {
                 1 => collection.Single(),
                 0 => throw new IndexOutOfRangeException($"Attempted to select a {nameof(Random)} element, but the given collection was empty!"),
-                _ => collection.ElementAt(BRandom.Gen.Next(0, collection.Count))
+                _ => collection.ElementAt(Brandom.Gen.Next(0, collection.Count))
             };
         }
 
@@ -233,6 +233,10 @@ namespace BrandonUtils.Standalone.Collections {
         /// <returns></returns>
         public static string JoinString<T>(this IEnumerable<T> enumerable, string separator = "") {
             return string.Join(separator, enumerable);
+        }
+
+        public static string JoinLines<T>(this IEnumerable<T> enumerable) {
+            return string.Join("\n", enumerable);
         }
 
         /// <summary>
@@ -453,6 +457,17 @@ namespace BrandonUtils.Standalone.Collections {
             TKey key
         ) {
             return dictionaries.First(dic => dic.ContainsKey(key) && ReflectionUtils.IsNotEmpty(dic[key]))[key];
+        }
+
+        /// <summary>
+        /// A simplified version of <see cref="Enumerable.GroupBy{TSource,TKey}(System.Collections.Generic.IEnumerable{TSource},System.Func{TSource,TKey})"/> that groups entries by equality.
+        /// </summary>
+        /// <param name="enumerable"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        [Pure]
+        public static IDictionary<T, int> Group<T>(this IEnumerable<T> enumerable) {
+            return enumerable.GroupBy(it => it).ToDictionary(it => it.Key, it => it.Count());
         }
 
         #endregion
