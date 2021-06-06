@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 
 using BrandonUtils.Standalone;
-using BrandonUtils.Standalone.Collections;
 
 using NUnit.Framework;
 
@@ -144,6 +143,7 @@ namespace BrandonUtils.Tests.EditMode {
         /// Allows access to <see cref="Privacy{T}.VariableInfos"/> cleanly in <see cref="ValueSourceAttribute"/>s
         /// </summary>
         public static List<VariableInfo> AllVariables => Privacy<int>.VariableInfos();
+        public static List<string> AllVariableNames => AllVariables.Select(it => it.Name).ToList();
 
         /// <summary>
         /// Returns the <see cref="MemberTypes.Property"/> entries from <see cref="AllVariables"/>
@@ -180,26 +180,22 @@ namespace BrandonUtils.Tests.EditMode {
             Assert.That(ReflectionUtils.GetVariableValue(privacy, expectedSettableVariable.Name), Is.Not.EqualTo(initialInt));
         }
 
+        /// <summary>
+        /// Somewhat redundant with <see cref="GetVariablesHasOnlyExpectedVariables"/>, but Unity's version of NUnit doesn't support soft assertions >:(
+        /// </summary>
         [Test]
-        public void GetVariablesHasSpecificVariable(
-            [ValueSource(nameof(AllVariables))]
-            VariableInfo expectedVariableName
-        ) {
+        public void GetVariablesHasAllExpectedVariables() {
             var actualVariableNames = typeof(Privacy<int>).GetVariables().Select(it => it.Name).ToList();
-
-            Assert.That(actualVariableNames, Contains.Item(expectedVariableName.Name));
+            Assert.That(actualVariableNames, Is.SupersetOf(AllVariableNames));
         }
 
+        /// <summary>
+        /// Somewhat redundant with <see cref="GetVariablesHasAllExpectedVariables"/>, but Unity's version of NUnit doesn't support soft assertions >:(
+        /// </summary>
         [Test]
         public void GetVariablesHasOnlyExpectedVariables() {
-            Console.WriteLine($"{nameof(AllVariables)}: {AllVariables.JoinString(", ")}");
-            Console.WriteLine($"{nameof(SettableVariables)}: {SettableVariables.JoinString(", ")}");
-            var actualVariableNames = typeof(Privacy<int>).GetVariables().Select(it => it.Name);
-
-            foreach (var vn in actualVariableNames) {
-                Console.WriteLine($"Checking {vn}");
-                Assert.That(AllVariables, Contains.Item(vn));
-            }
+            var actualVariableNames = typeof(Privacy<int>).GetVariables().Select(it => it.Name).ToList();
+            Assert.That(actualVariableNames, Is.SubsetOf(AllVariableNames));
         }
 
         [Test]
