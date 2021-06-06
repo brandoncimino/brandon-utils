@@ -50,8 +50,8 @@ namespace BrandonUtils.Tests.PlayMode {
                 yield return null;
 
                 //Make sure that time has actually passed...
-                Assert.That(DateTime.Now,  Is.Not.EqualTo(oldDateTimeNow));
-                Assert.That(FrameTime.Now, Is.Not.EqualTo(oldRealTimeNow));
+                Assert.That(DateTime.Now,  Is.Not.EqualTo(oldDateTimeNow), nameof(DateTime));
+                Assert.That(FrameTime.Now, Is.Not.EqualTo(oldRealTimeNow), nameof(FrameTime));
 
                 oldRealTimeNow = FrameTime.Now;
                 oldDateTimeNow = DateTime.Now;
