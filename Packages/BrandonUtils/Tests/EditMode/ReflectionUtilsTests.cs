@@ -183,11 +183,11 @@ namespace BrandonUtils.Tests.EditMode {
         [Test]
         public void GetVariablesHasSpecificVariable(
             [ValueSource(nameof(AllVariables))]
-            string expectedVariableName
+            VariableInfo expectedVariableName
         ) {
             var actualVariableNames = typeof(Privacy<int>).GetVariables().Select(it => it.Name).ToList();
 
-            Assert.That(actualVariableNames, Contains.Item(expectedVariableName));
+            Assert.That(actualVariableNames, Contains.Item(expectedVariableName.Name));
         }
 
         [Test]
