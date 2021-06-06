@@ -108,13 +108,11 @@ namespace BrandonUtils.Tests.PlayMode.UI {
             string searchIn,
             StringComparison stringComparison = StringComparison.Ordinal
         ) {
-            var textMesh = InstantiateTextMeshPro(searchIn);
-            var foundStr = find == Find.First ? textMesh.FirstSubstring(searchFor, stringComparison) : textMesh.LastSubstring(searchFor, stringComparison);
-
-            var expectedIndex = find == Find.First ? searchIn.IndexOf(searchFor, stringComparison) : searchIn.LastIndexOf(searchFor, stringComparison);
-
-            Assert.That(foundStr, Is.EqualTo(textMesh.textInfo.VisibleCharacterInfo().ToList().GetRange(expectedIndex, searchFor.Length)));
-
+            var textMesh                  = InstantiateTextMeshPro(searchIn);
+            var foundStr                  = find == Find.First ? textMesh.FirstSubstring(searchFor, stringComparison) : textMesh.LastSubstring(searchFor, stringComparison);
+            var expectedIndex             = find == Find.First ? searchIn.IndexOf(searchFor, stringComparison) : searchIn.LastIndexOf(searchFor, stringComparison);
+            var expectedCharacterInfoList = textMesh.textInfo.VisibleCharacterInfo().ToList().GetRange(expectedIndex, searchFor.Length);
+            Assert.That(foundStr.Word,       Is.EqualTo(expectedCharacterInfoList));
             Assert.That(foundStr.ToString(), Is.EqualTo(searchFor));
         }
 
