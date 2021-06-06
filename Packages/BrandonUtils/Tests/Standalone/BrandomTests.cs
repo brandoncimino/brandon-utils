@@ -56,10 +56,10 @@ namespace BrandonUtils.Tests.Standalone {
 
             var picks = numberOfPicks.Repeat(it => Brandom.FromWeightedList(weighted)).ToList();
 
-            assertPicks(picks, weighted);
+            AssertPicks(picks, weighted);
         }
 
-        private static void assertPicks(List<string> picks, Dictionary<string, int> weighted) {
+        private static void AssertPicks(List<string> picks, Dictionary<string, int> weighted) {
             Assert.That(picks, Is.SupersetOf(weighted.Keys));
 
             var groups = picks.Group();
@@ -83,7 +83,7 @@ namespace BrandonUtils.Tests.Standalone {
 
             var picks = numberOfPicks.Repeat(fromWeightedList.Get).ToList();
 
-            assertPicks(picks, weighted);
+            AssertPicks(picks, weighted);
         }
     }
 }
