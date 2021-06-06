@@ -50,7 +50,7 @@ namespace BrandonUtils.UI {
         }
 
         /// <summary>
-        /// Returns the local position of <paramref name="word"/>'s <paramref name="textAnchor"/>, e.g. <see cref="TextAnchor.MiddleLeft"/>.
+        /// Returns the local position of the <see cref="TMP_Word"/>'s <paramref name="textAnchor"/>, e.g. <see cref="TextAnchor.MiddleLeft"/>.
         /// </summary>
         /// <param name="textAnchor"></param>
         /// <returns></returns>
