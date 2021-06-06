@@ -6,7 +6,7 @@ using NUnit.Framework;
 
 using static BrandonUtils.Standalone.CoercionUtils;
 
-namespace BrandonUtils.Tests.EditMode {
+namespace BrandonUtils.Tests.Standalone {
     public class CoercionUtilsTests {
         [Test]
         public void CoerciveAddition_int() {

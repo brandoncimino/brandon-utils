@@ -11,7 +11,7 @@ using NUnit.Framework;
 // ReSharper disable UnusedAutoPropertyAccessor.Local
 // ReSharper disable AutoPropertyCanBeMadeGetOnly.Local
 
-namespace BrandonUtils.Tests.EditMode {
+namespace BrandonUtils.Tests.Standalone {
     public class ReflectionUtilsTests {
         private const int Prop_Static_Get_Only_Default_Value = 5;
 
