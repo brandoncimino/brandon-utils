@@ -31,9 +31,9 @@ namespace BrandonUtils.Vectors {
         /// <param name="original"></param>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static Vector2 SetX(this Vector2 original, float x) {
+        public static ref Vector2 SetX(this ref Vector2 original, float x) {
             original.Set(x, original.y);
-            return original;
+            return ref original;
         }
 
         /// <summary>
@@ -42,9 +42,9 @@ namespace BrandonUtils.Vectors {
         /// <param name="original"></param>
         /// <param name="y"></param>
         /// <returns></returns>
-        public static Vector2 SetY(this Vector2 original, float y) {
+        public static ref Vector2 SetY(this ref Vector2 original, float y) {
             original.Set(original.x, y);
-            return original;
+            return ref original;
         }
 
         /// <summary>
@@ -110,12 +110,12 @@ namespace BrandonUtils.Vectors {
         /// </summary>
         /// <param name="self"></param>
         /// <returns></returns>
-        public static Vector2 Swap(this Vector2 self) {
+        public static ref Vector2 Swap(this ref Vector2 self) {
             var old_x = self.x;
             var old_y = self.y;
             self.x = old_y;
             self.y = old_x;
-            return self;
+            return ref self;
         }
 
         /// <summary>
