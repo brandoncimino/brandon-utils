@@ -10,7 +10,7 @@ using NUnit.Framework;
 
 // ReSharper disable ReturnValueOfPureMethodIsNotUsed
 
-namespace BrandonUtils.Tests.EditMode.Collections {
+namespace BrandonUtils.Tests.Standalone.Collections {
     [TestOf(typeof(CollectionUtils))]
     public class CollectionUtilsTests {
         private static Dictionary<int, string> ValidDictionary => new Dictionary<int, string> {

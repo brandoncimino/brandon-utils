@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using BrandonUtils.Logging;
 using BrandonUtils.Standalone.Collections;
 
 using Newtonsoft.Json;
 
 using NUnit.Framework;
 
-namespace BrandonUtils.Tests.EditMode.Collections {
+namespace BrandonUtils.Tests.Standalone.Collections {
     public class KeyedListTests {
         private class NoInterface : IEquatable<NoInterface> {
             public DayOfWeek DayOfWeek;
@@ -76,7 +75,7 @@ namespace BrandonUtils.Tests.EditMode.Collections {
         public void KeyedListSerializes() {
             string json = JsonConvert.SerializeObject(_keyedList, Formatting.Indented);
 
-            LogUtils.Log(json);
+            Console.WriteLine(json);
 
             var kl = JsonConvert.DeserializeObject<KeyedList<DayOfWeek, HasInterface>>(json);
 
@@ -87,7 +86,7 @@ namespace BrandonUtils.Tests.EditMode.Collections {
         public void StringKeySerializes() {
             string json = JsonConvert.SerializeObject(StringKeyedList, Formatting.Indented);
 
-            LogUtils.Log(json);
+            Console.WriteLine(json);
 
             var kl = JsonConvert.DeserializeObject<KeyedList<string, StringKey>>(json);
 
