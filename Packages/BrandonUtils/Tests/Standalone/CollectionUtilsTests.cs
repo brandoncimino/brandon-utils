@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-using BrandonUtils.Logging;
 using BrandonUtils.Standalone.Collections;
 
 using Newtonsoft.Json;
@@ -77,7 +76,7 @@ namespace BrandonUtils.Tests.EditMode.Collections {
         }
 
         private static void PrintDictionary<TKey, TValue>(IDictionary<TKey, TValue> dictionary) {
-            LogUtils.Log(JsonConvert.SerializeObject(dictionary, Formatting.Indented));
+            Console.WriteLine(JsonConvert.SerializeObject(dictionary, Formatting.Indented));
         }
 
         #region Dictionary Joining
@@ -135,11 +134,13 @@ namespace BrandonUtils.Tests.EditMode.Collections {
         [Test]
         public void JoinPreferOriginal_Extension() {
             var jointDic = DicOrigin.JoinDictionaries(DicOverlap, CollectionUtils.ConflictResolution.FavorOriginal);
-            LogUtils.Log(
-                $"Original: {JsonConvert.SerializeObject(DicOrigin)}",
-                $"Overlap:  {JsonConvert.SerializeObject(DicOverlap)}",
-                $"Actual:   {JsonConvert.SerializeObject(jointDic)}",
-                $"Expected: {JsonConvert.SerializeObject(ResultFavoringOriginal)}"
+            Console.WriteLine(
+                new[] {
+                    $"Original: {JsonConvert.SerializeObject(DicOrigin)}",
+                    $"Overlap:  {JsonConvert.SerializeObject(DicOverlap)}",
+                    $"Actual:   {JsonConvert.SerializeObject(jointDic)}",
+                    $"Expected: {JsonConvert.SerializeObject(ResultFavoringOriginal)}"
+                }
             );
             Assert.That(jointDic, Is.EqualTo(ResultFavoringOriginal));
         }
@@ -159,9 +160,11 @@ namespace BrandonUtils.Tests.EditMode.Collections {
         [Test]
         public void JoinPreferNew_Extension() {
             var jointDic = DicOrigin.JoinDictionaries(DicOverlap, CollectionUtils.ConflictResolution.FavorNew);
-            LogUtils.Log(
-                $"Actual:   {JsonConvert.SerializeObject(jointDic)}",
-                $"Expected: {JsonConvert.SerializeObject(ResultFavoringNew)}"
+            Console.WriteLine(
+                new[] {
+                    $"Actual:   {JsonConvert.SerializeObject(jointDic)}",
+                    $"Expected: {JsonConvert.SerializeObject(ResultFavoringNew)}"
+                }
             );
             Assert.That(jointDic, Is.EqualTo(ResultFavoringNew));
         }
@@ -185,11 +188,13 @@ namespace BrandonUtils.Tests.EditMode.Collections {
 
             dicOrigin.JoinDictionaries(dicOverlap, conflictResolution);
 
-            LogUtils.Log(
-                $"{nameof(dicOrigin)}:  {dicOrigin.JoinString()}",
-                $"{nameof(DicOrigin)}:  {DicOrigin.JoinString()}",
-                $"{nameof(dicOverlap)}: {dicOverlap.JoinString()}",
-                $"{nameof(DicOverlap)}: {DicOverlap.JoinString()}"
+            Console.WriteLine(
+                new[] {
+                    $"{nameof(dicOrigin)}:  {dicOrigin.JoinString()}",
+                    $"{nameof(DicOrigin)}:  {DicOrigin.JoinString()}",
+                    $"{nameof(dicOverlap)}: {dicOverlap.JoinString()}",
+                    $"{nameof(DicOverlap)}: {DicOverlap.JoinString()}"
+                }
             );
 
             Assert.That(dicOrigin,  Is.EqualTo(DicOrigin));
@@ -205,11 +210,13 @@ namespace BrandonUtils.Tests.EditMode.Collections {
 
             CollectionUtils.JoinDictionaries(new[] {dicOrigin, dicOverlap}, conflictResolution);
 
-            LogUtils.Log(
-                $"{nameof(dicOrigin)}:  {dicOrigin.JoinString()}",
-                $"{nameof(DicOrigin)}:  {DicOrigin.JoinString()}",
-                $"{nameof(dicOverlap)}: {dicOverlap.JoinString()}",
-                $"{nameof(DicOverlap)}: {DicOverlap.JoinString()}"
+            Console.WriteLine(
+                new[] {
+                    $"{nameof(dicOrigin)}:  {dicOrigin.JoinString()}",
+                    $"{nameof(DicOrigin)}:  {DicOrigin.JoinString()}",
+                    $"{nameof(dicOverlap)}: {dicOverlap.JoinString()}",
+                    $"{nameof(DicOverlap)}: {DicOverlap.JoinString()}"
+                }.JoinLines()
             );
 
             Assert.That(dicOrigin,  Is.EqualTo(DicOrigin));
