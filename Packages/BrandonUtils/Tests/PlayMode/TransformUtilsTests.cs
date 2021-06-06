@@ -42,7 +42,8 @@ namespace BrandonUtils.Tests.PlayMode {
 
             var actual = TransformUtils.LocalVerp(obj1.transform, obj2_world, verp);
 
-            Assert.That(actual, Is.EqualTo(expected));
+            // Unity's Vector3's don't work with NUnit's Is.EqualTo()...
+            Assert.That(actual == expected, Is.True, $"{actual} == {expected}");
         }
 
         [Test]
