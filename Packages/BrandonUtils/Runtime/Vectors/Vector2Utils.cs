@@ -16,6 +16,8 @@ namespace BrandonUtils.Vectors {
             return Vector2.Scale(original, scale);
         }
 
+        #region Set Individual Axes
+
         /// <summary>
         /// Updates the <see cref="Vector2.x"/> coordinate of <paramref name="original"/>, and returns <paramref name="original"/>.
         /// </summary>
@@ -23,7 +25,7 @@ namespace BrandonUtils.Vectors {
         /// <param name="x"></param>
         /// <returns></returns>
         public static ref Vector2 SetX(this ref Vector2 original, float x) {
-            original.Set(x, original.y);
+            original.x = x;
             return ref original;
         }
 
@@ -34,9 +36,11 @@ namespace BrandonUtils.Vectors {
         /// <param name="y"></param>
         /// <returns></returns>
         public static ref Vector2 SetY(this ref Vector2 original, float y) {
-            original.Set(original.x, y);
+            original.y = y;
             return ref original;
         }
+
+        #endregion
 
         /// <summary>
         /// Returns the <see cref="Mathf.Min(float,float)"/> of the <see cref="Vector2"/>'s coordinates.

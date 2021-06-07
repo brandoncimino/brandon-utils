@@ -80,5 +80,42 @@ namespace BrandonUtils.Vectors {
                 Mathf.Lerp(original.z, destination.z, lerpAmounts.z)
             );
         }
+
+        #region Set Individual Axes
+
+        /// <summary>
+        /// Sets the <see cref="Vector3.x"/> coordinate of <paramref name="original"/>, returning <paramref name="original"/> for method chaining.
+        /// </summary>
+        /// <param name="original"></param>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        public static ref Vector3 SetX(this ref Vector3 original, float x) {
+            original.x = x;
+            return ref original;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="Vector3.y"/> coordinate of <see cref="original"/>, returning <see cref="original"/> for method chaining.
+        /// </summary>
+        /// <param name="original"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public static ref Vector3 SetY(this ref Vector3 original, float y) {
+            original.y = y;
+            return ref original;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="Vector3.z"/> coordinate of <see cref="original"/>, returning <see cref="original"/> for method chaining.
+        /// </summary>
+        /// <param name="original"></param>
+        /// <param name="z"></param>
+        /// <returns></returns>
+        public static ref Vector3 SetZ(this ref Vector3 original, float z) {
+            original.z = z;
+            return ref original;
+        }
+
+        #endregion
     }
 }
