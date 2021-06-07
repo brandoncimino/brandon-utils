@@ -76,6 +76,15 @@ namespace BrandonUtils.Tests.EditMode {
         }
 
         [Test]
+        public void SortChain() {
+            var vec = new Vector2(10, 1);
+            vec.Sort().SetX(vec.y + 1).Sort();
+
+            Assert.That(vec.x, Is.LessThanOrEqualTo(vec.y));
+            Assert.That(vec.y, Is.GreaterThanOrEqualTo(vec.x));
+        }
+
+        [Test]
         public void SortedDoesNotSort() {
             var unsorted = new Vector2(10, 1);
             var sorted   = unsorted.Sorted();

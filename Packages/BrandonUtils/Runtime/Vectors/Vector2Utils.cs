@@ -3,15 +3,6 @@
 namespace BrandonUtils.Vectors {
     public static class Vector2Utils {
         /// <summary>
-        /// Returns a new <see cref="Vector2"/> that is a copy of <paramref name="original"/>.
-        /// </summary>
-        /// <param name="original"></param>
-        /// <returns></returns>
-        public static Vector2 Copy(this Vector2 original) {
-            return new Vector2(original.x, original.y);
-        }
-
-        /// <summary>
         /// Multiplies each component of <paramref name="original"/> by the corresponding component of <paramref name="scale"/>.
         /// </summary>
         /// <remarks>
@@ -84,16 +75,16 @@ namespace BrandonUtils.Vectors {
         /// <remarks>This method <b>modifies <paramref name="original"/></b>!</remarks>
         /// <param name="original"></param>
         /// <returns></returns>
-        public static Vector2 Sort(this ref Vector2 original) {
+        public static ref Vector2 Sort(this ref Vector2 original) {
             if (original.x <= original.y) {
-                return original;
+                return ref original;
             }
 
             var old_x = original.x;
             var old_y = original.y;
             original.x = old_y;
             original.y = old_x;
-            return original;
+            return ref original;
         }
 
         /// <summary>
