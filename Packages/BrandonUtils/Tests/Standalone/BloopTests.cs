@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using BrandonUtils.Standalone;
 using BrandonUtils.Standalone.Collections;
@@ -18,5 +20,36 @@ namespace BrandonUtils.Tests.Standalone {
             var pickGroups = picks.Group();
             Assert.That(pickGroups, Has.Count.EqualTo(numberOfPicks));
         }
+
+        #region Stepping Through a Range
+
+        class RangeTestParameters {
+            public float  Min_F { get; }
+            public float  Max_F { get; }
+            public double Min_D => Min_F;
+            public double Max_D => Max_F;
+
+            public int StepCount;
+
+            public List<float>  Expected_F { get; }
+            public List<double> Expected_D => Expected_F.Select(it => (double) it).ToList();
+
+            public RangeTestParameters(float min_f, float max_f, int stepCount, List<float> expected_f) {
+                Min_F      = min_f;
+                Max_F      = max_f;
+                StepCount  = stepCount;
+                Expected_F = expected_f;
+            }
+        }
+
+        [Test]
+        [TestCase(0, 6, 3, 0, 2,   4)]
+        [TestCase(1, 2, 5, 1, 1.2, 1.4, 1.6, 1.8)]
+        public void StepExclusive(float min, float max, int stepCount, params double[] expectedResults) {
+            var steps = Bloop.StepExclusive(min, max, stepCount);
+            Assert.That(steps, Is.EquivalentTo(expectedResults));
+        }
+
+        #endregion
     }
 }

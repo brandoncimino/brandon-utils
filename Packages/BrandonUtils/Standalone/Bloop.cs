@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,6 +13,7 @@ namespace BrandonUtils.Standalone {
         #region "Repeat" Extensions
 
         #region int.Repeat(lambda) NOTE: These are the "real" or "base" methods; the rest of these methods are aliases for these!
+
         /// <summary>
         /// Similar to <see cref="Enumerable.Repeat{TResult}"/>, but evaluates <paramref name="supplier"/> separately for each iteration.
         /// </summary>
@@ -108,6 +108,7 @@ namespace BrandonUtils.Standalone {
                 action.Invoke();
             }
         }
+
         #endregion
 
         #region int.For(lambda)
@@ -131,6 +132,7 @@ namespace BrandonUtils.Standalone {
         public static void For(this int iterations, Action<int> consumer) {
             iterations.Repeat(consumer);
         }
+
         #endregion
 
         #region lambda.Repeat(int)
@@ -180,6 +182,119 @@ namespace BrandonUtils.Standalone {
         }
 
         #endregion
+
+        #endregion
+
+        #region Stepping through a range
+
+        /// <summary>
+        /// Cuts <see cref="distance"/> into <see cref="stepCount"/> equal parts.
+        /// </summary>
+        /// <remarks>
+        /// This does <b>not</b> include a point at <see cref="distance"/>.
+        /// </remarks>
+        /// <param name="distance"></param>
+        /// <param name="stepCount"></param>
+        /// <returns></returns>
+        public static IEnumerable<float> StepExclusive(float distance, int stepCount) {
+            var stepSize = distance / stepCount;
+            return stepCount.For(it => it * stepSize);
+        }
+
+        /// <inheritdoc cref="StepExclusive(float,int)"/>
+        public static IEnumerable<double> StepExclusive(double distance, int stepCount) {
+            var stepSize = distance / stepCount;
+            return stepCount.For(it => it * stepSize);
+        }
+
+        /// <summary>
+        /// Cuts (<see cref="max_exclusive"/> - <see cref="min_inclusive"/>) into <see cref="stepCount"/> equal parts.
+        /// </summary>
+        /// <remarks>
+        /// This does <b>not</b> include a point at <see cref="max_exclusive"/>.
+        /// </remarks>
+        /// <example>
+        /// <see cref="StepExclusive(float,float,int)">StepExclusive(10,30,5)</see>:
+        /// <code>
+        /// Distance:   30 - 10 = 20
+        /// Step size:  20 / 5  =  4
+        /// Results:    10, 14, 18, 22, 26
+        /// </code>
+        /// </example>
+        /// <param name="min_inclusive"></param>
+        /// <param name="max_exclusive"></param>
+        /// <param name="stepCount"></param>
+        /// <returns></returns>
+        public static IEnumerable<float> StepExclusive(float min_inclusive, float max_exclusive, int stepCount) {
+            var distance = max_exclusive - min_inclusive;
+            return StepExclusive(distance, stepCount).Select(it => it + min_inclusive);
+        }
+
+        /// <inheritdoc cref="StepExclusive(float,float,int)"/>
+        public static IEnumerable<double> StepExclusive(double min_inclusive, double max_exclusive, int stepCount) {
+            var distance = max_exclusive - min_inclusive;
+            return StepExclusive(distance, stepCount).Select(it => it + min_inclusive);
+        }
+
+        /// <summary>
+        /// Cuts <see cref="distance"/> into <see cref="stepCount"/> parts, and returns the points <b>on each side of those parts</b> (including the "bookend" at <see cref="distance"/>).
+        /// </summary>
+        /// <remarks>
+        /// This will return <b><see cref="stepCount"/>+1 points</b>, because it includes the "bookends" at both 0 and <see cref="distance"/>.
+        /// </remarks>
+        /// <seealso cref="StepExclusive(float,float,int)"/>
+        /// <example>
+        /// <b>Example 1</b><p/>
+        /// If a staircase of height 10 was being built with 5 steps, then this would return the height of <b>each flat surface</b>:
+        /// <code><![CDATA[
+        /// StepInclusive(10, 5);
+        ///
+        /// #1:  0      // the "ground floor"
+        /// #2:  2
+        /// #3:  4
+        /// #4:  6
+        /// #5:  8
+        /// #6: 10      // the "next floor"
+        /// ]]></code>
+        ///
+        /// <b>Example 2</b><p/>
+        /// If (one axis of) a grid of size <see cref="distance"/> was being drawn with <see cref="stepCount"/> boxes, then this would return the distance where <b>each line should be drawn</b>.
+        /// </example>
+        /// <param name="distance"></param>
+        /// <param name="stepCount"></param>
+        /// <returns></returns>
+        public static IEnumerable<float> StepInclusive(float distance, int stepCount) {
+            var stepSize = distance / stepCount;
+            return (stepCount + 1).For(it => it * stepSize);
+        }
+
+        /**
+         * <inheritdoc cref="StepInclusive(float,int)"/>
+         */
+        public static IEnumerable<double> StepInclusive(double distance, int stepCount) {
+            var stepSize = distance / stepCount;
+            return (stepCount + 1).For(it => it * stepSize);
+        }
+
+        /// <summary>
+        /// Similar to <see cref="StepInclusive(float,int)"/>, but goes from <see cref="min_inclusive"/> to <see cref="max_inclusive"/>.
+        /// </summary>
+        /// <param name="min_inclusive"></param>
+        /// <param name="max_inclusive"></param>
+        /// <param name="stepCount"></param>
+        /// <returns></returns>
+        public static IEnumerable<float> StepInclusive(float min_inclusive, float max_inclusive, int stepCount) {
+            var distance = max_inclusive - min_inclusive;
+            return StepInclusive(distance, stepCount).Select(it => it + min_inclusive);
+        }
+
+        /**
+         * <inheritdoc cref="StepInclusive(float,float,int)"/>
+         */
+        public static IEnumerable<double> StepInclusive(double min_inclusive, double max_inclusive, int stepCount) {
+            var distance = max_inclusive - min_inclusive;
+            return StepInclusive(distance, stepCount).Select(it => it + min_inclusive);
+        }
 
         #endregion
     }
