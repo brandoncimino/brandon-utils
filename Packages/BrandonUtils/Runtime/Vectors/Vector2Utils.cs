@@ -144,5 +144,14 @@ namespace BrandonUtils.Vectors {
         public static float Lerp(this Vector2 range, float lerpAmount) {
             return Mathf.Lerp(range.x, range.y, lerpAmount);
         }
+
+        /// <summary>
+        /// Returns <see cref="Vector2.y"/> - <see cref="Vector2.x"/>.
+        /// </summary>
+        /// <param name="range"></param>
+        /// <returns></returns>
+        public static float Delta(this Vector2 range) {
+            return range.y - range.x;
+        }
     }
 }
