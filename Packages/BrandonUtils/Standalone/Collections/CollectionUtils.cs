@@ -471,5 +471,22 @@ namespace BrandonUtils.Standalone.Collections {
         }
 
         #endregion
+
+        /// <summary>
+        /// Returns an <see cref="IEnumerable{T}"/>'s <typeparamref name="T"/> as a <see cref="Type"/>.
+        /// </summary>
+        /// <example>
+        /// <code><![CDATA[
+        /// var ls = new List<int>{ 1, 2, 3 };
+        ///
+        /// Assert.That(ls.ItemType() == typeof(int));
+        /// ]]></code>
+        /// </example>
+        /// <param name="enumerable"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static Type ItemType<T>(this IEnumerable<T> enumerable) {
+            return typeof(T);
+        }
     }
 }
