@@ -3,25 +3,46 @@
 using UnityEngine;
 
 namespace BrandonUtils.Mathb {
+    /// <summary>
+    /// Contains cute extension methods for primitive types, allowing things like <c>5.4f.Clamp01()</c>
+    /// </summary>
     public static class SugarMath {
-        public static float Clamp(this float f, float min, float max) {
-            return Mathf.Clamp(f, min, max);
+        /**
+         * <inheritdoc cref="Mathf.Clamp(float,float,float)"/>
+         */
+        public static float Clamp(this float value, float min, float max) {
+            return Mathf.Clamp(value, min, max);
         }
 
-        public static float Clamp(this float f, Vector2 range) {
-            return Mathf.Clamp(f, range.Min(), range.Max());
+        /// <summary>
+        /// Calls <see cref="Mathf.Clamp(float,float,float)"/> using <see cref="range"/>'s <see cref="Vector2Utils.Min(UnityEngine.Vector2)"/> and <see cref="Vector2Utils.Max(UnityEngine.Vector2)"/>.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="range"></param>
+        /// <returns></returns>
+        public static float Clamp(this float value, Vector2 range) {
+            return Mathf.Clamp(value, range.Min(), range.Max());
         }
 
-        public static float Clamp01(this float f) {
-            return Mathf.Clamp01(f);
+        /**
+         * <inheritdoc cref="Mathf.Clamp01"/>
+         */
+        public static float Clamp01(this float value) {
+            return Mathf.Clamp01(value);
         }
 
-        public static int Clamp(this int i, int min, int max) {
-            return Mathf.Clamp(i, min, max);
+        /**
+         * <inheritdoc cref="Mathf.Clamp(int, int, int)"/>
+         */
+        public static int Clamp(this int value, int min, int max) {
+            return Mathf.Clamp(value, min, max);
         }
 
-        public static int Clamp(this int i, Vector2Int range) {
-            return Mathf.Clamp(i, range.Min(), range.Max());
+        /**
+         * Calls <see cref="Mathf.Clamp(int,int,int)"/> using <see cref="range"/>'s <see cref="Vector2Utils.Min(UnityEngine.Vector2)"/> and <see cref="Vector2Utils.Max(UnityEngine.Vector2)"/>.
+         */
+        public static int Clamp(this int value, Vector2Int range) {
+            return Mathf.Clamp(value, range.Min(), range.Max());
         }
     }
 }
