@@ -2,11 +2,14 @@
 
 using UnityEngine;
 
-namespace BrandonUtils.Mathb {
+namespace BrandonUtils {
     /// <summary>
     /// Contains cute extension methods for primitive types, allowing things like <c>5.4f.Clamp01()</c>
     /// </summary>
-    public static class SugarMath {
+    /// <remarks>
+    /// GET IT! <see cref="Mathb"/>! Like <see cref="Mathf"/>!
+    /// </remarks>
+    public static class Mathb {
         /**
          * <inheritdoc cref="Mathf.Clamp(float,float,float)"/>
          */
