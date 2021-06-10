@@ -1,4 +1,6 @@
-﻿using BrandonUtils.Standalone;
+﻿using System;
+
+using BrandonUtils.Standalone;
 using BrandonUtils.Vectors;
 
 using NUnit.Framework;
@@ -103,6 +105,19 @@ namespace BrandonUtils.Tests.EditMode {
 
             Assert.That(swapped.x, Is.EqualTo(unswapped.y));
             Assert.That(swapped.y, Is.EqualTo(unswapped.x));
+        }
+
+        [Test]
+        public void GetPortionReversesInverseLerpUnclamped(
+            [Values(0.5f, 0.9f, 1f, 1.1f, 1.5f, 1.9f, 2.0f, 2.1f, 99f)]
+            float point
+        ) {
+            var range = new Vector2(1, 2);
+            Console.WriteLine(range.InverseLerp(point));
+
+            var portion = range.GetPortion(point);
+            var reLerp  = range.LerpUnclamped(portion);
+            Assert.That(reLerp, Is.EqualTo(point));
         }
     }
 }
