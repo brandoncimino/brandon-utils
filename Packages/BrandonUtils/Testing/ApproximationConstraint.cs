@@ -5,6 +5,16 @@ using BrandonUtils.Standalone;
 using NUnit.Framework.Constraints;
 
 namespace BrandonUtils.Testing {
+    /// <summary>
+    /// Possible alternative adjectives to "Approximately", in order by silliness:
+    /// <ul>
+    ///     <li>CloseTo (à la AssertJ's <a href="https://www.javadoc.io/doc/org.assertj/assertj-core/latest/org/assertj/core/api/NumberAssert.html#isCloseTo(ACTUAL,org.assertj.core.data.Offset)">isCloseTo()</a>)</li>
+    ///     <li>Roughly</li>
+    ///     <li>Almost</li>
+    ///     <li>Roundabout(s)</li>
+    ///     <li>Basically</li>
+    /// </ul>
+    /// </summary>
     public class ApproximationConstraint : RangeConstraint {
         private readonly object ExpectedValue;
         private readonly object Threshold;
