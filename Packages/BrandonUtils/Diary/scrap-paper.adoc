@@ -1,0 +1,15 @@
+﻿= Scrap Paper
+
+> wherein that down should be jot
+
+== Topology
+
+|===
+|Context |Definition
+
+|https://en.wikipedia.org/wiki/Topology[Math] |
+|Data streams |
+|Geography |Is actually called https://en.wikipedia.org/wiki/Topography[topography]
+|Programming |
+
+|===

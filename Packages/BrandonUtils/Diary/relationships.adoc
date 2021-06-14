@@ -1,0 +1,95 @@
+﻿= How to describe relationships between things
+:lightbulb: 💡
+:electricity: ⚡
+
+[NOTE]
+====
+WOAH!
+
+So many discussions in work arise because, as a QA, I must be concerned with https://en.wikipedia.org/wiki/Strict_conditional[strict conditionals], while other people are concerned with https://en.wikipedia.org/wiki/Material_conditional[material conditionals]!
+
+The statement "If `consentStatus` == `granted` -> `registrationStatus` == ``granted``" is a *materially true*, but not *strictly true*!
+====
+
+Say you want to *associate* two things together with a *relationship*.
+For example:
+
+.{blank}
+====
+{lightbulb} _depends on_ {electricity}
+====
+
+This has a "reciprocal":
+
+.{blank}
+====
+{electricity} _is depended on by_ {lightbulb}
+====
+
+This could be described in many ways:
+
+- As *2 representations* of *1 relationship*
+- As *2 relationships*, which are _reciprocals_ of each other
+
+The question becomes, *who "owns" that relationship*?
+
+.Applicable Scenario
+[sidebar]
+--
+`Baddie` objects have the following relationships:
+
+- `Baddie` _targets_ `Player`
+- `Baddie` _is allied with_ `Miniboss`
+- `Baddie` _serves_ `Boss`
+
+[cols='a,a,a,a,a']
+|===
+|Idiomatic |Inverse | n-to-n | ? |Relational database...
+
+| `Baddie` _is attacking_ `Player`
+| `Player` _is attacked by_ `Baddie`
+| 1 `Player` -> many ``Baddie``s
+| Reciprocal
+| `
+
+| `Baddie` _is allied with_ `Miniboss`
+| `Miniboss` _is allied with_ `Baddie`
+| many ``Baddie``s <--> many ``Miniboss``es
+| Involutory
+|
+
+| `Baddie` _serves_ `Boss`
+| `Boss` _is served by_ `Baddie`
+| 1 `Boss` -> many ``Baddie``s
+| Reciprocal
+|
+
+|===
+--
+
+== Option 1: Both
+
+== Sources
+
+=== Jira
+
+- Jira uses the verb _to link_, which then creates a "link" or a "relationship".
+- The data is used as a...
+
+[NOTE]
+====
+I found the term [], which states:
+
+> In mathematics, the unit interval is the closed interval [0,1].
+
+And though, I could use that for my lerp-amount prefix, but...
+
+> It is often denoted _I_ (capital letter I).
+
+That isn't going to work, because:
+
+- The prefix `I` means `interface`
+- Lowercase `i` means https://en.wikipedia.org/wiki/Imaginary_unit[imaginary unit]
+====
+
+TIP: https://en.wikipedia.org/wiki/Infimum[Infimum] is a cool word
