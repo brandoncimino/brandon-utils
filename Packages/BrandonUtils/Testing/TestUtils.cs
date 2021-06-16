@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using BrandonUtils.Standalone;
+using BrandonUtils.Standalone.Collections;
 
+using NUnit.Framework;
 using NUnit.Framework.Constraints;
 
 using UnityEngine;
-using UnityEngine.Assertions;
 
 // ReSharper disable MemberCanBePrivate.Global
 
@@ -25,11 +27,12 @@ namespace BrandonUtils.Testing {
         /// <param name="expectedList"></param>
         /// <param name="actualList"></param>
         /// <typeparam name="T"></typeparam>
+        [Obsolete("Please use " + nameof(NUnit.Framework.Assert.AreEqual) + " instead.")]
         public static void AreEqual<T>(IList<T> expectedList, IList<T> actualList) {
-            Assert.AreEqual(expectedList.Count, actualList.Count, "The lists weren't the same length!");
+            UnityEngine.Assertions.Assert.AreEqual(expectedList.Count, actualList.Count, "The lists weren't the same length!");
             for (int i = 0; i < expectedList.Count; i++) {
                 Debug.Log($"Comparing {expectedList[i]} == {actualList[i]}");
-                Assert.AreEqual(expectedList[i], actualList[i], $"The lists differ at index [{i}]!");
+                UnityEngine.Assertions.Assert.AreEqual(expectedList[i], actualList[i], $"The lists differ at index [{i}]!");
             }
         }
 
@@ -70,6 +73,27 @@ namespace BrandonUtils.Testing {
 
         public static WaitForSecondsRealtime WaitForRealtime(TimeSpan timeSpan, double multiplier = 1) {
             return new WaitForSecondsRealtime((float) timeSpan.Multiply(multiplier).TotalSeconds);
+        }
+
+        public static void AssertAll(params Action[] assertions) {
+            var failures = new List<string>();
+            foreach (var ass in assertions) {
+                try {
+                    ass.Invoke();
+                }
+                catch (Exception e) {
+                    failures.Add($"{ass.Method.Name} failed!\n{e.Message}");
+                }
+            }
+
+            if (failures.Any()) {
+                Assert.Fail($"{failures.Count} / {assertions.Length} assertions failed:\n\n{failures.JoinLines()}");
+            }
+        }
+
+        public static void AssertAll<T>(T actual, params Constraint[] assertions) {
+            var assActions = assertions.Select<Constraint, Action>(ass => () => Assert.That(actual, ass)).ToArray();
+            AssertAll(assActions);
         }
     }
 }
