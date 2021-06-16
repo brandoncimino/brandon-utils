@@ -1,0 +1,20 @@
+= GDC Talks
+
+Notes about cool GDC talks!
+
+== 8 Frames in 16ms
+> Rollback Networking in Mortal Kombat and Injustice 2
+
+NOTE: https://youtu.be/7jb0FOcImdg[Youtube]
+
+- Technical name for "delay-based netcode" is "https://en.wikipedia.org/wiki/Lockstep_(computing)[lockstep]"
+- "Rollback" might be the correct term
+** What I usually think of as "rollback netcode" is more accurately called "https://en.wikipedia.org/wiki/Dead_reckoning#For_networked_games[dead reckoning]"
+** The speaker
+
+== https://www.youtube.com/watch?v=yhGjCzxJV3E[The X Factor Between 2D and 3D]
+> GuiltyGearXrd's Art Style
+
+== Other
+
+- https://www.reddit.com/r/gamedev/comments/4oodum/what_are_some_of_the_best_gdc_talks/[Reddit thread about cool talks]

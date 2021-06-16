@@ -1,0 +1,27 @@
+= Archives
+
+> Useful articles and links and stuff
+
+== Algorithms
+> You know they're smart because they're plain-text!
+
+- https://tartarus.org/martin/PorterStemmer/index.html[The Porter Stemming Algorithm]
+** Original (1980): https://tartarus.org/martin/PorterStemmer/def.txt[An algorithm for suffix stripping]
+- https://www.ietf.org/rfc/rfc4122.txt[A Universally Unique IDentifier (UUID) URN Namespace]
+
+== Graphic Design
+- https://material.io/collections/getting-started/#[Material Design]
+- https://int10h.org/oldschool-pc-fonts/fontlist/[The Ultimate Oldschool PC Font Pack]
+
+== Game Dev
+- https://kotaku.com/the-messy-true-story-behind-the-making-of-destiny-1737556731[The Messy, True Story Behind The Making Of _Destiny_]
+- https://www.slideshare.net/davidsalz54/albion-online-software-architecture-of-an-mmo-talk-at-quo-vadis-2016-berlin[Albion Online - Software Architecture of an MMO (talk at Quo Vadis 2016 Berlin)]
+
+== Programming
+- https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/naming-guidelines?redirectedfrom=MSDN[Naming Guidelines | Microsoft Docs]
+- https://ui.adsabs.harvard.edu/abs/2012ASPC..461..623T/abstract[Practices in Code Discoverability - NASA/ADS]
+- https://www.sonarsource.com/docs/CognitiveComplexity.pdf[Cognitive Complexity (Sonar)]
+- "Tell; don't ask"
+** http://media.pragprog.com/articles/jan_03_enbug.pdf[The Art of Enbugging]
+** https://deviq.com/principles/tell-dont-ask[Dev IQ: Tell, Don't Ask]
+- https://en.wikipedia.org/wiki/Robustness_principle[Robustness Principle]
