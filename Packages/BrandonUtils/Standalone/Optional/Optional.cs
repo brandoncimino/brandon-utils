@@ -58,6 +58,18 @@ namespace BrandonUtils.Standalone.Optional {
     /// </remarks>
     /// <typeparam name="T"></typeparam>
     public readonly struct Optional<T> : IEquatable<T>, IEquatable<Optional<T>>, IReadOnlyCollection<T> {
+        public override bool Equals(object obj) {
+            return obj switch {
+                Optional<T> optional when Equals(optional) => true,
+                T t when Equals(t)                         => true,
+                _                                          => false
+            };
+        }
+
+        public override int GetHashCode() {
+            return (_items != null ? _items.GetHashCode() : 0);
+        }
+
         private readonly List<T> _items;
 
         private IEnumerable<T> EnumerableImplementation => HasValue ? _items : Enumerable.Empty<T>();
@@ -112,7 +124,7 @@ namespace BrandonUtils.Standalone.Optional {
 
         public bool Equals(Optional<T> other) {
             if (HasValue == other.HasValue) {
-                return !HasValue || Value.Equals(other.Value);
+                return !HasValue || Value.Equals(other.Value) || Equals(Value, other.Value);
             }
 
             return false;
@@ -123,6 +135,22 @@ namespace BrandonUtils.Standalone.Optional {
         }
 
         public static bool operator !=(Optional<T> a, Optional<T> b) {
+            return !a.Equals(b);
+        }
+
+        public static bool operator ==(T a, Optional<T> b) {
+            return b.Equals(a);
+        }
+
+        public static bool operator !=(T a, Optional<T> b) {
+            return b.Equals(a);
+        }
+
+        public static bool operator ==(Optional<T> a, T b) {
+            return a.Equals(b);
+        }
+
+        public static bool operator !=(Optional<T> a, T b) {
             return !a.Equals(b);
         }
 

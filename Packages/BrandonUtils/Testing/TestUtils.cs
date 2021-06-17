@@ -87,7 +87,7 @@ namespace BrandonUtils.Testing {
             }
 
             if (failures.Any()) {
-                Assert.Fail($"{failures.Count} / {assertions.Length} assertions failed:\n\n{failures.JoinLines()}");
+                Assert.Fail($"[{failures.Count}/{assertions.Length}] assertions failed:\n\n{failures.JoinLines()}");
             }
         }
 
