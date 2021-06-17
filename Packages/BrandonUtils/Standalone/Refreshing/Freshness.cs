@@ -1,22 +1,15 @@
 ﻿namespace BrandonUtils.Standalone.Refreshing {
+    /// <summary>
+    /// Describes the state of a <see cref="Refreshing{TValue,TStaleness}"/> value.
+    /// </summary>
+    /// <remarks>
+    /// I had a third state, "Pristine", which was the default, but I removed it because it:
+    /// <ul>
+    /// <li>Only seemed useful "internally" to the <see cref="Refreshing{TValue,TStaleness}"/> itself</li>
+    /// <li>Caused the statements "IsStale" and "NeedsRefresh" to somehow mean _different things_, which is very confusing</li>
+    /// </ul>
+    /// </remarks>
     public enum Freshness {
-        /// <summary>
-        /// Implies that:
-        /// <ul>
-        /// <li><see cref="Refreshing{TValue,TStaleness}.Refresh"/> has <b>never</b> been called.</li>
-        /// <li>The value of <see cref="Refreshing{TValue,TStaleness}._value"/> is the default <see cref="TValue"/>.</li>
-        /// </ul>
-        /// </summary>
-        /// <example>
-        /// <ul>
-        /// <li>An apple on the tree.</li>
-        /// <li>Spam in the can.</li>
-        /// </ul>
-        /// </example>
-        /// <remarks>
-        /// Also known as <a href="https://www.youtube.com/watch?v=6PrRUKFcnPM&amp;ab_channel=yadif2x">NRFB ("Never Remove From Box")</a>.
-        /// </remarks>
-        Pristine = default,
         /// <summary>
         /// Implies that:
         /// <ul>

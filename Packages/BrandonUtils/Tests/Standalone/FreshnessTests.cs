@@ -22,7 +22,7 @@ namespace BrandonUtils.Tests.Standalone {
             );
 
             Assert.That(timeKeeper.InvocationCount, Is.EqualTo(0));
-            Assert.That(perSecond.Freshness,        Is.EqualTo(Freshness.Pristine));
+            Assert.That(perSecond.Freshness,        Is.EqualTo(Freshness.Stale));
 
             Console.WriteLine(perSecond.Value);
             Assert.That(perSecond.Freshness,        Is.EqualTo(Freshness.Fresh));
@@ -56,7 +56,7 @@ namespace BrandonUtils.Tests.Standalone {
                 (prev, cur) => cur - prev >= TimeSpan.FromSeconds(1)
             );
 
-            Assert.That(perSecond, Has.Property(nameof(perSecond.Freshness)).EqualTo(Freshness.Pristine));
+            Assert.That(perSecond, Has.Property(nameof(perSecond.Freshness)).EqualTo(Freshness.Stale));
             Assert.That(invoker,   Has.Property(nameof(invoker.InvocationCount)).EqualTo(0));
         }
 
@@ -71,7 +71,7 @@ namespace BrandonUtils.Tests.Standalone {
             );
 
             Assert.That(invoker,    Has.Property(nameof(invoker.InvocationCount)).EqualTo(0));
-            Assert.That(refreshing, Has.Property(nameof(refreshing.Freshness)).EqualTo(Freshness.Pristine));
+            Assert.That(refreshing, Has.Property(nameof(refreshing.Freshness)).EqualTo(Freshness.Stale));
 
             10.Repeat(
                 () => {

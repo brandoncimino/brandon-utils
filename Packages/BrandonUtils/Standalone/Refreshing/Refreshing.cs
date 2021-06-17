@@ -35,7 +35,7 @@ namespace BrandonUtils.Standalone.Refreshing {
         /// </summary>
         public TValue Value {
             get {
-                if (Freshness != Freshness.Fresh) {
+                if (NeedsRefresh) {
                     Refresh();
                 }
 
@@ -46,26 +46,31 @@ namespace BrandonUtils.Standalone.Refreshing {
         /// <summary>
         /// The number of times that <see cref="RefreshCount"/> has been called
         /// </summary>
-        public int RefreshCount { get; private set; }
+        public int RefreshCount => ValueSupplier.InvocationCount;
 
         /// <summary>
         /// The current <see cref="Freshness"/> of the <see cref="_value"/>.
         /// </summary>
         public Freshness Freshness {
             get {
-                if (PreviousStalenessBasis.HasValue) {
-                    return IsStale ? Freshness.Stale : Freshness.Fresh;
+                if (!PreviousStalenessBasis.HasValue) {
+                    return Freshness.Stale;
                 }
-                else {
-                    return Freshness.Pristine;
-                }
+
+                return NeedsRefresh ? Freshness.Stale : Freshness.Fresh;
             }
         }
 
-        private bool IsStale {
+        /// <summary>
+        /// Whether or not <see cref="Refresh"/> will be invoked the next time <see cref="Value"/> is retrieved.
+        ///
+        /// This is slightly different from saying "is <see cref="Refreshing.Freshness.Stale"/>",
+        /// because this will return true for <see cref="Refreshing.Freshness.Pristine"/> as well.
+        /// </summary>
+        private bool NeedsRefresh {
             get {
                 if (!PreviousStalenessBasis.HasValue) {
-                    return false;
+                    return true;
                 }
 
                 var currentStalenessBasis = StalenessBasisSupplier.Invoke();
@@ -111,6 +116,10 @@ namespace BrandonUtils.Standalone.Refreshing {
 
         public bool Equals(TValue other) {
             return Value.Equals(other);
+        }
+
+        public TValue Peek() {
+            return _value;
         }
     }
 }
