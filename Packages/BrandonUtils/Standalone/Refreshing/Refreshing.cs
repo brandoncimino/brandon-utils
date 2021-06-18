@@ -7,7 +7,7 @@ namespace BrandonUtils.Standalone.Refreshing {
     /// Represents a value that:
     /// <ul>
     /// <li>Is expensive to generate</li>
-    /// <li>Can become <see cref="Refreshing.Freshness.Stale"/>, at which point it will need to be <see cref="Refresh"/>ed</li>
+    /// <li>Can become <see cref="Standalone.Refreshing.Freshness.Stale"/>, at which point it will need to be <see cref="Refresh"/>ed</li>
     /// <li>Has a <see cref="StalenessPredicate"/> that is cheap and simple</li>
     /// <li>Has a <see cref="StalenessPredicate"/> that callers don't need to worry about</li>
     /// </ul>
@@ -64,8 +64,8 @@ namespace BrandonUtils.Standalone.Refreshing {
         /// <summary>
         /// Whether or not <see cref="Refresh"/> will be invoked the next time <see cref="Value"/> is retrieved.
         ///
-        /// This is slightly different from saying "is <see cref="Refreshing.Freshness.Stale"/>",
-        /// because this will return true for <see cref="Refreshing.Freshness.Pristine"/> as well.
+        /// This is slightly different from saying "is <see cref="Standalone.Refreshing.Freshness.Stale"/>",
+        /// because this will return true for <see cref="Standalone.Refreshing.Freshness.Pristine"/> as well.
         /// </summary>
         private bool NeedsRefresh {
             get {
@@ -79,12 +79,12 @@ namespace BrandonUtils.Standalone.Refreshing {
         }
 
         /// <summary>
-        /// The expensive function that produces <see cref="Refreshing.Freshness.Fresh"/> <see cref="Value"/>s.
+        /// The expensive function that produces <see cref="Standalone.Refreshing.Freshness.Fresh"/> <see cref="Value"/>s.
         /// </summary>
         public CountedFunc<TValue> ValueSupplier { get; }
 
         /// <summary>
-        /// The function that determines if a value is <see cref="Refreshing.Freshness.Stale"/>.
+        /// The function that determines if a value is <see cref="Standalone.Refreshing.Freshness.Stale"/>.
         /// </summary>
         public Func<TStaleness, TStaleness, bool> StalenessPredicate { get; }
 
@@ -94,7 +94,11 @@ namespace BrandonUtils.Standalone.Refreshing {
         public Func<TStaleness> StalenessBasisSupplier { get; }
         public Optional<TStaleness> PreviousStalenessBasis;
 
-        public Refreshing(Func<TValue> valueSupplier, Func<TStaleness> stalenessBasisSupplier, Func<TStaleness, TStaleness, bool> stalenessPredicate) {
+        public Refreshing(
+            Func<TValue> valueSupplier,
+            Func<TStaleness> stalenessBasisSupplier,
+            Func<TStaleness, TStaleness, bool> stalenessPredicate
+        ) {
             this.ValueSupplier          = valueSupplier;
             this.StalenessBasisSupplier = stalenessBasisSupplier;
             this.StalenessPredicate     = stalenessPredicate;
@@ -118,8 +122,16 @@ namespace BrandonUtils.Standalone.Refreshing {
             return Value.Equals(other);
         }
 
+        /// <summary>
+        /// Returns the current <see cref="_value"/> <b>without</b> refreshing it.
+        /// </summary>
+        /// <returns></returns>
         public TValue Peek() {
             return _value;
+        }
+
+        public static implicit operator TValue(Refreshing<TValue, TStaleness> self) {
+            return self.Value;
         }
     }
 }
