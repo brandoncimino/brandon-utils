@@ -123,9 +123,9 @@ namespace BrandonUtils.Standalone.Refreshing {
             Func<TStaleness> stalenessBasisSupplier,
             Func<TStaleness, TStaleness, bool> stalenessPredicate
         ) {
-            this.ValueSupplier          = valueSupplier;
-            this.StalenessBasisSupplier = stalenessBasisSupplier;
-            this.StalenessPredicate     = stalenessPredicate;
+            ValueSupplier          = valueSupplier;
+            StalenessBasisSupplier = stalenessBasisSupplier;
+            StalenessPredicate     = stalenessPredicate;
         }
 
         /// <summary>
