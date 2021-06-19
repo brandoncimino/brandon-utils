@@ -104,7 +104,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
         }
 
         private static T Unboxional<T>(Optional<T> optional) {
-            return optional.GetValueOrDefault(default);
+            return optional.GetValueOrDefault((T) default);
         }
     }
 }

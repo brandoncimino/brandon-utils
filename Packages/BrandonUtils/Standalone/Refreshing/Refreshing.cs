@@ -4,7 +4,16 @@ using BrandonUtils.Standalone.Optional;
 
 namespace BrandonUtils.Standalone.Refreshing {
     /// <summary>
-    /// Represents a value that:
+    /// Represents a value that is expensive to compute, so you want to limit how often this occurs - such as once per frame.
+    /// <p/>
+    /// This consists of three main parts:
+    /// <ul>
+    /// <li>A <see cref="ValueSupplier"/>, which is the expensive function that you don't want to call all the time</li>
+    /// <li>A <see cref="StalenessBasisSupplier"/>, which provides the value we track to determine staleness, such as the current time or current frame</li>
+    /// <li>A <see cref="StalenessPredicate"/>, which compares the results of <see cref="StalenessBasisSupplier"/></li>
+    /// </ul>
+    ///
+    /// A good candidate for <see cref="Refreshing{TValue,TStaleness}"/> is a value that:
     /// <ul>
     /// <li>Is expensive to generate</li>
     /// <li>Can become <see cref="Standalone.Refreshing.Freshness.Stale"/>, at which point it will need to be <see cref="Refresh"/>ed</li>
@@ -25,9 +34,9 @@ namespace BrandonUtils.Standalone.Refreshing {
     public class Refreshing<TValue, TStaleness> : IEquatable<TValue>
         where TValue : IEquatable<TValue> {
         /// <summary>
-        /// The latest "cached" <see cref="TValue"/>.
+        /// The backing field for <see cref="Value"/>; i.e. the latest "cached" <see cref="TValue"/>.
         /// </summary>
-        private TValue _value;
+        private TValue _storedValue;
 
         /// <summary>
         /// The "C# style" of retrieving the value from the <see cref="Refreshing{TValue,TStaleness}"/>
@@ -35,11 +44,11 @@ namespace BrandonUtils.Standalone.Refreshing {
         /// </summary>
         public TValue Value {
             get {
-                if (NeedsRefresh) {
+                if (IsStale) {
                     Refresh();
                 }
 
-                return _value;
+                return _storedValue;
             }
         }
 
@@ -49,7 +58,7 @@ namespace BrandonUtils.Standalone.Refreshing {
         public int RefreshCount => ValueSupplier.InvocationCount;
 
         /// <summary>
-        /// The current <see cref="Freshness"/> of the <see cref="_value"/>.
+        /// The current <see cref="Freshness"/> of the <see cref="_storedValue"/>.
         /// </summary>
         public Freshness Freshness {
             get {
@@ -57,17 +66,14 @@ namespace BrandonUtils.Standalone.Refreshing {
                     return Freshness.Stale;
                 }
 
-                return NeedsRefresh ? Freshness.Stale : Freshness.Fresh;
+                return IsStale ? Freshness.Stale : Freshness.Fresh;
             }
         }
 
         /// <summary>
-        /// Whether or not <see cref="Refresh"/> will be invoked the next time <see cref="Value"/> is retrieved.
-        ///
-        /// This is slightly different from saying "is <see cref="Standalone.Refreshing.Freshness.Stale"/>",
-        /// because this will return true for <see cref="Standalone.Refreshing.Freshness.Pristine"/> as well.
+        /// Whether or not the current <see cref="_storedValue"/> is "stale", and so will be <see cref="Refresh"/>ed the next time <see cref="Value"/> is retrieved.
         /// </summary>
-        private bool NeedsRefresh {
+        private bool IsStale {
             get {
                 if (!PreviousStalenessBasis.HasValue) {
                     return true;
@@ -84,16 +90,34 @@ namespace BrandonUtils.Standalone.Refreshing {
         public CountedFunc<TValue> ValueSupplier { get; }
 
         /// <summary>
-        /// The function that determines if a value is <see cref="Standalone.Refreshing.Freshness.Stale"/>.
+        /// Compares the previous and current <see cref="TStaleness"/> values to determine if <see cref="_storedValue"/> is <see cref="Refreshing.Freshness.Stale"/>.
         /// </summary>
         public Func<TStaleness, TStaleness, bool> StalenessPredicate { get; }
 
         /// <summary>
-        /// prisdabn;laskjdf
+        /// The function that provides the <see cref="TStaleness"/> values used to determine <see cref="Freshness"/>.
         /// </summary>
+        /// <remarks>
+        /// This value is compared to <see cref="PreviousStalenessBasis"/> via <see cref="StalenessPredicate"/>.
+        /// </remarks>
+        /// <seealso cref="StalenessPredicate"/>
+        /// <seealso cref="PreviousStalenessBasis"/>
         public Func<TStaleness> StalenessBasisSupplier { get; }
+
+        /// <summary>
+        /// The result of <see cref="StalenessBasisSupplier"/> the last time <see cref="Refresh"/> was called.
+        /// </summary>
+        /// <remarks>
+        /// Would a better name for this be "StalenessBasisAtLastRefresh"? Or is that too verbose?
+        /// </remarks>
         public Optional<TStaleness> PreviousStalenessBasis;
 
+        /// <summary>
+        /// Constructs a new <see cref="Refreshing{TValue,TStaleness}"/> value.
+        /// </summary>
+        /// <param name="valueSupplier">the <see cref="ValueSupplier"/></param>
+        /// <param name="stalenessBasisSupplier">the <see cref="StalenessBasisSupplier"/></param>
+        /// <param name="stalenessPredicate">the <see cref="StalenessPredicate"/></param>
         public Refreshing(
             Func<TValue> valueSupplier,
             Func<TStaleness> stalenessBasisSupplier,
@@ -105,7 +129,7 @@ namespace BrandonUtils.Standalone.Refreshing {
         }
 
         /// <summary>
-        /// Forces an invocation of <see cref="ValueSupplier"/> and stores the result in <see cref="_value"/>, regardless of the current <see cref="Freshness"/>.
+        /// Forces an invocation of <see cref="ValueSupplier"/> and stores the result in <see cref="_storedValue"/>, regardless of the current <see cref="Freshness"/>.
         /// </summary>
         /// <remarks>
         /// This method should rarely be called externally, as it bypasses the <see cref="StalenessPredicate"/> and <b>always</b> invokes the <see cref="ValueSupplier"/>.
@@ -113,23 +137,25 @@ namespace BrandonUtils.Standalone.Refreshing {
         /// </remarks>
         /// <returns>the result of <see cref="ValueSupplier"/></returns>
         public TValue Refresh() {
-            _value                 = ValueSupplier.Invoke();
+            _storedValue           = ValueSupplier.Invoke();
             PreviousStalenessBasis = StalenessBasisSupplier.Invoke();
-            return _value;
+            return _storedValue;
         }
 
         public bool Equals(TValue other) {
             return Value.Equals(other);
         }
 
-        /// <summary>
-        /// Returns the current <see cref="_value"/> <b>without</b> refreshing it.
-        /// </summary>
-        /// <returns></returns>
+        /// <returns>the current <see cref="_storedValue"/> <b>without</b> refreshing it.</returns>
         public TValue Peek() {
-            return _value;
+            return _storedValue;
         }
 
+        /// <summary>
+        /// An implicit cast to <see cref="TValue"/> for convenience.
+        /// </summary>
+        /// <param name="self"></param>
+        /// <returns></returns>
         public static implicit operator TValue(Refreshing<TValue, TStaleness> self) {
             return self.Value;
         }

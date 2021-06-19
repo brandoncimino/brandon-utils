@@ -47,17 +47,58 @@ namespace BrandonUtils.Standalone.Optional {
             var ls = source.ToList();
             return ls.Any() ? Of(ls.Single()) : default;
         }
+
+        /// <summary>
+        /// Attempts to <see cref="Func{TResult}.Invoke"/> <see cref="functionThatMightFail"/>, returning a <see cref="Failable{TValue,TException}"/>
+        /// that contains either the successful result or the reason for failure.
+        /// </summary>
+        /// <param name="functionThatMightFail"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static Failable<T> Try<T>(this Func<T> functionThatMightFail) {
+            return new Failable<T>(functionThatMightFail);
+        }
+
+        /// <summary>
+        /// Returns <see cref="IOptional{T}.Value"/> if it is present; otherwise, returns <see cref="fallback"/>.
+        /// </summary>
+        /// <remarks>
+        /// Corresponds to:
+        /// <ul>
+        /// <li><see cref="Nullable{T}"/><see cref="Nullable{T}.GetValueOrDefault()"/></li>
+        /// <li>Java's <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html#orElse-T-">Optional.orElse()</a></li>
+        /// </ul>
+        /// </remarks>
+        /// <param name="optional"></param>
+        /// <param name="fallback"></param>
+        /// <returns></returns>
+        public static T GetValueOrDefault<T>(this IOptional<T> optional, T fallback) {
+            return optional.HasValue ? optional.Value : fallback;
+        }
+
+        /// <summary>
+        /// Returns <see cref="IOptional{T}.Value"/> if it is present; otherwise, <see cref="Func{TResult}.Invoke"/>s <see cref="fallbackSupplier"/>.
+        /// </summary>
+        /// <remarks>
+        /// Corresponds to Java's <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html#orElseGet-java.util.function.Supplier-">Optional.orElseGet()</a>.
+        /// </remarks>
+        /// <param name="optional">this <see cref="IOptional{T}"/></param>
+        /// <param name="fallbackSupplier">a <see cref="Func{TResult}"/> that produces a <see cref="T"/> if <see cref="IOptional{T}.Value"/> isn't present</param>
+        /// <returns><see cref="IOptional{T}.Value"/> if this <see cref="IOptional{T}.HasValue"/>; otherwise, <see cref="Func{TResult}.Invoke"/>s <see cref="fallbackSupplier"/></returns>
+        public static T GetValueOrDefault<T>(this IOptional<T> optional, Func<T> fallbackSupplier) {
+            return optional.HasValue ? optional.Value : fallbackSupplier.Invoke();
+        }
     }
 
     /// <summary>
     /// A mockery of Java's <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html">Optional</a> class.
     /// </summary>
     /// <remarks>
-    /// An <see cref="Optional{T}"/> can be treated as a <see cref="IReadOnlyCollection{T}"/> with a max capacity of 1.
+    /// An <see cref="Optional{T}"/> can be considered a <see cref="IReadOnlyCollection{T}"/> with a max capacity of 1.
     /// This gives access to the full suite of <see cref="System.Linq"/> extension methods.
     /// </remarks>
     /// <typeparam name="T"></typeparam>
-    public readonly struct Optional<T> : IEquatable<T>, IEquatable<Optional<T>>, IReadOnlyCollection<T> {
+    public readonly struct Optional<T> : IEquatable<T>, IEquatable<IOptional<T>>, IReadOnlyCollection<T>, IOptional<T> {
         public override bool Equals(object obj) {
             return obj switch {
                 Optional<T> optional when Equals(optional) => true,
@@ -92,22 +133,6 @@ namespace BrandonUtils.Standalone.Optional {
             _items = new List<T> {value};
         }
 
-        /// <summary>
-        /// Returns <see cref="Value"/> if it is present; otherwise, returns <see cref="fallback"/>.
-        /// </summary>
-        /// <remarks>
-        /// Corresponds to:
-        /// <ul>
-        /// <li><see cref="Nullable{T}"/><see cref="Nullable{T}.GetValueOrDefault()"/></li>
-        /// <li>Java's <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html#orElse-T-">Optional.orElse()</a></li>
-        /// </ul>
-        /// </remarks>
-        /// <param name="fallback"></param>
-        /// <returns></returns>
-        public T GetValueOrDefault(T fallback) {
-            return HasValue ? Value : fallback;
-        }
-
         #region Implementations
 
         public IEnumerator<T> GetEnumerator() {
@@ -122,7 +147,11 @@ namespace BrandonUtils.Standalone.Optional {
             return HasValue && Value.Equals(other);
         }
 
-        public bool Equals(Optional<T> other) {
+        public bool Equals(IOptional<T> other) {
+            if (other == null) {
+                return false;
+            }
+
             if (HasValue == other.HasValue) {
                 return !HasValue || Value.Equals(other.Value) || Equals(Value, other.Value);
             }
