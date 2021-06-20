@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-using BrandonUtils.Standalone.Collections;
-
 namespace BrandonUtils.Standalone.Optional {
     /// <summary>
     /// Utility and extension methods for <see cref="Optional{T}"/>.
@@ -89,6 +87,22 @@ namespace BrandonUtils.Standalone.Optional {
             return optional.HasValue ? optional.Value : fallbackSupplier.Invoke();
         }
 
+        /// <summary>
+        /// Tests the underlying values of <see cref="a"/> and <see cref="b"/> for equality.
+        /// <ul>
+        /// <li>If <b>both</b> <see cref="a"/> and <see cref="b"/> are <b>empty</b>, then they are considered <b>equal</b>.</li>
+        /// <li>If <b>both</b> <see cref="a"/> and <see cref="b"/> are <c>null</c>, then they are considered <b>equal</b>.</li>
+        /// <li>A <c>null</c> <see cref="IOptional{T}"/> is <b><i>NOT</i></b></li> considered equal to an <see cref="IOptional{T}"/> with a <c>null</c> <see cref="IOptional{T}.Value"/>!
+        /// </ul>
+        /// </summary>
+        /// <remarks>
+        /// I made this so that I had the same logic across all of the different <see cref="IEquatable{T}"/> and <c>==</c>
+        /// operator comparisons in <see cref="Optional{T}"/>, <see cref="Failable{TValue,TExcuse}"/>, etc.
+        /// </remarks>
+        /// <param name="a">aka "x", aka "left-hand side"</param>
+        /// <param name="b">aka "y", aka "right-hand side"</param>
+        /// <typeparam name="T">the actual type of the underlying <see cref="IOptional{T}.Value"/>s</typeparam>
+        /// <returns>the equality of the underlying <see cref="IOptional{T}.Value"/>s of <see cref="a"/> and <see cref="b"/></returns>
         public static bool AreEqual<T>(IOptional<T> a, IOptional<T> b) {
             if (ReferenceEquals(a, b)) {
                 return true;
@@ -118,6 +132,10 @@ namespace BrandonUtils.Standalone.Optional {
 
         public static bool AreEqual<T>(T a, IOptional<T> b) {
             return AreEqual(b, a);
+        }
+
+        public static string ToString<T>(IOptional<T> optional) {
+            return $"{optional.GetType().Name}<{typeof(T).Name}>[{(optional.HasValue ? (optional.Value == null ? "null" : optional.Value + "") : "")}]";
         }
     }
 
@@ -209,7 +227,8 @@ namespace BrandonUtils.Standalone.Optional {
         public int Count => HasValue ? 1 : 0;
 
         public override string ToString() {
-            return $"{nameof(Optional<T>)}<{this.ItemType().Name}>[{(HasValue ? Value + "" : "")}]";
+            // return $"{GetType().Name}<{this.ItemType().Name}>[{(HasValue ? (Value == null ? "null" : Value+"") : "")}]";
+            return Optional.ToString(this);
         }
 
         #endregion

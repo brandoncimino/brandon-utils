@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using BrandonUtils.Standalone.Optional;
 
@@ -82,9 +83,34 @@ public readonly struct Failable<TValue, TExcuse> : IFailable<TValue, TExcuse>, I
     }
 
     #endregion
+
+    public override string ToString() {
+        return Optional.ToString(this);
+    }
 }
 
 public readonly struct Failable<TValue> : IFailable<TValue, Exception>, IEquatable<IOptional<TValue>>, IEquatable<TValue> {
+    public override bool Equals(object obj) {
+        switch (obj) {
+            case IOptional<TValue> optional:
+                return Equals(optional);
+            case TValue value:
+                return Equals(value);
+            default:
+                return Equals(this, obj);
+        }
+    }
+
+    /// <summary>
+    /// TODO: What does this dooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+    /// </summary>
+    /// <returns></returns>
+    public override int GetHashCode() {
+        unchecked {
+            return (EqualityComparer<TValue>.Default.GetHashCode(_value) * 397) ^ HasValue.GetHashCode();
+        }
+    }
+
     public           bool      HasValue { get; }
     private readonly TValue    _value;
     public           TValue    Value => HasValue ? _value : throw new InvalidOperationException($"Unable to retrieve the {typeof(TValue).Name} {nameof(Value)} from the {GetType().Name} because it failed!", Excuse);
@@ -141,4 +167,8 @@ public readonly struct Failable<TValue> : IFailable<TValue, Exception>, IEquatab
     }
 
     #endregion
+
+    public override string ToString() {
+        return Optional.ToString(this);
+    }
 }

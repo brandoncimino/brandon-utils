@@ -106,5 +106,28 @@ namespace BrandonUtils.Tests.Standalone.Collections {
         private static T Unboxional<T>(Optional<T> optional) {
             return optional.GetValueOrDefault((T) default);
         }
+
+        [Test]
+        public void NullInterfaceEquality() {
+            var               optional_a  = (IOptional<string>) null;
+            var               optional_b  = (IOptional<string>) null;
+            var               optional_c  = (Optional<string>) null;
+            IOptional<string> def_a       = default;
+            IOptional<string> def_b       = default;
+            Optional<string>  def_c       = default;
+            const string      null_string = default;
+            Console.WriteLine(def_c);
+            Console.WriteLine(optional_c);
+            AssertAll.Of(
+                () => Assert.False(Optional.AreEqual(optional_a,  null_string), "Optional.AreEqual(optional_a, null_string)"),
+                () => Assert.False(Optional.AreEqual(null_string, optional_a),  "Optional.AreEqual(null_string, optional_a)"),
+                () => Assert.False(Optional.AreEqual(optional_a,  optional_b),  "Optional.AreEqual(optional_a, optional_b)"),
+                () => Assert.False(Optional.AreEqual(optional_b,  optional_a),  "Optional.AreEqual(optional_b,optional_a)"),
+                () => Assert.False(Optional.AreEqual(def_a,       def_b),       "Optional.AreEqual(def_a, def_b)"),
+                () => Assert.False(Optional.AreEqual(def_a,       def_a),       "Optional.AreEqual(def_a, def_a)"),
+                () => Assert.False(Optional.AreEqual(optional_a,  optional_c),  "Optional.AreEqual(optional_a, optional_c)"),
+                () => Assert.False(Optional.AreEqual(optional_c,  def_c),       "Optional.AreEqual(optional_c, def_c)")
+            );
+        }
     }
 }

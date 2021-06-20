@@ -21,6 +21,10 @@ namespace BrandonUtils.Tests.Standalone.Collections {
             return Expected_Value;
         }
 
+        private static int UnexpectedSuccess() {
+            return Unexpected_Value;
+        }
+
         #endregion
 
         private static class Validate {
@@ -71,6 +75,17 @@ namespace BrandonUtils.Tests.Standalone.Collections {
                     () => Assert.That(failable.Equals(expectedValue),                  Is.EqualTo(expectedEquality), "failable.Equals(expectedValue)"),
                     () => Assert.That(Optional.AreEqual(failable,      expectedValue), Is.EqualTo(expectedEquality), "Optional.AreEqual(failable, expectedValue)"),
                     () => Assert.That(Optional.AreEqual(expectedValue, failable),      Is.EqualTo(expectedEquality), "Optional.AreEqual(expectedValue, failable)")
+                );
+            }
+
+            public static void ObjectEquality<T>(Failable<T> failable, object obj, bool expectedEquality) {
+                AssertAll.Of(
+                    () => Assert.That(failable.Equals(obj), Is.EqualTo(expectedEquality), "failable.Equals(obj)"),
+                    () => {
+                        if (obj != null) {
+                            Assert.That(obj.Equals(failable), Is.EqualTo(expectedEquality), "obj.Equals(failable)");
+                        }
+                    }
                 );
             }
         }
@@ -158,6 +173,27 @@ namespace BrandonUtils.Tests.Standalone.Collections {
             AssertAll.Of(
                 () => Validate.FailedFailable(failable),
                 () => Assert.That(failable, Has.Property(nameof(failable.Excuse)).Null)
+            );
+        }
+
+        [Test]
+        public void FailableSuccessObjectEquality() {
+            var failable  = Optional.Try(Succeed);
+            var failable2 = Optional.Try(Succeed);
+            AssertAll.Of(
+                () => Validate.ObjectEquality(failable, Expected_Value, true),
+                () => Validate.ObjectEquality(failable, failable2,      true)
+            );
+        }
+
+        [Test]
+        public void FailableSuccessObjectInequality() {
+            var failable  = Optional.Try(Succeed);
+            var failable2 = Optional.Try(UnexpectedSuccess);
+            AssertAll.Of(
+                () => Validate.ObjectEquality(failable, Unexpected_Value, false),
+                () => Validate.ObjectEquality(failable, failable2,        false),
+                () => Validate.ObjectEquality(failable, null,             false)
             );
         }
     }
