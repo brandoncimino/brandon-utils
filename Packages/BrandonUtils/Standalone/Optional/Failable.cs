@@ -11,12 +11,12 @@ namespace BrandonUtils.Standalone.Optional {
     /// </remarks>
     /// <typeparam name="TValue">The <see cref="IOptional{T}.Value"/>, if this succeeded</typeparam>
     /// <typeparam name="TExcuse">Information about the failure, if this <see cref="Failed"/></typeparam>
-    public interface IFailable<TValue, out TExcuse> : IOptional<TValue> {
+    public interface IFailable<out TValue, out TExcuse> : IOptional<TValue> {
         /// <summary>
         /// Information about why this <see cref="Failed"/> (if it did).
         /// </summary>
         /// <remarks>
-        /// Retrieving this when the <see cref="IFailable{TValue,TExcuse}"/> wasn't <see cref="Failed"/> should throw an <see cref="IndexOutOfRangeException"/>.
+        /// Retrieving this when the <see cref="IFailable{TValue,TExcuse}"/> wasn't <see cref="Failed"/> should throw an <see cref="InvalidOperationException"/>.
         /// </remarks>
         public TExcuse Excuse { get; }
 
@@ -33,14 +33,14 @@ namespace BrandonUtils.Standalone.Optional {
 /**
  * <inheritdoc cref="IFailable{TValue,TExcuse}"/>
  */
-public readonly struct Failable<TValue, TExcuse> : IFailable<TValue, TExcuse> {
+public readonly struct Failable<TValue, TExcuse> : IFailable<TValue, TExcuse>, IEquatable<TValue>, IEquatable<IOptional<TValue>> {
     public           bool   HasValue { get; }
     private readonly TValue _value;
-    public           TValue Value => HasValue ? _value : throw new IndexOutOfRangeException($"Unable to retrieve the {typeof(TValue).Name} {nameof(Value)} from the {nameof(Failable<TValue, TExcuse>)} because it failed!\n{nameof(Excuse)}: {Excuse}");
+    public           TValue Value => HasValue ? _value : throw new InvalidOperationException($"Unable to retrieve the {typeof(TValue).Name} {nameof(Value)} from the {nameof(Failable<TValue, TExcuse>)} because it failed!\n{nameof(Excuse)}: {Excuse}");
 
     public           bool    Failed => !HasValue;
     private readonly TExcuse _excuse;
-    public           TExcuse Excuse => Failed ? _excuse : throw new IndexOutOfRangeException($"Unable to retrieve the {nameof(Excuse)} of type {typeof(TExcuse).Name} from the {GetType().Name} because it didn't fail! (Actual {nameof(Value)}: {Value})");
+    public           TExcuse Excuse => Failed ? _excuse : throw new InvalidOperationException($"Unable to retrieve the {nameof(Excuse)} of type {typeof(TExcuse).Name} from the {GetType().Name} because it didn't fail! (Actual {nameof(Value)}: {Value})");
 
     public Failable(Func<TValue> valueSupplier, Func<Exception, TExcuse> disclaimer) {
         try {
@@ -55,17 +55,41 @@ public readonly struct Failable<TValue, TExcuse> : IFailable<TValue, TExcuse> {
         }
     }
 
-    public TValue GetValueOrDefault(TValue fallback) {
-        return HasValue ? Value : fallback;
+    #region Equality
+
+    public bool Equals(TValue other) {
+        return Optional.AreEqual(this, other);
     }
+
+    public bool Equals(IOptional<TValue> other) {
+        return Optional.AreEqual(this, other);
+    }
+
+    public static bool operator ==(Failable<TValue, TExcuse> a, IOptional<TValue> b) {
+        return Optional.AreEqual(a, b);
+    }
+
+    public static bool operator !=(Failable<TValue, TExcuse> a, IOptional<TValue> b) {
+        return !Optional.AreEqual(a, b);
+    }
+
+    public static bool operator ==(Failable<TValue, TExcuse> a, Optional<TValue> b) {
+        return Optional.AreEqual(a, b);
+    }
+
+    public static bool operator !=(Failable<TValue, TExcuse> a, Optional<TValue> b) {
+        return !Optional.AreEqual(a, b);
+    }
+
+    #endregion
 }
 
-public readonly struct Failable<TValue> : IFailable<TValue, Exception> {
+public readonly struct Failable<TValue> : IFailable<TValue, Exception>, IEquatable<IOptional<TValue>>, IEquatable<TValue> {
     public           bool      HasValue { get; }
     private readonly TValue    _value;
-    public           TValue    Value => HasValue ? _value : throw new IndexOutOfRangeException($"Unable to retrieve the {typeof(TValue).Name} {nameof(Value)} from the {GetType().Name} because it failed!", Excuse);
+    public           TValue    Value => HasValue ? _value : throw new InvalidOperationException($"Unable to retrieve the {typeof(TValue).Name} {nameof(Value)} from the {GetType().Name} because it failed!", Excuse);
     private readonly Exception _excuse;
-    public           Exception Excuse => Failed ? _excuse : throw new IndexOutOfRangeException($"Unable to retrieve the {nameof(Excuse)} from the {GetType().Name} because it succeeded! (Actual {nameof(Value)}: {Value})");
+    public           Exception Excuse => Failed ? _excuse : throw new InvalidOperationException($"Unable to retrieve the {nameof(Excuse)} from the {GetType().Name} because it succeeded! (Actual {nameof(Value)}: {Value})");
     public           bool      Failed => !HasValue;
 
 
@@ -82,7 +106,39 @@ public readonly struct Failable<TValue> : IFailable<TValue, Exception> {
         }
     }
 
-    public TValue GetValueOrDefault(TValue fallback) {
-        return HasValue ? Value : fallback;
+    #region Equality
+
+    public bool Equals(IOptional<TValue> other) {
+        return Optional.AreEqual(this, other);
     }
+
+    public bool Equals(TValue other) {
+        return Optional.AreEqual(this, other);
+    }
+
+    public static bool operator ==(Failable<TValue> a, IOptional<TValue> b) {
+        return Optional.AreEqual(a, b);
+    }
+
+    public static bool operator !=(Failable<TValue> a, IOptional<TValue> b) {
+        return !Optional.AreEqual(a, b);
+    }
+
+    public static bool operator ==(Failable<TValue> a, TValue b) {
+        return Optional.AreEqual(a, b);
+    }
+
+    public static bool operator !=(Failable<TValue> a, TValue b) {
+        return !Optional.AreEqual(a, b);
+    }
+
+    public static bool operator ==(TValue a, Failable<TValue> b) {
+        return Optional.AreEqual(a, b);
+    }
+
+    public static bool operator !=(TValue a, Failable<TValue> b) {
+        return !Optional.AreEqual(a, b);
+    }
+
+    #endregion
 }

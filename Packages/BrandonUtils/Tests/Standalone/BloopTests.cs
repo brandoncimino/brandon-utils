@@ -4,6 +4,7 @@ using System.Linq;
 
 using BrandonUtils.Standalone;
 using BrandonUtils.Standalone.Collections;
+using BrandonUtils.Testing;
 
 using NUnit.Framework;
 
@@ -43,11 +44,14 @@ namespace BrandonUtils.Tests.Standalone {
         }
 
         [Test]
-        [TestCase(0, 6, 3, 0, 2,   4)]
-        [TestCase(1, 2, 5, 1, 1.2, 1.4, 1.6, 1.8)]
-        public void StepExclusive(float min, float max, int stepCount, params double[] expectedResults) {
+        [TestCase(0, 6, 3, 0, 2,    4)]
+        [TestCase(1, 2, 5, 1, 1.2f, 1.4f, 1.6f, 1.8f)]
+        public void StepExclusive(float min, float max, int stepCount, params float[] expectedResults) {
             var steps = Bloop.StepExclusive(min, max, stepCount);
-            Assert.That(steps, Is.EquivalentTo(expectedResults));
+            AssertAll.Of(
+                () => Assert.That(steps, Is.EqualTo(expectedResults)),
+                () => Assert.That(steps, Is.EquivalentTo(expectedResults))
+            );
         }
 
         #endregion

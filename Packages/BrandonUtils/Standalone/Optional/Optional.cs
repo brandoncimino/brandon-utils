@@ -88,6 +88,37 @@ namespace BrandonUtils.Standalone.Optional {
         public static T GetValueOrDefault<T>(this IOptional<T> optional, Func<T> fallbackSupplier) {
             return optional.HasValue ? optional.Value : fallbackSupplier.Invoke();
         }
+
+        public static bool AreEqual<T>(IOptional<T> a, IOptional<T> b) {
+            if (ReferenceEquals(a, b)) {
+                return true;
+            }
+
+            if (ReferenceEquals(a, null) || ReferenceEquals(b, null)) {
+                return false;
+            }
+
+            Console.WriteLine($"a: {a.HasValue}");
+
+            if (a.HasValue == b.HasValue) {
+                return !a.HasValue || Equals(a.Value, b.Value);
+            }
+
+            return false;
+        }
+
+        public static bool AreEqual<T>(IOptional<T> a, T b) {
+            // We should be comparing the _value_ of `a` to `b`, which means a value has to exist
+            if (ReferenceEquals(a, null)) {
+                return false;
+            }
+
+            return a.HasValue && a.Value.Equals(b);
+        }
+
+        public static bool AreEqual<T>(T a, IOptional<T> b) {
+            return AreEqual(b, a);
+        }
     }
 
     /// <summary>
@@ -127,7 +158,7 @@ namespace BrandonUtils.Standalone.Optional {
         /// </remarks>
         public bool HasValue => _items != null;
 
-        public T Value => HasValue ? _items[0] : throw new IndexOutOfRangeException($"Unable to retrieve the {nameof(Value)} from the {GetType().Name} because it is empty!");
+        public T Value => HasValue ? _items[0] : throw new InvalidOperationException($"Unable to retrieve the {nameof(Value)} from the {GetType().Name} because it is empty!");
 
         public Optional(T value) {
             _items = new List<T> {value};
@@ -144,43 +175,35 @@ namespace BrandonUtils.Standalone.Optional {
         }
 
         public bool Equals(T other) {
-            return HasValue && Value.Equals(other);
+            return Optional.AreEqual(this, other);
         }
 
         public bool Equals(IOptional<T> other) {
-            if (other == null) {
-                return false;
-            }
-
-            if (HasValue == other.HasValue) {
-                return !HasValue || Value.Equals(other.Value) || Equals(Value, other.Value);
-            }
-
-            return false;
+            return Optional.AreEqual(this, other);
         }
 
-        public static bool operator ==(Optional<T> a, Optional<T> b) {
-            return a.Equals(b);
+        public static bool operator ==(Optional<T> a, IOptional<T> b) {
+            return Optional.AreEqual(a, b);
         }
 
-        public static bool operator !=(Optional<T> a, Optional<T> b) {
-            return !a.Equals(b);
+        public static bool operator !=(Optional<T> a, IOptional<T> b) {
+            return !Optional.AreEqual(a, b);
         }
 
         public static bool operator ==(T a, Optional<T> b) {
-            return b.Equals(a);
+            return Optional.AreEqual(a, b);
         }
 
         public static bool operator !=(T a, Optional<T> b) {
-            return b.Equals(a);
+            return !Optional.AreEqual(a, b);
         }
 
         public static bool operator ==(Optional<T> a, T b) {
-            return a.Equals(b);
+            return Optional.AreEqual(a, b);
         }
 
         public static bool operator !=(Optional<T> a, T b) {
-            return !a.Equals(b);
+            return !Optional.AreEqual(a, b);
         }
 
         public int Count => HasValue ? 1 : 0;

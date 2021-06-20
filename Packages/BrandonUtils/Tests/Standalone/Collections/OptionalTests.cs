@@ -14,7 +14,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
             var a = new Optional<int>();
             var b = new Optional<int>();
 
-            TestUtils.AssertAll(
+            AssertAll.Of(
                 () => Assert.That(a,                          Is.EqualTo(b), "a equals b"),
                 () => Assert.That(a,                          Is.EqualTo(new Optional<int>())),
                 () => Assert.That(a.Equals(new string[] { }), Is.False, "a should not equal a different empty collection of the same item type"),
@@ -42,7 +42,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
             Console.WriteLine(a);
 
-            TestUtils.AssertAll(
+            AssertAll.Of(
                 a,
                 Has.Property(nameof(a.HasValue)).EqualTo(false),
                 Is.EqualTo(new Optional<int>())
@@ -54,7 +54,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
             const string str = "yolo";
             var          a   = new Optional<string>(str);
 
-            TestUtils.AssertAll(
+            AssertAll.Of(
                 () => Assert.That(a.Equals(str), "a.Equals(str)"),
                 () => Assert.That(a,             Is.EqualTo(str)),
                 () => Assert.That(a == str,      "a == str"),
@@ -72,7 +72,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
             var iOpt = Optional.Of(i);
             var lOpt = Optional.Of(l);
 
-            TestUtils.AssertAll(
+            AssertAll.Of(
                 () => Assert.That(iOpt == i, "iOpt == i"),
                 // () => Assert.That(iOpt == l, "iOpt == l"),
                 () => Assert.That(lOpt == i, "lOpt == i"),
