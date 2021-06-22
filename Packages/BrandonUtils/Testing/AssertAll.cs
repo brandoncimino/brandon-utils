@@ -36,9 +36,10 @@ namespace BrandonUtils.Testing {
         /// <summary>
         /// <see cref="Action.Invoke"/>s each of the provided <see cref="Action"/>s, returning <b>all</b> of the failures.
         /// </summary>
+        /// <param name="heading"></param>
         /// <param name="assertions"></param>
         /// <exception cref="AssertionException">if any of the <see cref="assertions"/> <see cref="Action"/>s throws an <see cref="Exception"/></exception>
-        public static void Of(params Action[] assertions) {
+        public static void Of(string heading, params Action[] assertions) {
             var failures = new List<string>();
             foreach (var ass in assertions) {
                 try {
@@ -50,8 +51,20 @@ namespace BrandonUtils.Testing {
             }
 
             if (failures.Any()) {
-                Assert.Fail($"[{failures.Count}/{assertions.Length}] assertions failed:\n\n{failures.JoinLines()}");
+                var msg = $"[{failures.Count}/{assertions.Length}] assertions failed:\n\n{failures.JoinLines()}";
+                if (!string.IsNullOrEmpty(heading)) {
+                    msg = heading + "\n" + msg;
+                }
+
+                Assert.Fail(msg);
             }
+        }
+
+        /**
+         * <inheritdoc cref="Of(string,System.Action[])"/>
+         */
+        public static void Of(params Action[] assertions) {
+            Of(null, assertions);
         }
 
         /// <summary>

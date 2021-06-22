@@ -109,8 +109,10 @@ namespace BrandonUtils.Tests.PlayMode {
         [Test]
         public void TestSaveFilePathsAreSortedChronologically() {
             var loadedSaves = SaveDataTestImpl.GetAllSaveFilePaths(DummyNickName);
-            Assert.AreNotEqual(0, loadedSaves.Length, "No saves were actually loaded!");
-            TestUtils.AreEqual(DummySaveFiles, loadedSaves);
+            AssertAll.Of(
+                () => Assert.AreNotEqual(0, loadedSaves.Length, "No saves were actually loaded!"),
+                () => Assert.AreEqual(DummySaveFiles, loadedSaves)
+            );
         }
 
         [Test]

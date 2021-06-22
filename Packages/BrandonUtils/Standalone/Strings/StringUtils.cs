@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+using BrandonUtils.Standalone.Collections;
+
 using Newtonsoft.Json;
 
 // using UnityEngine;
@@ -165,6 +167,57 @@ namespace BrandonUtils.Standalone.Strings {
             }
 
             return result;
+        }
+
+        public static string FillRight(this string self, int totalLength, string filler) {
+            ValidateFillParameters(filler, totalLength);
+
+            if (self.Length >= totalLength) {
+                return self;
+            }
+
+            var additionalLengthNeeded = totalLength - self.Length;
+            return self + filler.Fill(additionalLengthNeeded);
+        }
+
+        public static string FillLeft(this string self, int totalLength, string filler) {
+            ValidateFillParameters(filler, totalLength);
+
+            if (self.Length >= totalLength) {
+                return self;
+            }
+
+            var additionalLengthNeeded = totalLength - self.Length;
+            return self + filler.Fill(additionalLengthNeeded).Reverse().JoinString();
+        }
+
+        public static string Fill(this string filler, int totalLength) {
+            ValidateFillParameters(filler, totalLength);
+
+            var fullLength  = totalLength / filler.Length;
+            var extraLength = totalLength % filler.Length;
+            var filled      = filler.Repeat(fullLength) + filler.Substring(0, extraLength);
+            return filled;
+        }
+
+        private static void ValidateFillParameters(string filler, int totalLength) {
+            if (filler == null) {
+                throw new ArgumentNullException(nameof(filler));
+            }
+
+            if (string.IsNullOrEmpty(filler)) {
+                throw new ArgumentException($"Cannot fill with an empty string!", nameof(filler));
+            }
+
+            if (totalLength < 0) {
+                throw new ArgumentOutOfRangeException(nameof(totalLength), "Must be positive");
+            }
+        }
+
+        public static string FormatHeading(string heading, string border = "=", string padding = " ") {
+            var middle = $"{border}{padding}{heading}{padding}{border}";
+            var hRule  = border.FillRight(middle.Length, border);
+            return $"{hRule}\n{middle}\n{hRule}";
         }
     }
 }

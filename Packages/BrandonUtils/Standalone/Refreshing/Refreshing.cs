@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 
 using BrandonUtils.Standalone.Optional;
 
@@ -51,6 +52,13 @@ namespace BrandonUtils.Standalone.Refreshing {
                 return _storedValue;
             }
         }
+
+        /// <summary>
+        /// The "Java-style" of retrieving the value from the <see cref="Refreshing{TValue,TStaleness}"/>.
+        /// </summary>
+        /// <returns><see cref="Value"/></returns>
+        [Pure]
+        public TValue Get() => Value;
 
         /// <summary>
         /// The number of times that <see cref="RefreshCount"/> has been called
