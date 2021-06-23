@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace BrandonUtils.Standalone.Exceptions {
     public class BrandonException : SystemException {
@@ -14,6 +15,10 @@ namespace BrandonUtils.Standalone.Exceptions {
             CustomMessage = message;
         }
 
+        protected BrandonException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+
+
+        // ReSharper disable once MemberCanBePrivate.Global
         protected static string FormatMessage(string customMessage, string baseMessage) {
             return customMessage == null ? baseMessage : $"{customMessage}\n{baseMessage}";
         }
