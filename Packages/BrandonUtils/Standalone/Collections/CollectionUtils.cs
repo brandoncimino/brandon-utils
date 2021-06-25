@@ -488,5 +488,25 @@ namespace BrandonUtils.Standalone.Collections {
         public static Type ItemType<T>(this IEnumerable<T> enumerable) {
             return typeof(T);
         }
+
+        /// <summary>
+        /// Shorthand for not-<see cref="Enumerable.Any{TSource}(System.Collections.Generic.IEnumerable{TSource})"/>
+        /// </summary>
+        /// <param name="enumerable">this <see cref="IEnumerable{T}"/></param>
+        /// <typeparam name="T">the <see cref="ItemType{T}"/></typeparam>
+        /// <returns>the inverse of <see cref="Enumerable.Any{TSource}(System.Collections.Generic.IEnumerable{TSource})"/></returns>
+        public static bool IsEmpty<T>(this IEnumerable<T> enumerable) {
+            return !enumerable.Any();
+        }
+
+        /// <summary>
+        /// A less hideous alias for <see cref="Enumerable.Any{TSource}(System.Collections.Generic.IEnumerable{TSource})"/>
+        /// </summary>
+        /// <param name="enumerable"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static bool IsNotEmpty<T>(this IEnumerable<T> enumerable) {
+            return enumerable.Any();
+        }
     }
 }
