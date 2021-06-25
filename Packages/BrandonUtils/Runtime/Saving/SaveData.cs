@@ -26,9 +26,11 @@ namespace BrandonUtils.Saving {
     /// <seealso cref="SaveDataTestImpl" />
     public abstract class SaveData<T> where T : SaveData<T>, new() {
         [JsonIgnore]
-        public static readonly string SaveFolderName = nameof(SaveData<T>);
+        [UsedImplicitly]
+        public const string SaveFolderName = nameof(SaveData<T>);
 
         [JsonIgnore]
+        [UsedImplicitly]
         public static readonly string SaveTypeName = typeof(T).Name;
 
         [JsonIgnore]
@@ -41,7 +43,7 @@ namespace BrandonUtils.Saving {
         public const int BackupSaveSlots = 10;
 
         [JsonIgnore]
-        public static JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings {
+        private static JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings {
             ObjectCreationHandling = ObjectCreationHandling.Replace,
             Formatting             = Formatting.Indented
         };
@@ -69,7 +71,8 @@ namespace BrandonUtils.Saving {
         public static readonly TimeSpan ReSaveDelay = TimeSpan.FromSeconds(1);
 
         [JsonProperty]
-        public string nickName;
+        [NotNull]
+        public string Nickname;
 
         [JsonProperty]
         public DateTime LastSaveTime { get; set; } = FrameTime.Now;
@@ -78,16 +81,16 @@ namespace BrandonUtils.Saving {
         public DateTime LastSaveTime_Exact { get; set; } = DateTime.Now;
 
         [JsonIgnore]
-        public string[] AllSaveFilePaths => GetAllSaveFilePaths(nickName);
+        public string[] AllSaveFilePaths => GetAllSaveFilePaths(Nickname);
 
         [JsonIgnore]
-        public string LatestSaveFilePath => GetLatestSaveFilePath(nickName);
+        public string LatestSaveFilePath => GetLatestSaveFilePath(Nickname);
 
         [JsonIgnore]
-        public string OldestSaveFilePath => GetOldestSaveFilePath(nickName);
+        public string OldestSaveFilePath => GetOldestSaveFilePath(Nickname);
 
         [JsonIgnore]
-        public bool Exists => SaveFileExists(nickName);
+        public bool Exists => SaveFileExists(Nickname);
 
         /// <summary>
         /// The time that this <see cref="SaveData{T}"/> was loaded.
@@ -108,7 +111,9 @@ namespace BrandonUtils.Saving {
             }
         }
 
-        protected SaveData() { }
+        protected SaveData([NotNull] string nickname) {
+            Nickname = nickname;
+        }
 
         public static T Load(string nickName) {
             Log($"Loading save file: {nickName}");
@@ -143,18 +148,18 @@ namespace BrandonUtils.Saving {
         /// </remarks>
         /// <returns></returns>
         public T Reload() {
-            Log($"Reloading save file: {nickName}");
+            Log($"Reloading save file: {Nickname}");
             JsonConvert.PopulateObject(GetSaveFileContent(LatestSaveFilePath), this);
             OnLoadPrivate();
             return (T) this;
         }
 
         /// <summary>
-        /// Attempts to <see cref="Load"/> the <see cref="SaveData{T}"/> with the <see cref="nickName"/> <paramref name="nickName"/>, storing it in <paramref name="saveData"/>.
+        /// Attempts to <see cref="Load"/> the <see cref="SaveData{T}"/> with the <see cref="Nickname"/> <paramref name="nickName"/>, storing it in <paramref name="saveData"/>.
         ///
         /// Returns <c>true</c> or <c>false</c> based on whether or not the <see cref="Load"/> succeeded.
         /// </summary>
-        /// <param name="nickName">The <see cref="nickName"/> of the <see cref="SaveData{T}"/> you would like to <see cref="Load"/>.</param>
+        /// <param name="nickName">The <see cref="Nickname"/> of the <see cref="SaveData{T}"/> you would like to <see cref="Load"/>.</param>
         /// <param name="saveData">Holds the <see cref="SaveData{T}"/>, if the <see cref="Load"/> was a success; otherwise, <c>null</c>.</param>
         /// <returns></returns>
         public static bool TryLoad(string nickName, out T saveData) {
@@ -236,14 +241,14 @@ namespace BrandonUtils.Saving {
         }
 
         /// <summary>
-        ///     Creates a new, blank <see cref="SaveData{T}" /> of type <see cref="T" />, and <see cref="Save(BrandonUtils.Saving.SaveData{T},string,bool)" />s it as a new file with the <see cref="nickName" /> <paramref name="nickname" />.
+        ///     Creates a new, blank <see cref="SaveData{T}" /> of type <see cref="T" />, and <see cref="Save(BrandonUtils.Saving.SaveData{T},string,bool)" />s it as a new file with the <see cref="Nickname" /> <paramref name="nickname" />.
         /// </summary>
         /// <param name="nickname"></param>
         /// <returns>the newly created <see cref="SaveData{T}" /></returns>
         public static T NewSaveFile(string nickname) {
             Log(
                 $"Creating a new save file:",
-                $"{nameof(nickName)}: {nickname}",
+                $"{nameof(Nickname)}: {nickname}",
                 $"type: {typeof(T).Name}",
                 $"folder: {SaveFolderPath}"
             );
@@ -270,7 +275,7 @@ namespace BrandonUtils.Saving {
         ///     <para>May update fields in <paramref name="saveData" />, such as <see cref="LastSaveTime" />.</para>
         /// </remarks>
         /// <param name="saveData">The <see cref="SaveData{T}" /> inheritor to be saved.</param>
-        /// <param name="nickName">The <see cref="nickName" /> that the <see cref="saveData" /> should be given.</param>
+        /// <param name="nickName">The <see cref="Nickname" /> that the <see cref="saveData" /> should be given.</param>
         /// <param name="useReSaveDelay">If <c>true</c>, check if <see cref="ReSaveDelay" /> has elapsed since <see cref="LastSaveTime" />.</param>
         /// <returns>The passed <paramref name="saveData" /> for method chaining.</returns>
         /// <exception cref="ArgumentNullException"></exception>
@@ -300,7 +305,7 @@ namespace BrandonUtils.Saving {
                 );
             }
 
-            saveData.nickName           = nickName;
+            saveData.Nickname           = nickName;
             saveData.LastSaveTime_Exact = saveTime;
             saveData.LastSaveTime       = FrameTime.Now;
 
@@ -336,13 +341,13 @@ namespace BrandonUtils.Saving {
         }
 
         /// <summary>
-        ///     Calls the static <see cref="Save(BrandonUtils.Saving.SaveData{T},string,bool)" /> with this <see cref="SaveData{T}" />'s <see cref="nickName" />.
+        ///     Calls the static <see cref="Save(BrandonUtils.Saving.SaveData{T},string,bool)" /> with this <see cref="SaveData{T}" />'s <see cref="Nickname" />.
         ///     <br />
         /// </summary>
         /// <param name="useReSaveDelay">If <c>true</c>, check if <see cref="ReSaveDelay" /> has elapsed since <see cref="LastSaveTime" />.</param>
         /// <exception cref="ReSaveDelayException{t}">If <paramref name="useReSaveDelay" /> is <c>true</c> and <see cref="ReSaveDelay" /> hasn't elapsed since <see cref="LastSaveTime" />.</exception>
         public void Save(bool useReSaveDelay = true) {
-            Save(this, nickName, useReSaveDelay);
+            Save(this, Nickname, useReSaveDelay);
         }
 
         /// <summary>
@@ -383,7 +388,7 @@ namespace BrandonUtils.Saving {
         public static string GetLatestSaveFilePath(string nickName) {
             var allPaths = GetAllSaveFilePaths(nickName);
             if (allPaths.Length == 0) {
-                throw new SaveDataException<T>($"Unable to retrieve the latest save file path because no files exist with the {nameof(SaveData<T>.nickName)} {nickName}!");
+                throw new SaveDataException<T>($"Unable to retrieve the latest save file path because no files exist with the {nameof(SaveData<T>.Nickname)} {nickName}!");
             }
 
             return allPaths.Last();
@@ -392,7 +397,7 @@ namespace BrandonUtils.Saving {
         public static string GetOldestSaveFilePath(string nickName) {
             var allPaths = GetAllSaveFilePaths(nickName);
             if (allPaths.Length == 0) {
-                throw new SaveDataException<T>($"Unable to retrieve the oldest save file path because no files exist with the {nameof(SaveData<T>.nickName)} {nickName}!");
+                throw new SaveDataException<T>($"Unable to retrieve the oldest save file path because no files exist with the {nameof(SaveData<T>.Nickname)} {nickName}!");
             }
 
             return allPaths.First();

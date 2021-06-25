@@ -53,7 +53,7 @@ namespace BrandonUtils.Saving {
             };
 
             if (saveData != null) {
-                lines.Add($"{nameof(saveData.nickName)}: {saveData.nickName}");
+                lines.Add($"{nameof(saveData.Nickname)}: {saveData.Nickname}");
                 lines.Add($"{typeof(T)}:\n{saveData}");
             }
 

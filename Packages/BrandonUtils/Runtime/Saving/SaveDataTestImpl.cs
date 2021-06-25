@@ -1,4 +1,6 @@
-﻿namespace BrandonUtils.Saving {
+﻿using System;
+
+namespace BrandonUtils.Saving {
     /// <summary>
     ///     An example implementation of <see cref="SaveData{T}"/>.
     /// </summary>
@@ -7,5 +9,6 @@
     /// </remarks>
     public class SaveDataTestImpl : SaveData<SaveDataTestImpl> {
         public string Word;
+        public SaveDataTestImpl() : base(nameof(SaveDataTestImpl) + Guid.NewGuid()) { }
     }
 }

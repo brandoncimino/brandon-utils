@@ -93,7 +93,7 @@ namespace BrandonUtils.Tests.PlayMode {
             }
         }
 
-        static List<string> MakeDummyFiles() {
+        private static List<string> MakeDummyFiles() {
             Log($"About to create {nameof(DummySaveFiles)}, which are EMPTY (in retrospect, I probably should've named them \"empty save files\" instead...)");
             NukeSaveFolder();
             var allSaves = new List<string>();
@@ -142,7 +142,7 @@ namespace BrandonUtils.Tests.PlayMode {
             const string nickName = nameof(TestBackupSaveSlots);
             DeleteSaveFiles(nickName);
 
-            var newSave = new SaveDataTestImpl {nickName = nickName};
+            var newSave = new SaveDataTestImpl {Nickname = nickName};
 
             Assume.That(newSave.AllSaveFilePaths, Is.Empty);
 
@@ -159,7 +159,7 @@ namespace BrandonUtils.Tests.PlayMode {
                         Math.Min(numberOfSaveFiles, SaveDataTestImpl.BackupSaveSlots)
                     ),
                     $"Didn't find the correct number of saves!" +
-                    $"\n\t{string.Join("\n\t", SaveDataTestImpl.GetAllSaveFilePaths(newSave.nickName))}"
+                    $"\n\t{string.Join("\n\t", SaveDataTestImpl.GetAllSaveFilePaths(newSave.Nickname))}"
                 );
             }
         }
@@ -226,7 +226,7 @@ namespace BrandonUtils.Tests.PlayMode {
 
         [Test]
         public void TestIgnoreReSaveDelay() {
-            SaveDataTestImpl saveDataTestImpl = new SaveDataTestImpl {nickName = nameof(TestIgnoreReSaveDelay)};
+            SaveDataTestImpl saveDataTestImpl = new SaveDataTestImpl {Nickname = nameof(TestIgnoreReSaveDelay)};
 
             for (int i = 0; i < 5; i++) {
                 try {
@@ -245,7 +245,7 @@ namespace BrandonUtils.Tests.PlayMode {
             saveData.Word = firstEdit;
             saveData.Save(false);
 
-            var saveData2  = SaveDataTestImpl.NewSaveFile(saveData.nickName);
+            var saveData2  = SaveDataTestImpl.NewSaveFile(saveData.Nickname);
             var secondEdit = "Second Edit";
             saveData2.Word = secondEdit;
             saveData2.Save(false);
@@ -327,11 +327,11 @@ namespace BrandonUtils.Tests.PlayMode {
         [Test]
         public void ReloadingMissingSavePathThrowsSaveDataException() {
             const string nickName = nameof(ReloadingMissingSavePathThrowsSaveDataException);
-            var          saveData = new SaveDataTestImpl {nickName = nickName};
+            var          saveData = new SaveDataTestImpl {Nickname = nickName};
             Assume.That(
                 saveData.Exists,
                 Is.False,
-                $"{nameof(saveData)} (with the {nameof(saveData.nickName)} {saveData.nickName}) .{nameof(saveData.Exists)} should be FALSE!"
+                $"{nameof(saveData)} (with the {nameof(saveData.Nickname)} {saveData.Nickname}) .{nameof(saveData.Exists)} should be FALSE!"
             );
 
             Assume.That(
