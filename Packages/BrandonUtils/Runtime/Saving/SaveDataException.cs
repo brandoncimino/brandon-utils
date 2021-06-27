@@ -8,53 +8,57 @@ namespace BrandonUtils.Saving {
     /// <summary>
     /// A special <see cref="BrandonException"/> for exceptions caused by <see cref="SaveData{t}"/>.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class SaveDataException<T> : BrandonException where T : SaveData<T>, new() {
-        private SaveData<T> saveData;
+    public class SaveDataException : BrandonException {
+        public SaveDataException(ISaveData saveData) : base(GetMessage(saveData)) { }
 
-        public SaveDataException(SaveData<T> saveData) : base(GetMessage(saveData)) {
-            this.saveData = saveData;
-        }
+        public SaveDataException(ISaveData saveData, string message) : base(GetMessage(saveData, message)) { }
 
-        public SaveDataException(SaveData<T> saveData, string message) : base(GetMessage(saveData, message)) {
-            this.saveData = saveData;
-        }
-
-        public SaveDataException(SaveData<T> saveData, Exception innerException) : base(
+        public SaveDataException(
+            ISaveData saveData,
+            Exception innerException
+        ) : base(
             GetMessage(saveData),
             innerException
-        ) {
-            this.saveData = saveData;
-        }
+        ) { }
 
         public SaveDataException(Exception innerException) : base(GetMessage(), innerException) { }
 
-        public SaveDataException(string message, Exception innerException) : base(
+        public SaveDataException(
+            string message,
+            Exception innerException
+        ) : base(
             GetMessage(message: message),
             innerException
         ) { }
 
         public SaveDataException(string message) : base(GetMessage(message: message)) { }
 
-        public SaveDataException(SaveData<T> saveData, string message, Exception innerException) : base(
+        public SaveDataException(
+            ISaveData saveData,
+            string message,
+            Exception innerException
+        ) : base(
             GetMessage(saveData, message),
             innerException
-        ) {
-            this.saveData = saveData;
-        }
+        ) { }
 
+        /// <summary>
+        /// Formats the <see cref="BrandonException.Message"/>
+        /// </summary>
+        /// <param name="saveData"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         private static string GetMessage(
-            SaveData<T> saveData = null,
+            ISaveData saveData = null,
             string message = "Something went wrong with save data management!"
         ) {
-            var lines = new List<string> {
-                $"Type: {typeof(T).Name} ({typeof(T)})",
+            var lines = new List<string>() {
                 message
             };
 
             if (saveData != null) {
                 lines.Add($"{nameof(saveData.Nickname)}: {saveData.Nickname}");
-                lines.Add($"{typeof(T)}:\n{saveData}");
+                lines.Add($"{saveData.GetType()}:\n{saveData}");
             }
 
             return lines.JoinString("\n");

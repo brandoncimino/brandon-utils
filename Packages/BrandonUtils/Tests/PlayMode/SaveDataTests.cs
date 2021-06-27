@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,6 +17,7 @@ using UnityEngine.TestTools;
 using static BrandonUtils.Logging.LogUtils;
 
 namespace BrandonUtils.Tests.PlayMode {
+    [SuppressMessage("ReSharper", "AccessToStaticMemberViaDerivedType")]
     public class SaveDataTests {
         private const  string       DummyNickName = "DummySaveFile";
         private static List<string> DummySaveFiles;
@@ -63,7 +65,7 @@ namespace BrandonUtils.Tests.PlayMode {
 
         private static string MakeDummyFile(string fileName) {
             Log("Creating dummy file: " + fileName);
-            string newFilePath = Path.ChangeExtension(Path.Combine(SaveDataTestImpl.SaveFolderPath, fileName), SaveDataTestImpl.SaveFileExtension);
+            string newFilePath = Path.ChangeExtension(Path.Combine(SaveDataTestImpl.SaveFolderPath, fileName), SaveData.SaveFileExtension);
 
             //create the save folder if it doesn't already exist:
             Directory.CreateDirectory(SaveDataTestImpl.SaveFolderPath);
@@ -142,21 +144,21 @@ namespace BrandonUtils.Tests.PlayMode {
             const string nickName = nameof(TestBackupSaveSlots);
             DeleteSaveFiles(nickName);
 
-            var newSave = new SaveDataTestImpl {Nickname = nickName};
+            var newSave = new SaveDataTestImpl(nickName);
 
             Assume.That(newSave.AllSaveFilePaths, Is.Empty);
 
-            for (int numberOfSaveFiles = 1; numberOfSaveFiles < SaveDataTestImpl.BackupSaveSlots * 2; numberOfSaveFiles++) {
+            for (int numberOfSaveFiles = 1; numberOfSaveFiles < SaveData.BackupSaveSlots * 2; numberOfSaveFiles++) {
                 newSave.Save(false);
 
                 Log($"Created new save file:[{numberOfSaveFiles}] {newSave}");
 
-                Assert.That(newSave.AllSaveFilePaths.Length, Is.LessThanOrEqualTo(SaveDataTestImpl.BackupSaveSlots), $"There should never be more than {SaveDataTestImpl.BackupSaveSlots} save files!");
+                Assert.That(newSave.AllSaveFilePaths.Length, Is.LessThanOrEqualTo(SaveData.BackupSaveSlots), $"There should never be more than {SaveData.BackupSaveSlots} save files!");
 
                 Assert.That(
                     newSave.AllSaveFilePaths.Length,
                     Is.EqualTo(
-                        Math.Min(numberOfSaveFiles, SaveDataTestImpl.BackupSaveSlots)
+                        Math.Min(numberOfSaveFiles, SaveData.BackupSaveSlots)
                     ),
                     $"Didn't find the correct number of saves!" +
                     $"\n\t{string.Join("\n\t", SaveDataTestImpl.GetAllSaveFilePaths(newSave.Nickname))}"
@@ -182,7 +184,7 @@ namespace BrandonUtils.Tests.PlayMode {
             SaveDataTestImpl saveData = SaveDataTestImpl.NewSaveFile(nickName);
             for (int i = 0; i < saveCount; i++) {
                 if (i != 0) {
-                    Log($"Waiting {SaveDataTestImpl.ReSaveDelay} before continuing...");
+                    Log($"Waiting {SaveData.ReSaveDelay} before continuing...");
                 }
 
                 //add a unique value into the save data
@@ -212,12 +214,12 @@ namespace BrandonUtils.Tests.PlayMode {
         public void TestUseReSaveDelay() {
             SaveDataTestImpl saveDataTestImpl = SaveDataTestImpl.NewSaveFile(nameof(TestUseReSaveDelay));
 
-            var message = $"{nameof(ReSaveDelayException<SaveDataTestImpl>)} when saved again within the {nameof(SaveDataTestImpl.ReSaveDelay)} ({SaveDataTestImpl.ReSaveDelay})!";
+            var message = $"{nameof(ReSaveDelayException)} when saved again within the {nameof(SaveData.ReSaveDelay)} ({SaveData.ReSaveDelay})!";
 
             try {
                 saveDataTestImpl.Save(true);
             }
-            catch (ReSaveDelayException<SaveDataTestImpl> e) {
+            catch (ReSaveDelayException e) {
                 Assert.Pass($"Properly threw a {message}\nException: {e.Message}");
             }
 
@@ -226,14 +228,14 @@ namespace BrandonUtils.Tests.PlayMode {
 
         [Test]
         public void TestIgnoreReSaveDelay() {
-            SaveDataTestImpl saveDataTestImpl = new SaveDataTestImpl {Nickname = nameof(TestIgnoreReSaveDelay)};
+            SaveDataTestImpl saveDataTestImpl = new SaveDataTestImpl(nameof(TestIgnoreReSaveDelay));
 
             for (int i = 0; i < 5; i++) {
                 try {
                     saveDataTestImpl.Save(false);
                 }
-                catch (ReSaveDelayException<SaveDataTestImpl> e) {
-                    throw new AssertionException($"When useReSaveDelay is FALSE, we shouldn't throw a {nameof(ReSaveDelayException<SaveDataTestImpl>)}, but we threw {e.Message}!", e);
+                catch (ReSaveDelayException e) {
+                    throw new AssertionException($"When useReSaveDelay is FALSE, we shouldn't throw a {nameof(ReSaveDelayException)}, but we threw {e.Message}!", e);
                 }
             }
         }
@@ -321,13 +323,13 @@ namespace BrandonUtils.Tests.PlayMode {
             const string nickName = nameof(LoadingMissingNickNameThrowsSaveDataException);
             Assume.That(SaveDataTestImpl.GetAllSaveFilePaths(nickName), Is.Empty, $"Save files with the nickname {nickName} were found - please delete them, then run this test again.");
 
-            Assert.Throws<SaveDataException<SaveDataTestImpl>>(() => SaveDataTestImpl.Load(nickName));
+            Assert.Throws<SaveDataException>(() => SaveDataTestImpl.Load(nickName));
         }
 
         [Test]
         public void ReloadingMissingSavePathThrowsSaveDataException() {
             const string nickName = nameof(ReloadingMissingSavePathThrowsSaveDataException);
-            var          saveData = new SaveDataTestImpl {Nickname = nickName};
+            var          saveData = new SaveDataTestImpl(nickName);
             Assume.That(
                 saveData.Exists,
                 Is.False,
@@ -342,17 +344,17 @@ namespace BrandonUtils.Tests.PlayMode {
 
             Assume.That(saveData.AllSaveFilePaths, Is.Empty);
 
-            Assert.Throws<SaveDataException<SaveDataTestImpl>>(() => saveData.Reload());
+            Assert.Throws<SaveDataException>(() => saveData.Reload());
         }
 
         [Test]
         public void LoadingInvalidJsonContentByPathThrowsSaveDataException() {
-            Assert.Throws<SaveDataException<SaveDataTestImpl>>(() => SaveDataTestImpl.LoadByPath(DummySaveFiles[0]));
+            Assert.Throws<SaveDataException>(() => SaveDataTestImpl.LoadByPath(DummySaveFiles[0]));
         }
 
         [Test]
         public void LoadingInvalidContentByNicknameThrowsSaveDataException() {
-            Assert.Throws<SaveDataException<SaveDataTestImpl>>(() => SaveDataTestImpl.Load(DummyNickName));
+            Assert.Throws<SaveDataException>(() => SaveDataTestImpl.Load(DummyNickName));
         }
     }
 }

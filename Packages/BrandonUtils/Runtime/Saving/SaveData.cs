@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 using BrandonUtils.Logging;
+using BrandonUtils.Standalone;
 using BrandonUtils.Timing;
 
 using JetBrains.Annotations;
@@ -15,6 +16,34 @@ using UnityEngine;
 using static BrandonUtils.Logging.LogUtils;
 
 namespace BrandonUtils.Saving {
+    public abstract class SaveData {
+        [JsonIgnore]
+        [UsedImplicitly]
+        public static string SaveFolderName { get; } = nameof(SaveData);
+        [JsonIgnore]
+        public const string AutoSaveName = "AutoSave";
+        [JsonIgnore]
+        public const string SaveFileExtension = "sav";
+        [JsonIgnore]
+        public const int BackupSaveSlots = 10;
+        [JsonIgnore]
+        public static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings {
+            ObjectCreationHandling = ObjectCreationHandling.Replace,
+            Formatting             = Formatting.Indented
+        };
+        /// <summary>
+        ///     The required length of timestamps in save file names generated via <see cref="SaveData{T}.GetSaveFileNameWithDate" />
+        /// </summary>
+        public const int TimeStampLength = 18;
+        public const int LoadRetryLimit = 10;
+        /// <summary>
+        ///     Timestamps will be serialized into file names using their <see cref="DateTime.Ticks" /> value, which will have 18 digits until 11/16/3169 09:46:40.
+        /// </summary>
+        public static readonly string TimeStampPattern = $@"\d{{{TimeStampLength}}}";
+        public static readonly string   SaveFilePattern = $@"(?<nickName>.*)_(?<date>{TimeStampPattern})";
+        public static readonly TimeSpan ReSaveDelay     = TimeSpan.FromSeconds(1);
+    }
+
     /// <summary>
     ///     A single "Save File", containing data
     /// </summary>
@@ -24,55 +53,21 @@ namespace BrandonUtils.Saving {
     /// </remarks>
     /// <typeparam name="T">The inheriting class, e.g. <see cref="SaveDataTestImpl" /></typeparam>
     /// <seealso cref="SaveDataTestImpl" />
-    public abstract class SaveData<T> where T : SaveData<T>, new() {
-        [JsonIgnore]
-        [UsedImplicitly]
-        public const string SaveFolderName = nameof(SaveData<T>);
-
+    public abstract class SaveData<T> : SaveData, ISaveData where T : SaveData<T> {
         [JsonIgnore]
         [UsedImplicitly]
         public static readonly string SaveTypeName = typeof(T).Name;
 
         [JsonIgnore]
-        public const string AutoSaveName = "AutoSave";
-
-        [JsonIgnore]
-        public const string SaveFileExtension = "sav";
-
-        [JsonIgnore]
-        public const int BackupSaveSlots = 10;
-
-        [JsonIgnore]
-        private static JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings {
-            ObjectCreationHandling = ObjectCreationHandling.Replace,
-            Formatting             = Formatting.Indented
-        };
-
-        /// <summary>
-        ///     The required length of timestamps in save file names generated via <see cref="GetSaveFileNameWithDate" />
-        /// </summary>
-        private const int TimeStampLength = 18;
-
-        public const int LoadRetryLimit = 10;
-
-        /// <summary>
-        ///     Timestamps will be serialized into file names using their <see cref="DateTime.Ticks" /> value, which will have 18 digits until 11/16/3169 09:46:40.
-        /// </summary>
-        public static readonly string TimeStampPattern = @"\d{" + TimeStampLength + "}";
-
-        public static readonly string SaveFilePattern = $@"(?<nickName>.*)_(?<date>{TimeStampPattern})";
-
-        public static readonly string SaveFolderPath = Path.Combine(
+        [UsedImplicitly]
+        public static string SaveFolderPath => Path.Combine(
             Application.persistentDataPath,
             SaveFolderName,
             SaveTypeName
         );
 
-        public static readonly TimeSpan ReSaveDelay = TimeSpan.FromSeconds(1);
-
         [JsonProperty]
-        [NotNull]
-        public string Nickname;
+        public string Nickname { get; set; }
 
         [JsonProperty]
         public DateTime LastSaveTime { get; set; } = FrameTime.Now;
@@ -101,6 +96,7 @@ namespace BrandonUtils.Saving {
         [JsonIgnore]
         public DateTime LastLoadTime { get; set; } = FrameTime.Now;
 
+
         /// <summary>
         ///     Static initializer that makes sure the <see cref="SaveFolderPath" /> exists.
         /// </summary>
@@ -118,7 +114,7 @@ namespace BrandonUtils.Saving {
         public static T Load(string nickName) {
             Log($"Loading save file: {nickName}");
             if (!SaveFileExists(nickName)) {
-                throw new SaveDataException<T>($"Attempt to load {typeof(T)} failed: No save files with the nickname {nickName} exist!");
+                throw new SaveDataException($"Attempt to load {typeof(T)} failed: No save files with the nickname {nickName} exist!");
             }
 
             var latestSaveFilePath = GetAllSaveFilePaths(nickName).Last();
@@ -142,7 +138,7 @@ namespace BrandonUtils.Saving {
         /// <remarks>
         /// This utilizes <see cref="JsonConvert.PopulateObject(string,object)"/> rather than <see cref="JsonConvert.DeserializeObject(string)"/>.
         /// <p/>
-        /// <see cref="JsonConvert.DeserializeObject(string)"/> has wrappers that throw <see cref="SaveDataException{T}"/>s - <see cref="DeserializeByPath"/>, etc. - so I considered creating analogous methods for <see cref="JsonConvert.PopulateObject(string,object)"/>, e.g. "PopulateByPath".
+        /// <see cref="JsonConvert.DeserializeObject(string)"/> has wrappers that throw <see cref="SaveDataException"/>s - <see cref="DeserializeByPath"/>, etc. - so I considered creating analogous methods for <see cref="JsonConvert.PopulateObject(string,object)"/>, e.g. "PopulateByPath".
         /// <p/>
         /// However, the intricacies of <see cref="JsonConvert.PopulateObject(string,object)"/> - for example, why is it able to populate the <c>target</c> object without using a <see langword="ref"/> parameter - didn't seem practical to tease out.
         /// </remarks>
@@ -167,7 +163,7 @@ namespace BrandonUtils.Saving {
                 saveData = Load(nickName);
                 return true;
             }
-            catch (SaveDataException<T>) {
+            catch (SaveDataException) {
                 saveData = null;
                 return false;
             }
@@ -178,7 +174,7 @@ namespace BrandonUtils.Saving {
                 return JsonConvert.DeserializeObject<T>(saveFileContent);
             }
             catch (JsonException e) {
-                throw new SaveDataException<T>(
+                throw new SaveDataException(
                     $"Unable to {nameof(DeserializeByContent)} the provided {nameof(saveFileContent)}!\n\tContent:{saveFileContent}\n",
                     e
                 );
@@ -190,7 +186,7 @@ namespace BrandonUtils.Saving {
                 return File.ReadAllText(saveFilePath);
             }
             catch (FileNotFoundException e) {
-                throw new SaveDataException<T>($"No save file exists at the path {saveFilePath}", e);
+                throw new SaveDataException($"No save file exists at the path {saveFilePath}", e);
             }
         }
 
@@ -199,7 +195,7 @@ namespace BrandonUtils.Saving {
                 return DeserializeByContent(GetSaveFileContent(saveFilePath));
             }
             catch (FileNotFoundException e) {
-                throw new SaveDataException<T>($"No save file exists to {nameof(DeserializeByPath)} at path {saveFilePath}", e);
+                throw new SaveDataException($"No save file exists to {nameof(DeserializeByPath)} at path {saveFilePath}", e);
             }
         }
 
@@ -232,12 +228,17 @@ namespace BrandonUtils.Saving {
         /// <returns></returns>
         [UsedImplicitly]
         public static string GetSaveFilePath(string nickName, DateTime dateTime) {
-            return Path.ChangeExtension(Path.Combine(SaveFolderPath, GetSaveFileNameWithDate(nickName, dateTime)), SaveFileExtension);
+            return Path.ChangeExtension(Path.Combine(SaveFolderPath, GetSaveFileNameWithDate(nickName, dateTime)), SaveData.SaveFileExtension);
         }
 
+        /// <summary>
+        /// Returns <c>true</c> if <b>any</b> files exist with the given <see cref="Nickname"/>.
+        /// </summary>
+        /// <param name="nickname">the expected <see cref="Nickname"/></param>
+        /// <returns></returns>
         [UsedImplicitly]
-        public static bool SaveFileExists(string nickName) {
-            return GetAllSaveFilePaths(nickName).Any(File.Exists);
+        public static bool SaveFileExists(string nickname) {
+            return GetAllSaveFilePaths(nickname).Any(File.Exists);
         }
 
         /// <summary>
@@ -256,65 +257,78 @@ namespace BrandonUtils.Saving {
             //create the save folder if it doesn't already exist
             Directory.CreateDirectory(
                 SaveFolderPath ??
-                throw new SaveDataException<T>(
+                throw new SaveDataException(
                     $"The path {SaveFolderPath} didn't have a valid directory name!",
                     new DirectoryNotFoundException()
                 )
             );
 
             //create a new, blank save data, and save it as the new file
-            return Save(new T(), nickname, false);
+            return Save(Construct(nickname), nickname, false);
         }
 
         /// <summary>
-        ///     Serializes <paramref name="saveData" /> to a new <see cref="File" />.
+        /// Constructs a new instance of <see cref="T"/> with the given <see cref="Nickname"/>.
         /// </summary>
         /// <remarks>
-        ///     <para>The new file will be located at <see cref="GetNewSaveFilePath" />.</para>
-        ///     <para>Retains previous saves with the same <paramref name="nickName" />, up to <see cref="BackupSaveSlots" />, via <see cref="TrimSaves" />.</para>
-        ///     <para>May update fields in <paramref name="saveData" />, such as <see cref="LastSaveTime" />.</para>
+        /// Calling this from a child class, like <see cref="SaveDataTestImpl"/>, should create an instance of the child class.
         /// </remarks>
-        /// <param name="saveData">The <see cref="SaveData{T}" /> inheritor to be saved.</param>
-        /// <param name="nickName">The <see cref="Nickname" /> that the <see cref="saveData" /> should be given.</param>
-        /// <param name="useReSaveDelay">If <c>true</c>, check if <see cref="ReSaveDelay" /> has elapsed since <see cref="LastSaveTime" />.</param>
+        /// <param name="nickname">the desired <see cref="Nickname"/></param>
+        /// <returns>a new instance of <see cref="T"/></returns>
+        [NotNull]
+        public static T Construct([NotNull] string nickname) {
+            return ReflectionUtils.Construct<T>(nickname);
+        }
+
+        /// <summary>
+        ///     Serializes <paramref name="saveData" /> to a new <see cref="SaveData.SaveFileExtension"/> <see cref="File"/>.
+        /// </summary>
+        /// <remarks>
+        ///     <para>The new file will be located at <see cref="GetSaveFilePath"/>.</para>
+        ///     <para>Retains previous saves with the same <paramref name="nickname"/>, up to <see cref="SaveData.BackupSaveSlots"/>, via <see cref="TrimSaves"/>.</para>
+        ///     <para>May update fields in <paramref name="saveData"/>, such as <see cref="LastSaveTime" />.</para>
+        /// </remarks>
+        /// <param name="saveData">The <see cref="SaveData{T}"/> inheritor to be saved.</param>
+        /// <param name="nickname">The <see cref="Nickname"/> that the <see cref="saveData"/> should be given.</param>
+        /// <param name="useReSaveDelay">If <c>true</c>, check if <see cref="SaveData.ReSaveDelay"/> has elapsed since <see cref="LastSaveTime"/>.</param>
         /// <returns>The passed <paramref name="saveData" /> for method chaining.</returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="SaveDataException{T}">If <paramref name="nickName" /> <see cref="string.IsNullOrWhiteSpace" />.</exception>
-        /// <exception cref="ReSaveDelayException{t}">If <paramref name="useReSaveDelay" /> is <c>true</c> and <see cref="ReSaveDelay" /> hasn't elapsed since <see cref="LastSaveTime" />.</exception>
-        private static T Save([NotNull] SaveData<T> saveData, [NotNull] string nickName, bool useReSaveDelay = true) {
+        /// <exception cref="ArgumentNullException">If <paramref name="saveData"/> is null</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="nickname"/> <see cref="string.IsNullOrWhiteSpace"/></exception>
+        /// <exception cref="SaveDataException">If a file at <see cref="GetSaveFilePath"/> already exists</exception>
+        /// <exception cref="ReSaveDelayException">If <paramref name="useReSaveDelay"/> is <c>true</c> and <see cref="SaveData.ReSaveDelay"/> hasn't elapsed since <see cref="LastSaveTime"/></exception>
+        private static T Save([NotNull] SaveData<T> saveData, [NotNull] string nickname, bool useReSaveDelay = true) {
             if (saveData == null) {
                 throw new ArgumentNullException(nameof(saveData));
             }
 
-            if (string.IsNullOrWhiteSpace(nickName)) {
-                var argException = new ArgumentException("Value cannot be null or whitespace.", nameof(nickName));
-                throw new SaveDataException<T>(saveData, $"The name of the file you tried to save was '{nickName}', which is null, blank, or whitespace, so we can't save it!", argException);
+            if (string.IsNullOrWhiteSpace(nickname)) {
+                throw new ArgumentException($"The name of the file you tried to save was '{nickname}', which is null, blank, or whitespace, so we can't save it!", nameof(nickname));
             }
 
             var saveTime = DateTime.Now;
 
             //throw an error if ReSaveDelay hasn't elapsed since the last time the file was saved
-            if (useReSaveDelay && saveTime - saveData.LastSaveTime_Exact < ReSaveDelay) {
-                throw new ReSaveDelayException<T>(
+            if (useReSaveDelay && saveTime - saveData.LastSaveTime_Exact < SaveData.ReSaveDelay) {
+                throw new ReSaveDelayException(
                     saveData,
-                    $"The save file {nickName} was saved too recently!" +
+                    $"The save file {nickname} was saved too recently!" +
                     $"\n\t{nameof(saveData.LastSaveTime_Exact)}: {saveData.LastSaveTime_Exact}" +
                     $"\n\tNew {nameof(saveTime)}: {saveTime}" +
-                    $"\n\t{nameof(ReSaveDelay)}: {ReSaveDelay}" +
+                    $"\n\t{nameof(SaveData.ReSaveDelay)}: {SaveData.ReSaveDelay}" +
                     $"\n\tDelta: {saveTime - saveData.LastSaveTime_Exact}"
                 );
             }
 
-            saveData.Nickname           = nickName;
+            saveData.Nickname           = nickname;
             saveData.LastSaveTime_Exact = saveTime;
             saveData.LastSaveTime       = FrameTime.Now;
 
             var previousFileCount = saveData.AllSaveFilePaths.Length;
-            var newFilePath       = GetSaveFilePath(nickName, saveTime);
+            var newFilePath       = GetSaveFilePath(nickname, saveTime);
 
             //Make sure that the file we're trying to create doesn't already exist
             if (File.Exists(newFilePath)) {
-                throw new SaveDataException<T>(saveData, $"Couldn't save {nickName} because there was already a save file at the path {newFilePath}");
+                throw new SaveDataException(saveData, $"Couldn't save {nickname} because there was already a save file at the path {newFilePath}");
             }
 
             //Write to the new save file
@@ -326,26 +340,25 @@ namespace BrandonUtils.Saving {
             ;
 
             if (saveData.AllSaveFilePaths.Length <= previousFileCount) {
-                throw new SaveDataException<T>(
+                throw new SaveDataException(
                     saveData,
-                    $"When saving {nickName}, we failed to create a new file!" +
+                    $"When saving {nickname}, we failed to create a new file!" +
                     $"\n\t{nameof(previousFileCount)} = {previousFileCount}" +
                     $"\n\tcurrentFileCount = {saveData.AllSaveFilePaths.Length}"
                 );
             }
 
-            Log($"Finished saving {nickName}! Trimming previous saves down to {BackupSaveSlots}...");
-            TrimSaves(nickName);
+            Log($"Finished saving {nickname}! Trimming previous saves down to {SaveData.BackupSaveSlots}...");
+            TrimSaves(nickname);
 
             return saveData as T;
         }
 
         /// <summary>
         ///     Calls the static <see cref="Save(BrandonUtils.Saving.SaveData{T},string,bool)" /> with this <see cref="SaveData{T}" />'s <see cref="Nickname" />.
-        ///     <br />
         /// </summary>
-        /// <param name="useReSaveDelay">If <c>true</c>, check if <see cref="ReSaveDelay" /> has elapsed since <see cref="LastSaveTime" />.</param>
-        /// <exception cref="ReSaveDelayException{t}">If <paramref name="useReSaveDelay" /> is <c>true</c> and <see cref="ReSaveDelay" /> hasn't elapsed since <see cref="LastSaveTime" />.</exception>
+        /// <inheritdoc cref="Save(BrandonUtils.Saving.SaveData{T},string,bool)"/>
+        /// <returns></returns>
         public void Save(bool useReSaveDelay = true) {
             Save(this, Nickname, useReSaveDelay);
         }
@@ -380,7 +393,7 @@ namespace BrandonUtils.Saving {
         /// <returns></returns>
         public static string[] GetAllSaveFilePaths(string nickName) {
             //This used to use "" as a default value for nickName, and I don't know why...
-            var saveFiles = Directory.GetFiles(SaveFolderPath, $"{nickName}*{SaveFileExtension}");
+            var saveFiles = Directory.GetFiles(SaveFolderPath, $"{nickName}*{SaveData.SaveFileExtension}");
             SortSaveFilePaths(saveFiles);
             return saveFiles;
         }
@@ -388,7 +401,7 @@ namespace BrandonUtils.Saving {
         public static string GetLatestSaveFilePath(string nickName) {
             var allPaths = GetAllSaveFilePaths(nickName);
             if (allPaths.Length == 0) {
-                throw new SaveDataException<T>($"Unable to retrieve the latest save file path because no files exist with the {nameof(SaveData<T>.Nickname)} {nickName}!");
+                throw new SaveDataException($"Unable to retrieve the latest save file path because no files exist with the {nameof(Nickname)} {nickName}!");
             }
 
             return allPaths.Last();
@@ -397,7 +410,7 @@ namespace BrandonUtils.Saving {
         public static string GetOldestSaveFilePath(string nickName) {
             var allPaths = GetAllSaveFilePaths(nickName);
             if (allPaths.Length == 0) {
-                throw new SaveDataException<T>($"Unable to retrieve the oldest save file path because no files exist with the {nameof(SaveData<T>.Nickname)} {nickName}!");
+                throw new SaveDataException($"Unable to retrieve the oldest save file path because no files exist with the {nameof(Nickname)} {nickName}!");
             }
 
             return allPaths.First();
@@ -420,8 +433,8 @@ namespace BrandonUtils.Saving {
         /// </summary>
         /// <param name="dateTime">The <see cref="DateTime" /> to be converted.</param>
         /// <returns>A file-name-friendly "Time Stamp" string.</returns>
-        /// <seealso cref="TimeStampLength" />
-        /// <seealso cref="TimeStampPattern" />
+        /// <seealso cref="SaveData.TimeStampLength" />
+        /// <seealso cref="SaveData.TimeStampPattern" />
         public static string GetTimeStamp(DateTime dateTime) {
             return dateTime.Ticks.ToString().PadLeft(18, '0');
         }
@@ -439,7 +452,7 @@ namespace BrandonUtils.Saving {
                 return saveDate;
             }
             catch (Exception e) {
-                throw new SaveDataException<T>($"Could not parse the time stamp from {nameof(saveFileName)} {saveFileName}!" + $"\n\t{nameof(dateString)} was extracted as: [{dateString}]", e);
+                throw new SaveDataException($"Could not parse the time stamp from {nameof(saveFileName)} {saveFileName}!" + $"\n\t{nameof(dateString)} was extracted as: [{dateString}]", e);
             }
         }
 
