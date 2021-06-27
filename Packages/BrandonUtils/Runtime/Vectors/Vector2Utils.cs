@@ -268,7 +268,6 @@ namespace BrandonUtils.Vectors {
         /// <returns></returns>
         public static float InverseLerp(this Vector2 range, float point) {
             return Mathf.InverseLerp(range.x, range.y, point);
-            return range.GetPortion(point);
         }
     }
 }
