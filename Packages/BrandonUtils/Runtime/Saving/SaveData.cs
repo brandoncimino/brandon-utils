@@ -143,7 +143,7 @@ namespace BrandonUtils.Saving {
         /// However, the intricacies of <see cref="JsonConvert.PopulateObject(string,object)"/> - for example, why is it able to populate the <c>target</c> object without using a <see langword="ref"/> parameter - didn't seem practical to tease out.
         /// </remarks>
         /// <returns></returns>
-        public T Reload() {
+        public virtual T Reload() {
             Log($"Reloading save file: {Nickname}");
             JsonConvert.PopulateObject(GetSaveFileContent(LatestSaveFilePath), this);
             OnLoadPrivate();
