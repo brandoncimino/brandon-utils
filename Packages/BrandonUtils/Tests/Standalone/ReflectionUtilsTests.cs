@@ -213,7 +213,10 @@ namespace BrandonUtils.Tests.Standalone {
             [ValueSource(nameof(AllVariables))]
             VariableInfo propertyWithBackingField
         ) {
-            Assume.That(propertyWithBackingField.MemberType, Is.EqualTo(MemberTypes.Property), "This is not a property!");
+            if (propertyWithBackingField.MemberType != MemberTypes.Property) {
+                throw new IgnoreException($"{propertyWithBackingField} is not a {MemberTypes.Property}!");
+            }
+
             var backingFieldInfo = typeof(Privacy<int>).GetField(propertyWithBackingField.BackingFieldName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
 
             Assert.That(backingFieldInfo, Is.Not.Null, $"Unable to retrieve a field named {propertyWithBackingField.BackingFieldName}");
@@ -250,6 +253,57 @@ namespace BrandonUtils.Tests.Standalone {
 
             Assert.That(backingFieldInfo,                Is.Not.Null);
             Assert.That(backingFieldInfo.IsBackingField, Is.True);
+        }
+
+        #endregion
+
+        #region Constructing
+
+        #region Classes with constructors
+
+        private abstract class Constructibles {
+            public bool Successful { get; private set; }
+
+            public class NoParamConstructor : Constructibles {
+                public NoParamConstructor() {
+                    Successful = true;
+                }
+            }
+
+            public class OptionalParamConstructor : Constructibles {
+                public bool OptionalWasProvided { get; }
+
+                public OptionalParamConstructor(bool optionalWasProvided = false) {
+                    Successful          = true;
+                    OptionalWasProvided = optionalWasProvided;
+                }
+            }
+        }
+
+        #endregion
+
+        [Test]
+        public void NoParamConstructor() {
+            Assert.That(ReflectionUtils.Construct<Constructibles.NoParamConstructor>(), Has.Property(nameof(Constructibles.Successful)).True);
+        }
+
+        [Test]
+        public void OptionalParamConstructor_NotProvided() {
+            Assert.That(
+                () => ReflectionUtils.Construct<Constructibles.OptionalParamConstructor>(),
+                Throws.InstanceOf<MissingMemberException>()
+            );
+        }
+
+        [Test]
+        public void OptionalParamConstructor_Provided_JustGeneric() {
+            Assert.That(
+                ReflectionUtils.Construct<Constructibles.OptionalParamConstructor>(true),
+                Has.Property(nameof(Constructibles.Successful))
+                   .True
+                   .And.Property(nameof(Constructibles.OptionalParamConstructor.OptionalWasProvided))
+                   .True
+            );
         }
 
         #endregion

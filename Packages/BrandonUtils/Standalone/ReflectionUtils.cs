@@ -236,5 +236,67 @@ namespace BrandonUtils.Standalone {
         }
 
         #endregion
+
+        #region Constructors
+
+        /// <summary>
+        /// Returns a <see cref="ConstructorInfo"/> with parameter types matching <see cref="parameterTypes"/> if one exists;
+        /// otherwise throws a <see cref="MissingMethodException"/>.
+        /// </summary>
+        /// <remarks>
+        /// This is a wrapper around <see cref="Type.GetConstructor(Type[])"/>
+        /// that:
+        /// <ul>
+        ///     <li>Will throw an exception on failure rather than returning null</li>
+        /// <li>Accepts <see cref="Type"/>s as <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/params">params</a> (aka <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/language/varargs.html">varargs</a> aka <a href="https://en.wikipedia.org/wiki/Variadic_function">variadic</a> aka arbitrary <a href="https://en.wikipedia.org/wiki/Arity">arity</a>)</li>
+        /// </ul>
+        ///
+        /// </remarks>
+        /// <param name="type"></param>
+        /// <param name="parameterTypes"></param>
+        /// <returns></returns>
+        /// <exception cref="MissingMethodException"></exception>
+        [Pure]
+        public static ConstructorInfo EnsureConstructor(this Type type, params Type[] parameterTypes) {
+            return type.GetConstructor(parameterTypes) ?? throw new MissingMethodException($"Could not retrieve a constructor for {type}");
+        }
+
+        private static TOut Construct<TOut>(Type[] parameterTypes, object[] parametersValues) {
+            try {
+                var constructor = typeof(TOut).EnsureConstructor(parameterTypes);
+                return (TOut) constructor.Invoke(parametersValues);
+            }
+            catch (Exception e) {
+                throw e.PrependMessage($"Could not construct an instance of {typeof(TOut).Name} with the parameters {parametersValues}!");
+            }
+        }
+
+        /// <summary>
+        /// Constructs a new instance of <see cref="TOut"/> using a constructor that <b>exactly</b> matches the given <see cref="parameters"/>.
+        ///
+        /// <p/><b>NOTE:</b><br/>
+        /// This must match the desired constructor <b>EXACTLY</b> - that means that the parameter types must be exact, and that optional parameters must be present!
+        ///
+        /// </summary>
+        /// <remarks>
+        /// I tried to make this an extension method of <see cref="Type"/>, but couldn't get it to work:
+        /// Unfortunately, I don't think it's possible, in C#, to go from a <see cref="Type"/> to a generic type parameter in a way that the
+        /// compiler knows about - i.e., in a way equivalent to Java's <![CDATA[Class<T>]]>.
+        ///
+        /// This means that making this a <see cref="Type"/> extension method is redundant with <typeparamref name="TOut"/>,
+        /// other than allowing this to be an extension method and thus giving you a way to find it that is semantically similar
+        /// to <see cref="Type.GetConstructor(System.Reflection.BindingFlags,System.Reflection.Binder,System.Reflection.CallingConventions,System.Type[],System.Reflection.ParameterModifier[])">Type.GetConstructor()</see>.
+        /// </remarks>
+        /// <param name="parameters">the parameters of the constructor to be called</param>
+        /// <typeparam name="TOut">the desired type to be constructed</typeparam>
+        /// <returns>an instance of <see cref="TOut"/> constructed with <paramref name="parameters"/></returns>
+        public static TOut Construct<TOut>(params object[] parameters) {
+            return Construct<TOut>(
+                parameters.Select(it => it.GetType()).ToArray(),
+                parameters
+            );
+        }
+
+        #endregion
     }
 }
