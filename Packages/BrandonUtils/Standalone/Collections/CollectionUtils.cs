@@ -508,5 +508,14 @@ namespace BrandonUtils.Standalone.Collections {
         public static bool IsNotEmpty<T>(this IEnumerable<T> enumerable) {
             return enumerable.Any();
         }
+
+        /// <remarks>Negation of <see cref="Enumerable.Any{TSource}(System.Collections.Generic.IEnumerable{TSource})"/>.</remarks>
+        /// <param name="enumerable"></param>
+        /// <param name="predicate"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>true if none of the items in <paramref name="enumerable"/> satisfy <paramref name="predicate"/></returns>
+        public static bool None<T>(this IEnumerable<T> enumerable, Func<T, bool> predicate) {
+            return !enumerable.Any(predicate);
+        }
     }
 }

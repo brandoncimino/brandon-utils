@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
 
+using BrandonUtils.Standalone.Exceptions;
+
 namespace BrandonUtils.Standalone.Enums {
     public static class EnumUtils {
         public static T Step<T>(this T currentEnumValue, int step) where T : Enum {
@@ -35,6 +37,28 @@ namespace BrandonUtils.Standalone.Enums {
         /// <returns></returns>
         public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(string argumentName, T enumValue) where T : Enum {
             return new InvalidEnumArgumentException(argumentName, (int) (object) enumValue, typeof(T));
+        }
+
+        /// <summary>
+        /// A generic wrapper for <see cref="Enum.Parse(System.Type,string)"/> that throws a <b>useful message</b> if <see cref="value"/> is an empty string -
+        /// because for some reason, C#'s message in that scenario is "Must specify valid information for parsing in the string."
+        /// </summary>
+        /// <param name="name">the string name of a <see cref="T"/> value</param>
+        /// <typeparam name="T">the type of the <see cref="Enum"/></typeparam>
+        /// <returns><see cref="name"/> parsed as a <see cref="T"/> value</returns>
+        /// <exception cref="ArgumentException">if <see cref="name"/> is an empty string (i.e. <c>""</c>)</exception>
+        public static T Parse<T>(string name, bool ignoreCase = false) where T : struct {
+            try {
+                return (T) Enum.Parse(typeof(T), name, ignoreCase);
+            }
+            catch (Exception e) {
+                if (name == "") {
+                    throw e.PrependMessage($"Cannot parse an empty string as an enum of type {typeof(T).Name}!");
+                }
+                else {
+                    throw;
+                }
+            }
         }
     }
 }

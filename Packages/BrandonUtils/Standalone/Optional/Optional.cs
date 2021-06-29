@@ -137,6 +137,57 @@ namespace BrandonUtils.Standalone.Optional {
         public static string ToString<T>(IOptional<T> optional) {
             return $"{optional.GetType().Name}<{typeof(T).Name}>[{(optional.HasValue ? (optional.Value == null ? "null" : optional.Value + "") : "")}]";
         }
+
+        public static TOut IfOrElse<TIn, TOut>(this TIn? nullable, Func<TIn, TOut> ifPresent, Func<TOut> orElse) where TIn : struct {
+            return nullable.HasValue ? ifPresent.Invoke(nullable.Value) : orElse.Invoke();
+        }
+
+        /**
+         * <inheritdoc cref="IfOrElse{TIn}(IOptional{TIn},System.Action{TIn},System.Action)"/>
+         */
+        public static void IfOrElse<TIn>(this TIn? nullable, Action<TIn> ifPresent, Action orElse) where TIn : struct {
+            if (nullable.HasValue) {
+                ifPresent.Invoke(nullable.Value);
+            }
+            else {
+                orElse.Invoke();
+            }
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <remarks>
+        /// Mimic's Java's
+        /// </remarks>
+        /// <param name="optional"></param>
+        /// <param name="ifPresent"></param>
+        /// <param name="orElse"></param>
+        /// <typeparam name="TIn"></typeparam>
+        /// <typeparam name="TOut"></typeparam>
+        /// <returns></returns>
+        public static TOut IfOrElse<TIn, TOut>(this IOptional<TIn> optional, Func<TIn, TOut> ifPresent, Func<TOut> orElse) {
+            return optional.HasValue ? ifPresent.Invoke(optional.Value) : orElse.Invoke();
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <remarks>
+        /// Mimics Java's <a href="https://docs.oracle.com/javase/9/docs/api/java/util/Optional.html#ifPresentOrElse-java.util.function.Consumer-java.lang.Runnable-">ifPresentOrElse()</a>
+        /// </remarks>
+        /// <param name="optional"></param>
+        /// <param name="ifPresent"></param>
+        /// <param name="orElse"></param>
+        /// <typeparam name="TIn"></typeparam>
+        public static void IfOrElse<TIn>(this IOptional<TIn> optional, Action<TIn> ifPresent, Action orElse) {
+            if (optional.HasValue) {
+                ifPresent.Invoke(optional.Value);
+            }
+            else {
+                orElse.Invoke();
+            }
+        }
     }
 
     /// <summary>
