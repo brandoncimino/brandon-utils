@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 using BrandonUtils.Standalone.Collections;
+using BrandonUtils.Standalone.Exceptions;
+using BrandonUtils.Standalone.Strings;
 
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
@@ -46,7 +48,8 @@ namespace BrandonUtils.Testing {
                     ass.Invoke();
                 }
                 catch (Exception e) {
-                    failures.Add($"{ass.Method.Name} failed!\n{e.Message}");
+                    var nUnitFilter = new StringFilter().Matching("$in NUnit");
+                    failures.Add($"{ass.Method.Name} failed!\n{e.Message}\n{e.FilteredStackTrace(nUnitFilter).TruncateLines(10)}");
                 }
             }
 

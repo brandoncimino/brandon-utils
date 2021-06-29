@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Reflection;
 
+using BrandonUtils.Standalone.Strings;
+
 namespace BrandonUtils.Standalone.Exceptions {
     public static class ExceptionUtils {
         private static readonly MethodInfo ModifyMessageMethod = typeof(ExceptionUtils).GetMethod(
@@ -58,6 +60,18 @@ namespace BrandonUtils.Standalone.Exceptions {
          */
         public static T PrependMessage<T>(this T exception, string additionalMessage) where T : Exception {
             return ModifyMessage_Internal(exception, $"{additionalMessage}\n{exception.Message}");
+        }
+
+        /// <summary>
+        /// Applies the given <see cref="StringFilter"/>s to the <see cref="Exception.StackTrace"/> of <paramref name="exception"/>
+        /// </summary>
+        /// <param name="exception"></param>
+        /// <param name="filter"></param>
+        /// <param name="additionalFilters"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static string[] FilteredStackTrace<T>(this T exception, StringFilter filter, params StringFilter[] additionalFilters) where T : Exception {
+            return StringUtils.CollapseLines(exception.StackTrace.SplitLines(), filter, additionalFilters);
         }
     }
 }
