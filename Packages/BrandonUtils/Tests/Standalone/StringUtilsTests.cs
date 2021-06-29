@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 
+using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Strings;
 using BrandonUtils.Testing;
 
@@ -100,6 +102,92 @@ namespace BrandonUtils.Tests.Standalone {
         )]
         public void FormatHeader(string heading, string border, string padding, string expectedResult) {
             Assert.That(StringUtils.FormatHeading(heading, border, padding), Is.EqualTo(expectedResult));
+        }
+
+        [Test]
+        [TestCase(
+            @"a1
+b
+b
+a2
+b
+b
+a3",
+            @"a1
+...(2 lines omitted)
+a2
+...(2 lines omitted)
+a3"
+        )]
+        [TestCase(
+            @"a1
+b
+b
+b
+b
+b",
+            @"a1
+...(5 lines omitted)"
+        )]
+        [TestCase(
+            @"b
+b
+a
+b
+b",
+            @"...(2 lines omitted)
+a
+...(2 lines omitted)"
+        )]
+        [TestCase(
+            @"b
+a
+b
+a
+b
+",
+            @"...
+a
+...
+a
+..."
+        )]
+        public void CollapseLines(string lines, string expected) {
+            var split     = lines.SplitLines();
+            var collapsed = StringUtils.CollapseLines(split, s => s == "b");
+            Console.WriteLine(collapsed.JoinLines());
+            Assert.That(collapsed, Is.EqualTo(expected.SplitLines()));
+        }
+
+        [Test]
+        public void TruncateLines(
+            [Values(1, 5, 10, 50, 100)]
+            int lineCount,
+            [Values(1, 2, 10, 50, 100)]
+            int truncateTo,
+            [Values(true, false)]
+            bool includeMessage
+        ) {
+            var ln            = Enumerable.Repeat("LINE", lineCount);
+            var truncated     = ln.TruncateLines(truncateTo, includeMessage);
+            var truncateCount = lineCount - truncateTo;
+
+            if (lineCount > truncateTo) {
+                AssertAll.Of(
+                    () => Assert.That(truncated, Has.Length.EqualTo(truncateTo)),
+                    () => {
+                        if (includeMessage) {
+                            AssertAll.Of(
+                                () => Assert.That(truncated.Last(), Is.Not.EqualTo("LINE")),
+                                () => Assert.That(truncated.Last(), Contains.Substring(truncateCount + ""))
+                            );
+                        }
+                    }
+                );
+            }
+            else if (lineCount <= truncateTo) {
+                Assert.That(truncated, Is.EqualTo(ln));
+            }
         }
     }
 }

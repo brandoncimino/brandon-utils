@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 using BrandonUtils.Standalone.Collections;
 
@@ -219,5 +220,146 @@ namespace BrandonUtils.Standalone.Strings {
             var hRule  = border.FillRight(middle.Length, border);
             return $"{hRule}\n{middle}\n{hRule}";
         }
+
+        public static string[] SplitLines(this string contentWithLines) {
+            return Splitex(contentWithLines, "[\n\r]+");
+        }
+
+        /// <summary>
+        /// An extension method to call <see cref="Regex.Split(string)"/>.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="pattern"></param>
+        /// <returns></returns>
+        public static string[] Splitex(this string input, string pattern) {
+            return Regex.Split(input, pattern);
+        }
+
+        /**
+         * <inheritdoc cref="Splitex(string,string)"/>
+         */
+        public static string[] Splitex(this string input, string pattern, RegexOptions options) {
+            return Regex.Split(input, pattern, options);
+        }
+
+        /**
+         * <inheritdoc cref="Splitex(string,string)"/>
+         */
+        public static string[] Splitex(this string input, string pattern, RegexOptions options, TimeSpan matchTimeout) {
+            return Regex.Split(input, pattern, options, matchTimeout);
+        }
+
+        /// <summary>
+        /// Returns true if the given <see cref="string"/> <see cref="string.Contains"/> <b>any</b> of the given <see cref="substrings"/>.
+        /// </summary>
+        /// <remarks>
+        /// TODO: I wonder if it would be faster to search for the shortest substring first...? And maybe excluding substrings that wholly contain other substrings?
+        /// </remarks>
+        /// <param name="str">the <see cref="string"/> to check for <see cref="substrings"/></param>
+        /// <param name="substrings">the possible <see cref="substrings"/></param>
+        /// <returns>true if the given <see cref="string"/> <see cref="string.Contains"/> <b>any</b> of the given <see cref="substrings"/></returns>
+        public static bool ContainsAny(this string str, IEnumerable<string> substrings) {
+            return substrings.Any(str.Contains);
+        }
+
+        /**
+         * <inheritdoc cref="ContainsAny(string,System.Collections.Generic.IEnumerable{string})"/>
+         */
+        public static bool ContainsAny(this string str, params string[] substrings) {
+            return ContainsAny(str, substrings.AsEnumerable());
+        }
+
+        /// <summary>
+        /// Returns true if the given <see cref="string"/> <see cref="string.Contains"/> <b>all</b> of the given <see cref="substrings"/>.
+        /// </summary>
+        /// <param name="str">the <see cref="string"/> to search through</param>
+        /// <param name="substrings">the possible substrings</param>
+        /// <returns>true if the given <see cref="string"/> <see cref="string.Contains"/> <b>all</b> of the given <see cref="substrings"/></returns>
+        public static bool ContainsAll(this string str, IEnumerable<string> substrings) {
+            return substrings.All(str.Contains);
+        }
+
+        /**
+         * <inheritdoc cref="ContainsAll(string,System.Collections.Generic.IEnumerable{string})"/>
+         */
+        public static bool ContainsAll(this string str, params string[] substrings) {
+            return ContainsAll(str, substrings.AsEnumerable());
+        }
+
+        #region Truncation & Collapsing
+
+        /// <summary>
+        /// Returns the first <see cref="lineCount"/> full lines of <see cref="lines"/>.
+        /// </summary>
+        /// <param name="lines"></param>
+        /// <param name="lineCount"></param>
+        /// <param name="includeMessage"></param>
+        /// <returns></returns>
+        public static string[] TruncateLines(this IEnumerable<string> lines, int lineCount, bool includeMessage = true) {
+            var lns = lines.ToArray();
+            if (lns.Length <= lineCount) {
+                return lns.ToArray();
+            }
+
+            if (includeMessage) {
+                return lns.Take(lineCount - 1)
+                          .Append($"...[{lns.Length - lineCount} lines omitted]")
+                          .ToArray();
+            }
+            else {
+                return lns.Take(lineCount)
+                          .ToArray();
+            }
+        }
+
+        public static string[] TruncateLines(this string contentWithLines, int lineCount, bool includeMessage = true) {
+            return TruncateLines(contentWithLines.SplitLines(), lineCount, includeMessage);
+        }
+
+        public static string[] CollapseLines(string[] lines, Func<string, bool> predicate) {
+            var  filteredLines = new List<string>();
+            int? collapseFrom  = null;
+            for (int i = 0; i < lines.Length; i++) {
+                var matches = predicate.Invoke(lines[i]);
+
+                // NOT currently collapsing
+                if (!collapseFrom.HasValue) {
+                    // Starting to collapse
+                    if (matches) {
+                        collapseFrom = i;
+                        continue;
+                    }
+
+                    filteredLines.Add(lines[i]);
+                    continue;
+                }
+
+                // Continue to collapse
+                if (matches) {
+                    continue;
+                }
+
+                // Finish collapsing
+                int collapseSize = i - collapseFrom.Value;
+
+                filteredLines.Add(collapseSize == 1 ? "..." : $"...({collapseSize} lines omitted)");
+                collapseFrom = null;
+
+                filteredLines.Add(lines[i]);
+            }
+
+            if (collapseFrom.HasValue) {
+                int collapseSize = lines.Length - collapseFrom.Value;
+                filteredLines.Add(collapseSize == 1 ? "..." : $"...({collapseSize} lines omitted)");
+            }
+
+            return filteredLines.ToArray();
+        }
+
+        public static string[] CollapseLines(string[] lines, StringFilter filter, params StringFilter[] additionalFilters) {
+            return CollapseLines(lines, str => additionalFilters.Prepend(filter).Any(it => it.TestFilter(str)));
+        }
+
+        #endregion
     }
 }

@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 6/29/2021
+
+- New `StringUtils`
+    - `SplitLines()` - splits a string by line breaks
+    - `CollapseLines()` - replaces groups of lines matching a predicate with `...`
+    - `TruncateLines()`
+    - `StringFilter` - a simple holder for multiple `Contains()` substrings and `Regex` patterns
+    - `ContainsAll()`
+    - `ContainsAny()`
+    - `ContainsNone()`
+
 ## [2.1.0] - 6/26/2021
 
 ### Changed
