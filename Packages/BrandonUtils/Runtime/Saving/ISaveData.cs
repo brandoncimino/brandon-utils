@@ -52,4 +52,32 @@ namespace BrandonUtils.Saving {
         /// <returns></returns>
         string ToJson();
     }
+
+    /// <summary>
+    /// Generic version of <see cref="ISaveData"/>, which primarily contains methods that return implementor types such as <see cref="Reload"/>.
+    /// </summary>
+    /// <typeparam name="T">the actual type that inherits from <see cref="ISaveData{T}"/></typeparam>
+    public interface ISaveData<out T> : ISaveData where T : ISaveData<T> {
+        /// <summary>
+        /// Loads the most recent version of the save file.
+        /// </summary>
+        /// <remarks>
+        /// This utilizes <see cref="JsonConvert.PopulateObject(string,object)"/> rather than <see cref="JsonConvert.DeserializeObject(string)"/>.
+        /// <p/>
+        /// <see cref="JsonConvert.DeserializeObject(string)"/> has wrappers that throw <see cref="SaveDataException"/>s - <see cref="DeserializeByPath"/>, etc. - so I considered creating analogous methods for <see cref="JsonConvert.PopulateObject(string,object)"/>, e.g. "PopulateByPath".
+        /// <p/>
+        /// However, the intricacies of <see cref="JsonConvert.PopulateObject(string,object)"/> - for example, why is it able to populate the <c>target</c> object without using a <see langword="ref"/> parameter - didn't seem practical to tease out.
+        /// </remarks>
+        /// <returns></returns>
+        T Reload();
+
+        /// <summary>
+        /// Resets all of the values of the <see cref="ISaveData"/> as though it were a new instance - <b>except</b> for <see cref="Nickname"/>
+        /// </summary>
+        /// <remarks>
+        /// This was made to handle weirdness that was arising through <see cref="JsonConvert.PopulateObject(string,object)"/> due to circular references in child objects (specifically, this happened in Fortune Fountain G)
+        /// </remarks>
+        /// <returns><see langword="this"/></returns>
+        T Reset();
+    }
 }
