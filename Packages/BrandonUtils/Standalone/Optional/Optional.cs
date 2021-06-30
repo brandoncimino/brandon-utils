@@ -188,6 +188,48 @@ namespace BrandonUtils.Standalone.Optional {
                 orElse.Invoke();
             }
         }
+
+        /// <summary>
+        /// If this <see cref="IOptional{T}.HasValue"/>, returns <see cref="IOptional{T}.Value"/>.
+        ///
+        /// Throws an exception if the <see cref="IOptional{T}"/> is empty.
+        /// </summary>
+        /// <param name="optional">an <see cref="IOptional{T}"/></param>
+        /// <param name="exceptionProvider">the <see cref="Func{TResult}"/> that generates the exception. Defaults to <see cref="NoCanHasValue{T}"/></param>
+        /// <typeparam name="T">the underlying type of the <see cref="IOptional{T}"/></typeparam>
+        /// <returns>the <see cref="IOptional{T}.Value"/></returns>
+        /// <exception cref="Exception">if the <see cref="IOptional{T}"/> is empty</exception>
+        public static T OrElseThrow<T>(this IOptional<T> optional, Func<Exception> exceptionProvider = default) {
+            return optional.HasValue ? optional.Value : throw (exceptionProvider?.Invoke() ?? NoCanHasValue(optional));
+        }
+
+        /// <summary>
+        /// If this <see cref="Nullable{T}.HasValue"/>, returns <see cref="Nullable{T}.Value"/>.
+        ///
+        /// Throws and exception if the <see cref="Nullable{T}"/> is empty.
+        /// </summary>
+        /// <param name="nullable">a <see cref="Nullable{T}"/></param>
+        /// <param name="exceptionProvider"><inheritdoc cref="OrElseThrow{T}(BrandonUtils.Standalone.Optional.IOptional{T},System.Func{System.Exception})"/></param>
+        /// <typeparam name="T">the underlying type of the <see cref="Nullable{T}"/></typeparam>
+        /// <returns></returns>
+        /// <exception cref="Exception">if the <see cref="Nullable{T}"/> is empty</exception>
+        public static T OrElseThrow<T>(this T? nullable, Func<Exception> exceptionProvider = default) where T : struct {
+            return nullable ?? throw (exceptionProvider?.Invoke() ?? NoCanHasValue<T?>());
+        }
+
+        private static ArgumentNullException NoCanHasValue<T>(T emptyThing = default) {
+            return new ArgumentNullException($"The {typeof(T).Name} was empty!");
+        }
+
+        /// <returns>negation of <see cref="IOptional{T}.HasValue"/></returns>
+        public static bool IsEmpty<T>(this IOptional<T> optional) {
+            return !optional.HasValue;
+        }
+
+        /// <returns>negation of <see cref="Nullable{T}.HasValue"/></returns>
+        public static bool IsEmpty<T>(this T? nullable) where T : struct {
+            return !nullable.HasValue;
+        }
     }
 
     /// <summary>
