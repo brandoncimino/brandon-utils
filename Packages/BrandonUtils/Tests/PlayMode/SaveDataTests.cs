@@ -196,17 +196,17 @@ namespace BrandonUtils.Tests.PlayMode {
 
                 Log($"Saved {nickName} #{i}:\n{saveData}");
 
-                //Assert that the timestamp in the filename matches the lastSaveTime
-                Assert.That(
-                    saveData.LastSaveTime_Exact.Ticks,
-                    Is.EqualTo(
-                        SaveDataTestImpl.GetSaveDate(saveData.LatestSaveFilePath).Ticks
+                AssertAll.Of(
+                    //Assert that the timestamp in the filename matches the lastSaveTime
+                    () => Assert.That(saveData, Has.Property(nameof(saveData.LastSaveTime_Exact)).Not.Null),
+                    () => Assert.That(
+                        saveData.LastSaveTime_Exact?.Ticks,
+                        Is.EqualTo(SaveDataTestImpl.GetSaveDate(saveData.LatestSaveFilePath).Ticks),
+                        $"Incorrect timestamp pulled from path {saveData.LatestSaveFilePath}"
                     ),
-                    $"Incorrect timestamp pulled from path {saveData.LatestSaveFilePath}"
+                    //load the save data and check the unique value
+                    () => Assert.That(SaveDataTestImpl.Load(nickName).Word, Is.EqualTo(saveData.Word))
                 );
-
-                //load the save data and check the unique value
-                Assert.That(SaveDataTestImpl.Load(nickName).Word, Is.EqualTo(saveData.Word));
             }
         }
 
@@ -270,8 +270,10 @@ namespace BrandonUtils.Tests.PlayMode {
             var      saveData     = SaveDataTestImpl.NewSaveFile(nameof(SaveTimeUnaffectedByLoading));
             DateTime afterNewSave = DateTime.Now;
 
-            Assert.That(saveData.LastSaveTime, Is.InRange(beforeNewSave, afterNewSave));
-            Assert.That(saveData.LastLoadTime, Is.InRange(beforeNewSave, afterNewSave));
+            AssertAll.Of(
+                () => Assert.That(saveData.LastSaveTime, Is.InRange(beforeNewSave, afterNewSave)),
+                () => Assert.That(saveData.LastLoadTime, Is.Null)
+            );
 
             var oldSaveTime = saveData.LastSaveTime;
             var oldLoadTime = saveData.LastLoadTime;
@@ -284,11 +286,11 @@ namespace BrandonUtils.Tests.PlayMode {
             saveData.Reload();
             DateTime afterReload = DateTime.Now;
 
-            Assert.That(saveData.LastSaveTime, Is.EqualTo(oldSaveTime), $"The {nameof(SaveDataTestImpl.LastSaveTime)} should not have changed, because we {nameof(SaveDataTestImpl.Reload)}-ed without {nameof(SaveDataTestImpl.Save)}-ing!");
-
-            Assert.That(saveData.LastLoadTime, Is.Not.EqualTo(oldLoadTime), $"The {nameof(SaveDataTestImpl.LastLoadTime)} should have changed, because we {nameof(SaveDataTestImpl.Reload)}-ed!");
-
-            Assert.That(saveData.LastLoadTime, Is.InRange(beforeReload, afterReload));
+            AssertAll.Of(
+                () => Assert.That(saveData.LastSaveTime, Is.EqualTo(oldSaveTime),     $"The {nameof(SaveDataTestImpl.LastSaveTime)} should not have changed, because we {nameof(SaveDataTestImpl.Reload)}-ed without {nameof(SaveDataTestImpl.Save)}-ing!"),
+                () => Assert.That(saveData.LastLoadTime, Is.Not.EqualTo(oldLoadTime), $"The {nameof(SaveDataTestImpl.LastLoadTime)} should have changed, because we {nameof(SaveDataTestImpl.Reload)}-ed!"),
+                () => Assert.That(saveData.LastLoadTime, Is.InRange(beforeReload, afterReload))
+            );
         }
 
         [UnityTest]
@@ -299,8 +301,10 @@ namespace BrandonUtils.Tests.PlayMode {
             var saveData     = SaveDataTestImpl.NewSaveFile(nameof(LoadTimeUnaffectedBySaving));
             var afterNewSave = DateTime.Now;
 
-            Assert.That(saveData.LastSaveTime, Is.InRange(beforeNewSave, afterNewSave));
-            Assert.That(saveData.LastLoadTime, Is.InRange(beforeNewSave, afterNewSave));
+            AssertAll.Of(
+                () => Assert.That(saveData.LastSaveTime, Is.InRange(beforeNewSave, afterNewSave)),
+                () => Assert.That(saveData.LastLoadTime, Is.Null)
+            );
 
             var oldSaveTime = saveData.LastSaveTime;
             var oldLoadTime = saveData.LastLoadTime;
@@ -313,9 +317,11 @@ namespace BrandonUtils.Tests.PlayMode {
             saveData.Save(false);
             var afterReSave = DateTime.Now;
 
-            Assert.That(saveData.LastSaveTime, Is.InRange(beforeReSave, afterReSave));
-            Assert.That(saveData.LastSaveTime, Is.Not.EqualTo(oldSaveTime));
-            Assert.That(saveData.LastLoadTime, Is.EqualTo(oldLoadTime));
+            AssertAll.Of(
+                () => Assert.That(saveData.LastSaveTime, Is.InRange(beforeReSave, afterReSave)),
+                () => Assert.That(saveData.LastSaveTime, Is.Not.EqualTo(oldSaveTime)),
+                () => Assert.That(saveData.LastLoadTime, Is.EqualTo(oldLoadTime))
+            );
         }
 
         [Test]
@@ -355,6 +361,37 @@ namespace BrandonUtils.Tests.PlayMode {
         [Test]
         public void LoadingInvalidContentByNicknameThrowsSaveDataException() {
             Assert.Throws<SaveDataException>(() => SaveDataTestImpl.Load(DummyNickName));
+        }
+
+        [Test]
+        public void EmptyObjectIsCorrect() {
+            var saveData  = new SaveDataTestImpl(nameof(EmptyObjectIsCorrect));
+            var emptySave = SaveDataTestImpl.EmptySaveData.Value;
+
+            AssertAll.Of(
+                () => Assert.That(emptySave.Word,  Is.EqualTo(saveData.Word)),
+                () => Assert.That(emptySave.Word2, Is.EqualTo(saveData.Word2)),
+                () => Assert.That(emptySave,       Has.Property(nameof(emptySave.LastLoadTime)).Null)
+            );
+        }
+
+        [Test]
+        public void ResetSaveData() {
+            var saveData = new SaveDataTestImpl(nameof(ResetSaveData));
+
+            var word_default  = saveData.Word;
+            var word2_default = saveData.Word2;
+
+            saveData.Word  += "_EDIT";
+            saveData.Word2 += "_EDIT";
+
+            saveData.Reset();
+
+            AssertAll.Of(
+                () => Assert.That(saveData.Word,  Is.EqualTo(word_default)),
+                () => Assert.That(saveData.Word2, Is.EqualTo(word2_default)),
+                () => Assert.That(saveData,       Has.Property(nameof(saveData.LastLoadTime)).Null)
+            );
         }
     }
 }

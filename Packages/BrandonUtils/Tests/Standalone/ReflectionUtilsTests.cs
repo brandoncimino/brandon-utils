@@ -12,8 +12,10 @@ using NUnit.Framework;
 // ReSharper disable AutoPropertyCanBeMadeGetOnly.Local
 
 namespace BrandonUtils.Tests.Standalone {
-    public class ReflectionUtilsTests {
+    public partial class ReflectionUtilsTests {
         private const int Prop_Static_Get_Only_Default_Value = 5;
+
+        #region Variables
 
         public class VariableInfo {
             public string      Name;
@@ -206,6 +208,7 @@ namespace BrandonUtils.Tests.Standalone {
             );
         }
 
+
         #region Backing Fields
 
         [Test]
@@ -254,6 +257,8 @@ namespace BrandonUtils.Tests.Standalone {
             Assert.That(backingFieldInfo,                Is.Not.Null);
             Assert.That(backingFieldInfo.IsBackingField, Is.True);
         }
+
+        #endregion
 
         #endregion
 

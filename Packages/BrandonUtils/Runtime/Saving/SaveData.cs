@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 using BrandonUtils.Logging;
@@ -15,7 +16,16 @@ using UnityEngine;
 
 using static BrandonUtils.Logging.LogUtils;
 
+// ReSharper disable StaticMemberInGenericType
+
+[assembly: InternalsVisibleTo("BrandonUtils.Tests.Playmode")]
+
 namespace BrandonUtils.Saving {
+    /// <summary>
+    /// Non-generic base class for <see cref="SaveData{T}"/>
+    ///
+    /// TODO: Look for things that were made public but are only used for testing, and switch them to `internal`
+    /// </summary>
     public abstract class SaveData {
         [JsonIgnore]
         [UsedImplicitly]
@@ -53,7 +63,7 @@ namespace BrandonUtils.Saving {
     /// </remarks>
     /// <typeparam name="T">The inheriting class, e.g. <see cref="SaveDataTestImpl" /></typeparam>
     /// <seealso cref="SaveDataTestImpl" />
-    public abstract class SaveData<T> : SaveData, ISaveData where T : SaveData<T> {
+    public abstract class SaveData<T> : SaveData, ISaveData<T> where T : SaveData<T> {
         [JsonIgnore]
         [UsedImplicitly]
         public static readonly string SaveTypeName = typeof(T).Name;
@@ -67,13 +77,13 @@ namespace BrandonUtils.Saving {
         );
 
         [JsonProperty]
-        public string Nickname { get; set; }
+        public string Nickname { get; private set; }
 
         [JsonProperty]
-        public DateTime LastSaveTime { get; set; } = FrameTime.Now;
+        public DateTime? LastSaveTime { get; protected set; }
 
         [JsonProperty]
-        public DateTime LastSaveTime_Exact { get; set; } = DateTime.Now;
+        public DateTime? LastSaveTime_Exact { get; protected set; }
 
         [JsonIgnore]
         public string[] AllSaveFilePaths => GetAllSaveFilePaths(Nickname);
@@ -94,8 +104,21 @@ namespace BrandonUtils.Saving {
         /// Set to <see cref="FrameTime.Now"/> when the data is initialized, <see cref="Load"/>-ed, or <see cref="Reload"/>-ed.
         /// </remarks>
         [JsonIgnore]
-        public DateTime LastLoadTime { get; set; } = FrameTime.Now;
+        public DateTime? LastLoadTime { get; set; }
 
+        /**
+         * Stores an "empty" instance of <typeparamref name="T"/> for use with <see cref="Reset"/>.
+         */
+        [JsonIgnore]
+        internal static readonly Lazy<T> EmptySaveData = new Lazy<T>(() => Construct("EMPTY"));
+
+        /**
+         * Stores the json representation of <see cref="EmptySaveData"/> for use with <see cref="Reset"/>.
+         *
+         * TODO: It's possible that <see cref="JsonConvert"/> respects <see cref="System.ComponentModel.DefaultValueAttribute"/> via <see cref="DefaultValueHandling"/>, which would probably be waaaaaaaaaaaaaaaaay more efficient and reasonable than this
+         */
+        [JsonIgnore]
+        internal static readonly Lazy<string> EmptyJson = new Lazy<string>(() => EmptySaveData.Value.ToJson());
 
         /// <summary>
         ///     Static initializer that makes sure the <see cref="SaveFolderPath" /> exists.
@@ -132,21 +155,18 @@ namespace BrandonUtils.Saving {
             return deserializedSaveFile;
         }
 
-        /// <summary>
-        /// Loads the most recent version of the save file.
-        /// </summary>
-        /// <remarks>
-        /// This utilizes <see cref="JsonConvert.PopulateObject(string,object)"/> rather than <see cref="JsonConvert.DeserializeObject(string)"/>.
-        /// <p/>
-        /// <see cref="JsonConvert.DeserializeObject(string)"/> has wrappers that throw <see cref="SaveDataException"/>s - <see cref="DeserializeByPath"/>, etc. - so I considered creating analogous methods for <see cref="JsonConvert.PopulateObject(string,object)"/>, e.g. "PopulateByPath".
-        /// <p/>
-        /// However, the intricacies of <see cref="JsonConvert.PopulateObject(string,object)"/> - for example, why is it able to populate the <c>target</c> object without using a <see langword="ref"/> parameter - didn't seem practical to tease out.
-        /// </remarks>
-        /// <returns></returns>
-        public virtual T Reload() {
+        public T Reload() {
             Log($"Reloading save file: {Nickname}");
-            JsonConvert.PopulateObject(GetSaveFileContent(LatestSaveFilePath), this);
+            Reset();
+            JsonConvert.PopulateObject(GetSaveFileContent(LatestSaveFilePath), this, JsonSerializerSettings);
             OnLoadPrivate();
+            return (T) this;
+        }
+
+        public T Reset() {
+            var oldNickname = Nickname;
+            JsonConvert.PopulateObject(EmptyJson.Value, this, JsonSerializerSettings);
+            Nickname = oldNickname;
             return (T) this;
         }
 
@@ -171,7 +191,7 @@ namespace BrandonUtils.Saving {
 
         private static T DeserializeByContent(string saveFileContent) {
             try {
-                return JsonConvert.DeserializeObject<T>(saveFileContent);
+                return JsonConvert.DeserializeObject<T>(saveFileContent, JsonSerializerSettings);
             }
             catch (JsonException e) {
                 throw new SaveDataException(
@@ -336,8 +356,6 @@ namespace BrandonUtils.Saving {
             if (!File.Exists(newFilePath)) {
                 throw new FileNotFoundException("Couldn't create the new save file!", newFilePath);
             }
-
-            ;
 
             if (saveData.AllSaveFilePaths.Length <= previousFileCount) {
                 throw new SaveDataException(

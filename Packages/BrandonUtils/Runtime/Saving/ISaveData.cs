@@ -15,11 +15,11 @@ namespace BrandonUtils.Saving {
     public interface ISaveData {
         [NotNull]
         [JsonProperty]
-        string Nickname { get; set; }
+        string Nickname { get; }
         [JsonProperty]
-        DateTime LastSaveTime { get; set; }
+        DateTime? LastSaveTime { get; }
         [JsonProperty]
-        DateTime LastSaveTime_Exact { get; set; }
+        DateTime? LastSaveTime_Exact { get; }
         [JsonIgnore]
         string[] AllSaveFilePaths { get; }
         [JsonIgnore]
@@ -31,12 +31,16 @@ namespace BrandonUtils.Saving {
 
         /// <summary>
         /// The time that this <see cref="SaveData{T}"/> was loaded.
+        ///
+        /// If the <see cref="ISaveData"/> has <b>never</b> been loaded, then <see cref="Nullable{T}.HasValue"/> should be false.
         /// </summary>
         /// <remarks>
-        /// Set to <see cref="FrameTime.Now"/> when the data is initialized, <see cref="Load"/>-ed, or <see cref="Reload"/>-ed.
+        /// Set to <see cref="FrameTime.Now"/> when the data is <see cref="SaveData{T}.Load"/>-ed or <see cref="ISaveData{T}.Reload"/>-ed.
+        /// <br/>
+        /// Set to null when the data is initialized or <see cref="ISaveData{T}.Reset"/>.
         /// </remarks>
         [JsonIgnore]
-        DateTime LastLoadTime { get; set; }
+        DateTime? LastLoadTime { get; }
 
         /// <summary>
         ///     Calls the static <see cref="SaveData{T}.Save(BrandonUtils.Saving.SaveData{T},string,bool)" /> with this <see cref="SaveData{T}" />'s <see cref="SaveData{T}.Nickname" />.

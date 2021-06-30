@@ -13,6 +13,14 @@ namespace BrandonUtils.Standalone {
     /// </summary>
     public static class ReflectionUtils {
         /// <summary>
+        /// Returns the <see cref="MethodInfo"/> for this method that <b><i>called <see cref="ThisMethod"/></i></b>.
+        /// </summary>
+        /// <returns></returns>
+        public static MethodInfo ThisMethod() {
+            throw new NotImplementedException("TBD - I need to stop getting distracted!");
+        }
+
+        /// <summary>
         /// <see cref="BindingFlags"/> that correspond to all "variables",
         /// which should be all <see cref="PropertyInfo"/>s and <see cref="FieldInfo"/>s
         /// (including <see cref="BindingFlags.NonPublic"/> and <see cref="BindingFlags.Static"/>)
@@ -32,14 +40,23 @@ namespace BrandonUtils.Standalone {
             BindingFlags.Public |
             BindingFlags.Static;
 
+        public const BindingFlags ConstructorBindingFlags =
+            BindingFlags.Instance |
+            BindingFlags.Public |
+            BindingFlags.NonPublic;
+
         private const string PropertyCaptureGroupName = "property";
 
-        /// <summary>
-        /// Returns the <see cref="MethodInfo"/> for this method that <b><i>called <see cref="ThisMethod"/></i></b>.
-        /// </summary>
-        /// <returns></returns>
-        public static MethodInfo ThisMethod() {
-            throw new NotImplementedException("TBD - I need to stop getting distracted!");
+        #region Variables
+
+        private static ArgumentException NotVariableException(MemberInfo memberInfo, Exception innerException = null) {
+            return new ArgumentException($"{nameof(MemberInfo)} {memberInfo.DeclaringType}.{memberInfo.Name} isn't a 'Variable' (either a property or a non-backing-field)!", innerException);
+        }
+
+        private static void ValidateIsVariable(MemberInfo memberInfo) {
+            if (!memberInfo.IsVariable()) {
+                throw NotVariableException(memberInfo);
+            }
         }
 
         /// <summary>
@@ -56,7 +73,8 @@ namespace BrandonUtils.Standalone {
             // TODO: There's some warning here that I should probably resolve, about co-variant types or something...
             MemberInfo[] properties = type.GetProperties(VariablesBindingFlags);
             MemberInfo[] fields     = type.GetFields(VariablesBindingFlags);
-            return properties.Concat(fields).Where(it => !it.IsBackingField()).ToList();
+            return properties.Union(fields).Where(it => !it.IsBackingField()).ToList();
+            ;
         }
 
         /// <summary>
@@ -81,6 +99,32 @@ namespace BrandonUtils.Standalone {
             throw new MissingMemberException($"The {nameof(type)} {type} did not have a field or property named {variableName}!");
         }
 
+        public static T ResetAllVariables<T>(this T objectWithVariables) where T : class {
+            var variables         = objectWithVariables.GetType().GetVariables();
+            var settableVariables = variables.Where(IsSettable);
+            foreach (var vInfo in settableVariables) {
+                SetVariableValue(objectWithVariables, vInfo.Name, vInfo);
+            }
+
+            return objectWithVariables;
+        }
+
+        public static bool IsSettable(this MemberInfo fieldOrProperty) {
+            return fieldOrProperty switch {
+                PropertyInfo p => IsSettable(p),
+                FieldInfo f    => IsSettable(f),
+                _              => false
+            };
+        }
+
+        private static bool IsSettable(this PropertyInfo propertyInfo) {
+            return propertyInfo.CanWrite;
+        }
+
+        private static bool IsSettable(this FieldInfo fieldInfo) {
+            return !fieldInfo.IsBackingField();
+        }
+
         /// <summary>
         /// <inheritdoc cref="GetVariableInfo"/>
         /// </summary>
@@ -93,6 +137,13 @@ namespace BrandonUtils.Standalone {
             return typeof(T).GetVariableInfo(variableName);
         }
 
+        public static bool IsVariable(this MemberInfo memberInfo) {
+            return memberInfo switch {
+                PropertyInfo p => true,
+                FieldInfo f    => !f.IsBackingField(),
+                _              => false
+            };
+        }
 
         /// <summary>
         /// <inheritdoc cref="GetVariableInfo"/>
@@ -162,6 +213,8 @@ namespace BrandonUtils.Standalone {
                     throw new BrandonException($"Couldn't find a field or property named {variableName} for the type {obj.GetType()}!");
             }
         }
+
+        #endregion
 
         [Pure]
         public static bool IsEmpty(object thing) {
@@ -258,7 +311,7 @@ namespace BrandonUtils.Standalone {
         /// <exception cref="MissingMethodException"></exception>
         [Pure]
         public static ConstructorInfo EnsureConstructor(this Type type, params Type[] parameterTypes) {
-            return type.GetConstructor(parameterTypes) ?? throw new MissingMethodException($"Could not retrieve a constructor for {type}");
+            return type.GetConstructor(ConstructorBindingFlags, null, parameterTypes, null) ?? throw new MissingMethodException($"Could not retrieve a constructor for {type}");
         }
 
         private static TOut Construct<TOut>(Type[] parameterTypes, object[] parametersValues) {
