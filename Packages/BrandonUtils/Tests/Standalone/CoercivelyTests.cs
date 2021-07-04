@@ -11,37 +11,16 @@ using Is = NUnit.Framework.Is;
 
 namespace BrandonUtils.Tests.Standalone {
     public class CoercivelyTests {
-        private static readonly Type[] IntegralTypes = {
-            typeof(byte),
-            typeof(sbyte),
-            typeof(ushort),
-            typeof(short),
-            typeof(int),
-            typeof(uint),
-            typeof(long),
-            typeof(ulong),
-        };
-
-        private static readonly Type[] FloatingPointTypes = {
-            typeof(float),
-            typeof(double),
-            typeof(decimal)
-        };
-
-        private static readonly Type[] NumericTypes = FloatingPointTypes.Union(IntegralTypes).ToArray();
-
-        private static readonly Type[] PseudoIntTypes = {typeof(byte), typeof(sbyte), typeof(short), typeof(ushort)};
-
         private static readonly Type[] OtherCoerciveTypes = {
             typeof(string),
             typeof(DateTime),
             typeof(TimeSpan)
         };
 
-        private static readonly Type[] CoerciveTypes = Enumerable.Union(NumericTypes, OtherCoerciveTypes).ToArray();
+        private static readonly Type[] CoerciveTypes = Enumerable.Union(PrimitiveUtils.NumericTypes, OtherCoerciveTypes).ToArray();
 
         private static Type GetExpectedResultType(Type aType) {
-            return PseudoIntTypes.Contains(aType) ? typeof(int) : aType;
+            return PrimitiveUtils.PseudoIntTypes.Contains(aType) ? typeof(int) : aType;
         }
 
         #region Coercively, or: "CoercionUtils 2.0"
@@ -124,9 +103,9 @@ namespace BrandonUtils.Tests.Standalone {
 
         [Test]
         public void Coercively_Compute_Numeric(
-            [ValueSource(nameof(NumericTypes))]
+            [ValueSource(nameof(PrimitiveUtils.NumericTypes))]
             Type aType,
-            [ValueSource(nameof(NumericTypes))]
+            [ValueSource(nameof(PrimitiveUtils.NumericTypes))]
             Type bType,
             [Values] Coercive.Operation operation
         ) {
@@ -135,9 +114,9 @@ namespace BrandonUtils.Tests.Standalone {
 
         [Test]
         public void Coercively_Verb_Numeric(
-            [ValueSource(nameof(NumericTypes))]
+            [ValueSource(nameof(PrimitiveUtils.NumericTypes))]
             Type aType,
-            [ValueSource(nameof(NumericTypes))]
+            [ValueSource(nameof(PrimitiveUtils.NumericTypes))]
             Type bType,
             [Values] Coercive.Operation operation
         ) {

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
+using System.Linq;
 
 namespace BrandonUtils.Standalone {
     public static class PrimitiveUtils {
@@ -112,6 +114,55 @@ namespace BrandonUtils.Standalone {
         }
 
         #endregion
+
+        #endregion
+
+        #region Type-checking
+
+        /// <summary>
+        /// See <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/integral-numeric-types">Integral Numeric Types</a>
+        /// </summary>
+        private static readonly ReadOnlyCollection<Type> IntegralTypes = Array.AsReadOnly(
+            new[] {
+                typeof(byte),
+                typeof(sbyte),
+                typeof(ushort),
+                typeof(short),
+                typeof(int),
+                typeof(uint),
+                typeof(long),
+                typeof(ulong),
+            }
+        );
+
+        /// <summary>
+        /// See <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/floating-point-numeric-types">Floating-Point Numeric Types</a>
+        /// </summary>
+        private static readonly ReadOnlyCollection<Type> FloatingPointTypes = Array.AsReadOnly(
+            new[] {
+                typeof(float),
+                typeof(double),
+                typeof(decimal)
+            }
+        );
+
+        /// <summary>
+        /// Both <see cref="IntegralTypes"/> and <see cref="FloatingPointTypes"/>.
+        /// </summary>
+        public static readonly ReadOnlyCollection<Type> NumericTypes = FloatingPointTypes.Union(IntegralTypes).ToList().AsReadOnly();
+        /// <summary>
+        /// Special <see cref="NumericTypes"/> that are automatically cast to <see cref="Int32"/> when used in <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/arithmetic-operators">arithmetic</a>.
+        /// </summary>
+        public static readonly ReadOnlyCollection<Type> PseudoIntTypes = Array.AsReadOnly(new[] {typeof(byte), typeof(sbyte), typeof(short), typeof(ushort)});
+
+        /// <summary>
+        /// Returns whether or not the given <see cref="value"/> is one of the <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/integral-numeric-types">integral numeric types</a> or <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/floating-point-numeric-types">floating-point numeric types</a>.
+        /// </summary>
+        /// <param name="value">some random junk</param>
+        /// <returns>true if the value is of a numeric type</returns>
+        public static bool IsNumber(this object value) {
+            return NumericTypes.Contains(value.GetType());
+        }
 
         #endregion
     }
