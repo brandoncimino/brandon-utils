@@ -517,5 +517,100 @@ namespace BrandonUtils.Standalone.Collections {
         public static bool None<T>(this IEnumerable<T> enumerable, Func<T, bool> predicate) {
             return !enumerable.Any(predicate);
         }
+
+        /// <summary>
+        /// Returns true if the <see cref="IEnumerable{T}"/> contains <see cref="Enumerable.Any{TSource}(System.Collections.Generic.IEnumerable{TSource})"/> of the <paramref name="others"/>.
+        /// </summary>
+        /// <param name="enumerable"></param>
+        /// <param name="others"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static bool ContainsAny<T>(this IEnumerable<T> enumerable, IEnumerable<T> others) {
+            return others.Any(enumerable.Contains);
+        }
+
+        /**
+         * <inheritdoc cref="ContainsAny{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
+         */
+        public static bool ContainsAny<T>(this IEnumerable<T> enumerable, params T[] others) {
+            return ContainsAny(enumerable, (IEnumerable<T>) others);
+        }
+
+        /// <summary>
+        /// Inverse of <see cref="ContainsAny{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
+        /// </summary>
+        /// <param name="enumerable"></param>
+        /// <param name="others"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static bool ContainsNone<T>(this IEnumerable<T> enumerable, IEnumerable<T> others) {
+            return others.None(enumerable.Contains);
+        }
+
+        /**
+         * <inheritdoc cref="ContainsNone{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
+         */
+        public static bool ContainsNone<T>(this IEnumerable<T> enumerable, params T[] others) {
+            return ContainsNone(enumerable, (IEnumerable<T>) others);
+        }
+
+        /// <summary>
+        /// Returns true if the <see cref="IEnumerable{T}"/> <see cref="Enumerable.Contains{TSource}(System.Collections.Generic.IEnumerable{TSource},TSource)"/> each of the given items.
+        /// </summary>
+        /// <param name="superset">the set that you are checking</param>
+        /// <param name="subset">the items that might be in the <paramref name="superset"/></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static bool ContainsAll<T>(this IEnumerable<T> superset, IEnumerable<T> subset) {
+            return subset.All(superset.Contains);
+        }
+
+        /**
+         * <inheritdoc cref="ContainsAll{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
+         */
+        public static bool ContainsAll<T>(this IEnumerable<T> enumerable, params T[] others) {
+            return ContainsAll(enumerable, (IEnumerable<T>) others);
+        }
+
+        /// <summary>
+        /// Returns true if the first <see cref="IEnumerable{T}"/> is a <a href="https://en.wikipedia.org/wiki/Superset">superset</a> of the second <see cref="IEnumerable{T}"/>.
+        /// </summary>
+        /// <remarks>
+        /// This method is <b>identical</b> to <see cref="ContainsAll{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>.
+        /// </remarks>
+        /// <param name="superset">the <b>larger</b> set</param>
+        /// <param name="subset">the <b>smaller</b> set</param>
+        /// <typeparam name="T">the <see cref="Type"/> of each individual item</typeparam>
+        /// <returns></returns>
+        /// <seealso cref="ContainsAll{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
+        /// <seealso cref="SubsetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
+        public static bool SupersetOf<T>(this IEnumerable<T> superset, IEnumerable<T> subset) {
+            return ContainsAll(superset, subset);
+        }
+
+        /**
+         * <inheritdoc cref="SupersetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
+         */
+        public static bool SupersetOf<T>(this IEnumerable<T> superset, params T[] subset) {
+            return ContainsAll(superset, subset);
+        }
+
+        /// <summary>
+        /// Returns true if the first <see cref="IEnumerable{T}"/> is a <a href="https://en.wikipedia.org/wiki/Subset">subset</a> of the second <see cref="IEnumerable{T}"/>.
+        /// </summary>
+        /// <param name="subset">the <b>smaller</b> set</param>
+        /// <param name="superset">the <b>larger</b> set</param>
+        /// <typeparam name="T">the <see cref="Type"/> of each individual item</typeparam>
+        /// <returns></returns>
+        public static bool SubsetOf<T>(this IEnumerable<T> subset, IEnumerable<T> superset) {
+            return ContainsAll(superset, subset);
+        }
+
+        /**
+         * <inheritdoc cref="SubsetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
+         */
+        public static bool SubsetOf<T>(this IEnumerable<T> subset, params T[] superset) {
+            return ContainsAll(superset, subset);
+        }
     }
 }
