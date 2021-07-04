@@ -283,6 +283,8 @@ namespace BrandonUtils.Standalone {
             switch (value) {
                 case TimeSpan timeSpan:
                     return timeSpan;
+                case DateTime dateTime:
+                    return dateTime.AsTimeSpan();
                 case int i:
                     return TimeSpan.FromTicks(i);
                 case long l:
@@ -293,9 +295,26 @@ namespace BrandonUtils.Standalone {
                     return TimeSpan.FromTicks((long) d);
                 case decimal d:
                     return TimeSpan.FromTicks((long) d);
+                case string s:
+                    return TimeSpan.Parse(s);
                 default:
-                    return null;
+                    try {
+                        return (TimeSpan) Convert.ChangeType(value, typeof(TimeSpan));
+                    }
+                    catch {
+                        return null;
+                    }
             }
+        }
+
+        /// <summary>
+        /// <inheritdoc cref="TimeSpanFromObject"/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidCastException">If the <see cref="value"/> could not be converted to a <see cref="TimeSpan"/></exception>
+        public static TimeSpan TimeSpanOf(object value) {
+            return TimeSpanFromObject(value) ?? throw new InvalidCastException($"Could not convert {nameof(value)} [{value?.GetType().Name}]{value} to a {nameof(TimeSpan)}!");
         }
 
         /// <summary>
