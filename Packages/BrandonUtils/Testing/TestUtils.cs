@@ -43,13 +43,11 @@ namespace BrandonUtils.Testing {
         }
 
         public static ApproximationConstraint Approximately<T>(this ConstraintExpression constraintExpression, T expectedValue, T threshold) {
-            // return (RangeConstraint) constraintExpression.Append(new RangeConstraint((dynamic) expectedValue - threshold, (dynamic) expectedValue + threshold));
             return (ApproximationConstraint) constraintExpression.Append(new ApproximationConstraint(expectedValue, threshold));
         }
 
         public static ApproximationConstraint Approximately<T>(this ConstraintExpression constraintExpression, T expectedValue) {
-            // return Approximately(constraintExpression, expectedValue, (dynamic) expectedValue * ApproximationThreshold);
-            throw new NotImplementedException("The usage of `(dynamic)` here is causing issues, I believe based on the .NET vs .NET Core vs .NET Framework version that other projects are targeting for their API compatibility. It should be removed if possible. Plus, coming back and looking at it...what does `dynamic` even do?!");
+            return Approximately(constraintExpression, expectedValue, (dynamic) expectedValue * ApproximationThreshold);
         }
 
         public static ApproximationConstraint Approximately(this ConstraintExpression constraintExpression, DateTime expectedValue, TimeSpan threshold) {
