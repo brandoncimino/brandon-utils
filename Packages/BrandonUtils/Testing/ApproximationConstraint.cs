@@ -32,19 +32,19 @@ namespace BrandonUtils.Testing {
             object expectedValue,
             object threshold
         ) : base(
-            (IComparable) CoercionUtils.CoerciveSubtraction(
+            (IComparable) Coercively.Subtract(
                 expectedValue,
                 threshold
             ),
-            (IComparable) CoercionUtils.CoerciveAddition(
+            (IComparable) Coercively.Add(
                 expectedValue,
                 threshold
             )
         ) {
             ExpectedValue = expectedValue;
             Threshold     = threshold;
-            MinValue      = CoercionUtils.CoerciveSubtraction(ExpectedValue, Threshold);
-            MaxValue      = CoercionUtils.CoerciveAddition(ExpectedValue, Threshold);
+            MinValue      = Coercively.Subtract(ExpectedValue, Threshold);
+            MaxValue      = Coercively.Add(ExpectedValue, Threshold);
         }
 
         /// <summary>

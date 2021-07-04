@@ -3,6 +3,7 @@ using System.Diagnostics.Contracts;
 using System.Numerics;
 
 namespace BrandonUtils.Standalone {
+    [Obsolete("Please use " + nameof(Coercively) + " instead")]
     public static class CoercionUtils {
         /// <summary>
         /// Attempts to add <paramref name="a"/> and <paramref name="b"/> together by coercing them into compatible types.
@@ -39,6 +40,7 @@ namespace BrandonUtils.Standalone {
         /// <exception cref="InvalidCastException"></exception>
         [Pure]
         // [UsedImplicitly]
+        [Obsolete("Please use " + nameof(Coercively) + "." + nameof(Coercively.Add) + " instead")]
         public static object CoerciveAddition(object a, object b, int sign = 1) {
             //store the sign of "sign" (in case somebody passed us a weird number)
             sign = Math.Sign(sign);
@@ -117,6 +119,7 @@ namespace BrandonUtils.Standalone {
         [Pure]
         // TODO: fix jetbrains annotations
         // [UsedImplicitly]
+        [Obsolete("Please use " + nameof(Coercively) + "." + nameof(Coercively.Add) + " instead")]
         public static object CoerciveSubtraction(object a, object b) {
             return CoerciveAddition(a, b, -1);
         }
