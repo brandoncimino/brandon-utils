@@ -132,6 +132,11 @@ namespace BrandonUtils.Standalone.Strings {
             return $"[{method}]{prettyString}".Indent(indentCount: recursionCount);
         }
 
+        //TODO: Add an extension method version if "Prettify" and re-do the fuck out of "Prettify"
+        public static string Pretty(this object obj) {
+            throw new NotImplementedException("DEAR GOD I immediately started making a 'PrettyOptions' enum to go along with this ARGH");
+        }
+
         public static string ListVariables(object obj) {
             return ListMembers(obj, MemberTypes.Property | MemberTypes.Field);
         }
