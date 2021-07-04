@@ -342,7 +342,7 @@ namespace BrandonUtils.Standalone.Strings {
                 // Finish collapsing
                 int collapseSize = i - collapseFrom.Value;
 
-                filteredLines.Add(collapseSize == 1 ? "..." : $"...({collapseSize} lines omitted)");
+                filteredLines.Add(collapseSize == 1 ? "..." : $"...({collapseSize}/{lines.Length} lines omitted)");
                 collapseFrom = null;
 
                 filteredLines.Add(lines[i]);
@@ -350,7 +350,7 @@ namespace BrandonUtils.Standalone.Strings {
 
             if (collapseFrom.HasValue) {
                 int collapseSize = lines.Length - collapseFrom.Value;
-                filteredLines.Add(collapseSize == 1 ? "..." : $"...({collapseSize} lines omitted)");
+                filteredLines.Add(collapseSize == 1 ? "..." : $"...({collapseSize}/{lines.Length} lines omitted)");
             }
 
             return filteredLines.ToArray();

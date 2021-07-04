@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using BrandonUtils.Standalone.Collections;
@@ -48,8 +49,10 @@ namespace BrandonUtils.Testing {
                     ass.Invoke();
                 }
                 catch (Exception e) {
-                    var nUnitFilter = new StringFilter().Matching("$in NUnit");
-                    failures.Add($"{ass.Method.Name} failed!\n{e.Message}\n{e.FilteredStackTrace(nUnitFilter).TruncateLines(10)}");
+                    var stackTraceFilter = new StringFilter()
+                                           .Matching(@"^\s*(in|at) NUnit")
+                                           .Matching($@"^\s*(in|at) {typeof(AssertAll)}");
+                    failures.Add($"{ass.Method.Name} failed!\n{e.Message}\n{e.FilteredStackTrace(stackTraceFilter).TruncateLines(10).JoinLines()}");
                 }
             }
 
@@ -76,12 +79,22 @@ namespace BrandonUtils.Testing {
         /// <remarks>
         /// Constructions an <see cref="Action"/> for each <see cref="Constraint"/> and passes it to <see cref="Of(Action[])"/>
         /// </remarks>
-        /// <param name="actual"></param>
-        /// <param name="assertions"></param>
-        /// <typeparam name="T"></typeparam>
+        /// <param name="actual">the actual value being tested</param>
+        /// <param name="assertions">an array of <see cref="Constraint"/>s to be applied as <b>individual <see cref="Assert"/>ions</b></param>
+        /// <typeparam name="T">the <see cref="Type"/> of the `<paramref name="actual"/>` value</typeparam>
         public static void Of<T>(T actual, params Constraint[] assertions) {
             var assActions = assertions.Select<Constraint, Action>(ass => () => Assert.That(actual, ass)).ToArray();
             Of(assActions);
+        }
+
+        /**
+         * <param name="heading">a string displayed before the list of failures</param>
+         * <inheritdoc cref ="Of{T}(T,Constraint[])"/>
+         */
+        [SuppressMessage("ReSharper", "InvalidXmlDocComment")]
+        public static void Of<T>(string heading, T actual, params Constraint[] assertions) {
+            var assActions = assertions.Select<Constraint, Action>(ass => () => Assert.That(actual, ass)).ToArray();
+            Of(heading, assActions);
         }
     }
 }
