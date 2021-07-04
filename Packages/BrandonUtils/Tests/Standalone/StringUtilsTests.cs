@@ -7,6 +7,8 @@ using BrandonUtils.Testing;
 
 using NUnit.Framework;
 
+using Is = NUnit.Framework.Is;
+
 namespace BrandonUtils.Tests.Standalone {
     public class StringUtilsTests {
         [Test]

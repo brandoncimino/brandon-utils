@@ -87,6 +87,8 @@ namespace BrandonUtils.Standalone.Strings {
             switch (thing) {
                 //don't do anything special with strings
                 //check for value types (int, char, etc.), which we shouldn't do anything fancy with
+                //TODO 7/4/2021: The line written above is a BOLD FACED LIE
+                //  Actually, this whole method is just hot garbage and needs to be REBORN
                 case string s:
                     method       = "string";
                     prettyString = s;
