@@ -47,12 +47,24 @@ namespace BrandonUtils.Testing {
             return constraintExpression.Append(new ApproximationConstraint(expectedValue, threshold, clusivity)) as ApproximationConstraint;
         }
 
+        public static ApproximationConstraint CloseTo(this ConstraintExpression constraintExpression, object expectedValue, object threshold) {
+            return constraintExpression.Approximately(expectedValue, threshold);
+        }
+
         public static ApproximationConstraint Approximately(this ConstraintExpression constraintExpression, object expectedValue) {
             return constraintExpression.Append(new ApproximationConstraint(expectedValue)) as ApproximationConstraint;
         }
 
+        public static ApproximationConstraint CloseTo(this ConstraintExpression constraintExpression, object expectedValue) {
+            return constraintExpression.Approximately(expectedValue);
+        }
+
         public static ApproximationConstraint Approximately(this ConstraintExpression constraintExpression, DateTime expectedValue, TimeSpan threshold) {
             return constraintExpression.Append(new ApproximationConstraint(expectedValue, threshold)) as ApproximationConstraint;
+        }
+
+        public static ApproximationConstraint CloseTo(this ConstraintExpression constraintExpression, DateTime expectedValue, TimeSpan threshold) {
+            return constraintExpression.Approximately(expectedValue, threshold);
         }
 
         public static WaitForSeconds WaitFor(TimeSpan timeSpan, double multiplier = 1) {

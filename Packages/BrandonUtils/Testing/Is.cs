@@ -16,12 +16,24 @@ namespace BrandonUtils.Testing {
             return new ApproximationConstraint(expectedValue, threshold, clusivity);
         }
 
+        public static ApproximationConstraint CloseTo(object expectedValue, object threshold, Clusivity clusivity = Clusivity.Inclusive) {
+            return Approximately(expectedValue, threshold, clusivity);
+        }
+
         public static ApproximationConstraint Approximately(object expectedValue) {
             return new ApproximationConstraint(expectedValue);
         }
 
+        public static ApproximationConstraint CloseTo(object expectedValue) {
+            return Approximately(expectedValue);
+        }
+
         public static ApproximationConstraint Approximately(DateTime expectedValue, TimeSpan threshold, Clusivity clusivity = Clusivity.Inclusive) {
             return new ApproximationConstraint(expectedValue, threshold);
+        }
+
+        public static ApproximationConstraint CloseTo(DateTime expectedValue, TimeSpan threshold, Clusivity clusivity = Clusivity.Inclusive) {
+            return Approximately(expectedValue, threshold, clusivity);
         }
     }
 }
