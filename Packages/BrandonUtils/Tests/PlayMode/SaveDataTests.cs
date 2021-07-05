@@ -16,6 +16,8 @@ using UnityEngine.TestTools;
 
 using static BrandonUtils.Logging.LogUtils;
 
+using Is = NUnit.Framework.Is;
+
 namespace BrandonUtils.Tests.PlayMode {
     [SuppressMessage("ReSharper", "AccessToStaticMemberViaDerivedType")]
     public class SaveDataTests {

@@ -1,6 +1,10 @@
 ﻿using System;
 
 using BrandonUtils.Standalone;
+using BrandonUtils.Standalone.Collections;
+using BrandonUtils.Standalone.Enums;
+
+using JetBrains.Annotations;
 
 using NUnit.Framework.Constraints;
 
@@ -16,36 +20,62 @@ namespace BrandonUtils.Testing {
     /// </ul>
     /// </summary>
     public class ApproximationConstraint : RangeConstraint {
-        private readonly object ExpectedValue;
-        private readonly object Threshold;
-        private readonly object MinValue;
-        private readonly object MaxValue;
-        private const    string NUnitDateTimeFormat = "yyyy-MM-dd HH:mm:ss.fff";
+        private readonly object    ExpectedValue;
+        private readonly object    Threshold;
+        private readonly object    MinValue;
+        private readonly object    MaxValue;
+        private readonly Clusivity MinClusivity;
+        private readonly Clusivity MaxClusivity;
+        private const    string    NUnitDateTimeFormat = "yyyy-MM-dd HH:mm:ss.fff";
 
-        public override string Description =>
-            $"~ {FormatObject(ExpectedValue)}" +
-            $"\n\t{nameof(Threshold)} = {FormatObject(Threshold)}" +
-            $"\n\t{nameof(MinValue)}  = {FormatObject(MinValue)}" +
-            $"\n\t{nameof(MaxValue)}  = {FormatObject(MaxValue)}";
+        public override string Description => new[] {
+            $"≈ {FormatObject(ExpectedValue)} ± {Threshold}",
+            $"\tRange: {ClusivityUtils.FormatRange(MinValue, MinClusivity, MaxValue, MaxClusivity)}"
+        }.JoinLines();
 
         public ApproximationConstraint(
             object expectedValue,
-            object threshold
+            object threshold,
+            Clusivity minClusivity,
+            Clusivity maxClusivity
         ) : base(
-            (IComparable) Coercively.Subtract(
-                expectedValue,
-                threshold
-            ),
-            (IComparable) Coercively.Add(
-                expectedValue,
-                threshold
-            )
+            (IComparable) Coercively.Subtract(expectedValue, threshold),
+            (IComparable) Coercively.Add(expectedValue, threshold)
         ) {
             ExpectedValue = expectedValue;
             Threshold     = threshold;
             MinValue      = Coercively.Subtract(ExpectedValue, Threshold);
             MaxValue      = Coercively.Add(ExpectedValue, Threshold);
+            MinClusivity  = minClusivity;
+            MaxClusivity  = maxClusivity;
         }
+
+        public override ConstraintResult ApplyTo([NotNull] object actual) {
+            var minCompare = ComparisonAdapter.Default.Compare(MinValue, actual);
+            var minCheck   = MinClusivity == Clusivity.Inclusive ? minCompare <= 0 : minCompare < 0;
+            var maxCompare = ComparisonAdapter.Default.Compare(MaxValue, actual);
+            var maxCheck   = MaxClusivity == Clusivity.Inclusive ? maxCompare >= 0 : maxCompare > 0;
+            var isSuccess  = minCheck && maxCheck;
+            return new ConstraintResult(this, actual, isSuccess);
+        }
+
+        public ApproximationConstraint(
+            object expectedValue,
+            object threshold,
+            Clusivity clusivity = Clusivity.Inclusive
+        ) : this(
+            expectedValue,
+            threshold,
+            clusivity,
+            clusivity
+        ) { }
+
+        public ApproximationConstraint(object expectedValue) : this(
+            expectedValue,
+            GetDefaultThreshold(expectedValue)
+        ) { }
+
+        public ApproximationConstraint(DateTime expectedValue, TimeSpan? threshold = default, Clusivity clusivity = Clusivity.Inclusive) : this((object) expectedValue, threshold) { }
 
         /// <summary>
         /// Formats <paramref name="obj"/> in a similar style to NUnit's "MsgUtils" (which, unfortunately, is an <see langword="internal"/> class...)
@@ -53,12 +83,18 @@ namespace BrandonUtils.Testing {
         /// <param name="obj"></param>
         /// <returns></returns>
         private static string FormatObject(object obj) {
-            switch (obj) {
-                case DateTime date:
-                    return date.ToString(NUnitDateTimeFormat);
-                default:
-                    return obj.ToString();
-            }
+            return obj switch {
+                DateTime date => date.ToString(NUnitDateTimeFormat),
+                _             => obj.ToString()
+            };
+        }
+
+        private static object GetDefaultThreshold(object expectedValue) {
+            return expectedValue switch {
+                DateTime dt => TestUtils.ApproximationTimeThreshold,
+                TimeSpan ts => TestUtils.ApproximationTimeThreshold,
+                _           => TestUtils.ApproximationThreshold
+            };
         }
     }
 }

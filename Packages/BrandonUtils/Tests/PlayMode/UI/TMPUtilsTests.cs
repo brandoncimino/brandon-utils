@@ -12,6 +12,7 @@ using TMPro;
 
 using UnityEngine;
 
+using Is = NUnit.Framework.Is;
 using Object = UnityEngine.Object;
 
 namespace BrandonUtils.Tests.PlayMode.UI {

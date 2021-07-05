@@ -7,6 +7,8 @@ using BrandonUtils.Testing;
 
 using NUnit.Framework;
 
+using Is = BrandonUtils.Testing.Is;
+
 namespace BrandonUtils.Tests.Standalone.Collections {
     public class OptionalTests {
         [Test]

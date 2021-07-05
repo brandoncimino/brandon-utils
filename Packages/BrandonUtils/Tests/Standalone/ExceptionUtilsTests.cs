@@ -5,6 +5,8 @@ using BrandonUtils.Testing;
 
 using NUnit.Framework;
 
+using Is = NUnit.Framework.Is;
+
 namespace BrandonUtils.Tests.Standalone {
     public class ExceptionUtilsTests {
         private const string Prepended = "PREPENDED";

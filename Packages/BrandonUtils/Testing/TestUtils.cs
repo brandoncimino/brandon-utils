@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using BrandonUtils.Standalone;
+using BrandonUtils.Standalone.Enums;
 
 using NUnit.Framework.Constraints;
 
@@ -42,24 +43,16 @@ namespace BrandonUtils.Testing {
             return constraintExpression.Append(new ValuesOperator());
         }
 
-        public static ApproximationConstraint Approximately<T>(this ConstraintExpression constraintExpression, T expectedValue, T threshold) {
-            return (ApproximationConstraint) constraintExpression.Append(new ApproximationConstraint(expectedValue, threshold));
+        public static ApproximationConstraint Approximately(this ConstraintExpression constraintExpression, object expectedValue, object threshold, Clusivity clusivity = Clusivity.Inclusive) {
+            return constraintExpression.Append(new ApproximationConstraint(expectedValue, threshold, clusivity)) as ApproximationConstraint;
         }
 
-        public static ApproximationConstraint Approximately<T>(this ConstraintExpression constraintExpression, T expectedValue) {
-            return Approximately(constraintExpression, expectedValue, (dynamic) expectedValue * ApproximationThreshold);
+        public static ApproximationConstraint Approximately(this ConstraintExpression constraintExpression, object expectedValue) {
+            return constraintExpression.Append(new ApproximationConstraint(expectedValue)) as ApproximationConstraint;
         }
 
         public static ApproximationConstraint Approximately(this ConstraintExpression constraintExpression, DateTime expectedValue, TimeSpan threshold) {
-            return (ApproximationConstraint) constraintExpression.Append(new ApproximationConstraint(expectedValue, threshold));
-        }
-
-        public static ApproximationConstraint Approximately(this ConstraintExpression constraintExpression, DateTime expectedValue) {
-            return constraintExpression.Approximately(expectedValue, ApproximationTimeThreshold);
-        }
-
-        public static ApproximationConstraint Approximately(this ConstraintExpression constraintExpression, TimeSpan expectedValue) {
-            return constraintExpression.Approximately(expectedValue, ApproximationTimeThreshold);
+            return constraintExpression.Append(new ApproximationConstraint(expectedValue, threshold)) as ApproximationConstraint;
         }
 
         public static WaitForSeconds WaitFor(TimeSpan timeSpan, double multiplier = 1) {

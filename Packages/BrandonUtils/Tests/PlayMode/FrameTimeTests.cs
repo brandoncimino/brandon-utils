@@ -10,6 +10,8 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
+using Is = NUnit.Framework.Is;
+
 namespace BrandonUtils.Tests.PlayMode {
     public class FrameTimeTests {
         private static float[] RealTimes = {
