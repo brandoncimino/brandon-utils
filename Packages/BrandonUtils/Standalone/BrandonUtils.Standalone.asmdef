@@ -8,7 +8,8 @@
   "overrideReferences": true,
   "precompiledReferences": [
     "Newtonsoft.Json.dll",
-    "nunit.framework.dll"
+    "nunit.framework.dll",
+    "JetBrains.Annotations.dll"
   ],
   "autoReferenced": true,
   "defineConstraints": [],

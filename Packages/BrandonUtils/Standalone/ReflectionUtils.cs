@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
 using BrandonUtils.Standalone.Exceptions;
+
+using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone {
     /// <summary>
@@ -268,12 +269,12 @@ namespace BrandonUtils.Standalone {
         }
 
         [Pure]
-        public static string GetBackedPropertyName( /*[NotNull]*/ this MemberInfo memberInfo) {
+        public static string GetBackedPropertyName([NotNull] this MemberInfo memberInfo) {
             return Regex.Match(memberInfo.Name, GetBackingFieldNamePattern()).Groups[PropertyCaptureGroupName].Value;
         }
 
         [Pure]
-        public static FieldInfo BackingField( /*[NotNull]*/ this MemberInfo memberInfo) {
+        public static FieldInfo BackingField([NotNull] this MemberInfo memberInfo) {
             if (memberInfo.DeclaringType == null) {
                 throw new BrandonException($"The provided {nameof(MemberInfo)}, {memberInfo.Name}, does not have a {nameof(MemberInfo.DeclaringType)}!");
             }
