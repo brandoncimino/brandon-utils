@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 using BrandonUtils.Standalone.Optional;
 
+using JetBrains.Annotations;
+
 namespace BrandonUtils.Standalone.Optional {
     /// <summary>
     /// Represents something that <i>might</i> have failed.
@@ -34,6 +36,7 @@ namespace BrandonUtils.Standalone.Optional {
 /**
  * <inheritdoc cref="IFailable{TValue,TExcuse}"/>
  */
+[PublicAPI]
 public readonly struct Failable<TValue, TExcuse> : IFailable<TValue, TExcuse>, IEquatable<TValue>, IEquatable<IOptional<TValue>> {
     public           bool   HasValue { get; }
     private readonly TValue _value;
