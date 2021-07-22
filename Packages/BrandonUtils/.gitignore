@@ -6,3 +6,13 @@ Sketchbook/*
 # Credentials used by BuildAutomator.ps1, etc.
 # You *can* place credentials in this file instead of typing them into the command line
 unity_credentials.json
+
+# NuGet packages embedded inside of the BrandonUtils package (which...I think works?)
+# Specifically, the first line excludes all of the different "lib" folders,
+# and then the second line explicitly re-includes `netstandard2.0`.
+# This is in order to:
+#   - Not include multiple DLLs with the same name, which NuGet otherwise would download (i.e. one for standard 2.0, one for .net 4.X, etc.)
+#   - Make sure the `netstandard2.0` folder, and all of the related .meta files, ARE still included,
+#     because the .meta files include the "amdef"-like import settings for each `.dll`.
+NuGet/*/lib/*/
+!NuGet/*/lib/netstandard2.0
