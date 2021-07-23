@@ -124,7 +124,7 @@ namespace BrandonUtils.Tests.PlayMode {
                         action.Invoke();
                         return true;
                     }
-                    catch (Exception e) {
+                    catch {
                         return false;
                     }
                 }

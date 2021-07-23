@@ -38,13 +38,17 @@ namespace BrandonUtils.Standalone.Optional {
  */
 [PublicAPI]
 public readonly struct Failable<TValue, TExcuse> : IFailable<TValue, TExcuse>, IEquatable<TValue>, IEquatable<IOptional<TValue>> {
-    public           bool   HasValue { get; }
-    private readonly TValue _value;
-    public           TValue Value => HasValue ? _value : throw new InvalidOperationException($"Unable to retrieve the {typeof(TValue).Name} {nameof(Value)} from the {nameof(Failable<TValue, TExcuse>)} because it failed!\n{nameof(Excuse)}: {Excuse}");
+    public bool HasValue { get; }
 
-    public           bool    Failed => !HasValue;
+    private readonly TValue _value;
+
+    public TValue Value => HasValue ? _value : throw new InvalidOperationException($"Unable to retrieve the {typeof(TValue).Name} {nameof(Value)} from the {nameof(Failable<TValue, TExcuse>)} because it failed!\n{nameof(Excuse)}: {Excuse}");
+
+    public bool Failed => !HasValue;
+
     private readonly TExcuse _excuse;
-    public           TExcuse Excuse => Failed ? _excuse : throw new InvalidOperationException($"Unable to retrieve the {nameof(Excuse)} of type {typeof(TExcuse).Name} from the {GetType().Name} because it didn't fail! (Actual {nameof(Value)}: {Value})");
+
+    public TExcuse Excuse => Failed ? _excuse : throw new InvalidOperationException($"Unable to retrieve the {nameof(Excuse)} of type {typeof(TExcuse).Name} from the {GetType().Name} because it didn't fail! (Actual {nameof(Value)}: {Value})");
 
     public Failable(Func<TValue> valueSupplier, Func<Exception, TExcuse> disclaimer) {
         try {
@@ -84,6 +88,22 @@ public readonly struct Failable<TValue, TExcuse> : IFailable<TValue, TExcuse>, I
     public static bool operator !=(Failable<TValue, TExcuse> a, Optional<TValue> b) {
         return !Optional.AreEqual(a, b);
     }
+
+    #region Jetbrains auto-generated equality members
+
+    public bool Equals(Failable<TValue, TExcuse> other) {
+        return EqualityComparer<TValue>.Default.Equals(_value, other._value);
+    }
+
+    public override bool Equals(object obj) {
+        return obj is Failable<TValue, TExcuse> other && Equals(other);
+    }
+
+    public override int GetHashCode() {
+        return EqualityComparer<TValue>.Default.GetHashCode(_value);
+    }
+
+    #endregion
 
     #endregion
 

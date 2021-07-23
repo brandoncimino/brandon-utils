@@ -14,6 +14,10 @@ namespace BrandonUtils.Standalone.Collections {
     /// 6/1/21:
     /// TODO: Should TX and TY be restricted to ISerializable?
     /// TODO: Should this be changed from a `struct` to an interface + concrete class? (That would allow for implicit conversion to Vector2)
+    ///
+    /// 7/22/21:
+    /// TODO: Need to see what functionality, if any, is lost by replacing Pair{TX,TY} with with Tuple{T1,T2}:
+    ///     - Loses IPrimaryKeyed interface
     /// </code>
     /// </summary>
     /// <remarks>
