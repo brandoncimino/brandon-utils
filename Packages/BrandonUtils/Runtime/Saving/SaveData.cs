@@ -26,6 +26,7 @@ namespace BrandonUtils.Saving {
     ///
     /// TODO: Look for things that were made public but are only used for testing, and switch them to `internal`
     /// </summary>
+    [PublicAPI]
     public abstract class SaveData {
         [JsonIgnore]
         [UsedImplicitly]
@@ -37,9 +38,10 @@ namespace BrandonUtils.Saving {
         [JsonIgnore]
         public const int BackupSaveSlots = 10;
         [JsonIgnore]
-        public static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings {
+        public static JsonSerializerSettings JsonSerializerSettings { get; protected set; } = new JsonSerializerSettings {
             ObjectCreationHandling = ObjectCreationHandling.Replace,
-            Formatting             = Formatting.Indented
+            Formatting             = Formatting.Indented,
+            TypeNameHandling       = TypeNameHandling.Auto
         };
         /// <summary>
         ///     The required length of timestamps in save file names generated via <see cref="SaveData{T}.GetSaveFileNameWithDate" />
