@@ -2,23 +2,25 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics.Contracts;
 using System.Linq;
 
 using BrandonUtils.Standalone.Enums;
 using BrandonUtils.Standalone.Randomization;
 
+using JetBrains.Annotations;
+
 namespace BrandonUtils.Standalone.Collections {
     /// <summary>
     ///     Contains utility and extension methods for collections, such as <see cref="IDictionary{TKey,TValue}" /> and <see cref="IList{T}" />.
     /// </summary>
+    [PublicAPI]
     public static class CollectionUtils {
         #region Randomization
 
         /// <param name="collection"></param>
         /// <typeparam name="T">The type of the <see cref="Collection{T}"/></typeparam>
         /// <returns>a random <see cref="Enumerable.ElementAt{TSource}"/> from the given <paramref name="collection"/>.</returns>
-        [Pure]
+        [System.Diagnostics.Contracts.Pure]
         public static T Random<T>(this ICollection<T> collection) {
             return collection.Count switch {
                 1 => collection.Single(),
@@ -77,14 +79,14 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="oldList"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        [Pure]
+        [System.Diagnostics.Contracts.Pure]
         public static IList<T> RandomCopy<T>(this List<T> oldList) {
             var copy = oldList.Copy();
             copy.Randomize();
             return copy;
         }
 
-        [Pure]
+        [System.Diagnostics.Contracts.Pure]
         // ReSharper disable once ReturnTypeCanBeEnumerable.Global
         public static List<T> ListOf<T>(params T[] stuff) {
             return new List<T>(stuff);
@@ -338,7 +340,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="TValue"></typeparam>
         /// <returns></returns>
         /// <exception cref="ConflictResolution.Fail">If <see cref="ConflictResolution"/> or an unknown <see cref="InvalidEnumArgumentException"/> is passed.</exception>
-        [Pure]
+        [System.Diagnostics.Contracts.Pure]
         public static Dictionary<TKey, TValue> Overlap<TKey, TValue>(this IDictionary<TKey, TValue> original, IDictionary<TKey, TValue> additional, ConflictResolution conflictResolution) {
             var overlappingKeys = original.Keys.Where(additional.ContainsKey);
 
@@ -385,7 +387,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <returns></returns>
         /// <exception cref="ArgumentException">If <paramref name="conflictResolution"/> is <see cref="ConflictResolution.Fail"/> and there are duplicate <see cref="IDictionary{TKey,TValue}.Keys"/> in the <paramref name="dictionaries"/>.</exception>
         /// <exception cref="InvalidEnumArgumentException"></exception>
-        [Pure]
+        [System.Diagnostics.Contracts.Pure]
         public static Dictionary<TKey, TValue> JoinDictionaries<TKey, TValue>(
             IEnumerable<IDictionary<TKey, TValue>> dictionaries,
             ConflictResolution conflictResolution = ConflictResolution.Fail
@@ -426,7 +428,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <returns></returns>
         /// <exception cref="ArgumentException">If <paramref name="conflictResolution"/> is <see cref="ConflictResolution.Fail"/> and there are duplicate <see cref="IDictionary{TKey,TValue}.Keys"/> between <paramref name="original"/> and <paramref name="additional"/>.</exception>
         /// <exception cref="InvalidEnumArgumentException"></exception>
-        [Pure]
+        [System.Diagnostics.Contracts.Pure]
         public static IDictionary<TKey, TValue> JoinDictionaries<TKey, TValue>(
             this IDictionary<TKey, TValue> original,
             IDictionary<TKey, TValue> additional,
@@ -435,7 +437,7 @@ namespace BrandonUtils.Standalone.Collections {
             return JoinDictionaries(new[] {original, additional}, conflictResolution);
         }
 
-        [Pure]
+        [System.Diagnostics.Contracts.Pure]
         public static IDictionary<TKey, TValue> JoinDictionaries<TKey, TValue>(
             this IDictionary<TKey, TValue> original,
             params IDictionary<TKey, TValue>[] additional
@@ -443,7 +445,7 @@ namespace BrandonUtils.Standalone.Collections {
             return JoinDictionaries(additional.Prepend(original));
         }
 
-        [Pure]
+        [System.Diagnostics.Contracts.Pure]
         public static TValue FirstValue<TKey, TValue>(
             this IEnumerable<Dictionary<TKey, TValue>> dictionaries,
             TKey key
@@ -451,7 +453,7 @@ namespace BrandonUtils.Standalone.Collections {
             return dictionaries.First(dic => dic.ContainsKey(key))[key];
         }
 
-        [Pure]
+        [System.Diagnostics.Contracts.Pure]
         public static TValue FirstNonEmptyValue<TKey, TValue>(
             this IEnumerable<IDictionary<TKey, TValue>> dictionaries,
             TKey key
@@ -465,7 +467,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="enumerable"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        [Pure]
+        [System.Diagnostics.Contracts.Pure]
         public static IDictionary<T, int> Group<T>(this IEnumerable<T> enumerable) {
             return enumerable.GroupBy(it => it).ToDictionary(it => it.Key, it => it.Count());
         }
@@ -611,6 +613,19 @@ namespace BrandonUtils.Standalone.Collections {
          */
         public static bool SubsetOf<T>(this IEnumerable<T> subset, params T[] superset) {
             return ContainsAll(superset, subset);
+        }
+
+        public static bool AddIfMissing<T>(
+            this ICollection<T> collection,
+            [CanBeNull]
+            T newItem
+        ) {
+            if (collection.Contains(newItem)) {
+                return false;
+            }
+
+            collection.Add(newItem);
+            return true;
         }
     }
 }
