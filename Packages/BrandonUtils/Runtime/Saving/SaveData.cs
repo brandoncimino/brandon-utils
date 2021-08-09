@@ -37,20 +37,35 @@ namespace BrandonUtils.Saving {
         public const string SaveFileExtension = "sav";
         [JsonIgnore]
         public const int BackupSaveSlots = 10;
-        [JsonIgnore]
-        public static JsonSerializerSettings JsonSerializerSettings { get; protected set; } = new JsonSerializerSettings {
+
+        /// <returns>A <b>new</b> instance of the default <see cref="CurrentJsonSerializerSettings"/></returns>
+        public static JsonSerializerSettings GetDefaultSerializerSettings() => new JsonSerializerSettings {
             ObjectCreationHandling = ObjectCreationHandling.Replace,
             Formatting             = Formatting.Indented,
-            TypeNameHandling       = TypeNameHandling.Auto
+            TypeNameHandling       = TypeNameHandling.Auto,
         };
+
         /// <summary>
-        ///     The required length of timestamps in save file names generated via <see cref="SaveData{T}.GetSaveFileNameWithDate" />
+        /// The actual <see cref="JsonSerializerSettings"/> being used.
+        ///
+        /// Defaults to <see cref="GetDefaultSerializerSettings"/>, but can be freely modified.
+        /// </summary>
+        [JsonIgnore]
+        public static JsonSerializerSettings CurrentJsonSerializerSettings { get; set; } = GetDefaultSerializerSettings();
+
+        /// <summary>
+        /// The required length of timestamps in save file names generated via <see cref="SaveData{T}.GetSaveFileNameWithDate"/>
         /// </summary>
         public const int TimeStampLength = 18;
-        public const int LoadRetryLimit = 10;
+
         /// <summary>
-        ///     Timestamps will be serialized into file names using their <see cref="DateTime.Ticks" /> value, which will have 18 digits until 11/16/3169 09:46:40.
+        /// Timestamps will be serialized into file names using their <see cref="DateTime.Ticks" /> value, which will have 18 digits until 11/16/3169 09:46:40.
         /// </summary>
+        /// <remarks>
+        /// Update from Brandon on 8/8/2021: I don't understand why I did this instead of just using <c>\d+</c>
+        /// Maybe it was so that the nickname pattern could be `.*`? That would make _some_ sense, I guess...it's still weird though and probably not necessary.
+        /// OH! Now I remember! It was so that I could properly limit the save nickname length, because the timestamp would have a reliable length!
+        /// </remarks>
         public static readonly string TimeStampPattern = $@"\d{{{TimeStampLength}}}";
         public static readonly string   SaveFilePattern = $@"(?<nickName>.*)_(?<date>{TimeStampPattern})";
         public static readonly TimeSpan ReSaveDelay     = TimeSpan.FromSeconds(1);
@@ -160,16 +175,16 @@ namespace BrandonUtils.Saving {
         public T Reload() {
             Log($"Reloading save file: {Nickname}");
             Reset();
-            JsonConvert.PopulateObject(GetSaveFileContent(LatestSaveFilePath), this, JsonSerializerSettings);
+            JsonConvert.PopulateObject(GetSaveFileContent(LatestSaveFilePath), this, CurrentJsonSerializerSettings);
             OnLoadPrivate();
-            return (T) this;
+            return (T)this;
         }
 
         public T Reset() {
             var oldNickname = Nickname;
-            JsonConvert.PopulateObject(EmptyJson.Value, this, JsonSerializerSettings);
+            JsonConvert.PopulateObject(EmptyJson.Value, this, CurrentJsonSerializerSettings);
             Nickname = oldNickname;
-            return (T) this;
+            return (T)this;
         }
 
         /// <summary>
@@ -193,7 +208,7 @@ namespace BrandonUtils.Saving {
 
         private static T DeserializeByContent(string saveFileContent) {
             try {
-                return JsonConvert.DeserializeObject<T>(saveFileContent, JsonSerializerSettings);
+                return JsonConvert.DeserializeObject<T>(saveFileContent, CurrentJsonSerializerSettings);
             }
             catch (JsonException e) {
                 throw new SaveDataException(
@@ -494,7 +509,7 @@ namespace BrandonUtils.Saving {
         /// </summary>
         /// <returns></returns>
         public string ToJson() {
-            return JsonConvert.SerializeObject(this, JsonSerializerSettings);
+            return JsonConvert.SerializeObject(this, CurrentJsonSerializerSettings);
         }
 
         public override string ToString() {
