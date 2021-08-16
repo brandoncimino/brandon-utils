@@ -2,6 +2,8 @@
 using System.Diagnostics.Contracts;
 using System.Numerics;
 
+using BrandonUtils.Standalone.Chronic;
+
 namespace BrandonUtils.Standalone {
     [Obsolete("Please use " + nameof(Coercively) + " instead")]
     public static class CoercionUtils {
@@ -39,7 +41,6 @@ namespace BrandonUtils.Standalone {
         /// <returns></returns>
         /// <exception cref="InvalidCastException"></exception>
         [Pure]
-        // [UsedImplicitly]
         [Obsolete("Please use " + nameof(Coercively) + "." + nameof(Coercively.Add) + " instead")]
         public static object CoerciveAddition(object a, object b, int sign = 1) {
             //store the sign of "sign" (in case somebody passed us a weird number)
@@ -117,8 +118,6 @@ namespace BrandonUtils.Standalone {
         }
 
         [Pure]
-        // TODO: fix jetbrains annotations
-        // [UsedImplicitly]
         [Obsolete("Please use " + nameof(Coercively) + "." + nameof(Coercively.Add) + " instead")]
         public static object CoerciveSubtraction(object a, object b) {
             return CoerciveAddition(a, b, -1);

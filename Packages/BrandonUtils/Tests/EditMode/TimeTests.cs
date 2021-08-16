@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using BrandonUtils.Standalone;
+using BrandonUtils.Standalone.Chronic;
 
 using NUnit.Framework;
 
@@ -41,7 +41,7 @@ namespace BrandonUtils.Tests.EditMode {
             var dividend = TimeSpan.FromSeconds(dividendSeconds);
             var divisor  = TimeSpan.FromSeconds(divisorSeconds);
 
-            var expectedDivisionResult = (double) dividend.Ticks / divisor.Ticks;
+            var expectedDivisionResult = (double)dividend.Ticks / divisor.Ticks;
 
             Assert.That(dividend.Divide(divisor), Is.EqualTo(expectedDivisionResult));
         }
@@ -121,7 +121,7 @@ namespace BrandonUtils.Tests.EditMode {
         ) {
             var multiplicand                 = TimeSpan.FromSeconds(multiplicandInSeconds);
             var multiplicandTicks            = multiplicand.Ticks;
-            var expectedProductTicks         = (long) (multiplicandTicks * multiplier);
+            var expectedProductTicks         = (long)(multiplicandTicks * multiplier);
             var expectedProductSpanFromTicks = TimeSpan.FromTicks(expectedProductTicks);
 
             Assert.That(multiplicand.Multiply(multiplier), Is.EqualTo(expectedProductSpanFromTicks));
@@ -140,7 +140,7 @@ namespace BrandonUtils.Tests.EditMode {
             var b_span = TimeSpan.FromSeconds(b_seconds);
             var c_span = TimeSpan.FromSeconds(c_seconds);
 
-            var ls = new List<TimeSpan> {a_span, b_span, c_span};
+            var ls = new List<TimeSpan> { a_span, b_span, c_span };
 
             Assert.That(ls.Sum(), Is.EqualTo(a_span + b_span + c_span));
         }

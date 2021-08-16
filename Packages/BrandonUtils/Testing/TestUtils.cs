@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using BrandonUtils.Standalone;
+using BrandonUtils.Standalone.Chronic;
 using BrandonUtils.Standalone.Enums;
 
 using NUnit.Framework.Constraints;
@@ -14,7 +14,7 @@ namespace BrandonUtils.Testing {
     public static class TestUtils {
         public const           double   ApproximationThreshold       = 0.001;
         public const           double   ApproximationThreshold_Loose = 0.005;
-        public const           long     ApproximationTickThreshold   = (long) (TimeSpan.TicksPerSecond * ApproximationThreshold_Loose);
+        public const           long     ApproximationTickThreshold   = (long)(TimeSpan.TicksPerSecond * ApproximationThreshold_Loose);
         public static readonly TimeSpan ApproximationTimeThreshold   = TimeSpan.FromTicks(ApproximationTickThreshold);
 
         /// <summary>
@@ -68,11 +68,11 @@ namespace BrandonUtils.Testing {
         }
 
         public static WaitForSeconds WaitFor(TimeSpan timeSpan, double multiplier = 1) {
-            return new WaitForSeconds((float) timeSpan.Multiply(multiplier).TotalSeconds);
+            return new WaitForSeconds((float)timeSpan.Multiply(multiplier).TotalSeconds);
         }
 
         public static WaitForSecondsRealtime WaitForRealtime(TimeSpan timeSpan, double multiplier = 1) {
-            return new WaitForSecondsRealtime((float) timeSpan.Multiply(multiplier).TotalSeconds);
+            return new WaitForSecondsRealtime((float)timeSpan.Multiply(multiplier).TotalSeconds);
         }
     }
 }

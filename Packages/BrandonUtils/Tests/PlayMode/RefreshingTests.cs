@@ -7,6 +7,7 @@ using System.Threading;
 using BrandonUtils.Logging;
 using BrandonUtils.Refreshing;
 using BrandonUtils.Standalone;
+using BrandonUtils.Standalone.Chronic;
 using BrandonUtils.Standalone.Refreshing;
 
 using NUnit.Framework;
@@ -135,9 +136,9 @@ namespace BrandonUtils.Tests.PlayMode {
 
             LogUtils.Log(
                 new Dictionary<object, object>() {
-                    {nameof(simpleDuration), $"{nameof(simpleDuration.Average)}: {simpleDuration.Average.TotalMilliseconds}, {nameof(simpleDuration.Shortest)}: {simpleDuration.Shortest.TotalMilliseconds}, {nameof(simpleDuration.Longest)}: {simpleDuration.Longest.TotalMilliseconds}"},
-                    {nameof(perFrameDuration), $"{nameof(perFrameDuration.Average)}: {perFrameDuration.Average.TotalMilliseconds}, {nameof(perFrameDuration.Shortest)}: {perFrameDuration.Shortest.TotalMilliseconds}, {nameof(perFrameDuration.Longest)}: {perFrameDuration.Longest.TotalMilliseconds}"},
-                    {"Ratio", perFrameDuration.Average.Divide(simpleDuration.Average)}
+                    { nameof(simpleDuration), $"{nameof(simpleDuration.Average)}: {simpleDuration.Average.TotalMilliseconds}, {nameof(simpleDuration.Shortest)}: {simpleDuration.Shortest.TotalMilliseconds}, {nameof(simpleDuration.Longest)}: {simpleDuration.Longest.TotalMilliseconds}" },
+                    { nameof(perFrameDuration), $"{nameof(perFrameDuration.Average)}: {perFrameDuration.Average.TotalMilliseconds}, {nameof(perFrameDuration.Shortest)}: {perFrameDuration.Shortest.TotalMilliseconds}, {nameof(perFrameDuration.Longest)}: {perFrameDuration.Longest.TotalMilliseconds}" },
+                    { "Ratio", perFrameDuration.Average.Divide(simpleDuration.Average) }
                 }
             );
         }

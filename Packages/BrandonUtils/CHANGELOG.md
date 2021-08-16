@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.1] - 8/16/2021
+
+### Changed
+
+- Moved `TimeUtils` into the new `BrandonUtils.Standalone.Chronic` package
+- Replaced `TimeUtils.DateTimeIntervalType` enum with `TimeUnit`
+
+### Added
+
+- `TimeUnitExtensions`
+- `TimeSpanExtensions`, but I dunno if I'm really committed to it yet
+
 ## [2.8.1] - 8/15/2021
 
 ### Added

@@ -1,5 +1,7 @@
 ﻿using System;
 
+using BrandonUtils.Standalone.Chronic;
+
 namespace BrandonUtils.Standalone {
     public static class Coercive {
         /// <summary>

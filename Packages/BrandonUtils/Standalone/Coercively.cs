@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
+using BrandonUtils.Standalone.Chronic;
 using BrandonUtils.Standalone.Enums;
 using BrandonUtils.Standalone.Strings;
 

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
+using BrandonUtils.Standalone.Chronic;
+
 namespace BrandonUtils.Standalone {
     /// <summary>
     /// A convenient way to record multi-lap <see cref="System.Diagnostics.Stopwatch"/>es

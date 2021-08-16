@@ -1,108 +1,67 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 
 using BrandonUtils.Standalone.Enums;
 
+using JetBrains.Annotations;
+
 using Newtonsoft.Json;
 
-// ReSharper disable MemberCanBePrivate.Global
-
-namespace BrandonUtils.Standalone {
+namespace BrandonUtils.Standalone.Chronic {
     /// <summary>
     /// Contains utility methods that manipulate or extend <see cref="DateTime" />, <see cref="TimeSpan" />, etc.
     ///
-    /// TODO: Allow for the syntax <c>TimeSpan * 2</c>. I think that would require a namespace-specific extension of <see cref="TimeSpan"/> that is also called <see cref="TimeSpan"/>...
+    /// TODO: Figure out if I want "{X}Extensions" or "{X}Utils"..."{X}Extensions" seems to be the standard practice, but that feels arbitrary - after all, it makes sense to call methods with the syntax TimeUtils.Min(a,b) or TimeUtils.Divide(n), but also maybe a.Min(b)...
     /// </summary>
+    [PublicAPI]
     public static class TimeUtils {
         /// <summary>
-        ///     Corresponds to <a href="https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.datavisualization.charting.datetimeintervaltype?view=netframework-4.8">DateTimeIntervalType</a> and <a href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.visualbasic.dateinterval?view=netcore-3.1">DateInterval</a>, but I couldn't find a corresponding enum that was available inside of Unity.
+        /// Creates a <see cref="TimeSpan"/> of some amount of the given <see cref="TimeUnit"/>.
         /// </summary>
-        /// <remarks>
-        ///     <li>Specifically for use in <see cref="TimeUtils.NormalizePrecision" />.</li>
-        ///     <li>These should have parity with the <see cref="TimeSpan" /> methods like <see cref="TimeSpan.FromDays" />.</li>
-        /// </remarks>
-        public enum DateTimeIntervalType {
-            Milliseconds,
-            Seconds,
-            Minutes,
-            Hours,
-            Days
+        /// <param name="amount">the number of <see cref="TimeUnit"/>s</param>
+        /// <param name="timeUnit">the <see cref="TimeUnit"/> of <paramref name="amount"/>"/></param>
+        /// <returns>a new <see cref="TimeSpan"/></returns>
+        [Pure]
+        public static TimeSpan SpanOf(double amount, TimeUnit timeUnit) {
+            return timeUnit.SpanOf(amount);
         }
 
         /// <summary>
-        /// Creates a <see cref="TimeSpan"/> from any of the valid <see cref="DateTimeIntervalType"/>s.
-        /// </summary>
-        /// <param name="timeDateTimeIntervalType"></param>
-        /// <param name="amount"></param>
-        /// <returns></returns>
-        /// <exception cref="InvalidEnumArgumentException"></exception>
-        public static TimeSpan TimeSpanFromInterval(DateTimeIntervalType timeDateTimeIntervalType, double amount) {
-            switch (timeDateTimeIntervalType) {
-                case DateTimeIntervalType.Milliseconds:
-                    return TimeSpan.FromMilliseconds(amount);
-                case DateTimeIntervalType.Seconds:
-                    return TimeSpan.FromSeconds(amount);
-                case DateTimeIntervalType.Minutes:
-                    return TimeSpan.FromMinutes(amount);
-                case DateTimeIntervalType.Hours:
-                    return TimeSpan.FromHours(amount);
-                case DateTimeIntervalType.Days:
-                    return TimeSpan.FromDays(amount);
-                default:
-                    throw EnumUtils.InvalidEnumArgumentException(nameof(timeDateTimeIntervalType), timeDateTimeIntervalType);
-            }
-        }
-
-        public static TimeSpan GetTimeSpan(this DateTimeIntervalType timeDateTimeIntervalType, double amount) {
-            return TimeSpanFromInterval(timeDateTimeIntervalType, amount);
-        }
-
-        public static double TotalOfInterval(this TimeSpan timeSpan, DateTimeIntervalType dateTimeIntervalType) {
-            switch (dateTimeIntervalType) {
-                case DateTimeIntervalType.Milliseconds:
-                    return timeSpan.TotalMilliseconds;
-                case DateTimeIntervalType.Seconds:
-                    return timeSpan.TotalSeconds;
-                case DateTimeIntervalType.Minutes:
-                    return timeSpan.Minutes;
-                case DateTimeIntervalType.Hours:
-                    return timeSpan.TotalHours;
-                case DateTimeIntervalType.Days:
-                    return timeSpan.TotalDays;
-                default:
-                    throw EnumUtils.InvalidEnumArgumentException(nameof(dateTimeIntervalType), dateTimeIntervalType);
-            }
-        }
-
-        /// <summary>
-        ///     Mimics .NET Core's <a href="https://docs.microsoft.com/en-us/dotnet/api/system.timespan.divide">TimeSpan.Divide</a>.
-        ///     Does this by converting the given <see cref="TimeSpan" />s into <see cref="TimeSpan.TotalSeconds" /> and performing the division on those.
+        /// Mimics .NET Core's <a href="https://docs.microsoft.com/en-us/dotnet/api/system.timespan.divide">TimeSpan.Divide</a>.
+        /// Does this by converting the given <see cref="TimeSpan" />s into <see cref="TimeSpan.TotalSeconds" /> and performing the division on those.
         /// </summary>
         /// <remarks>
-        ///     This originally performed the division on <see cref="TimeSpan.Ticks" /> rather than <see cref="TimeSpan.TotalSeconds" />, but this was actually slightly inaccurate due to the number of ticks being so large.
+        /// This originally performed the division on <see cref="TimeSpan.Ticks" /> rather than <see cref="TimeSpan.TotalSeconds" />, but this was actually slightly inaccurate due to the number of ticks being so large.
+        ///
+        /// Update from Brandon on 8/15/2021: What did I mean? How was using <see cref="TimeSpan.Ticks"/> less accurate than <see cref="TimeSpan.TotalSeconds"/>...?
+        /// <br/>
+        /// I would prefer to name this "DividedBy", by I named it "Divide" for parity with .NET Core's <a href="https://docs.microsoft.com/en-us/dotnet/api/system.timespan.divide">TimeSpan.Divide</a>.
         /// </remarks>
-        /// <param name="dividend">The number to be divided (i.e. top of the fraction)</param>
-        /// <param name="divisor">The number by which <paramref name="dividend" /> will be divided (i.e. the bottom of the fraction)</param>
+        /// <param name="dividend">the <see cref="TimeSpan"/> to be divided (i.e. top of the fraction)</param>
+        /// <param name="divisor">the <see cref="TimeSpan"/> by which the <paramref name="dividend" /> will be divided (i.e. the bottom of the fraction)</param>
         /// <returns></returns>
+        /// <exception cref="DivideByZeroException">if the <see cref="divisor"/> is <see cref="TimeSpan.Zero"/></exception>
+        [Pure]
         public static double Divide(this TimeSpan dividend, TimeSpan divisor) {
             ValidateDivisor(divisor);
-            return (double) dividend.Ticks / divisor.Ticks;
+            return (double)dividend.Ticks / divisor.Ticks;
         }
 
         /// <summary>
         /// Divides <paramref name="dividend"/> by <paramref name="divisor"/>, returning a new <see cref="TimeSpan"/>.
         /// </summary>
-        /// <param name="dividend"></param>
-        /// <param name="divisor"></param>
+        /// <param name="dividend">the <see cref="TimeSpan"/> to be divided (i.e. the top of the fraction)</param>
+        /// <param name="divisor">the number to divide the <see cref="dividend"/> by (i.e. the bottom of the fraction)</param>
         /// <returns></returns>
+        [Pure]
         public static TimeSpan Divide(this TimeSpan dividend, double divisor) {
-            return TimeSpan.FromTicks((long) (dividend.Ticks / divisor));
+            return TimeSpan.FromTicks((long)(dividend.Ticks / divisor));
         }
 
 
         /// <inheritdoc cref="Divide(System.TimeSpan,double)"/>
+        [Pure]
         public static TimeSpan Divide(this DateTime dividend, double divisor) {
             return dividend.AsTimeSpan().Divide(divisor);
         }
@@ -113,6 +72,7 @@ namespace BrandonUtils.Standalone {
         /// <param name="dividend">The number to be divided (i.e. top of the fraction)</param>
         /// <param name="divisor">The number by which <paramref name="dividend" /> will be divided (i.e. the bottom of the fraction)</param>
         /// <returns></returns>
+        [Pure]
         public static double Quotient(this TimeSpan dividend, TimeSpan divisor) {
             ValidateDivisor(divisor);
             return Math.Floor(Divide(dividend, divisor));
@@ -124,6 +84,7 @@ namespace BrandonUtils.Standalone {
         /// <param name="dividend">The number to be divided (i.e. top of the fraction)</param>
         /// <param name="divisor">The number by which <paramref name="dividend" /> will be divided (i.e. the bottom of the fraction)</param>
         /// <returns></returns>
+        [Pure]
         public static TimeSpan Modulus(this TimeSpan dividend, TimeSpan divisor) {
             ValidateDivisor(divisor);
             return TimeSpan.FromTicks(dividend.Ticks % divisor.Ticks);
@@ -141,9 +102,12 @@ namespace BrandonUtils.Standalone {
         /// <param name="timeSpan"></param>
         /// <param name="factor"></param>
         /// <returns></returns>
+        [Pure]
         public static TimeSpan Multiply(this TimeSpan timeSpan, double factor) {
-            return TimeSpan.FromTicks((long) (timeSpan.Ticks * factor));
+            return TimeSpan.FromTicks((long)(timeSpan.Ticks * factor));
         }
+
+        #region Precision Normalization
 
         /// <inheritdoc cref="NormalizePrecision" />
         public static double NormalizeMinutes(double minutes) {
@@ -176,7 +140,7 @@ namespace BrandonUtils.Standalone {
         /// <remarks>
         ///     <li>Converts <paramref name="value" /> into a <see cref="TimeSpan" /> via the given <paramref name="unit" />, then returns the total <paramref name="unit" />s of the new <see cref="TimeSpan" />.</li>
         ///     <li>
-        ///         Joins together the multiple "Normalize" methods, e.g. <see cref="NormalizeMinutes" />, into one method, via <see cref="DateTimeIntervalType" />.
+        ///         Joins together the multiple "Normalize" methods, e.g. <see cref="NormalizeMinutes" />, into one method, via <see cref="TimeUnit" />.
         ///         <ul>
         ///             <li>
         ///                 The individual methods such as <see cref="NormalizeDays" /> are maintained for parity with <see cref="TimeSpan" /> methods such as <see cref="TimeSpan.FromDays" />.
@@ -186,27 +150,24 @@ namespace BrandonUtils.Standalone {
         /// </remarks>
         /// <example>
         ///     TODO: Add an example, because this is kinda hard to explain without one.
+        ///     TODO: Future Brandon, on 8/16/2021, can confirm past Brandon's assessment from 9/22/2020.
         /// </example>
         /// <param name="value"></param>
         /// <param name="unit"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public static double NormalizePrecision(double value, DateTimeIntervalType unit) {
-            switch (unit) {
-                case DateTimeIntervalType.Milliseconds:
-                    return NormalizeMilliseconds(value);
-                case DateTimeIntervalType.Seconds:
-                    return NormalizeSeconds(value);
-                case DateTimeIntervalType.Minutes:
-                    return NormalizeMinutes(value);
-                case DateTimeIntervalType.Hours:
-                    return NormalizeHours(value);
-                case DateTimeIntervalType.Days:
-                    return NormalizeDays(value);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(unit), unit, $"I don't know how to make a {nameof(TimeSpan)} out of {unit}s!");
-            }
+        public static double NormalizePrecision(double value, TimeUnit unit) {
+            return unit switch {
+                TimeUnit.Milliseconds => NormalizeMilliseconds(value),
+                TimeUnit.Seconds      => NormalizeSeconds(value),
+                TimeUnit.Minutes      => NormalizeMinutes(value),
+                TimeUnit.Hours        => NormalizeHours(value),
+                TimeUnit.Days         => NormalizeDays(value),
+                _                     => throw EnumUtils.InvalidEnumArgumentException(nameof(unit), unit)
+            };
         }
+
+        #endregion
 
         /// <summary>
         /// Corresponds to <see cref="Math.Min(int, int)"/>, etc.
@@ -215,6 +176,7 @@ namespace BrandonUtils.Standalone {
         /// <param name="b"></param>
         /// <param name="c"></param>
         /// <returns></returns>
+        [Pure]
         public static DateTime Min(this DateTime a, DateTime b, params DateTime[] c) {
             return c.Append(a).Append(b).Min();
         }
@@ -226,14 +188,17 @@ namespace BrandonUtils.Standalone {
         /// <param name="b"></param>
         /// <param name="c"></param>
         /// <returns></returns>
+        [Pure]
         public static DateTime Max(this DateTime a, DateTime b, params DateTime[] c) {
             return c.Append(a).Append(b).Max();
         }
 
+        [Pure]
         public static TimeSpan Min(this TimeSpan a, TimeSpan b, params TimeSpan[] c) {
             return c.Append(a).Append(b).Min();
         }
 
+        [Pure]
         public static TimeSpan Max(this TimeSpan a, TimeSpan b, params TimeSpan[] c) {
             return c.Append(a).Append(b).Max();
         }
@@ -247,6 +212,7 @@ namespace BrandonUtils.Standalone {
         /// </remarks>
         /// <param name="dateTime"></param>
         /// <returns></returns>
+        [Pure]
         public static TimeSpan AsTimeSpan(this DateTime dateTime) {
             return TimeSpan.FromTicks(dateTime.Ticks);
         }
@@ -256,6 +222,7 @@ namespace BrandonUtils.Standalone {
         /// </summary>
         /// <param name="timeSpan"></param>
         /// <returns></returns>
+        [Pure]
         public static DateTime AsDateTime(this TimeSpan timeSpan) {
             return new DateTime(timeSpan.Ticks);
         }
@@ -268,6 +235,7 @@ namespace BrandonUtils.Standalone {
         /// </remarks>
         /// <param name="timeSpans"></param>
         /// <returns></returns>
+        [Pure]
         public static TimeSpan Sum(this IEnumerable<TimeSpan> timeSpans) {
             return new TimeSpan(timeSpans.Sum(it => it.Ticks));
         }
@@ -279,6 +247,7 @@ namespace BrandonUtils.Standalone {
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
+        [Pure]
         public static TimeSpan? TimeSpanFromObject(object value) {
             switch (value) {
                 case TimeSpan timeSpan:
@@ -290,16 +259,16 @@ namespace BrandonUtils.Standalone {
                 case long l:
                     return TimeSpan.FromTicks(l);
                 case float f:
-                    return TimeSpan.FromTicks((long) f);
+                    return TimeSpan.FromTicks((long)f);
                 case double d:
-                    return TimeSpan.FromTicks((long) d);
+                    return TimeSpan.FromTicks((long)d);
                 case decimal d:
-                    return TimeSpan.FromTicks((long) d);
+                    return TimeSpan.FromTicks((long)d);
                 case string s:
                     return TimeSpan.Parse(s);
                 default:
                     try {
-                        return (TimeSpan) Convert.ChangeType(value, typeof(TimeSpan));
+                        return (TimeSpan)Convert.ChangeType(value, typeof(TimeSpan));
                     }
                     catch {
                         return null;
@@ -313,6 +282,7 @@ namespace BrandonUtils.Standalone {
         /// <param name="value"></param>
         /// <returns></returns>
         /// <exception cref="InvalidCastException">If the <see cref="value"/> could not be converted to a <see cref="TimeSpan"/></exception>
+        [Pure]
         public static TimeSpan TimeSpanOf(object value) {
             return TimeSpanFromObject(value) ?? throw new InvalidCastException($"Could not convert {nameof(value)} [{value?.GetType().Name}]{value} to a {nameof(TimeSpan)}!");
         }
@@ -320,6 +290,8 @@ namespace BrandonUtils.Standalone {
         /// <summary>
         /// Wraps a <see cref="List{T}"/> of <see cref="TimeSpan.Ticks"/> (as <see cref="Times"/>) and provides some convenient Linq methods and a flexible <see cref="CompareTo"/>.
         /// </summary>
+        /// <remarks>
+        /// From Brandon on 8/15/2021: What <i>is</i> this...?</remarks>
         [JsonObject(MemberSerialization.OptIn)]
         public class ExecutionTime : IComparable<ExecutionTime> {
             public readonly List<long> Times = new List<long>();
@@ -337,7 +309,7 @@ namespace BrandonUtils.Standalone {
             public double AverageTicks => Times.Average();
 
             [JsonProperty]
-            public TimeSpan Average => TimeSpan.FromTicks((long) AverageTicks);
+            public TimeSpan Average => TimeSpan.FromTicks((long)AverageTicks);
 
             public long TotalTicks => Times.Sum();
 
@@ -359,7 +331,7 @@ namespace BrandonUtils.Standalone {
                 var maxCompare = Max.CompareTo(other.Max);
                 var avgCompare = Average.CompareTo(other.Average);
 
-                var compares = new int[] {minCompare, maxCompare, avgCompare};
+                var compares = new int[] { minCompare, maxCompare, avgCompare };
                 if (compares.Any(it => it > 0) && compares.All(it => it >= 0)) {
                     return 1;
                 }
