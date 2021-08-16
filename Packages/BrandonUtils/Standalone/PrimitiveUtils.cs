@@ -74,6 +74,14 @@ namespace BrandonUtils.Standalone {
         #region Math.Sign()
 
         /**
+         * <seealso cref="Math.Sign(short)"/>
+         */
+        [Pure]
+        public static int Sign(this short value) {
+            return Math.Sign(value);
+        }
+
+        /**
          * <seealso cref="Math.Sign(int)"/>
          */
         [Pure]
@@ -82,20 +90,22 @@ namespace BrandonUtils.Standalone {
         }
 
         /**
+         * <seealso cref="Math.Sign(long)"/>
+         */
+        [Pure]
+        public static int Sign(this long value) => Math.Sign(value);
+
+        /**
          * <seealso cref="Math.Sign(float)"/>
          */
         [Pure]
-        public static int Sign(this float value) {
-            return Math.Sign(value);
-        }
+        public static int Sign(this float value) => Math.Sign(value);
 
         /**
          * <seealso cref="Math.Sign(double)"/>
          */
         [Pure]
-        public static int Sign(this double value) {
-            return Math.Sign(value);
-        }
+        public static int Sign(this double value) => Math.Sign(value);
 
         /**
          * <seealso cref="Math.Sign(decimal)"/>
@@ -105,13 +115,38 @@ namespace BrandonUtils.Standalone {
             return Math.Sign(value);
         }
 
-        /**
-         * <seealso cref="Math.Sign(short)"/>
-         */
-        [Pure]
-        public static int Sign(this short value) {
-            return Math.Sign(value);
-        }
+        #endregion
+
+        #region IsPositive
+
+        public static bool IsPositive(this short value) => value >= 0;
+        public static bool IsPositive(this int value) => value >= 0;
+        public static bool IsPositive(this long value) => value >= 0;
+        public static bool IsPositive(this float value) => value >= 0;
+        public static bool IsPositive(this double value) => value >= 0;
+        public static bool IsPositive(this decimal value) => value >= 0;
+
+        #endregion
+
+        #region IsStrictlyPositive
+
+        public static bool IsStrictlyPositive(int value) => value > 0;
+        public static bool IsStrictlyPositive(short value) => value > 0;
+        public static bool IsStrictlyPositive(long value) => value > 0;
+        public static bool IsStrictlyPositive(float value) => value > 0;
+        public static bool IsStrictlyPositive(double value) => value > 0;
+        public static bool IsStrictlyPositive(decimal value) => value > 0;
+
+        #endregion
+
+        #region IsNegative
+
+        public static bool IsNegative(this int value) => value < 0;
+        public static bool IsNegative(this long value) => value < 0;
+        public static bool IsNegative(this float value) => value < 0;
+        public static bool IsNegative(this double value) => value < 0;
+        public static bool IsNegative(this short value) => value < 0;
+        public static bool IsNegative(this decimal value) => value < 0;
 
         #endregion
 
@@ -153,7 +188,7 @@ namespace BrandonUtils.Standalone {
         /// <summary>
         /// Special <see cref="NumericTypes"/> that are automatically cast to <see cref="Int32"/> when used in <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/arithmetic-operators">arithmetic</a>.
         /// </summary>
-        public static readonly ReadOnlyCollection<Type> PseudoIntTypes = Array.AsReadOnly(new[] {typeof(byte), typeof(sbyte), typeof(short), typeof(ushort)});
+        public static readonly ReadOnlyCollection<Type> PseudoIntTypes = Array.AsReadOnly(new[] { typeof(byte), typeof(sbyte), typeof(short), typeof(ushort) });
 
         /// <summary>
         /// Returns whether or not the given <see cref="value"/> is one of the <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/integral-numeric-types">integral numeric types</a> or <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/floating-point-numeric-types">floating-point numeric types</a>.
