@@ -92,7 +92,7 @@ namespace BrandonUtils.Standalone.Chronic {
 
         private static void ValidateDivisor(TimeSpan divisor) {
             if (divisor == TimeSpan.Zero) {
-                throw new DivideByZeroException("Cannot divide by a zero TimeSpan!");
+                throw new DivideByZeroException($"Cannot divide by a zero {nameof(TimeSpan)}!");
             }
         }
 

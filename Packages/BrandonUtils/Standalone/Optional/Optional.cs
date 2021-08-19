@@ -2,11 +2,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+
+using BrandonUtils.Standalone.Enums;
+
+using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone.Optional {
     /// <summary>
     /// Utility and extension methods for <see cref="Optional{T}"/>.
     /// </summary>
+    [PublicAPI]
     public static class Optional {
         /// <summary>
         /// Creates an <see cref="Optional{T}"/> without ugly type parameters.
@@ -42,6 +48,9 @@ namespace BrandonUtils.Standalone.Optional {
                 return default;
             }
 
+            Func<DayOfWeek> fickleFunc      = () => DateTime.Now.DayOfWeek == DayOfWeek.Tuesday ? throw new CryptographicException() : DateTime.Now.DayOfWeek;
+            Func<bool>      onlyOnWednesday = () => DateTime.Now.DayOfWeek == DayOfWeek.Wednesday ? true : throw new InvalidTimeZoneException();
+
             var ls = source.ToList();
             return ls.Any() ? Of(ls.Single()) : default;
         }
@@ -53,6 +62,9 @@ namespace BrandonUtils.Standalone.Optional {
         /// <param name="functionThatMightFail"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
+        /// <example>
+        /// TODO: Add an example, but I'm tired right now and when I started writing one instead made <see cref="DayOfWeekExtensions.IsSchoolNight"/>
+        /// </example>
         public static Failable<T> Try<T>(this Func<T> functionThatMightFail) {
             return new Failable<T>(functionThatMightFail);
         }
@@ -63,12 +75,12 @@ namespace BrandonUtils.Standalone.Optional {
         /// <remarks>
         /// Corresponds to:
         /// <ul>
-        /// <li><see cref="Nullable{T}"/><see cref="Nullable{T}.GetValueOrDefault()"/></li>
+        /// <li><see cref="Nullable{T}"/>.<see cref="Nullable{T}.GetValueOrDefault()"/></li>
         /// <li>Java's <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html#orElse-T-">Optional.orElse()</a></li>
         /// </ul>
         /// </remarks>
-        /// <param name="optional"></param>
-        /// <param name="fallback"></param>
+        /// <param name="optional">this <see cref="IOptional{T}"/></param>
+        /// <param name="fallback">the return value if this <see cref="IsEmpty{T}(BrandonUtils.Standalone.Optional.IOptional{T})"/></param>
         /// <returns></returns>
         public static T GetValueOrDefault<T>(this IOptional<T> optional, T fallback) {
             return optional.HasValue ? optional.Value : fallback;
@@ -78,7 +90,8 @@ namespace BrandonUtils.Standalone.Optional {
         /// Returns <see cref="IOptional{T}.Value"/> if it is present; otherwise, <see cref="Func{TResult}.Invoke"/>s <see cref="fallbackSupplier"/>.
         /// </summary>
         /// <remarks>
-        /// Corresponds to Java's <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html#orElseGet-java.util.function.Supplier-">Optional.orElseGet()</a>.
+        /// Corresponds to Java's <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html#orElseGet-java.util.function.Supplier-">Optional.orElseGet()</a>,
+        /// but with C#-style naming that matches <see cref="Nullable{T}"/>.<see cref="Nullable{T}.GetValueOrDefault()"/>.
         /// </remarks>
         /// <param name="optional">this <see cref="IOptional{T}"/></param>
         /// <param name="fallbackSupplier">a <see cref="Func{TResult}"/> that produces a <see cref="T"/> if <see cref="IOptional{T}.Value"/> isn't present</param>
@@ -98,11 +111,15 @@ namespace BrandonUtils.Standalone.Optional {
         /// <remarks>
         /// I made this so that I had the same logic across all of the different <see cref="IEquatable{T}"/> and <c>==</c>
         /// operator comparisons in <see cref="Optional{T}"/>, <see cref="Failable{TValue,TExcuse}"/>, etc.
+        /// <p/>
+        /// In fancy language, this method provides a default equality comparator for <see cref="IOptional{T}"/> implementations.
         /// </remarks>
         /// <param name="a">aka "x", aka "left-hand side"</param>
         /// <param name="b">aka "y", aka "right-hand side"</param>
         /// <typeparam name="T">the actual type of the underlying <see cref="IOptional{T}.Value"/>s</typeparam>
         /// <returns>the equality of the underlying <see cref="IOptional{T}.Value"/>s of <see cref="a"/> and <see cref="b"/></returns>
+        /// <seealso cref="AreEqual{T}(BrandonUtils.Standalone.Optional.IOptional{T},T)"/>
+        /// <seealso cref="AreEqual{T}(T,BrandonUtils.Standalone.Optional.IOptional{T})"/>
         public static bool AreEqual<T>(IOptional<T> a, IOptional<T> b) {
             if (ReferenceEquals(a, b)) {
                 return true;
@@ -112,8 +129,6 @@ namespace BrandonUtils.Standalone.Optional {
                 return false;
             }
 
-            Console.WriteLine($"a: {a.HasValue}");
-
             if (a.HasValue == b.HasValue) {
                 return !a.HasValue || Equals(a.Value, b.Value);
             }
@@ -121,8 +136,17 @@ namespace BrandonUtils.Standalone.Optional {
             return false;
         }
 
+        /// <summary>
+        /// Compares the <see cref="IOptional{T}.Value"/> of an <see cref="IOptional{T}"/> to a vanilla <typeparamref name="T"/> value
+        /// </summary>
+        /// <param name="a">an <see cref="IOptional{T}"/></param>
+        /// <param name="b">a vanilla <typeparamref name="T"/> value</param>
+        /// <typeparam name="T">the underlying type being compared</typeparam>
+        /// <returns>the equality of (<paramref name="a"/>.<see cref="IOptional{T}.Value"/>) and (<paramref name="b"/>)</returns>
+        /// <seealso cref="AreEqual{T}(BrandonUtils.Standalone.Optional.IOptional{T},BrandonUtils.Standalone.Optional.IOptional{T})"/>
+        /// <seealso cref="AreEqual{T}(T,BrandonUtils.Standalone.Optional.IOptional{T})"/>
         public static bool AreEqual<T>(IOptional<T> a, T b) {
-            // We should be comparing the _value_ of `a` to `b`, which means a value has to exist
+            // this method compares the _value_ of `a` to `b`, which means a value has to exist
             if (ReferenceEquals(a, null)) {
                 return false;
             }
@@ -130,22 +154,43 @@ namespace BrandonUtils.Standalone.Optional {
             return a.HasValue && a.Value.Equals(b);
         }
 
+        /// <summary>
+        /// Compares a vanilla <typeparamref name="T"/> value to the underlying <see cref="IOptional{T}.Value"/> of an <see cref="IOptional{T}"/>.
+        /// </summary>
+        /// <remarks>
+        /// Behind the scenes, this flips <paramref name="a"/> and <paramref name="b"/> and sends them to <see cref="AreEqual{T}(BrandonUtils.Standalone.Optional.IOptional{T},T)"/>
+        /// </remarks>
+        /// <param name="a">a vanilla <typeparamref name="T"/> value</param>
+        /// <param name="b">an <see cref="IOptional{T}"/></param>
+        /// <typeparam name="T">the underlying type being compared</typeparam>
+        /// <returns>the equality of (<paramref name="a"/>) and (<paramref name="b"/>.<see cref="IOptional{T}.Value"/>)</returns>
+        /// <seealso cref="AreEqual{T}(BrandonUtils.Standalone.Optional.IOptional{T},BrandonUtils.Standalone.Optional.IOptional{T})"/>
+        /// <seealso cref="AreEqual{T}(BrandonUtils.Standalone.Optional.IOptional{T},T)"/>
         public static bool AreEqual<T>(T a, IOptional<T> b) {
             return AreEqual(b, a);
         }
 
+        /// <summary>
+        /// Provides a "default" <see cref="object.ToString"/> method for <see cref="IOptional{T}"/> implementations to use.
+        /// </summary>
+        /// <param name="optional">an <see cref="IOptional{T}"/></param>
+        /// <typeparam name="T">the underlying type of the <see cref="IOptional{T}"/></typeparam>
+        /// <returns>a <see cref="object.ToString"/> representation of the given <see cref="IOptional{T}"/></returns>
         public static string ToString<T>(IOptional<T> optional) {
             return $"{optional.GetType().Name}<{typeof(T).Name}>[{(optional.HasValue ? (optional.Value == null ? "null" : optional.Value + "") : "")}]";
         }
 
-        public static TOut IfOrElse<TIn, TOut>(this TIn? nullable, Func<TIn, TOut> ifPresent, Func<TOut> orElse) where TIn : struct {
+        /**
+         * <inheritdoc cref="IfPresentOrElse{TIn,TOut}(IOptional{TIn},System.Func{TIn,TOut},System.Func{TOut})"/>
+         */
+        public static TOut IfPresentOrElse<TIn, TOut>(this TIn? nullable, Func<TIn, TOut> ifPresent, Func<TOut> orElse) where TIn : struct {
             return nullable.HasValue ? ifPresent.Invoke(nullable.Value) : orElse.Invoke();
         }
 
         /**
-         * <inheritdoc cref="IfOrElse{TIn}(IOptional{TIn},System.Action{TIn},System.Action)"/>
+         * <inheritdoc cref="IfPresentOrElse{TIn,TOut}(IOptional{TIn},System.Func{TIn,TOut},System.Func{TOut})"/>
          */
-        public static void IfOrElse<TIn>(this TIn? nullable, Action<TIn> ifPresent, Action orElse) where TIn : struct {
+        public static void IfPresentOrElse<TIn>(this TIn? nullable, Action<TIn> ifPresent, Action orElse) where TIn : struct {
             if (nullable.HasValue) {
                 ifPresent.Invoke(nullable.Value);
             }
@@ -155,32 +200,42 @@ namespace BrandonUtils.Standalone.Optional {
         }
 
         /// <summary>
-        ///
+        /// If this <see cref="IOptional{T}.HasValue"/>, return the result of <paramref name="ifPresent"/>.
+        /// Otherwise, return the result of <paramref name="orElse"/>.
         /// </summary>
         /// <remarks>
-        /// Mimic's Java's
+        /// Doesn't mimic one of Java's <a href="https://docs.oracle.com/javase/9/docs/api/java/util/Optional.html">Optional</a> methods directly,
+        /// but is equivalent to calling:
+        /// <code><![CDATA[//JAVA
+        /// Optional<Integer> optional;
+        ///
+        /// optional.map(it -> ifPresent(it))
+        ///     .orElseGet(() -> orElse())
+        /// ]]></code>
+        /// I suppose it could be called "<c>IfPresentOrElseGet</c>", but that's silly
         /// </remarks>
-        /// <param name="optional"></param>
-        /// <param name="ifPresent"></param>
-        /// <param name="orElse"></param>
-        /// <typeparam name="TIn"></typeparam>
-        /// <typeparam name="TOut"></typeparam>
+        /// <param name="optional">this <see cref="IOptional{T}"/></param>
+        /// <param name="ifPresent">the "mapping" <see cref="Func{TIn, TResult}"/> to run if this <see cref="IOptional{T}.HasValue"/></param>
+        /// <param name="orElse">the <see cref="Func{TResult}"/> that generates the "default" / "fallback" value when this <see cref="IsEmpty{T}(BrandonUtils.Standalone.Optional.IOptional{T})"/></param>
+        /// <typeparam name="TIn">the underlying type of the original <see cref="IOptional{T}"/></typeparam>
+        /// <typeparam name="TOut">the resulting type</typeparam>
         /// <returns></returns>
-        public static TOut IfOrElse<TIn, TOut>(this IOptional<TIn> optional, Func<TIn, TOut> ifPresent, Func<TOut> orElse) {
+        public static TOut IfPresentOrElse<TIn, TOut>(this IOptional<TIn> optional, Func<TIn, TOut> ifPresent, Func<TOut> orElse) {
             return optional.HasValue ? ifPresent.Invoke(optional.Value) : orElse.Invoke();
         }
 
         /// <summary>
-        ///
+        /// If this <see cref="IOptional{T}.HasValue"/>, executes <paramref name="ifPresent"/>.
+        /// Otherwise, executes <paramref name="orElse"/>.
         /// </summary>
         /// <remarks>
         /// Mimics Java's <a href="https://docs.oracle.com/javase/9/docs/api/java/util/Optional.html#ifPresentOrElse-java.util.function.Consumer-java.lang.Runnable-">ifPresentOrElse()</a>
         /// </remarks>
-        /// <param name="optional"></param>
-        /// <param name="ifPresent"></param>
-        /// <param name="orElse"></param>
-        /// <typeparam name="TIn"></typeparam>
-        public static void IfOrElse<TIn>(this IOptional<TIn> optional, Action<TIn> ifPresent, Action orElse) {
+        /// <param name="optional">this <see cref="IOptional{T}"/></param>
+        /// <param name="ifPresent">the <see cref="Action{T}"/> to run if this <see cref="IOptional{T}.HasValue"/></param>
+        /// <param name="orElse">the parameterless <see cref="Action"/> to run if this <see cref="IsEmpty{T}(BrandonUtils.Standalone.Optional.IOptional{T})"/></param>
+        /// <typeparam name="TIn">the underlying type of this <see cref="Optional{T}"/></typeparam>
+        public static void IfPresentOrElse<TIn>(this IOptional<TIn> optional, Action<TIn> ifPresent, Action orElse) {
             if (optional.HasValue) {
                 ifPresent.Invoke(optional.Value);
             }
@@ -194,6 +249,9 @@ namespace BrandonUtils.Standalone.Optional {
         ///
         /// Throws an exception if the <see cref="IOptional{T}"/> is empty.
         /// </summary>
+        /// <remarks>
+        /// For the <see cref="Nullable{T}"/> equivalent, see <see cref="OrElseThrow{T}(Nullable{T},System.Func{System.Exception})"/>
+        /// </remarks>
         /// <param name="optional">an <see cref="IOptional{T}"/></param>
         /// <param name="exceptionProvider">the <see cref="Func{TResult}"/> that generates the exception. Defaults to <see cref="NoCanHasValue{T}"/></param>
         /// <typeparam name="T">the underlying type of the <see cref="IOptional{T}"/></typeparam>
@@ -208,11 +266,15 @@ namespace BrandonUtils.Standalone.Optional {
         ///
         /// Throws and exception if the <see cref="Nullable{T}"/> is empty.
         /// </summary>
+        /// <remarks>
+        /// For the <see cref="Optional{T}"/> equivalent, see <see cref="OrElseThrow{T}(BrandonUtils.Standalone.Optional.IOptional{T},System.Func{System.Exception})"/>
+        /// </remarks>
         /// <param name="nullable">a <see cref="Nullable{T}"/></param>
         /// <param name="exceptionProvider"><inheritdoc cref="OrElseThrow{T}(BrandonUtils.Standalone.Optional.IOptional{T},System.Func{System.Exception})"/></param>
         /// <typeparam name="T">the underlying type of the <see cref="Nullable{T}"/></typeparam>
         /// <returns></returns>
         /// <exception cref="Exception">if the <see cref="Nullable{T}"/> is empty</exception>
+        [ContractAnnotation("nullable:null => stop")]
         public static T OrElseThrow<T>(this T? nullable, Func<Exception> exceptionProvider = default) where T : struct {
             return nullable ?? throw (exceptionProvider?.Invoke() ?? NoCanHasValue<T?>());
         }
@@ -272,7 +334,7 @@ namespace BrandonUtils.Standalone.Optional {
         public T Value => HasValue ? _items[0] : throw new InvalidOperationException($"Unable to retrieve the {nameof(Value)} from the {GetType().Name} because it is empty!");
 
         public Optional(T value) {
-            _items = new List<T> {value};
+            _items = new List<T> { value };
         }
 
         #region Implementations
@@ -282,7 +344,7 @@ namespace BrandonUtils.Standalone.Optional {
         }
 
         IEnumerator IEnumerable.GetEnumerator() {
-            return ((IEnumerable) EnumerableImplementation).GetEnumerator();
+            return ((IEnumerable)EnumerableImplementation).GetEnumerator();
         }
 
         public bool Equals(T other) {

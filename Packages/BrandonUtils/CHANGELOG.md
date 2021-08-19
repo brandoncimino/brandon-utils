@@ -5,17 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.9.1] - 8/16/2021
+## [2.9.2] - 8/18/2021
+
+### Added
+
+- A ton of documentation to `IOptional` extensions
+- `ContractAnnotation` attributes to `IOptional.OrElseThrow()` methods
+- `DayOfWeekExtensions`, which includes completely useless methods like `IsSchoolNight()`
+-
 
 ### Changed
 
-- Moved `TimeUtils` into the new `BrandonUtils.Standalone.Chronic` package
-- Replaced `TimeUtils.DateTimeIntervalType` enum with `TimeUnit`
+- Pulled `IFailable` into its own class
+- Renamed the bizarre `IOptional.IfOrElse` -> `IOptional.IfPresentOrElse`
+
+### Fixed
+
+- Properly put `Failable` implementations into the `Optional` namespace, I think?
+
+## [2.9.1] - 8/16/2021
 
 ### Added
 
 - `TimeUnitExtensions`
 - `TimeSpanExtensions`, but I dunno if I'm really committed to it yet
+
+### Changed
+
+- Moved `TimeUtils` into the new `BrandonUtils.Standalone.Chronic` package
+- Replaced `TimeUtils.DateTimeIntervalType` enum with `TimeUnit`
 
 ## [2.8.1] - 8/15/2021
 

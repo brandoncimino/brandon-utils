@@ -97,7 +97,7 @@ namespace BrandonUtils.Standalone.Strings {
         #region MatchesAll
 
         public static bool MatchesAll(this string str, IEnumerable<string> patterns, RegexOptions? options = default) {
-            return options.IfOrElse(
+            return options.IfPresentOrElse(
                 rOpts => patterns.All(pat => Regex.IsMatch(str, pat, rOpts)),
                 () => patterns.All(pat => Regex.IsMatch(str,    pat))
             );
@@ -120,7 +120,7 @@ namespace BrandonUtils.Standalone.Strings {
         #region MatchesAny
 
         public static bool MatchesAny(this string str, IEnumerable<string> patterns, RegexOptions? options = default) {
-            return options.IfOrElse(
+            return options.IfPresentOrElse(
                 rOpts => patterns.Any(pat => Regex.IsMatch(str, pat, rOpts)),
                 () => patterns.Any(pat => Regex.IsMatch(str,    pat))
             );
@@ -143,7 +143,7 @@ namespace BrandonUtils.Standalone.Strings {
         #region MatchesNone
 
         public static bool MatchesNone(this string str, IEnumerable<string> patterns, RegexOptions? options = default) {
-            return options.IfOrElse(
+            return options.IfPresentOrElse(
                 rOpts => patterns.None(pat => Regex.IsMatch(str, pat, rOpts)),
                 () => patterns.None(pat => Regex.IsMatch(str,    pat))
             );
