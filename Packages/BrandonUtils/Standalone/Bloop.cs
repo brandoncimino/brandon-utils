@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using JetBrains.Annotations;
+
 namespace BrandonUtils.Standalone {
+    [PublicAPI]
     public static class Bloop {
         public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action) {
             foreach (var e in enumerable) {
@@ -13,6 +16,22 @@ namespace BrandonUtils.Standalone {
         #region "Repeat" Extensions
 
         #region int.Repeat(lambda) NOTE: These are the "real" or "base" methods; the rest of these methods are aliases for these!
+
+        /// <summary>
+        /// An extension method version of <see cref="Enumerable"/>.<see cref="Enumerable.Repeat{TResult}"/>.
+        /// </summary>
+        /// <remarks>
+        /// Normally I'd just name the type parameter "<c>T</c>", but I used <typeparamref name="TResult"/> to match <see cref="Repeat{TResult}(int,TResult)"/>.
+        /// </remarks>
+        /// <param name="count">The number of times to repeat the value in the generated sequence.</param>
+        /// <param name="element">The value to be repeated.</param>
+        /// <typeparam name="TResult">The type of the value to be repeated in the result sequence.</typeparam>
+        /// <returns>An <see cref="T:System.Collections.Generic.IEnumerable`1" /> that contains a repeated value.</returns>
+        /// <exception cref="T:System.ArgumentOutOfRangeException">
+        /// <paramref name="count" /> is less than 0.</exception>
+        public static IEnumerable<TResult> Repeat<TResult>(this int count, TResult element) {
+            return Enumerable.Repeat(element, count);
+        }
 
         /// <summary>
         /// Similar to <see cref="Enumerable.Repeat{TResult}"/>, but evaluates <paramref name="supplier"/> separately for each iteration.
@@ -112,6 +131,13 @@ namespace BrandonUtils.Standalone {
         #endregion
 
         #region int.For(lambda)
+
+        /**
+         * <inheritdoc cref="Repeat{TResult}(int,TResult)"/>
+         */
+        public static IEnumerable<TResult> For<TResult>(this int iterations, TResult element) {
+            return Enumerable.Repeat(element, iterations);
+        }
 
         /// <inheritdoc cref="Repeat{T}(int,System.Func{T})"/>
         public static IEnumerable<T> For<T>(this int iterations, Func<T> supplier) {
