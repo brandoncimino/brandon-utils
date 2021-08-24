@@ -1,0 +1,37 @@
+﻿= Troubleshooting
+
+== `Invalid option '8.0' for /langversion; must be ISO-1, ISO-2, 3, 4, 5 or Default`
+
+=== Symptom
+
+When attempting to *either*:
+
+- Execute unit tests via the *Standalone NUnit Launcher*
+- Build the code using a vanilla "build" command
+
+The build *fails* with the following message:
+
+----
+Build FAILED.
+
+       "Z:\Dev\Projects\brandon-utils\BrandonUtils.Standalone.csproj" (build target) (1) ->
+       (CoreCompile target) ->
+         CSC : error CS1617: Invalid option '8.0' for /langversion; must be ISO-1, ISO-2, 3, 4, 5 or Default
+----
+
+=== Solution
+
+> https://forum.unity.com/threads/issues-with-running-code-in-rider-and-long-enter-play-mode-times.1114033/#post-7443683
+
+. Go to `File` -> `Settings` -> `Build, Execution, and Deployment` -> `Toolset and Build` -> `Use MSBuild Version`
+. Change the value from `Auto Detected (4.0)` to `16.0`{wj}footnote:[I used the embedded JetBrains path. I don't know if that is significant, however I'm not brave enough to attempt to test it.]
+. Expand the `Save` drop-down
+. Save to the `project-shared` layer
+
+Ultimately, this led to the following appearing in link:../../brandon-utils.sln.DotSettings[]:
+
+[source,xml]
+----
+	<s:String x:Key="/Default/Environment/Hierarchy/Build/BuildTool/CustomBuildToolPath/@EntryValue">C:\Program Files\JetBrains\JetBrains Rider 2021.2\tools\MSBuild\Current\Bin\MSBuild.exe</s:String>
+	<s:Int64 x:Key="/Default/Environment/Hierarchy/Build/BuildTool/MsbuildVersion/@EntryValue">1048576</s:Int64>
+----

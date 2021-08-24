@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.6] - 8/24/2021
+
+### Fixed
+
+- Set `MSBuild` version in `brandon-utils.sln.DotSettings`, which, for some reason, fixes
+  the [invalid /langversion '8.0'](https://forum.unity.com/threads/issues-with-running-code-in-rider-and-long-enter-play-mode-times.1114033/#post-7443683)
+  issue that prevented executing NUnit standalone tests
+
 ## [2.9.5] - 8/23/2021
 
 ### Added
