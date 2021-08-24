@@ -7,9 +7,33 @@ using JetBrains.Annotations;
 namespace BrandonUtils.Standalone {
     [PublicAPI]
     public static class Bloop {
+        /// <summary>
+        /// Provides extension-method-style <c>foreach</c> loop functionality to <see cref="IEnumerable{T}"/>.
+        /// </summary>
+        /// <remarks>
+        /// This is similar to the existing <see cref="List{T}"/>.<see cref="List{T}.ForEach"/>, but works with all <see cref="IEnumerable{T}"/>s.
+        /// </remarks>
+        /// <param name="enumerable">this <see cref="IEnumerable{T}"/></param>
+        /// <param name="action">the <see cref="Action{T}"/> to be performed on each entry of <paramref name="enumerable"/></param>
+        /// <typeparam name="T">the type of the entries of <paramref name="enumerable"/></typeparam>
+        /// <seealso cref="List{T}.ForEach"/>
         public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action) {
             foreach (var e in enumerable) {
                 action.Invoke(e);
+            }
+        }
+
+        /// <summary>
+        /// Executes <see cref="actionWithIndex"/> against each entry in this <see cref="IEnumerable{T}"/> <b>AND</b>
+        /// that entry's <see cref="int"/> index.
+        /// </summary>
+        /// <param name="enumerable">this <see cref="IEnumerable{T}"/></param>
+        /// <param name="actionWithIndex">an <see cref="Action{T1,T2}"/> that consumes a <typeparamref name="T"/> entry of <paramref name="enumerable"/> <b>AND</b> its <see cref="int"/> index</param>
+        /// <typeparam name="T">the type of each entry in <paramref name="enumerable"/></typeparam>
+        public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T, int> actionWithIndex) {
+            var list = enumerable.ToList();
+            for (int i = 0; i < list.Count; i++) {
+                actionWithIndex(list[i], i);
             }
         }
 
