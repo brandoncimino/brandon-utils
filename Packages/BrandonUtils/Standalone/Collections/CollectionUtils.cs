@@ -5,7 +5,9 @@ using System.ComponentModel;
 using System.Linq;
 
 using BrandonUtils.Standalone.Enums;
+using BrandonUtils.Standalone.Optional;
 using BrandonUtils.Standalone.Randomization;
+using BrandonUtils.Standalone.Strings;
 
 using JetBrains.Annotations;
 
@@ -158,12 +160,12 @@ namespace BrandonUtils.Standalone.Collections {
 
         /// <inheritdoc cref="Inverse_Internal{TKey_Original,TValue_Original}"/>
         public static Dictionary<TValue_Original, TKey_Original> Inverse<TKey_Original, TValue_Original>(this Dictionary<TKey_Original, TValue_Original> dictionary) {
-            return (Dictionary<TValue_Original, TKey_Original>) Inverse_Internal(dictionary);
+            return (Dictionary<TValue_Original, TKey_Original>)Inverse_Internal(dictionary);
         }
 
         /// <inheritdoc cref="Inverse_Internal{TKey_Original,TValue_Original}"/>
         public static ReadOnlyDictionary<TValue_Original, TKey_Original> Inverse<TKey_Original, TValue_Original>(this ReadOnlyDictionary<TKey_Original, TValue_Original> readOnlyDictionary) {
-            return (ReadOnlyDictionary<TValue_Original, TKey_Original>) Inverse_Internal(readOnlyDictionary);
+            return (ReadOnlyDictionary<TValue_Original, TKey_Original>)Inverse_Internal(readOnlyDictionary);
         }
 
         #endregion
@@ -237,8 +239,49 @@ namespace BrandonUtils.Standalone.Collections {
             return string.Join(separator, enumerable);
         }
 
+        /// <summary>
+        /// An extension method version of <see cref="string.Join(string,System.Collections.Generic.IEnumerable{string})"/> that joins using the <c>\n</c> line break.
+        /// </summary>
+        /// <param name="enumerable">the <see cref="IEnumerable{T}"/> whose entries will be joined</param>
+        /// <typeparam name="T">the type of each <see cref="IEnumerable{T}"/> entry </typeparam>
+        /// <returns>the result of <see cref="string.Join(string,System.Collections.Generic.IEnumerable{string})"/></returns>
         public static string JoinLines<T>(this IEnumerable<T> enumerable) {
             return string.Join("\n", enumerable);
+        }
+
+        /// <summary>
+        /// Similar to <see cref="JoinLines{T}"/>, except that this method will recur onto any entries in the <see cref="IEnumerable{T}"/>
+        /// which are themselves <see cref="IEnumerable{T}"/>s - essentially "flattening" the result.
+        /// </summary>
+        /// <example>
+        /// This method endeavors to return meaningful <see cref="object.ToString"/> representations of individual entries, rather than useless <c>System.Object[]</c> nonsense:
+        /// <code>
+        /// var jaggedArray = new object[]{
+        ///     1,
+        ///     new string[]{ "a", "b", "c" },
+        ///     new object[]{
+        ///         "x",
+        ///         new string[]{ "y","z" }
+        ///     }
+        /// }
+        /// </code>
+        /// Will produce:
+        /// <code>
+        /// 1
+        /// a
+        /// b
+        /// c
+        /// x
+        /// y
+        /// z
+        /// </code>
+        ///
+        /// </example>
+        /// <param name="enumerable"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static string JoinLinesFlatly<T>(this IEnumerable<T> enumerable) {
+            return string.Join("\n", enumerable.ToStringLines());
         }
 
         /// <summary>
@@ -414,6 +457,7 @@ namespace BrandonUtils.Standalone.Collections {
 
         /// <summary>
         /// Joins <paramref name="original"/> and <paramref name="additional"/> together via the given <see cref="ConflictResolution"/> method, returning a <b>new <see cref="IDictionary{TKey,TValue}"/></b>.
+        /// TODO: Replace <see cref="IDictionary{TKey,TValue}"/> with <c><![CDATA[T : IDictionary<TKey, TValue>]]></c>
         /// </summary>
         /// <remarks>
         /// The order of the <see cref="IDictionary{TKey,TValue}.Keys"/> in the result will always be:
@@ -434,7 +478,7 @@ namespace BrandonUtils.Standalone.Collections {
             IDictionary<TKey, TValue> additional,
             ConflictResolution conflictResolution = ConflictResolution.Fail
         ) {
-            return JoinDictionaries(new[] {original, additional}, conflictResolution);
+            return JoinDictionaries(new[] { original, additional }, conflictResolution);
         }
 
         [System.Diagnostics.Contracts.Pure]
@@ -497,6 +541,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="enumerable">this <see cref="IEnumerable{T}"/></param>
         /// <typeparam name="T">the <see cref="ItemType{T}"/></typeparam>
         /// <returns>the inverse of <see cref="Enumerable.Any{TSource}(System.Collections.Generic.IEnumerable{TSource})"/></returns>
+        /// TODO: Experiment on whether it makes sense to have a special version of <see cref="IsEmpty{T}"/> as an <see cref="IOptional{T}"/> extension method, which would return the inverse of <see cref="IOptional{T}.HasValue"/>. The problem is that this method causes ambiguity with the <see cref="IEnumerable{T}"/> version of <see cref="IOptional{T}"/>
         public static bool IsEmpty<T>(this IEnumerable<T> enumerable) {
             return !enumerable.Any();
         }
@@ -535,7 +580,7 @@ namespace BrandonUtils.Standalone.Collections {
          * <inheritdoc cref="ContainsAny{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
          */
         public static bool ContainsAny<T>(this IEnumerable<T> enumerable, params T[] others) {
-            return ContainsAny(enumerable, (IEnumerable<T>) others);
+            return ContainsAny(enumerable, (IEnumerable<T>)others);
         }
 
         /// <summary>
@@ -553,7 +598,7 @@ namespace BrandonUtils.Standalone.Collections {
          * <inheritdoc cref="ContainsNone{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
          */
         public static bool ContainsNone<T>(this IEnumerable<T> enumerable, params T[] others) {
-            return ContainsNone(enumerable, (IEnumerable<T>) others);
+            return ContainsNone(enumerable, (IEnumerable<T>)others);
         }
 
         /// <summary>
@@ -571,7 +616,7 @@ namespace BrandonUtils.Standalone.Collections {
          * <inheritdoc cref="ContainsAll{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
          */
         public static bool ContainsAll<T>(this IEnumerable<T> enumerable, params T[] others) {
-            return ContainsAll(enumerable, (IEnumerable<T>) others);
+            return ContainsAll(enumerable, (IEnumerable<T>)others);
         }
 
         /// <summary>
@@ -615,6 +660,13 @@ namespace BrandonUtils.Standalone.Collections {
             return ContainsAll(superset, subset);
         }
 
+        /// <summary>
+        /// TODO: Is it correct for this to be an <see cref="ICollection{T}"/> extension, rather than <see cref="IEnumerable{T}"/>?
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="newItem"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public static bool AddIfMissing<T>(
             this ICollection<T> collection,
             [CanBeNull]
@@ -626,6 +678,51 @@ namespace BrandonUtils.Standalone.Collections {
 
             collection.Add(newItem);
             return true;
+        }
+
+        /// <summary>
+        /// Both <see cref="Enumerable.Append{TSource}"/>s and <see cref="Enumerable.Prepend{TSource}"/>s <paramref name="bookend"/> to <paramref name="source"/>.
+        /// </summary>
+        /// <param name="source">the original <see cref="IEnumerable{T}"/></param>
+        /// <param name="bookend">the <typeparamref name="T"/> element to be both <see cref="Enumerable.Append{TSource}">appended</see> and <see cref="Enumerable.Prepend{TSource}">prepended</see></param>
+        /// <typeparam name="T">the type of the elements of <paramref name="source"/></typeparam>
+        /// <returns>a new sequence that begins <b>and</b> ends with <paramref name="bookend"/></returns>
+        public static IEnumerable<T> Bookend<T>(this IEnumerable<T> source, T bookend) {
+            return source
+                   .Prepend(bookend)
+                   .Append(bookend);
+        }
+
+        /// <summary>
+        /// <see cref="Enumerable.Append{TSource}"/>s a <typeparamref name="T"/> element to <paramref name="source"/> if it isn't <c>null</c>.
+        /// </summary>
+        /// <param name="source">the original <see cref="IEnumerable{T}"/></param>
+        /// <param name="valueThatMightBeNull">the additional element to maybe add</param>
+        /// <typeparam name="T">the type of the elements of <paramref name="source"/></typeparam>
+        /// <returns>a new sequence that ends with <paramref name="valueThatMightBeNull"/> if it wasn't <c>null</c></returns>
+        public static IEnumerable<T> AddNonNull<T>([NotNull] this IEnumerable<T> source, [CanBeNull] T valueThatMightBeNull) {
+            return valueThatMightBeNull == null ? source : source.Append(valueThatMightBeNull);
+        }
+
+        /// <summary>
+        /// <see cref="Enumerable.Concat{TSource}"/>s all of the <see cref="NonNull{T}"/> entries in <paramref name="additionalValuesThatMightBeNull"/> to <paramref name="source"/>.
+        /// </summary>
+        /// <param name="source">the original <see cref="IEnumerable{T}"/></param>
+        /// <param name="additionalValuesThatMightBeNull">a sequence of values that might be <c>null</c></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static IEnumerable<T> AddNonNull<T>([NotNull] this IEnumerable<T> source, [CanBeNull] [ItemCanBeNull] IEnumerable<T> additionalValuesThatMightBeNull) {
+            return additionalValuesThatMightBeNull == null ? source : source.Concat(additionalValuesThatMightBeNull.NonNull());
+        }
+
+        /// <summary>
+        /// Returns only the non-<c>null</c> entries from <paramref name="source"/>.
+        /// </summary>
+        /// <param name="source">the original <see cref="IEnumerable{T}"/></param>
+        /// <typeparam name="T">the type of the items in <paramref name="source"/></typeparam>
+        /// <returns>a new sequence containing only the non-<c>null</c> entries from <paramref name="source"/></returns>
+        public static IEnumerable<T> NonNull<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> source) {
+            return source.Where(it => it != null);
         }
     }
 }

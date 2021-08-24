@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.10.1] - 8/24/2021
+
+### Added
+
+- `StringUtils`
+  - A version of `SplitLines()` that operates on `IEnumerable<string>`s
+  - A `ToString()` extension method that takes a "null placeholder" value
+  - `ToStringLines()`, which recursively converts things into their `ToString()` representations, splits each string
+    line-by-line, and flattens the result
+- `CollectionUtils`
+  - `JoinLinesFlatly()`, which is a recursive equivalent to `JoinLines()`
+  - `AddNonNull()`, which adds things that are non-`null`
+  - `NonNull()`, which returns things that are non-`null`
+
+### Changed
+
+- `StringUtils.SplitLines()` no longer "collapses" repeated white space
+
 ## [2.9.6] - 8/24/2021
 
 ### Fixed

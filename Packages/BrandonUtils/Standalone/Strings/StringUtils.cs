@@ -7,14 +7,30 @@ using System.Text.RegularExpressions;
 
 using BrandonUtils.Standalone.Collections;
 
+using JetBrains.Annotations;
+
 using Newtonsoft.Json;
 
 // using UnityEngine;
 
 namespace BrandonUtils.Standalone.Strings {
+    [PublicAPI]
     public static class StringUtils {
         /// <summary>
-        ///     Prepends <paramref name="toIndent" />.
+        /// Valid strings for <a href="https://en.wikipedia.org/wiki/Newline">line breaks</a>, in <b>order of precedence</b> as required by <see cref="string.Split(string[], StringSplitOptions)"/>:
+        /// <ul>
+        /// <li><c>"\r\n"</c>, aka "Carriage Return + Line Feed", aka <c>"CRLF"</c></li>
+        /// <li><c>"\r"</c>, aka <a href="https://en.wikipedia.org/wiki/Carriage_return">"Carriage Return"</a>, aka <c>"CR"</c></li>
+        /// <li><c>"\n"</c>, aka <a href="https://en.wikipedia.org/wiki/Newline#In_programming_languages">"Newline"</a>, aka "Line Feed", aka <c>"LF"</c></li>
+        /// </ul>
+        /// </summary>
+        /// <remarks>
+        /// Intended to passed to <see cref="string.Split(string[], StringSplitOptions)"/>.
+        /// </remarks>
+        private static readonly string[] LineBreakSplitters = { "\r\n", "\r", "\n" };
+
+        /// <summary>
+        /// Prepends <paramref name="toIndent" />.
         /// </summary>
         /// <param name="toIndent">The <see cref="string" /> to be indented.</param>
         /// <param name="indentCount">The number of indentations (i.e. number of times hitting "tab").</param>
@@ -26,7 +42,7 @@ namespace BrandonUtils.Standalone.Strings {
         }
 
         /// <summary>
-        ///     Joins <paramref name="toRepeat" /> with itself <paramref name="repetitions" /> times, using the optional <paramref name="separator" />
+        /// Joins <paramref name="toRepeat" /> with itself <paramref name="repetitions" /> times, using the optional <paramref name="separator" />
         /// </summary>
         /// <param name="toRepeat">The <see cref="string" /> to be joined with itself.</param>
         /// <param name="repetitions">The number of times <paramref name="toRepeat" /> should be repeated.</param>
@@ -78,6 +94,8 @@ namespace BrandonUtils.Standalone.Strings {
             return string.IsNullOrEmpty(baseString) ? stringToJoin : string.Join(separator, baseString, stringToJoin);
         }
 
+        #region Prettification
+
         public static string Prettify(object thing, bool recursive = true, int recursionCount = 0) {
             const int recursionMax = 10;
             var       type         = thing.GetType().ToString();
@@ -125,14 +143,17 @@ namespace BrandonUtils.Standalone.Strings {
 
             // account for null prettyString and method
             // (we're doing this here, rather than initializing them to default values, so we can trigger things if there's a failure)
-            prettyString = prettyString ?? thing.ToString();
-            method       = method ?? "NO METHOD FOUND";
+            // NOTE from Brandon on 8/22/2021: this fancy-schmancy ??= operator is...funky
+            prettyString ??= thing.ToString();
+            method       ??= "NO METHOD FOUND";
 
 
             return $"[{method}]{prettyString}".Indent(indentCount: recursionCount);
         }
 
-        //TODO: Add an extension method version if "Prettify" and re-do the fuck out of "Prettify"
+        //TODO: Add an extension method version of "Prettify" and re-do the fuck out of "Prettify"
+        //TODO: Move prettification methods into a dedicated class
+        //TODO: the fuck is the difference between "Prettify" and "Pretty"?! "Prettify" is definitely a better name!
         public static string Pretty(this object obj) {
             throw new NotImplementedException("DEAR GOD I immediately started making a 'PrettyOptions' enum to go along with this ARGH");
         }
@@ -155,6 +176,12 @@ namespace BrandonUtils.Standalone.Strings {
             return objType.GetMembers().Where(member => memberTypes.HasFlag(member.MemberType)).Aggregate($"[{objType}] {memberTypes}:", (current, member) => current + $"\n\t{FormatMember(member, obj)}");
         }
 
+        /// <summary>
+        /// TODO: rename this to "PrettifyMember"
+        /// </summary>
+        /// <param name="memberInfo"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static string FormatMember(MemberInfo memberInfo, object obj = null) {
             var result = $"[{memberInfo.MemberType}] {memberInfo}";
 
@@ -176,6 +203,8 @@ namespace BrandonUtils.Standalone.Strings {
 
             return result;
         }
+
+        #endregion
 
         public static string FillRight(this string self, int totalLength, string filler) {
             ValidateFillParameters(filler, totalLength);
@@ -226,10 +255,6 @@ namespace BrandonUtils.Standalone.Strings {
             var middle = $"{border}{padding}{heading}{padding}{border}";
             var hRule  = border.FillRight(middle.Length, border);
             return $"{hRule}\n{middle}\n{hRule}";
-        }
-
-        public static string[] SplitLines(this string contentWithLines) {
-            return Splitex(contentWithLines, "[\n\r]+");
         }
 
         /// <summary>
@@ -291,6 +316,34 @@ namespace BrandonUtils.Standalone.Strings {
          */
         public static bool ContainsAll(this string str, params string[] substrings) {
             return ContainsAll(str, substrings.AsEnumerable());
+        }
+
+        #region Line Management
+
+        /// <summary>
+        /// Splits <paramref name="contentWithLines"/> via <c>"\r\n", "\r", or "\n"</c>.
+        /// </summary>
+        /// <example>
+        /// This will match any
+        /// </example>
+        /// <param name="contentWithLines">the <see cref="string"/> being <see cref="string.Split(char[])"/></param>
+        /// <param name="options"><see cref="StringSplitOptions"/></param>
+        /// <returns>an <see cref="Array"/> containing each individual line from <paramref name="contentWithLines"/></returns>
+        public static string[] SplitLines(this string contentWithLines, StringSplitOptions options = default) {
+            return contentWithLines.Split(LineBreakSplitters, options);
+        }
+
+        /// <summary>
+        /// Runs <see cref="SplitLines(string,System.StringSplitOptions)"/> against each <see cref="string"/> in <paramref name="contentsWithLines"/>,
+        /// flattening the results.
+        /// </summary>
+        /// <param name="contentsWithLines">a collection of <see cref="string"/>s that will each be passed to <see cref="SplitLines(string,System.StringSplitOptions)"/></param>
+        /// <param name="options"><see cref="StringSplitOptions"/></param>
+        /// <returns>all of the individual <see cref="string"/>s, split line-by-line, and flattened</returns>
+        /// <seealso cref="SplitLines(string,System.StringSplitOptions)"/>
+        /// <seealso cref="ToStringLines"/>
+        public static string[] SplitLines(this IEnumerable<string> contentsWithLines, StringSplitOptions options = default) {
+            return contentsWithLines.SelectMany(content => content.SplitLines(options)).ToArray();
         }
 
         #region Truncation & Collapsing
@@ -367,6 +420,33 @@ namespace BrandonUtils.Standalone.Strings {
             return CollapseLines(lines, str => additionalFilters.Prepend(filter).Any(it => it.TestFilter(str)));
         }
 
+        /// <summary>
+        /// Converts <paramref name="obj"/> - and its entries, if it is an <see cref="IEnumerable{T}"/> - into their <see cref="object.ToString"/> representations,
+        /// and splits the result line-by-line via <see cref="SplitLines(string,System.StringSplitOptions)"/>.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="nullPlaceholder"></param>
+        /// <returns></returns>
+        public static string[] ToStringLines([CanBeNull] this object obj, [CanBeNull] string nullPlaceholder = "") {
+            if (obj is IEnumerable<object> e) {
+                return e.SelectMany(it => it.ToStringLines(nullPlaceholder)).SplitLines();
+            }
+
+            return obj?.ToString().SplitLines() ?? new[] { nullPlaceholder };
+        }
+
         #endregion
+
+        #endregion Line Management
+
+        /// <summary>
+        /// A variation on <see cref="object.ToString"/> that returns the specified <paramref name="nullPlaceholder"/> if the original <paramref name="obj"/> is <c>null</c>.
+        /// </summary>
+        /// <param name="obj">the original object</param>
+        /// <param name="nullPlaceholder">the <see cref="string"/> returned when <paramref name="obj"/> is <c>null</c></param>
+        /// <returns>the <see cref="object.ToString"/> representation of <paramref name="obj"/>, or <c>null</c></returns>
+        public static string ToString([CanBeNull] this object obj, string nullPlaceholder) {
+            return obj == null ? nullPlaceholder : obj.ToString();
+        }
     }
 }

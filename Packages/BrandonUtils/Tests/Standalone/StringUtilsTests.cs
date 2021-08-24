@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
+using BrandonUtils.Standalone;
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Strings;
 using BrandonUtils.Testing;
@@ -116,9 +118,9 @@ b
 b
 a3",
             @"a1
-...(2 lines omitted)
+...(2/7 lines omitted)
 a2
-...(2 lines omitted)
+...(2/7 lines omitted)
 a3"
         )]
         [TestCase(
@@ -129,7 +131,7 @@ b
 b
 b",
             @"a1
-...(5 lines omitted)"
+...(5/6 lines omitted)"
         )]
         [TestCase(
             @"b
@@ -137,17 +139,16 @@ b
 a
 b
 b",
-            @"...(2 lines omitted)
+            @"...(2/5 lines omitted)
 a
-...(2 lines omitted)"
+...(2/5 lines omitted)"
         )]
         [TestCase(
             @"b
 a
 b
 a
-b
-",
+b",
             @"...
 a
 ...
@@ -191,5 +192,145 @@ a
                 Assert.That(truncated, Is.EqualTo(ln));
             }
         }
+
+        #region SplitLines
+
+        public class SplitExpectation {
+            public readonly string   InputString;
+            public readonly string[] ExpectedLines;
+
+            public SplitExpectation(string inputString, params string[] expectedLines) {
+                this.InputString   = inputString;
+                this.ExpectedLines = expectedLines;
+            }
+        }
+
+        private static SplitExpectation[] SplitExpectations = new[] {
+            new SplitExpectation("a\nb",       "a", "b"),
+            new SplitExpectation("a\rb",       "a", "b"),
+            new SplitExpectation("a\n\nb",     "a", "", "b"),
+            new SplitExpectation("a\r\nb",     "a", "b"),
+            new SplitExpectation("a\r\rb",     "a", "", "b"),
+            new SplitExpectation("a\n\r\nb",   "a", "", "b"),
+            new SplitExpectation("a\r\n\rb",   "a", "", "b"),
+            new SplitExpectation("a\r\n\n\rb", "a", "", "", "b"),
+            new SplitExpectation("a",          "a"),
+            new SplitExpectation("a\n",        "a", ""),
+            new SplitExpectation("\na",        "",  "a"),
+            new SplitExpectation("",           ""),
+            new SplitExpectation("\n",         "", ""),
+            new SplitExpectation("\r\n\n",     "", "", "")
+        };
+
+        private static string[] FlatSplitInputs       => SplitExpectations.Select(it => it.InputString).ToArray();
+        private static string[] FlatSplitExpectations => SplitExpectations.SelectMany(it => it.ExpectedLines).ToArray();
+
+        [Test]
+        public void SplitLines_SingleString([ValueSource(nameof(SplitExpectations))] SplitExpectation splitExpectation) {
+            var split = splitExpectation.InputString.SplitLines();
+            Assert.That(split, Is.EqualTo(splitExpectation.ExpectedLines));
+        }
+
+        [Test]
+        public void SplitLines_Collection() {
+            Assert.That(FlatSplitInputs.SplitLines(), Is.EqualTo(FlatSplitExpectations));
+        }
+
+        #endregion
+
+        #region ToStringLines
+
+        [TestCase(new object[] { 1, 2, 3 },    new[] { "1", "2", "3" })]
+        [TestCase(new object[] { 1, null, 3 }, new[] { "1", "", "3" })]
+        public void ToStringLines_Simple(object[] input, string[] expectedLines) {
+            Assert.That(input.ToStringLines(), Is.EqualTo(expectedLines));
+        }
+
+        [Test]
+        public void ToStringLines_SingleString([ValueSource(nameof(SplitExpectations))] SplitExpectation expectation) {
+            Assert.That(expectation.InputString.ToStringLines(), Is.EqualTo(expectation.ExpectedLines));
+        }
+
+        [TestCase(new object[] { 1, 2, 3 },    "X", new[] { "1", "2", "3" })]
+        [TestCase(new object[] { 1, null, 3 }, "X", new[] { "1", "X", "3" })]
+        public void ToStringLines_WithNullPlaceholder(object[] input, string nullPlaceholder, string[] expectedLines) {
+            Assert.That(input.ToStringLines(nullPlaceholder), Is.EqualTo(expectedLines));
+        }
+
+        [Test]
+        public void ToStringLines_JaggedStringArray() {
+            string[][] superJaggedInputs = {
+                FlatSplitInputs,
+                FlatSplitInputs,
+            };
+
+            var singleExpected = FlatSplitExpectations;
+            var allExpected = singleExpected
+                              .Concat(singleExpected)
+                              .ToArray();
+            var split = superJaggedInputs.ToStringLines();
+            split.ForEach((it, i) => Console.WriteLine($"[{i}]{it}"));
+
+            Assert.That(split, Is.EqualTo(allExpected));
+        }
+
+        [Test]
+        public void ToStringLines_MixedTypes() {
+            var inputs = FlatSplitExpectations;
+            var str = new object[] {
+                inputs,
+                "yolo",
+                inputs
+            };
+
+            var singleExpected = FlatSplitExpectations;
+            var allExpected = singleExpected
+                              .Append("yolo")
+                              .Concat(singleExpected)
+                              .ToArray();
+
+            Assert.That(str.ToStringLines(), Is.EqualTo(allExpected));
+        }
+
+        [Test]
+        [TestCase("abc")]
+        public void ToStringLines_SingleLineString(string original) {
+            var expected = new[] { original };
+            var actual   = original.ToStringLines();
+            Assert.That(actual, Is.EqualTo(expected));
+        }
+
+        private class ToStringOverride {
+            public string Value;
+
+            public override string ToString() {
+                return $"[{Value}]";
+            }
+        }
+
+        [Test]
+        public void ToStringLines_WithToStringOverrides() {
+            var jaggedArray = new object[] {
+                "a",
+                2,
+                new ToStringOverride() { Value = "yolo" },
+                new List<object>() {
+                    new ToStringOverride() { Value = "first" },
+                    new ToStringOverride() { Value = "second" },
+                    new ToStringOverride() { Value = "third" },
+                }
+            };
+
+            var expectedLines = new[] {
+                "a",
+                "2",
+                "[yolo]",
+                "[first]", "[second]", "[third]"
+            };
+
+            Assert.That(jaggedArray.ToStringLines(), Is.EqualTo(expectedLines));
+        }
+
+        #endregion
     }
 }
