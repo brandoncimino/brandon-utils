@@ -30,36 +30,36 @@ namespace BrandonUtils.Tests.Standalone.Collections {
         #endregion
 
         private static class Validate {
-            public static void FailedFailable<T>(Failable<T> failable) {
+            public static void FailedFailable<T>(FailableFunc<T> failableFunc) {
                 AssertAll.Of(
-                    () => Assert.That(failable, Has.Property(nameof(failable.HasValue)).False),
-                    () => Assert.That(failable, Has.Property(nameof(failable.Failed)).True),
-                    () => Assert.DoesNotThrow(() => Console.WriteLine(failable.Excuse)),
-                    () => Assert.Throws<InvalidOperationException>(() => Console.WriteLine(failable.Value))
+                    () => Assert.That(failableFunc, Has.Property(nameof(failableFunc.HasValue)).False),
+                    () => Assert.That(failableFunc, Has.Property(nameof(failableFunc.Failed)).True),
+                    () => Assert.DoesNotThrow(() => Console.WriteLine(failableFunc.Excuse)),
+                    () => Assert.Throws<InvalidOperationException>(() => Console.WriteLine(failableFunc.Value))
                 );
             }
 
-            public static void PassedFailable<T>(Failable<T> failable) {
+            public static void PassedFailable<T>(FailableFunc<T> failableFunc) {
                 AssertAll.Of(
-                    () => Assert.That(failable, Has.Property(nameof(failable.HasValue)).True),
-                    () => Assert.That(failable, Has.Property(nameof(failable.Failed)).False),
-                    () => Assert.DoesNotThrow(() => Console.WriteLine(failable.Value)),
-                    () => Assert.Throws<InvalidOperationException>(() => Console.WriteLine(failable.Excuse))
+                    () => Assert.That(failableFunc, Has.Property(nameof(failableFunc.HasValue)).True),
+                    () => Assert.That(failableFunc, Has.Property(nameof(failableFunc.Failed)).False),
+                    () => Assert.DoesNotThrow(() => Console.WriteLine(failableFunc.Value)),
+                    () => Assert.Throws<InvalidOperationException>(() => Console.WriteLine(failableFunc.Excuse))
                 );
             }
 
-            public static void Equality<T>(Failable<T> failable, Optional<T> optional, bool expectedEquality) {
+            public static void Equality<T>(FailableFunc<T> failableFunc, Optional<T> optional, bool expectedEquality) {
                 AssertAll.Of(
-                    () => Assert.That(failable == optional,                  Is.EqualTo(expectedEquality), "failable == optional"),
-                    () => Assert.That(optional == failable,                  Is.EqualTo(expectedEquality), "optional == failable"),
-                    () => Assert.That(failable.Equals(optional),             Is.EqualTo(expectedEquality), "failable.Equals(optional)"),
-                    () => Assert.That(optional.Equals(failable),             Is.EqualTo(expectedEquality), "optional.Equals(failable)"),
-                    () => Assert.That(Optional.AreEqual(optional, failable), Is.EqualTo(expectedEquality), "Optional.AreEqual(optional, failable)"),
-                    () => Assert.That(Optional.AreEqual(failable, optional), Is.EqualTo(expectedEquality), "Optional.AreEqual(failable, optional)")
+                    () => Assert.That(failableFunc == optional,                      Is.EqualTo(expectedEquality), "failable == optional"),
+                    () => Assert.That(optional == failableFunc,                      Is.EqualTo(expectedEquality), "optional == failable"),
+                    () => Assert.That(failableFunc.Equals(optional),                 Is.EqualTo(expectedEquality), "failable.Equals(optional)"),
+                    () => Assert.That(optional.Equals(failableFunc),                 Is.EqualTo(expectedEquality), "optional.Equals(failable)"),
+                    () => Assert.That(Optional.AreEqual(optional,     failableFunc), Is.EqualTo(expectedEquality), "Optional.AreEqual(optional, failable)"),
+                    () => Assert.That(Optional.AreEqual(failableFunc, optional),     Is.EqualTo(expectedEquality), "Optional.AreEqual(failable, optional)")
                 );
             }
 
-            public static void Equality<T>(Failable<T> a, Failable<T> b, bool expectedEquality) {
+            public static void Equality<T>(FailableFunc<T> a, FailableFunc<T> b, bool expectedEquality) {
                 AssertAll.Of(
                     () => Assert.That(a == b,                  Is.EqualTo(expectedEquality), "a == b"),
                     () => Assert.That(b == a,                  Is.EqualTo(expectedEquality), "b == a"),
@@ -70,22 +70,22 @@ namespace BrandonUtils.Tests.Standalone.Collections {
                 );
             }
 
-            public static void Equality<T>(Failable<T> failable, T expectedValue, bool expectedEquality) {
+            public static void Equality<T>(FailableFunc<T> failableFunc, T expectedValue, bool expectedEquality) {
                 AssertAll.Of(
-                    () => Assert.That(failable == expectedValue,                       Is.EqualTo(expectedEquality), "failable == expectedValue"),
-                    () => Assert.That(expectedValue == failable,                       Is.EqualTo(expectedEquality), "expectedValue == failable"),
-                    () => Assert.That(failable.Equals(expectedValue),                  Is.EqualTo(expectedEquality), "failable.Equals(expectedValue)"),
-                    () => Assert.That(Optional.AreEqual(failable,      expectedValue), Is.EqualTo(expectedEquality), "Optional.AreEqual(failable, expectedValue)"),
-                    () => Assert.That(Optional.AreEqual(expectedValue, failable),      Is.EqualTo(expectedEquality), "Optional.AreEqual(expectedValue, failable)")
+                    () => Assert.That(failableFunc == expectedValue,                   Is.EqualTo(expectedEquality), "failable == expectedValue"),
+                    () => Assert.That(expectedValue == failableFunc,                   Is.EqualTo(expectedEquality), "expectedValue == failable"),
+                    () => Assert.That(failableFunc.Equals(expectedValue),              Is.EqualTo(expectedEquality), "failable.Equals(expectedValue)"),
+                    () => Assert.That(Optional.AreEqual(failableFunc,  expectedValue), Is.EqualTo(expectedEquality), "Optional.AreEqual(failable, expectedValue)"),
+                    () => Assert.That(Optional.AreEqual(expectedValue, failableFunc),  Is.EqualTo(expectedEquality), "Optional.AreEqual(expectedValue, failable)")
                 );
             }
 
-            public static void ObjectEquality<T>(Failable<T> failable, object obj, bool expectedEquality) {
+            public static void ObjectEquality<T>(FailableFunc<T> failableFunc, object obj, bool expectedEquality) {
                 AssertAll.Of(
-                    () => Assert.That(failable.Equals(obj), Is.EqualTo(expectedEquality), "failable.Equals(obj)"),
+                    () => Assert.That(failableFunc.Equals(obj), Is.EqualTo(expectedEquality), "failable.Equals(obj)"),
                     () => {
                         if (obj != null) {
-                            Assert.That(obj.Equals(failable), Is.EqualTo(expectedEquality), "obj.Equals(failable)");
+                            Assert.That(obj.Equals(failableFunc), Is.EqualTo(expectedEquality), "obj.Equals(failable)");
                         }
                     }
                 );
@@ -171,10 +171,10 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
         [Test]
         public void FailableDefault() {
-            Failable<int> failable = default;
+            FailableFunc<int> failableFunc = default;
             AssertAll.Of(
-                () => Validate.FailedFailable(failable),
-                () => Assert.That(failable, Has.Property(nameof(failable.Excuse)).Null)
+                () => Validate.FailedFailable(failableFunc),
+                () => Assert.That(failableFunc, Has.Property(nameof(failableFunc.Excuse)).Null)
             );
         }
 

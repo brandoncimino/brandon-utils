@@ -106,14 +106,14 @@ namespace BrandonUtils.Tests.Standalone.Collections {
         }
 
         private static T Unboxional<T>(Optional<T> optional) {
-            return optional.GetValueOrDefault((T) default);
+            return optional.GetValueOrDefault((T)default);
         }
 
         [Test]
         public void NullInterfaceEquality() {
-            var               optional_a  = (IOptional<string>) null;
-            var               optional_b  = (IOptional<string>) null;
-            var               optional_c  = (Optional<string>) null;
+            var               optional_a  = (IOptional<string>)null;
+            var               optional_b  = (IOptional<string>)null;
+            var               optional_c  = (Optional<string>)null;
             IOptional<string> def_a       = default;
             IOptional<string> def_b       = default;
             Optional<string>  def_c       = default;
@@ -131,5 +131,15 @@ namespace BrandonUtils.Tests.Standalone.Collections {
                 () => Assert.False(Optional.AreEqual(optional_c,  def_c),       "Optional.AreEqual(optional_c, def_c)")
             );
         }
+
+        #region ToOptional
+
+        [Test]
+        public void ToOptional_MultipleItems() {
+            var ls       = new[] { 1, 2, 3 };
+            var optional = ls.ToOptional();
+        }
+
+        #endregion
     }
 }

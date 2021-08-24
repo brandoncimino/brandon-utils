@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 
 using BrandonUtils.Standalone.Enums;
 
@@ -48,16 +46,13 @@ namespace BrandonUtils.Standalone.Optional {
                 return default;
             }
 
-            Func<DayOfWeek> fickleFunc      = () => DateTime.Now.DayOfWeek == DayOfWeek.Tuesday ? throw new CryptographicException() : DateTime.Now.DayOfWeek;
-            Func<bool>      onlyOnWednesday = () => DateTime.Now.DayOfWeek == DayOfWeek.Wednesday ? true : throw new InvalidTimeZoneException();
-
             var ls = source.ToList();
             return ls.Any() ? Of(ls.Single()) : default;
         }
 
         /// <summary>
-        /// Attempts to <see cref="Func{TResult}.Invoke"/> <see cref="functionThatMightFail"/>, returning a <see cref="Failable{TValue,TException}"/>
-        /// that contains either the successful result or the reason for failure.
+        /// Attempts to <see cref="Func{TResult}.Invoke"/> <see cref="functionThatMightFail"/>, returning a <see cref="FailableFunc{TValue,TExcuse}"/>
+        /// that contains either the successful result or the <see cref="IFailableFunc{TValue,TExcuse}.Excuse"/> for failure.
         /// </summary>
         /// <param name="functionThatMightFail"></param>
         /// <typeparam name="T"></typeparam>
@@ -65,9 +60,21 @@ namespace BrandonUtils.Standalone.Optional {
         /// <example>
         /// TODO: Add an example, but I'm tired right now and when I started writing one instead made <see cref="DayOfWeekExtensions.IsSchoolNight"/>
         /// </example>
-        public static Failable<T> Try<T>(this Func<T> functionThatMightFail) {
-            return new Failable<T>(functionThatMightFail);
+        public static FailableFunc<T> Try<T>(this Func<T> functionThatMightFail) {
+            return new FailableFunc<T>(functionThatMightFail);
         }
+
+        /// <summary>
+        /// Attempts to <see cref="Action.Invoke"/> <see cref="actionThatMightFail"/>, returning a <see cref="Failable"/>
+        /// that (might) contain the <see cref="IFailableFunc{TValue,TExcuse}.Excuse"/> for failure.
+        /// </summary>
+        /// <param name="actionThatMightFail"></param>
+        /// <returns></returns>
+        public static Failable Try(this Action actionThatMightFail) {
+            return new Failable(actionThatMightFail);
+        }
+
+        #region GetValueOrDefault
 
         /// <summary>
         /// Returns <see cref="IOptional{T}.Value"/> if it is present; otherwise, returns <see cref="fallback"/>.
@@ -100,6 +107,10 @@ namespace BrandonUtils.Standalone.Optional {
             return optional.HasValue ? optional.Value : fallbackSupplier.Invoke();
         }
 
+        #endregion
+
+        #region AreEqual
+
         /// <summary>
         /// Tests the underlying values of <see cref="a"/> and <see cref="b"/> for equality.
         /// <ul>
@@ -110,7 +121,7 @@ namespace BrandonUtils.Standalone.Optional {
         /// </summary>
         /// <remarks>
         /// I made this so that I had the same logic across all of the different <see cref="IEquatable{T}"/> and <c>==</c>
-        /// operator comparisons in <see cref="Optional{T}"/>, <see cref="Failable{TValue,TExcuse}"/>, etc.
+        /// operator comparisons in <see cref="Optional{T}"/>, <see cref="FailableFunc{TValue,TExcuse}"/>, etc.
         /// <p/>
         /// In fancy language, this method provides a default equality comparator for <see cref="IOptional{T}"/> implementations.
         /// </remarks>
@@ -170,6 +181,8 @@ namespace BrandonUtils.Standalone.Optional {
             return AreEqual(b, a);
         }
 
+        #endregion AreEqual
+
         /// <summary>
         /// Provides a "default" <see cref="object.ToString"/> method for <see cref="IOptional{T}"/> implementations to use.
         /// </summary>
@@ -179,6 +192,8 @@ namespace BrandonUtils.Standalone.Optional {
         public static string ToString<T>(IOptional<T> optional) {
             return $"{optional.GetType().Name}<{typeof(T).Name}>[{(optional.HasValue ? (optional.Value == null ? "null" : optional.Value + "") : "")}]";
         }
+
+        #region IfPresentOrElse
 
         /**
          * <inheritdoc cref="IfPresentOrElse{TIn,TOut}(IOptional{TIn},System.Func{TIn,TOut},System.Func{TOut})"/>
@@ -244,6 +259,10 @@ namespace BrandonUtils.Standalone.Optional {
             }
         }
 
+        #endregion IfPresentOrElse
+
+        #region OrElseThrow
+
         /// <summary>
         /// If this <see cref="IOptional{T}.HasValue"/>, returns <see cref="IOptional{T}.Value"/>.
         ///
@@ -279,151 +298,24 @@ namespace BrandonUtils.Standalone.Optional {
             return nullable ?? throw (exceptionProvider?.Invoke() ?? NoCanHasValue<T?>());
         }
 
+        #endregion OrElseThrow
+
         private static ArgumentNullException NoCanHasValue<T>(T emptyThing = default) {
             return new ArgumentNullException($"The {typeof(T).Name} was empty!");
         }
 
+        #region IsEmpty
+
         /// <returns>negation of <see cref="IOptional{T}.HasValue"/></returns>
-        public static bool IsEmpty<T>(this IOptional<T> optional) {
-            return !optional.HasValue;
-        }
+        // public static bool IsEmpty<T>(this IOptional<T> optional) {
+        //     return !optional.HasValue;
+        // }
 
         /// <returns>negation of <see cref="Nullable{T}.HasValue"/></returns>
         public static bool IsEmpty<T>(this T? nullable) where T : struct {
             return !nullable.HasValue;
         }
-    }
 
-    /// <summary>
-    /// A mockery of Java's <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html">Optional</a> class.
-    /// </summary>
-    /// <remarks>
-    /// An <see cref="Optional{T}"/> can be considered a <see cref="IReadOnlyCollection{T}"/> with a max capacity of 1.
-    /// This gives access to the full suite of <see cref="System.Linq"/> extension methods.
-    /// </remarks>
-    /// <typeparam name="T"></typeparam>
-    public readonly struct Optional<T> : IEquatable<T>, IEquatable<IOptional<T>>, IReadOnlyCollection<T>, IOptional<T> {
-        public override bool Equals(object obj) {
-            return obj switch {
-                Optional<T> optional when Equals(optional) => true,
-                T t when Equals(t)                         => true,
-                _                                          => false
-            };
-        }
-
-        public override int GetHashCode() {
-            return (_items != null ? _items.GetHashCode() : 0);
-        }
-
-        private readonly List<T> _items;
-
-        private IEnumerable<T> EnumerableImplementation => HasValue ? _items : Enumerable.Empty<T>();
-
-        /// <summary>
-        /// Whether or not a <see cref="Value"/> is present.
-        /// </summary>
-        /// <remarks>
-        /// Corresponds to:
-        /// <ul>
-        /// <li><see cref="Nullable{T}"/>.<see cref="Nullable{T}.HasValue"/></li>
-        /// <li>Java's <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html#isPresent--">Optional.isPresent()</a></li>
-        /// </ul>
-        /// </remarks>
-        public bool HasValue => _items != null;
-
-        public T Value => HasValue ? _items[0] : throw new InvalidOperationException($"Unable to retrieve the {nameof(Value)} from the {GetType().Name} because it is empty!");
-
-        public Optional(T value) {
-            _items = new List<T> { value };
-        }
-
-        #region Implementations
-
-        public IEnumerator<T> GetEnumerator() {
-            return EnumerableImplementation.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator() {
-            return ((IEnumerable)EnumerableImplementation).GetEnumerator();
-        }
-
-        public bool Equals(T other) {
-            return Optional.AreEqual(this, other);
-        }
-
-        public bool Equals(IOptional<T> other) {
-            return Optional.AreEqual(this, other);
-        }
-
-        public static bool operator ==(Optional<T> a, IOptional<T> b) {
-            return Optional.AreEqual(a, b);
-        }
-
-        public static bool operator !=(Optional<T> a, IOptional<T> b) {
-            return !Optional.AreEqual(a, b);
-        }
-
-        public static bool operator ==(T a, Optional<T> b) {
-            return Optional.AreEqual(a, b);
-        }
-
-        public static bool operator !=(T a, Optional<T> b) {
-            return !Optional.AreEqual(a, b);
-        }
-
-        public static bool operator ==(Optional<T> a, T b) {
-            return Optional.AreEqual(a, b);
-        }
-
-        public static bool operator !=(Optional<T> a, T b) {
-            return !Optional.AreEqual(a, b);
-        }
-
-        public int Count => HasValue ? 1 : 0;
-
-        public override string ToString() {
-            // return $"{GetType().Name}<{this.ItemType().Name}>[{(HasValue ? (Value == null ? "null" : Value+"") : "")}]";
-            return Optional.ToString(this);
-        }
-
-        #endregion
-
-        public static implicit operator Optional<T>(T value) {
-            return new Optional<T>(value);
-        }
-
-        /// <summary>
-        /// Works the same as <see cref="Enumerable.Select{TSource,TResult}(System.Collections.Generic.IEnumerable{TSource},System.Func{TSource,TResult})">Enumerable.Select</see>,
-        /// but returns a new <see cref="Optional{T}"/>.
-        /// </summary>
-        /// <remarks>
-        /// Corresponds to:
-        /// <ul>
-        /// <li><see cref="Enumerable.Select{TSource,TResult}(System.Collections.Generic.IEnumerable{TSource},System.Func{TSource,TResult})"/></li>
-        /// <li>Java's <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html#map-java.util.function.Function-">Optional.map()</a></li>
-        /// </ul>
-        /// </remarks>
-        /// <param name="selector"></param>
-        /// <typeparam name="TNew"></typeparam>
-        /// <returns></returns>
-        public Optional<TNew> Select<TNew>(Func<T, TNew> selector) {
-            return HasValue ? new Optional<TNew>(selector.Invoke(Value)) : new Optional<TNew>();
-        }
-
-        /// <summary>
-        /// If <see cref="HasValue"/> and <see cref="Value"/> satisfies <paramref name="predicate"/>, return this <see cref="Optional{T}"/>.
-        ///
-        /// Otherwise, return an empty <see cref="Optional{T}"/>.
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        public Optional<T> Where(Func<T, bool> predicate) {
-            if (HasValue && predicate.Invoke(Value)) {
-                return this;
-            }
-            else {
-                return default;
-            }
-        }
+        #endregion IsEmpty
     }
 }

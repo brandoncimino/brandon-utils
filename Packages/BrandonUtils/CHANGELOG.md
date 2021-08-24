@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.1] - 8/24/2021
+
+### Changed
+
+- Moved `Failable` implementations into separate `FailableFunc` files
+- Added a no-return-value, non-generic `Failable` implementation as the new `Failable.cs`
+- Split `IFailable` apart from `IOptional`
+  - `IFailable` doesn't have a return value
+  - `IFailableFunc` is the equivalent of the old `IFailable`
+- Separated and clarified different `IFailable` interfaces
+- Took the `Optional<T>` class out of the `Optional.cs` file and put it into a separate `Optional.T.cs` file
+
 ## [2.10.1] - 8/24/2021
 
 ### Added
