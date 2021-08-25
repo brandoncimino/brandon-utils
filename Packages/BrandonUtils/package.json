@@ -1,6 +1,6 @@
 {
   "name": "com.fowlfever.brandonutils",
-  "version": "2.11.1",
+  "version": "2.12.1",
   "displayName": "Brandon Utils",
   "description": "Stuff Brandon wants in every Unity project.",
   "dependencies": {

@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.12.1] - 8/24/2021
+
+### Added
+
+- Extension methods for `Math.Min` and `Math.Max`
+
+### Changed
+
+- Several of the `Mathb.Clamp` extension methods to use `Math` instead of Unity's `Mathf`
+
 ## [2.11.1] - 8/24/2021
 
 ### Changed
