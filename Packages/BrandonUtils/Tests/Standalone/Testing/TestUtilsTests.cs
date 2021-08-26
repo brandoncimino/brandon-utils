@@ -12,7 +12,7 @@ using NUnit.Framework;
 
 using Is = BrandonUtils.Testing.Is;
 
-namespace BrandonUtils.Tests.Standalone {
+namespace BrandonUtils.Tests.Standalone.Testing {
     [SuppressMessage("ReSharper", "AccessToStaticMemberViaDerivedType")]
     public class TestUtilsTests {
         private readonly struct ApproximationExpectation {
@@ -45,10 +45,10 @@ namespace BrandonUtils.Tests.Standalone {
             public override string ToString() {
                 return JsonConvert.SerializeObject(
                     new Dictionary<object, object>() {
-                        {nameof(Actual), $"[{Actual.GetType()}]{Actual}"},
-                        {nameof(Threshold), $"[{Threshold_Type}]{Threshold}"},
-                        {nameof(Expected_ToPass), $"[{Expected_Type}]{Expected_ToPass(Clusivity.Inclusive)}"},
-                        {nameof(Expected_ToFail), $"[{Expected_Type}]{Expected_ToFail(Clusivity.Inclusive)}"},
+                        { nameof(Actual), $"[{Actual.GetType()}]{Actual}" },
+                        { nameof(Threshold), $"[{Threshold_Type}]{Threshold}" },
+                        { nameof(Expected_ToPass), $"[{Expected_Type}]{Expected_ToPass(Clusivity.Inclusive)}" },
+                        { nameof(Expected_ToFail), $"[{Expected_Type}]{Expected_ToFail(Clusivity.Inclusive)}" },
                     }
                 );
             }

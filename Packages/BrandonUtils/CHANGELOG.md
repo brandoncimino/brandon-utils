@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.13.1] - 8/24/2021
+
+### Added
+
+- `Assertable`, an `IFailable` implementation with some extra bits for help with testing
+- Builder-style classes for executing multiple assertions:
+  - `Asserter`
+  - `Assumer`
+  - `Ignorer`
+- Equivalents of `AssertAll` with different result types - `AssumeAll` and `IgnoreAll`
+
 ## [2.12.2] - 8/24/2021
 
 ### Added

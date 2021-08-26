@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using BrandonUtils.Standalone.Chronic;
 using BrandonUtils.Standalone.Enums;
 
+using JetBrains.Annotations;
+
 using NUnit.Framework.Constraints;
 
 using UnityEngine;
@@ -11,6 +13,7 @@ using UnityEngine;
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace BrandonUtils.Testing {
+    [PublicAPI]
     public static class TestUtils {
         public const           double   ApproximationThreshold       = 0.001;
         public const           double   ApproximationThreshold_Loose = 0.005;

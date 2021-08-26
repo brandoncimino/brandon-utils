@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
-using BrandonUtils.Standalone.Collections;
-using BrandonUtils.Standalone.Exceptions;
-using BrandonUtils.Standalone.Strings;
+using JetBrains.Annotations;
 
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
@@ -35,6 +32,7 @@ namespace BrandonUtils.Testing {
     /// <p/>
     /// <b>NOTE 3:</b> Maybe I will keep this, 'cus stupid <a href="https://docs.nunit.org/articles/nunit/writing-tests/assertions/multiple-asserts.html">NUnit Assert.Multiple()</a> doesn't handle non-<see cref="AssertionException"/>s!!
     /// </remarks>
+    [PublicAPI]
     public static class AssertAll {
         /// <summary>
         /// <see cref="Action.Invoke"/>s each of the provided <see cref="Action"/>s, returning <b>all</b> of the failures.
@@ -43,27 +41,7 @@ namespace BrandonUtils.Testing {
         /// <param name="assertions"></param>
         /// <exception cref="AssertionException">if any of the <see cref="assertions"/> <see cref="Action"/>s throws an <see cref="Exception"/></exception>
         public static void Of(string heading, params Action[] assertions) {
-            var failures = new List<string>();
-            foreach (var ass in assertions) {
-                try {
-                    ass.Invoke();
-                }
-                catch (Exception e) {
-                    var stackTraceFilter = new StringFilter()
-                                           .Matching(@"^\s*(in|at) NUnit")
-                                           .Matching($@"^\s*(in|at) {typeof(AssertAll)}");
-                    failures.Add($"{ass.Method.Name} failed!\n{e.Message}\n{e.FilteredStackTrace(stackTraceFilter).TruncateLines(10).JoinLines()}");
-                }
-            }
-
-            if (failures.Any()) {
-                var msg = $"[{failures.Count}/{assertions.Length}] assertions failed:\n\n{failures.JoinLines()}";
-                if (!string.IsNullOrEmpty(heading)) {
-                    msg = heading + "\n" + msg;
-                }
-
-                Assert.Fail(msg);
-            }
+            MultipleAssertions.ExecuteMultipleAssertions(heading, assertions, Assert.Fail);
         }
 
         /**
@@ -84,6 +62,7 @@ namespace BrandonUtils.Testing {
         /// <typeparam name="T">the <see cref="Type"/> of the `<paramref name="actual"/>` value</typeparam>
         public static void Of<T>(T actual, params Constraint[] assertions) {
             var assActions = assertions.Select<Constraint, Action>(ass => () => Assert.That(actual, ass)).ToArray();
+            var asses      = assertions.Select(ass => MultipleAssertions.ConstraintToAction(actual, ass, Assert.That));
             Of(assActions);
         }
 
