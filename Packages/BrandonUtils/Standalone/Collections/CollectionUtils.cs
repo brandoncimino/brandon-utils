@@ -700,7 +700,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="valueThatMightBeNull">the additional element to maybe add</param>
         /// <typeparam name="T">the type of the elements of <paramref name="source"/></typeparam>
         /// <returns>a new sequence that ends with <paramref name="valueThatMightBeNull"/> if it wasn't <c>null</c></returns>
-        public static IEnumerable<T> AddNonNull<T>([NotNull] this IEnumerable<T> source, [CanBeNull] T valueThatMightBeNull) {
+        public static IEnumerable<T> AppendNonNull<T>([NotNull] this IEnumerable<T> source, [CanBeNull] T valueThatMightBeNull) {
             return valueThatMightBeNull == null ? source : source.Append(valueThatMightBeNull);
         }
 
@@ -711,8 +711,33 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="additionalValuesThatMightBeNull">a sequence of values that might be <c>null</c></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static IEnumerable<T> AddNonNull<T>([NotNull] this IEnumerable<T> source, [CanBeNull] [ItemCanBeNull] IEnumerable<T> additionalValuesThatMightBeNull) {
+        public static IEnumerable<T> AppendNonNull<T>([NotNull] this IEnumerable<T> source, [CanBeNull] [ItemCanBeNull] IEnumerable<T> additionalValuesThatMightBeNull) {
             return additionalValuesThatMightBeNull == null ? source : source.Concat(additionalValuesThatMightBeNull.NonNull());
+        }
+
+        public static TSource AddNonNull<TSource, TElements>([NotNull] this TSource source, [CanBeNull] TElements valueThatMightBeNull) where TSource : ICollection<TElements> {
+            if (valueThatMightBeNull != null) {
+                source.Add(valueThatMightBeNull);
+            }
+
+            return source;
+        }
+
+        /// <summary>
+        /// Actually <see cref="ICollection{T}.Add"/>s all of the non-null items from <paramref name="additionalValuesThatMightBeNull"/> to <paramref name="source"/>.
+        /// </summary>
+        /// <param name="source">the <see cref="ICollection{T}"/> being added to</param>
+        /// <param name="additionalValuesThatMightBeNull">the items that we might want to add to <paramref name="source"/></param>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TElements"></typeparam>
+        /// <returns></returns>
+        public static TSource AddNonNull<TSource, TElements>([NotNull] this TSource source, [CanBeNull] [ItemCanBeNull] IEnumerable<TElements> additionalValuesThatMightBeNull) where TSource : ICollection<TElements> {
+            if (additionalValuesThatMightBeNull == null) {
+                return source;
+            }
+
+            additionalValuesThatMightBeNull.NonNull().ForEach(source.Add);
+            return source;
         }
 
         /// <summary>
@@ -721,8 +746,8 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="source">the original <see cref="IEnumerable{T}"/></param>
         /// <typeparam name="T">the type of the items in <paramref name="source"/></typeparam>
         /// <returns>a new sequence containing only the non-<c>null</c> entries from <paramref name="source"/></returns>
-        public static IEnumerable<T> NonNull<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> source) {
-            return source.Where(it => it != null);
+        public static IEnumerable<T> NonNull<T>([CanBeNull] [ItemCanBeNull] this IEnumerable<T> source) {
+            return source == null ? Enumerable.Empty<T>() : source.Where(it => it != null);
         }
     }
 }
