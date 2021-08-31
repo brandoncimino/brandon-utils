@@ -10,6 +10,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - `ReflectionUtils.IsTupleType`
+- `ReflectionUtils.IsGenericTypeOrDefinition`
 
 ## [2.13.1] - 8/24/2021
 

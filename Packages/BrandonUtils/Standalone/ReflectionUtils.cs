@@ -173,14 +173,14 @@ namespace BrandonUtils.Standalone {
             switch (v) {
                 case PropertyInfo prop:
                     try {
-                        return (T) prop.GetValue(obj);
+                        return (T)prop.GetValue(obj);
                     }
                     catch (InvalidCastException e) {
                         throw new InvalidCastException($"A property named {variableName} was found for the {obj.GetType().Name} {obj}, but it couldn't be cast to a {typeof(T).Name}!", e);
                     }
                 case FieldInfo field:
                     try {
-                        return (T) field.GetValue(obj);
+                        return (T)field.GetValue(obj);
                     }
                     catch (InvalidCastException e) {
                         throw new InvalidCastException($"A field named {variableName} was found for the {obj.GetType().Name} {obj}, but it couldn't be cast to a {typeof(T).Name}!", e);
@@ -318,7 +318,7 @@ namespace BrandonUtils.Standalone {
         private static TOut Construct<TOut>(Type[] parameterTypes, object[] parametersValues) {
             try {
                 var constructor = typeof(TOut).EnsureConstructor(parameterTypes);
-                return (TOut) constructor.Invoke(parametersValues);
+                return (TOut)constructor.Invoke(parametersValues);
             }
             catch (Exception e) {
                 throw e.PrependMessage($"Could not construct an instance of {typeof(TOut).Name} with the parameters {parametersValues}!");
@@ -349,6 +349,46 @@ namespace BrandonUtils.Standalone {
                 parameters.Select(it => it.GetType()).ToArray(),
                 parameters
             );
+        }
+
+        #endregion
+
+        #region Generics
+
+        /// <param name="type">a <see cref="Type"/> that might be generic</param>
+        /// <returns><see cref="Type.IsGenericType"/> || <see cref="Type.IsGenericTypeDefinition"/></returns>
+        public static bool IsGenericTypeOrDefinition(this Type type) {
+            return type.IsGenericType || type.IsGenericTypeDefinition;
+        }
+
+        private static readonly Type[] TupleTypes = {
+            typeof(ValueTuple),
+            typeof(ValueTuple<>),
+            typeof(ValueTuple<,>),
+            typeof(ValueTuple<,,>),
+            typeof(ValueTuple<,,,>),
+            typeof(ValueTuple<,,,,>),
+            typeof(ValueTuple<,,,,,>),
+            typeof(ValueTuple<,,,,,,>),
+            typeof(ValueTuple<,,,,,,,>),
+            // NOTE: typeof(Tuple) is a static utility class
+            typeof(Tuple<>),
+            typeof(Tuple<,>),
+            typeof(Tuple<,,>),
+            typeof(Tuple<,,,>),
+            typeof(Tuple<,,,,>),
+            typeof(Tuple<,,,,,>),
+            typeof(Tuple<,,,,,,>),
+            typeof(Tuple<,,,,,,,>),
+        };
+
+        /// <remarks>
+        /// This is only necessary in .NET Standard 2.0, because in .NET Standard 2.1, an <a href="https://docs.microsoft.com/en-us/dotnet/api/System.Runtime.CompilerServices.ITuple?view=netframework-4.7.1">ITuple</a> interface is available.
+        /// </remarks>
+        /// <param name="type">a <see cref="Type"/></param>
+        /// <returns>true if the given <see cref="Type"/> is one of the <see cref="Tuple{T}"/> or <see cref="ValueTuple{T1}"/> types</returns>
+        public static bool IsTupleType(this Type type) {
+            return type.IsGenericTypeOrDefinition() && TupleTypes.Any(it => type.GetGenericTypeDefinition().IsAssignableFrom(it));
         }
 
         #endregion
