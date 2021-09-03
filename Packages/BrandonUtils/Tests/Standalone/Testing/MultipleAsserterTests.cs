@@ -95,7 +95,7 @@ namespace BrandonUtils.Tests.Standalone.Testing {
         public void IgnoreAll_WithFailures() {
             Assert.Throws<IgnoreException>(
                 () =>
-                    IgnoreAll.Of(
+                    Ignore.Unless(
                         5,
                         Is.False,
                         Is.Unique,

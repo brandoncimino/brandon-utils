@@ -6,14 +6,7 @@ using NUnit.Framework.Constraints;
 namespace BrandonUtils.Testing {
     public class Ignorer<T> : MultipleAsserter<Ignorer<T>, T> {
         protected override Action<string>                ActionOnFailure    => Assert.Ignore;
-        protected override Action<T, IResolveConstraint> ConstraintResolver => TestConstraintForIgnore;
-
-        private static void TestConstraintForIgnore(T actual, IResolveConstraint constraint) {
-            var appliedConstraint = constraint.Resolve().ApplyTo(actual);
-            if (appliedConstraint.IsSuccess == false) {
-                Assert.Ignore(appliedConstraint.Description);
-            }
-        }
+        protected override Action<T, IResolveConstraint> ConstraintResolver => Ignore.Unless;
 
         public Ignorer() { }
 
