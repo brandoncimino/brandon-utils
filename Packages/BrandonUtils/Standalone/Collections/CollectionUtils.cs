@@ -433,7 +433,7 @@ namespace BrandonUtils.Standalone.Collections {
         [System.Diagnostics.Contracts.Pure]
         public static Dictionary<TKey, TValue> JoinDictionaries<TKey, TValue>(
             IEnumerable<IDictionary<TKey, TValue>> dictionaries,
-            ConflictResolution conflictResolution = ConflictResolution.Fail
+            ConflictResolution                     conflictResolution = ConflictResolution.Fail
         ) {
             var allKeys = dictionaries.SelectMany(dic => dic.Keys);
 
@@ -475,15 +475,15 @@ namespace BrandonUtils.Standalone.Collections {
         [System.Diagnostics.Contracts.Pure]
         public static IDictionary<TKey, TValue> JoinDictionaries<TKey, TValue>(
             this IDictionary<TKey, TValue> original,
-            IDictionary<TKey, TValue> additional,
-            ConflictResolution conflictResolution = ConflictResolution.Fail
+            IDictionary<TKey, TValue>      additional,
+            ConflictResolution             conflictResolution = ConflictResolution.Fail
         ) {
             return JoinDictionaries(new[] { original, additional }, conflictResolution);
         }
 
         [System.Diagnostics.Contracts.Pure]
         public static IDictionary<TKey, TValue> JoinDictionaries<TKey, TValue>(
-            this IDictionary<TKey, TValue> original,
+            this   IDictionary<TKey, TValue>   original,
             params IDictionary<TKey, TValue>[] additional
         ) {
             return JoinDictionaries(additional.Prepend(original));
@@ -492,7 +492,7 @@ namespace BrandonUtils.Standalone.Collections {
         [System.Diagnostics.Contracts.Pure]
         public static TValue FirstValue<TKey, TValue>(
             this IEnumerable<Dictionary<TKey, TValue>> dictionaries,
-            TKey key
+            TKey                                       key
         ) {
             return dictionaries.First(dic => dic.ContainsKey(key))[key];
         }
@@ -500,7 +500,7 @@ namespace BrandonUtils.Standalone.Collections {
         [System.Diagnostics.Contracts.Pure]
         public static TValue FirstNonEmptyValue<TKey, TValue>(
             this IEnumerable<IDictionary<TKey, TValue>> dictionaries,
-            TKey key
+            TKey                                        key
         ) {
             return dictionaries.First(dic => dic.ContainsKey(key) && ReflectionUtils.IsNotEmpty(dic[key]))[key];
         }
@@ -564,6 +564,8 @@ namespace BrandonUtils.Standalone.Collections {
         public static bool None<T>(this IEnumerable<T> enumerable, Func<T, bool> predicate) {
             return !enumerable.Any(predicate);
         }
+
+        #region Containment
 
         /// <summary>
         /// Returns true if the <see cref="IEnumerable{T}"/> contains <see cref="Enumerable.Any{TSource}(System.Collections.Generic.IEnumerable{TSource})"/> of the <paramref name="others"/>.
@@ -659,6 +661,19 @@ namespace BrandonUtils.Standalone.Collections {
         public static bool SubsetOf<T>(this IEnumerable<T> subset, params T[] superset) {
             return ContainsAll(superset, subset);
         }
+
+        /// <summary>
+        /// A simple inverse of <see cref="Enumerable.Contains{TSource}(System.Collections.Generic.IEnumerable{TSource},TSource)"/>.
+        /// </summary>
+        /// <param name="source">A sequence in which to locate a value.</param>
+        /// <param name="value">The value to locate in the sequence.</param>
+        /// <typeparam name="T">The type of the elements of <paramref name="source" />.</typeparam>
+        /// <returns>the inverse of <see cref="Enumerable.Contains{TSource}(System.Collections.Generic.IEnumerable{TSource},TSource)"/></returns>
+        public static bool DoesNotContain<T>(this IEnumerable<T> source, T value) {
+            return !source.Contains(value);
+        }
+
+        #endregion
 
         /// <summary>
         /// TODO: Is it correct for this to be an <see cref="ICollection{T}"/> extension, rather than <see cref="IEnumerable{T}"/>?
