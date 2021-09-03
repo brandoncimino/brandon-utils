@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 using JetBrains.Annotations;
 
@@ -20,7 +22,9 @@ namespace BrandonUtils.Standalone.Optional {
 
         public Exception Excuse => _excuse ?? throw FailableException.DidNotFailException(this);
 
-        public bool Failed => !HasValue;
+        public  bool                Failed                   => !HasValue;
+        public  int                 Count                    => HasValue ? 1 : 0;
+        private IEnumerable<TValue> EnumerableImplementation => HasValue ? Enumerable.Repeat(Value, 1) : Enumerable.Empty<TValue>();
 
 
         public FailableFunc(Func<TValue> valueSupplier) {
@@ -46,6 +50,14 @@ namespace BrandonUtils.Standalone.Optional {
             unchecked {
                 return (EqualityComparer<TValue>.Default.GetHashCode(_value) * 397) ^ HasValue.GetHashCode();
             }
+        }
+
+        public IEnumerator<TValue> GetEnumerator() {
+            return EnumerableImplementation.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() {
+            return GetEnumerator();
         }
 
         public override bool Equals(object obj) {
