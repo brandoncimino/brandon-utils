@@ -13,11 +13,11 @@ namespace BrandonUtils.Standalone.Enums {
             }
 
             int enumCount        = Enum.GetValues(typeof(T)).Length;
-            int currentEnumIndex = (int) (object) currentEnumValue;
+            int currentEnumIndex = (int)(object)currentEnumValue;
             int nextEnumIndex    = (currentEnumIndex + step) % enumCount;
 
             // ReSharper disable once PossibleInvalidCastException
-            return (T) (object) nextEnumIndex;
+            return (T)(object)nextEnumIndex;
         }
 
         public static T Next<T>(this T currentEnumValue) where T : Enum {
@@ -35,8 +35,9 @@ namespace BrandonUtils.Standalone.Enums {
         /// <param name="enumValue"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
+        [Obsolete("Please use " + nameof(BEnum) + "." + nameof(BEnum.InvalidEnumArgumentException) + " instead")]
         public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(string argumentName, T enumValue) where T : Enum {
-            return new InvalidEnumArgumentException(argumentName, (int) (object) enumValue, typeof(T));
+            return BEnum.InvalidEnumArgumentException(argumentName, enumValue);
         }
 
         /// <summary>
@@ -49,7 +50,7 @@ namespace BrandonUtils.Standalone.Enums {
         /// <exception cref="ArgumentException">if <see cref="name"/> is an empty string (i.e. <c>""</c>)</exception>
         public static T Parse<T>(string name, bool ignoreCase = false) where T : struct {
             try {
-                return (T) Enum.Parse(typeof(T), name, ignoreCase);
+                return (T)Enum.Parse(typeof(T), name, ignoreCase);
             }
             catch (Exception e) {
                 if (name == "") {

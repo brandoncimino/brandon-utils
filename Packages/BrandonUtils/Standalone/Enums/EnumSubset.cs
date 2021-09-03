@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
+using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Exceptions;
 
 namespace BrandonUtils.Standalone.Enums {
@@ -26,8 +27,9 @@ namespace BrandonUtils.Standalone.Enums {
 
         #region Constructors
 
-        public EnumSubset(IList<T> values, bool isReadOnly = false) {
-            Subset = isReadOnly ? new ReadOnlyCollection<T>(values) : values;
+        public EnumSubset(IEnumerable<T> values, bool isReadOnly = false) {
+            var valueList = values.ToList();
+            Subset = isReadOnly ? (IList<T>)new ReadOnlyCollection<T>(valueList) : valueList;
         }
 
         public EnumSubset(params T[] values) : this(values, false) { }
@@ -109,6 +111,26 @@ namespace BrandonUtils.Standalone.Enums {
             }
         }
 
+        /// <summary>
+        /// Returns a new <see cref="EnumSubset{T}"/> containing all of the <see cref="T"/> values that are <b>NOT</b> in the original <see cref="EnumSubset{T}"/>.
+        /// </summary>
+        /// <example>
+        /// <code><![CDATA[
+        /// var weekEnds = new EnumSubset<DayOfWeek>(DayOfWeek.Saturday, DayOfWeek.Sunday);
+        /// var weekDays = weekEnds.Inverse(); // == Monday...Friday
+        /// ]]></code>
+        /// </example>
+        public EnumSubset<T> Inverse() {
+            var possibleValues = BEnum.Values<T>();
+            return possibleValues.Where(it => this.ContainsNone(it)).ToEnumSubset();
+        }
+
         #endregion
+    }
+
+    public static class EnumSubsetExtensions {
+        public static EnumSubset<T> ToEnumSubset<T>(this IEnumerable<T> source) where T : Enum {
+            return new EnumSubset<T>(source);
+        }
     }
 }
