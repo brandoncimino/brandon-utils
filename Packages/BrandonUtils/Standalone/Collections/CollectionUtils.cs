@@ -778,5 +778,25 @@ namespace BrandonUtils.Standalone.Collections {
         }
 
         #endregion
+
+        #region Finding indexes
+
+        /// TODO: alternate names could be: FirstIndexWhere, FirstIndexSatisfying
+        /// <param name="source"></param>
+        /// <param name="predicate"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>the index of the first entry in the <paramref name="source"/> that satisfies the <paramref name="predicate"/>; or null if none was found</returns>
+        public static int? FirstIndexOf<T>(this IEnumerable<T> source, Func<T, bool> predicate) {
+            var sourceArray = source.ToArray();
+            for (int i = 0; i < sourceArray.Length; i++) {
+                if (predicate.Invoke(sourceArray[i])) {
+                    return i;
+                }
+            }
+
+            return null;
+        }
+
+        #endregion
     }
 }
