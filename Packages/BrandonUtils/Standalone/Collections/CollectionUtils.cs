@@ -749,5 +749,34 @@ namespace BrandonUtils.Standalone.Collections {
         public static IEnumerable<T> NonNull<T>([CanBeNull] [ItemCanBeNull] this IEnumerable<T> source) {
             return source == null ? Enumerable.Empty<T>() : source.Where(it => it != null);
         }
+
+        #region Finding
+
+        /// <param name="source"></param>
+        /// <param name="predicate"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>an <see cref="Optional{T}"/> containing the <typeparamref name="T"/> value that matched the <paramref name="predicate"/></returns>
+        public static Optional<T> FindFirst<T>(this IEnumerable<T> source, Func<T, bool> predicate) {
+            return source.Where(predicate)
+                         .Select(Optional.Optional.Of)
+                         .DefaultIfEmpty(new Optional<T>())
+                         .First();
+        }
+
+        /// <param name="source"></param>
+        /// <param name="key"></param>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <returns>an <see cref="Optional{T}"/> containing the <typeparamref name="TValue"/> of <paramref name="key"/> if <paramref name="source"/> <see cref="IDictionary{TKey,TValue}.ContainsKey"/>; otherwise, an empty <see cref="Optional"/></returns>
+        public static Optional<TValue> Find<TKey, TValue>(this IDictionary<TKey, TValue> source, TKey key) {
+            return source.ContainsKey(key) ? source[key] : default(Optional<TValue>);
+        }
+
+        /// <inheritdoc cref="Find{TKey,TValue}(System.Collections.Generic.IDictionary{TKey,TValue},TKey)"/>
+        public static Optional<TValue> Find<TKey, TValue>(this KeyedCollection<TKey, TValue> source, TKey key) {
+            return source.Contains(key) ? source[key] : default(Optional<TValue>);
+        }
+
+        #endregion
     }
 }
