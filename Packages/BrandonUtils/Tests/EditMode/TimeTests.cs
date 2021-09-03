@@ -7,30 +7,14 @@ using NUnit.Framework;
 
 namespace BrandonUtils.Tests.EditMode {
     public class TimeTests {
-        private static double[] valuesInSeconds = {
-            5d,
-            0.53,
-            2,
-            10,
-            264576.523,
-            7801.623,
-            15.623,
-            0.123,
-            234678.234,
-            345.4 * 645.2,
-            Math.PI,
-            0.1,
-            0.01,
-            0.001,
-            0.00001,
-        };
+        private static double[] ValuesInSeconds = { 5d, 0.53, 2, 10, 264576.523, 7801.623, 15.623, 0.123, 234678.234, 345.4 * 645.2, Math.PI, 0.1, 0.01, 0.001, 0.00001, };
 
         [Test]
         [Combinatorial]
         public void TestDivision(
-            [ValueSource(nameof(valuesInSeconds)), Values(0)]
+            [ValueSource(nameof(ValuesInSeconds)), Values(0)]
             double dividendSeconds,
-            [ValueSource(nameof(valuesInSeconds))]
+            [ValueSource(nameof(ValuesInSeconds))]
             double divisorSeconds
         ) {
             dividendSeconds = TimeUtils.NormalizeSeconds(dividendSeconds);
@@ -48,7 +32,7 @@ namespace BrandonUtils.Tests.EditMode {
 
         [Test]
         public void TestDivisionByZero(
-            [ValueSource(nameof(valuesInSeconds)), Values(0)]
+            [ValueSource(nameof(ValuesInSeconds)), Values(0)]
             double dividendSeconds
         ) {
             Assert.Throws<DivideByZeroException>(() => TimeSpan.FromSeconds(dividendSeconds).Divide(TimeSpan.Zero));
@@ -57,9 +41,9 @@ namespace BrandonUtils.Tests.EditMode {
         [Test]
         [Combinatorial]
         public void TestQuotient(
-            [ValueSource(nameof(valuesInSeconds)), Values(0)]
+            [ValueSource(nameof(ValuesInSeconds)), Values(0)]
             double dividendSeconds,
-            [ValueSource(nameof(valuesInSeconds))]
+            [ValueSource(nameof(ValuesInSeconds))]
             double divisorSeconds
         ) {
             dividendSeconds = TimeUtils.NormalizeSeconds(dividendSeconds);
@@ -75,7 +59,7 @@ namespace BrandonUtils.Tests.EditMode {
 
         [Test]
         public void TestQuotientByZero(
-            [ValueSource(nameof(valuesInSeconds)), Values(0)]
+            [ValueSource(nameof(ValuesInSeconds)), Values(0)]
             double dividendSeconds
         ) {
             Assert.Throws<DivideByZeroException>(() => TimeSpan.FromSeconds(dividendSeconds).Quotient(TimeSpan.Zero));
@@ -84,9 +68,9 @@ namespace BrandonUtils.Tests.EditMode {
         [Test]
         [Combinatorial]
         public void TestModulusCombinatorial(
-            [ValueSource(nameof(valuesInSeconds)), Values(0)]
+            [ValueSource(nameof(ValuesInSeconds)), Values(0)]
             double dividendSeconds,
-            [ValueSource(nameof(valuesInSeconds))]
+            [ValueSource(nameof(ValuesInSeconds))]
             double divisorSeconds
         ) {
             dividendSeconds = TimeUtils.NormalizeSeconds(dividendSeconds);
@@ -106,7 +90,7 @@ namespace BrandonUtils.Tests.EditMode {
 
         [Test]
         public void TestModulusByZero(
-            [ValueSource(nameof(valuesInSeconds)), Values(0)]
+            [ValueSource(nameof(ValuesInSeconds)), Values(0)]
             double dividendSeconds
         ) {
             Assert.Throws<DivideByZeroException>(() => TimeSpan.FromSeconds(dividendSeconds).Modulus(TimeSpan.Zero));
@@ -114,9 +98,9 @@ namespace BrandonUtils.Tests.EditMode {
 
         [Test]
         public void TestMultiply(
-            [ValueSource(nameof(valuesInSeconds)), Values(0)]
+            [ValueSource(nameof(ValuesInSeconds)), Values(0)]
             double multiplicandInSeconds,
-            [ValueSource(nameof(valuesInSeconds)), Values(0)]
+            [ValueSource(nameof(ValuesInSeconds)), Values(0)]
             double multiplier
         ) {
             var multiplicand                 = TimeSpan.FromSeconds(multiplicandInSeconds);
@@ -129,11 +113,11 @@ namespace BrandonUtils.Tests.EditMode {
 
         [Test, Pairwise]
         public void TestSum(
-            [ValueSource(nameof(valuesInSeconds))]
+            [ValueSource(nameof(ValuesInSeconds))]
             double a_seconds,
-            [ValueSource(nameof(valuesInSeconds))]
+            [ValueSource(nameof(ValuesInSeconds))]
             double b_seconds,
-            [ValueSource(nameof(valuesInSeconds))]
+            [ValueSource(nameof(ValuesInSeconds))]
             double c_seconds
         ) {
             var a_span = TimeSpan.FromSeconds(a_seconds);
