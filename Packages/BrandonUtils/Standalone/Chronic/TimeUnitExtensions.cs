@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using BrandonUtils.Standalone.Enums;
 
@@ -23,6 +24,19 @@ namespace BrandonUtils.Standalone.Chronic {
             return (long)(originalUnit.TicksPer() * originalAmount);
         }
 
+        private static Dictionary<TimeUnit, long> TicksPerUnit = new Dictionary<TimeUnit, long>() {
+            { TimeUnit.Ticks, 1 },
+            { TimeUnit.Milliseconds, TimeSpan.TicksPerMillisecond },
+            { TimeUnit.Seconds, TimeSpan.TicksPerSecond },
+            { TimeUnit.Minutes, TimeSpan.TicksPerMinute },
+            { TimeUnit.Hours, TimeSpan.TicksPerHour },
+            { TimeUnit.Days, TimeSpan.TicksPerDay },
+            { TimeUnit.Weeks, TimeSpan.TicksPerDay                * 7 },
+            { TimeUnit.ShortRests, TimeSpan.TicksPerHour          * 1 },
+            { TimeUnit.LongRests, TimeSpan.TicksPerHour           * 8 },
+            { TimeUnit.QueensberryRounds, TimeSpan.TicksPerMinute * 3 },
+        };
+
         /// <summary>
         /// The number of <see cref="TimeUnit.Ticks"/> for a <b>single</b> instance of <paramref name="timeUnit"/>.
         /// </summary>
@@ -30,19 +44,7 @@ namespace BrandonUtils.Standalone.Chronic {
         /// <returns>the number of <see cref="TimeUnit.Ticks"/> per <paramref name="timeUnit"/></returns>
         /// <exception cref="System.ComponentModel.InvalidEnumArgumentException">if an unsupported <see cref="TimeUnit"/> is provided</exception>
         public static long TicksPer(this TimeUnit timeUnit) {
-            return timeUnit switch {
-                TimeUnit.Ticks             => 1,
-                TimeUnit.Milliseconds      => TimeSpan.TicksPerMillisecond,
-                TimeUnit.Seconds           => TimeSpan.TicksPerSecond,
-                TimeUnit.Minutes           => TimeSpan.TicksPerMinute,
-                TimeUnit.Hours             => TimeSpan.TicksPerHour,
-                TimeUnit.Days              => TimeSpan.TicksPerDay,
-                TimeUnit.Weeks             => TimeSpan.TicksPerDay * 7,
-                TimeUnit.ShortRests        => TimeSpan.TicksPerHour * 1,
-                TimeUnit.LongRests         => TimeSpan.TicksPerHour * 8,
-                TimeUnit.QueensberryRounds => TimeSpan.TicksPerMinute * 3,
-                _                          => throw EnumUtils.InvalidEnumArgumentException(nameof(timeUnit), timeUnit)
-            };
+            return TicksPerUnit.ContainsKey(timeUnit) ? TicksPerUnit[timeUnit] : throw BEnum.InvalidEnumArgumentException(nameof(timeUnit), timeUnit);
         }
 
         /// <summary>
