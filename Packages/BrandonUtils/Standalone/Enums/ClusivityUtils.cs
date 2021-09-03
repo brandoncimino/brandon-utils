@@ -1,4 +1,7 @@
-﻿namespace BrandonUtils.Standalone.Enums {
+﻿using JetBrains.Annotations;
+
+namespace BrandonUtils.Standalone.Enums {
+    [PublicAPI]
     public static class ClusivityUtils {
         public static string MaxSymbol(this Clusivity clusivity) {
             return clusivity == Clusivity.Exclusive ? ")" : "]";
