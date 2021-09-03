@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Optional;
@@ -10,6 +11,7 @@ using NUnit.Framework;
 using Is = BrandonUtils.Testing.Is;
 
 namespace BrandonUtils.Tests.Standalone.Collections {
+    [SuppressMessage("ReSharper", "AccessToStaticMemberViaDerivedType")]
     public class OptionalTests {
         [Test]
         public void EmptyEqualsEmpty() {
@@ -131,6 +133,74 @@ namespace BrandonUtils.Tests.Standalone.Collections {
                 () => Assert.False(Optional.AreEqual(optional_c,  def_c),       "Optional.AreEqual(optional_c, def_c)")
             );
         }
+
+        #region Optional of null
+
+        [Test]
+        public void OptionalOfNull_HasValue() {
+            var ofNull = new Optional<string>(null);
+
+            AssertAll.Of(
+                ofNull,
+                Has.Property(nameof(ofNull.HasValue)).True,
+                Has.Property(nameof(ofNull.Value)).Null
+            );
+        }
+
+        [Test]
+        [SuppressMessage("ReSharper", "SuggestVarOrType_Elsewhere")]
+        [SuppressMessage("ReSharper", "ExpressionIsAlwaysNull")]
+        public void OptionalOfNull_Equality() {
+            Optional<string>  ofNull           = new Optional<string>(null);
+            Optional<string>  ofNull2          = new Optional<string>(null);
+            string            nullValue        = (string)null;
+            Optional<string>  nullOptional     = (Optional<string>)null;
+            IOptional<string> nullInterface    = (IOptional<string>)null;
+            Optional<string>  defaultOptional  = default;
+            IOptional<string> defaultInterface = default;
+            Optional<string>  empty            = new Optional<string>();
+
+            Console.WriteLine($"ofNull: [{ofNull}]");
+            Console.WriteLine($"nullOptional: [{nullOptional}]");
+            Console.WriteLine($"defaultOptional: [{defaultOptional}]");
+
+            AssertAll.Of(
+                // vs. nullValue
+                () => Assert.That(ofNull == nullValue,                            "ofNull == nullValue"),
+                () => Assert.That(ofNull != nullValue,                            Is.False, "ofNull != nullValue"),
+                () => Assert.That((ofNull == nullValue) == (nullValue == ofNull), "(ofNull == nullValue) == (nullValue == ofNull)"),
+                () => Assert.That((ofNull != nullValue) == (nullValue != ofNull), "(ofNull != nullValue) == (nullValue != ofNull)"),
+                // vs. nullOptional
+                () => Assert.That(ofNull == nullOptional,                               "ofNull == nullOptional"),
+                () => Assert.That(ofNull != nullOptional,                               Is.False, "ofNull != nullOptional"),
+                () => Assert.That((ofNull == nullOptional) == (nullOptional == ofNull), "(ofNull == nullOptional) == (nullOptional == ofNull)"),
+                () => Assert.That((ofNull != nullOptional) == (nullOptional != ofNull), "(ofNull != nullOptional) == (nullOptional != ofNull)"),
+                // vs. nullInterface
+                () => Assert.That(ofNull == nullInterface, Is.False, "ofNull == nullInterface"),
+                () => Assert.That(ofNull != nullInterface, "ofNull != nullInterface"),
+                // operators with a left-hand IOptional aren't supported as it would cause lots of ambiguity with the other operators
+                // () => Assert.That((ofNull == nullInterface) == (nullInterface == ofNull), "(ofNull == nullInterface) == (nullInterface == ofNull)"),
+                // vs. ofNull2
+                () => Assert.That(ofNull == ofNull2, "ofNull == ofNull2"),
+                () => Assert.That(ofNull != ofNull2, Is.False, "ofNull != ofNull2"),
+                // vs. defaultOptional
+                () => Assert.That(ofNull == defaultOptional,                                  Is.False, "ofNull == defaultOptional"),
+                () => Assert.That(ofNull != defaultOptional,                                  "ofNull != defaultOptional"),
+                () => Assert.That(ofNull,                                                     Is.Not.EqualTo(defaultOptional), "ofNull, Is.Not.EqualTo(defaultOptional)"),
+                () => Assert.That((ofNull == defaultOptional) == (defaultOptional == ofNull), "(ofNull == defaultOptional) == (defaultOptional == ofNull)"),
+                // vs. defaultInterface
+                () => Assert.That(ofNull == defaultInterface, Is.False, "ofNull == defaultInterface"),
+                () => Assert.That(ofNull != defaultInterface, "ofNull != defaultInterface"),
+                () => Assert.That(ofNull,                     Is.Not.EqualTo(defaultInterface), "ofNull, Is.Not.EqualTo(defaultInterface)"),
+                // vs. empty
+                () => Assert.That(ofNull == empty,                        Is.False, "ofNull == empty"),
+                () => Assert.That(ofNull != empty,                        "ofNull != empty"),
+                () => Assert.That(ofNull,                                 Is.Not.EqualTo(empty), "ofNull, Is.Not.EqualTo(empty)"),
+                () => Assert.That((ofNull == empty) == (empty == ofNull), "(ofNull == empty) == (empty == ofNull)")
+            );
+        }
+
+        #endregion
 
         #region ToOptional
 

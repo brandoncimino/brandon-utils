@@ -12,8 +12,15 @@ namespace BrandonUtils.Standalone.Optional {
     /// This gives access to the full suite of <see cref="System.Linq"/> extension methods.
     /// </remarks>
     [PublicAPI]
-    public readonly struct Optional<T> : IEquatable<T>, IEquatable<IOptional<T>>, IReadOnlyCollection<T>, IOptional<T> {
+    public readonly struct Optional<T> : IEquatable<T>, IEquatable<IOptional<T>>, IOptional<T> {
+        public override int GetHashCode() {
+            unchecked {
+                return (EqualityComparer<T>.Default.GetHashCode(_value) * 397) ^ HasValue.GetHashCode();
+            }
+        }
+
         public override bool Equals(object obj) {
+            // this syntax...is scary
             return obj switch {
                 Optional<T> optional when Equals(optional) => true,
                 T t when Equals(t)                         => true,
@@ -21,13 +28,7 @@ namespace BrandonUtils.Standalone.Optional {
             };
         }
 
-        public override int GetHashCode() {
-            return (_items != null ? _items.GetHashCode() : 0);
-        }
-
-        private readonly List<T> _items;
-
-        private IEnumerable<T> EnumerableImplementation => HasValue ? _items : Enumerable.Empty<T>();
+        private readonly T _value;
 
         /// <summary>
         /// Whether or not a <see cref="Value"/> is present.
@@ -39,57 +40,46 @@ namespace BrandonUtils.Standalone.Optional {
         /// <li>Java's <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html#isPresent--">Optional.isPresent()</a></li>
         /// </ul>
         /// </remarks>
-        public bool HasValue => _items != null;
+        public bool HasValue { get; }
 
-        public T Value => HasValue ? _items[0] : throw new InvalidOperationException($"Unable to retrieve the {nameof(Value)} from the {GetType().Name} because it is empty!");
+        [NotNull] public T Value => HasValue ? _value : throw OptionalException.IsEmptyException(this);
 
         public Optional(T value) {
-            _items = new List<T> { value };
+            _value   = value;
+            HasValue = true;
         }
 
         #region Implementations
 
+        public int Count => HasValue ? 1 : 0;
+
+        private IEnumerable<T> GetEnumerable() {
+            return Enumerable.Repeat(_value, Count);
+        }
+
         public IEnumerator<T> GetEnumerator() {
-            return EnumerableImplementation.GetEnumerator();
+            return GetEnumerable().GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator() {
-            return ((IEnumerable)EnumerableImplementation).GetEnumerator();
+            return ((IEnumerable)GetEnumerable()).GetEnumerator();
         }
 
-        public bool Equals(T other) {
-            return Optional.AreEqual(this, other);
-        }
+        public bool Equals(T other) => Optional.AreEqual(this,            other);
+        public bool Equals(IOptional<T> other) => Optional.AreEqual(this, other);
 
-        public bool Equals(IOptional<T> other) {
-            return Optional.AreEqual(this, other);
-        }
+        public static bool operator ==(Optional<T> a, IOptional<T> b) => Optional.AreEqual(a, b);
+        public static bool operator !=(Optional<T> a, IOptional<T> b) => !Optional.AreEqual(a, b);
 
-        public static bool operator ==(Optional<T> a, IOptional<T> b) {
-            return Optional.AreEqual(a, b);
-        }
+        // NOTE: An equality comparator for a left-side IOptional isn't supported because it would cause ambiguity with other operators.
+        // public static bool operator ==(IOptional<T> a, Optional<T> b) => Optional.AreEqual(a, b);
+        // public static bool operator !=(IOptional<T> a, Optional<T> b) => !Optional.AreEqual(a, b);
 
-        public static bool operator !=(Optional<T> a, IOptional<T> b) {
-            return !Optional.AreEqual(a, b);
-        }
+        public static bool operator ==(T a, Optional<T> b) => Optional.AreEqual(a, b);
+        public static bool operator !=(T a, Optional<T> b) => !Optional.AreEqual(a, b);
 
-        public static bool operator ==(T a, Optional<T> b) {
-            return Optional.AreEqual(a, b);
-        }
-
-        public static bool operator !=(T a, Optional<T> b) {
-            return !Optional.AreEqual(a, b);
-        }
-
-        public static bool operator ==(Optional<T> a, T b) {
-            return Optional.AreEqual(a, b);
-        }
-
-        public static bool operator !=(Optional<T> a, T b) {
-            return !Optional.AreEqual(a, b);
-        }
-
-        public int Count => HasValue ? 1 : 0;
+        public static bool operator ==(Optional<T> a, T b) => Optional.AreEqual(a, b);
+        public static bool operator !=(Optional<T> a, T b) => !Optional.AreEqual(a, b);
 
         public override string ToString() {
             // return $"{GetType().Name}<{this.ItemType().Name}>[{(HasValue ? (Value == null ? "null" : Value+"") : "")}]";

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Enums;
 
 using JetBrains.Annotations;
@@ -77,7 +78,7 @@ namespace BrandonUtils.Standalone.Optional {
         #region GetValueOrDefault
 
         /// <summary>
-        /// Returns <see cref="IOptional{T}.Value"/> if it is present; otherwise, returns <see cref="fallback"/>.
+        /// Returns <see cref="IOptional{T}.Value"/> if this <see cref="IOptional{T}.HasValue"/>; otherwise, returns <see cref="fallback"/>.
         /// </summary>
         /// <remarks>
         /// Corresponds to:
@@ -87,10 +88,10 @@ namespace BrandonUtils.Standalone.Optional {
         /// </ul>
         /// </remarks>
         /// <param name="optional">this <see cref="IOptional{T}"/></param>
-        /// <param name="fallback">the return value if this <see cref="IsEmpty{T}(BrandonUtils.Standalone.Optional.IOptional{T})"/></param>
-        /// <returns></returns>
-        public static T GetValueOrDefault<T>(this IOptional<T> optional, T fallback) {
-            return optional.HasValue ? optional.Value : fallback;
+        /// <param name="fallback">the return value if this <see cref="CollectionUtils.IsEmpty{T}"/></param>
+        /// <returns><see cref="IOptional{T}.Value"/> if it this <see cref="IOptional{T}.HasValue"/>; otherwise, returns <see cref="fallback"/>.</returns>
+        public static T GetValueOrDefault<T>([CanBeNull] [ItemCanBeNull] this IOptional<T> optional, [CanBeNull] T fallback) {
+            return optional is { HasValue: true } ? optional.Value : fallback;
         }
 
         /// <summary>
@@ -103,8 +104,14 @@ namespace BrandonUtils.Standalone.Optional {
         /// <param name="optional">this <see cref="IOptional{T}"/></param>
         /// <param name="fallbackSupplier">a <see cref="Func{TResult}"/> that produces a <see cref="T"/> if <see cref="IOptional{T}.Value"/> isn't present</param>
         /// <returns><see cref="IOptional{T}.Value"/> if this <see cref="IOptional{T}.HasValue"/>; otherwise, <see cref="Func{TResult}.Invoke"/>s <see cref="fallbackSupplier"/></returns>
-        public static T GetValueOrDefault<T>(this IOptional<T> optional, Func<T> fallbackSupplier) {
-            return optional.HasValue ? optional.Value : fallbackSupplier.Invoke();
+        public static T GetValueOrDefault<T>([CanBeNull] this IOptional<T> optional, [NotNull] Func<T> fallbackSupplier) {
+            if (fallbackSupplier == null) {
+                throw new ArgumentNullException(nameof(fallbackSupplier));
+            }
+
+            // woah...this some new-fangled way to say:
+            // return optional != null && optional.HasValue ? optional.Value : fallbackSupplier.Invoke();
+            return optional is { HasValue: true } ? optional.Value : fallbackSupplier.Invoke();
         }
 
         #endregion
@@ -121,7 +128,7 @@ namespace BrandonUtils.Standalone.Optional {
         /// </summary>
         /// <remarks>
         /// I made this so that I had the same logic across all of the different <see cref="IEquatable{T}"/> and <c>==</c>
-        /// operator comparisons in <see cref="Optional{T}"/>, <see cref="FailableFunc{TValue,TExcuse}"/>, etc.
+        /// operator comparisons in <see cref="Optional{T}"/>, <see cref="FailableFunc{TValue}"/>, etc.
         /// <p/>
         /// In fancy language, this method provides a default equality comparator for <see cref="IOptional{T}"/> implementations.
         /// </remarks>
@@ -131,16 +138,25 @@ namespace BrandonUtils.Standalone.Optional {
         /// <returns>the equality of the underlying <see cref="IOptional{T}.Value"/>s of <see cref="a"/> and <see cref="b"/></returns>
         /// <seealso cref="AreEqual{T}(BrandonUtils.Standalone.Optional.IOptional{T},T)"/>
         /// <seealso cref="AreEqual{T}(T,BrandonUtils.Standalone.Optional.IOptional{T})"/>
-        public static bool AreEqual<T>(IOptional<T> a, IOptional<T> b) {
+        public static bool AreEqual<T>([CanBeNull] IOptional<T> a, [CanBeNull] IOptional<T> b) {
+            // return true if EITHER:
+            // - a & b are the same object, OR
+            // - a & b are both null
             if (ReferenceEquals(a, b)) {
                 return true;
             }
 
+            // since at this point we know that they can't _both_ be null, if _either_ of them is null, return false
             if (ReferenceEquals(a, null) || ReferenceEquals(b, null)) {
                 return false;
             }
 
+            // if a & b are both EITHER:
+            // - not empty, OR
+            // - empty
             if (a.HasValue == b.HasValue) {
+                // if a is empty, then b is empty, and two empties are considered to match, so we return TRUE
+                // otherwise, we compare the actual values
                 return !a.HasValue || Equals(a.Value, b.Value);
             }
 
@@ -150,19 +166,25 @@ namespace BrandonUtils.Standalone.Optional {
         /// <summary>
         /// Compares the <see cref="IOptional{T}.Value"/> of an <see cref="IOptional{T}"/> to a vanilla <typeparamref name="T"/> value
         /// </summary>
+        /// <remarks>
+        /// <ul>
+        /// <li>A null <see cref="IOptional{T}"/> should <b>not</b> be considered equal to a null <typeparamref name="T"/></li>
+        /// <li>Anm
+        /// </ul>
+        /// </remarks>
         /// <param name="a">an <see cref="IOptional{T}"/></param>
         /// <param name="b">a vanilla <typeparamref name="T"/> value</param>
         /// <typeparam name="T">the underlying type being compared</typeparam>
         /// <returns>the equality of (<paramref name="a"/>.<see cref="IOptional{T}.Value"/>) and (<paramref name="b"/>)</returns>
         /// <seealso cref="AreEqual{T}(BrandonUtils.Standalone.Optional.IOptional{T},BrandonUtils.Standalone.Optional.IOptional{T})"/>
         /// <seealso cref="AreEqual{T}(T,BrandonUtils.Standalone.Optional.IOptional{T})"/>
-        public static bool AreEqual<T>(IOptional<T> a, T b) {
+        public static bool AreEqual<T>([CanBeNull] IOptional<T> a, [CanBeNull] T b) {
             // this method compares the _value_ of `a` to `b`, which means a value has to exist
             if (ReferenceEquals(a, null)) {
                 return false;
             }
 
-            return a.HasValue && a.Value.Equals(b);
+            return a.HasValue && Equals(a.Value, b);
         }
 
         /// <summary>
@@ -177,7 +199,7 @@ namespace BrandonUtils.Standalone.Optional {
         /// <returns>the equality of (<paramref name="a"/>) and (<paramref name="b"/>.<see cref="IOptional{T}.Value"/>)</returns>
         /// <seealso cref="AreEqual{T}(BrandonUtils.Standalone.Optional.IOptional{T},BrandonUtils.Standalone.Optional.IOptional{T})"/>
         /// <seealso cref="AreEqual{T}(BrandonUtils.Standalone.Optional.IOptional{T},T)"/>
-        public static bool AreEqual<T>(T a, IOptional<T> b) {
+        public static bool AreEqual<T>([CanBeNull] T a, [CanBeNull] IOptional<T> b) {
             return AreEqual(b, a);
         }
 
@@ -189,8 +211,10 @@ namespace BrandonUtils.Standalone.Optional {
         /// <param name="optional">an <see cref="IOptional{T}"/></param>
         /// <typeparam name="T">the underlying type of the <see cref="IOptional{T}"/></typeparam>
         /// <returns>a <see cref="object.ToString"/> representation of the given <see cref="IOptional{T}"/></returns>
-        public static string ToString<T>(IOptional<T> optional) {
-            return $"{optional.GetType().Name}<{typeof(T).Name}>[{(optional.HasValue ? (optional.Value == null ? "null" : optional.Value + "") : "")}]";
+        public static string ToString<T>([CanBeNull] IOptional<T> optional) {
+            return optional == null
+                       ? $"(IOptional<{typeof(T).Name}>)null"
+                       : $"{optional.GetType().Name}<{typeof(T).Name}>[{(optional.HasValue ? (optional.Value == null ? "null" : optional.Value + "") : "")}]";
         }
 
         #region IfPresentOrElse
