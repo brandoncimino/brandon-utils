@@ -11,7 +11,7 @@ using NUnit.Framework;
 
 using Is = NUnit.Framework.Is;
 
-namespace BrandonUtils.Tests.Standalone {
+namespace BrandonUtils.Tests.Standalone.Strings {
     public class StringUtilsTests {
         [Test]
         [TestCase(

@@ -17,6 +17,16 @@ namespace BrandonUtils.Standalone.Strings {
     [PublicAPI]
     public static class StringUtils {
         /// <summary>
+        /// A <see cref="string"/> for a single-glyph <a href="https://en.wikipedia.org/wiki/Ellipsis">ellipsis</a>, i.e. <c>'…'</c>.
+        ///
+        /// <ul>
+        /// <li><b>Unicode:</b> <c>U+2026 … HORIZONTAL ELLIPSIS</c></li>
+        /// <li><b>HTML:</b> <c><![CDATA[&#8230;]]></c></li>
+        /// </ul>
+        /// </summary>
+        internal const string Ellipsis = "…";
+
+        /// <summary>
         /// Valid strings for <a href="https://en.wikipedia.org/wiki/Newline">line breaks</a>, in <b>order of precedence</b> as required by <see cref="string.Split(string[], StringSplitOptions)"/>:
         /// <ul>
         /// <li><c>"\r\n"</c>, aka "Carriage Return + Line Feed", aka <c>"CRLF"</c></li>
@@ -27,7 +37,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// <remarks>
         /// Intended to passed to <see cref="string.Split(string[], StringSplitOptions)"/>.
         /// </remarks>
-        private static readonly string[] LineBreakSplitters = { "\r\n", "\r", "\n" };
+        internal static readonly string[] LineBreakSplitters = { "\r\n", "\r", "\n" };
 
         /// <summary>
         /// Prepends <paramref name="toIndent" />.
@@ -206,6 +216,51 @@ namespace BrandonUtils.Standalone.Strings {
 
         #endregion
 
+        #region Padding, filling, truncating, trimming, and trailing
+
+        /// <summary>
+        /// Reduces <paramref name="self"/> to <paramref name="maxLength"/> characters, replacing the last bits with a <paramref name="trail"/> if specified.
+        ///
+        /// If the original <see cref="string.Length"/> is less than <paramref name="maxLength"/>, returns <paramref name="self"/>.
+        /// </summary>
+        /// <param name="self">the <see cref="string"/> being truncated</param>
+        /// <param name="maxLength">the <b>maximum</b> size of the final string</param>
+        /// <param name="trail">a <see cref="string"/> to replace the end bits of <paramref name="self"/> to show that it has been truncated. Defaults to an <see cref="Ellipsis"/></param>
+        /// <returns></returns>
+        public static string Truncate([CanBeNull] this string self, [ValueRange(0, long.MaxValue)] int maxLength, [CanBeNull] string trail = Ellipsis) {
+            if (self == null) {
+                return "";
+            }
+
+            if (self.Length > maxLength) {
+                var shortened = self.Substring(0, maxLength - trail?.Length ?? 0);
+                return $"{shortened}{trail}";
+            }
+
+            return self;
+        }
+
+        /// <summary>
+        /// Uses either <see cref="Truncate"/> or <see cref="FillRight"/> to get <paramref name="self"/> to be <paramref name="desiredLength"/> long.
+        /// </summary>
+        /// <param name="self">the original <see cref="string"/></param>
+        /// <param name="desiredLength">the <see cref="string.Length"/> that <paramref name="self"/> will have</param>
+        /// <param name="filler">the <see cref="string"/> used to <see cref="FillRight"/> if <paramref name="self"/> is shorter than <paramref name="desiredLength"/></param>
+        /// <param name="trail">the <see cref="string"/> used to indicated that <paramref name="self"/> has been <see cref="Truncate"/>d</param>
+        /// <returns>a <see cref="string"/> with a <see cref="string.Length"/> of <paramref name="desiredLength"/></returns>
+        /// <exception cref="ArgumentException"></exception>
+        [NotNull]
+        public static string ForceToLength([CanBeNull] this string self, [ValueRange(0, long.MaxValue)] int desiredLength, [CanBeNull] string filler = " ", [CanBeNull] string trail = Ellipsis) {
+            self ??= "";
+
+            return self.Length.CompareTo(desiredLength).Sign() switch {
+                -1 => self.FillRight(desiredLength, filler),
+                0  => self,
+                1  => self.Truncate(desiredLength, trail),
+                _  => throw new ArgumentException($"This should be unreachable, because we used a {nameof(int.CompareTo)} function AND got the {nameof(PrimitiveUtils.Sign)} of it, so we definitely should've only had the possibilities of -1, 0, or 1.")
+            };
+        }
+
         public static string FillRight(this string self, int totalLength, string filler) {
             ValidateFillParameters(filler, totalLength);
 
@@ -256,6 +311,8 @@ namespace BrandonUtils.Standalone.Strings {
             var hRule  = border.FillRight(middle.Length, border);
             return $"{hRule}\n{middle}\n{hRule}";
         }
+
+        #endregion
 
         /// <summary>
         /// An extension method to call <see cref="Regex.Split(string)"/>.
@@ -344,6 +401,14 @@ namespace BrandonUtils.Standalone.Strings {
         /// <seealso cref="ToStringLines"/>
         public static string[] SplitLines(this IEnumerable<string> contentsWithLines, StringSplitOptions options = default) {
             return contentsWithLines.SelectMany(content => content.SplitLines(options)).ToArray();
+        }
+
+        public static int LongestLine(this IEnumerable<string> strings) {
+            return strings.SelectMany(it => it.SplitLines()).Max(it => it.Length);
+        }
+
+        public static int LongestLine(this string str) {
+            return str.SplitLines().Max(it => it.Length);
         }
 
         #region Truncation & Collapsing
