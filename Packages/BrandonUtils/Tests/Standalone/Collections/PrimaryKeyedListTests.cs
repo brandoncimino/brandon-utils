@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace BrandonUtils.Tests.Standalone.Collections {
-    public class KeyedListTests {
+    public class PrimaryKeyedListTests {
         private class NoInterface : IEquatable<NoInterface> {
             public DayOfWeek DayOfWeek;
             public string    Info;
@@ -40,7 +40,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
             public AlsoHasInterface(DayOfWeek dayOfWeek) : base(dayOfWeek) { }
         }
 
-        private static KeyedList<DayOfWeek, HasInterface> _keyedList = new KeyedList<DayOfWeek, HasInterface> {
+        private static KeyedList<DayOfWeek, HasInterface> _keyedList = new PrimaryKeyedList<DayOfWeek, HasInterface> {
             new HasInterface(DayOfWeek.Monday),
             new HasInterface(DayOfWeek.Tuesday),
             new HasInterface(DayOfWeek.Wednesday),
@@ -65,7 +65,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
             }
         }
 
-        private static KeyedList<string, StringKey> StringKeyedList = new KeyedList<string, StringKey>() {
+        private static KeyedList<string, StringKey> StringKeyedList = new PrimaryKeyedList<string, StringKey>() {
             new StringKey("one",   1),
             new StringKey("two",   2),
             new StringKey("three", 3)
@@ -128,7 +128,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
         [Test]
         public void AddViaKey() {
-            var kl = new KeyedList<DayOfWeek, HasInterface>() {
+            var kl = new PrimaryKeyedList<DayOfWeek, HasInterface>() {
                 new HasInterface(DayOfWeek.Monday)
             };
 
@@ -154,7 +154,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
                 new HasInterface(DayOfWeek.Tuesday),
                 new HasInterface(DayOfWeek.Tuesday)
             };
-            Assert.Throws<ArgumentException>(() => new KeyedList<DayOfWeek, HasInterface>(ls));
+            Assert.Throws<ArgumentException>(() => new PrimaryKeyedList<DayOfWeek, HasInterface>(ls));
         }
 
         [Test]
@@ -165,18 +165,18 @@ namespace BrandonUtils.Tests.Standalone.Collections {
                 new HasInterface(DayOfWeek.Wednesday)
             };
 
-            var kl = new KeyedList<DayOfWeek, HasInterface> {
+            var kl = new PrimaryKeyedList<DayOfWeek, HasInterface> {
                 new HasInterface(DayOfWeek.Monday),
                 new HasInterface(DayOfWeek.Tuesday),
                 new HasInterface(DayOfWeek.Wednesday)
             };
 
-            Assert.That(new KeyedList<DayOfWeek, HasInterface>(ls), Is.EqualTo(kl));
+            Assert.That(new PrimaryKeyedList<DayOfWeek, HasInterface>(ls), Is.EqualTo(kl));
         }
 
         [Test]
         public void ErrorOnMissingKey() {
-            var kl = new KeyedList<DayOfWeek, HasInterface>() {
+            var kl = new PrimaryKeyedList<DayOfWeek, HasInterface>() {
                 new HasInterface(DayOfWeek.Tuesday)
             };
 
@@ -185,7 +185,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
         [Test]
         public void ErrorOnRemovingMissingKey() {
-            var kl = new KeyedList<DayOfWeek, HasInterface>() {
+            var kl = new PrimaryKeyedList<DayOfWeek, HasInterface>() {
                 new HasInterface(DayOfWeek.Tuesday)
             };
 
@@ -194,7 +194,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
         [Test]
         public void TestRemove() {
-            var kl = new KeyedList<DayOfWeek, HasInterface>() {
+            var kl = new PrimaryKeyedList<DayOfWeek, HasInterface>() {
                 new HasInterface(DayOfWeek.Monday),
                 new HasInterface(DayOfWeek.Tuesday)
             };
@@ -209,7 +209,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
         [Test]
         public void TestJsonPopulateWithSameData() {
-            var kl = new KeyedList<DayOfWeek, HasInterface> {
+            var kl = new PrimaryKeyedList<DayOfWeek, HasInterface> {
                 new HasInterface(DayOfWeek.Monday),
                 new HasInterface(DayOfWeek.Tuesday)
             };
@@ -220,14 +220,14 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
         [Test]
         public void TestJsonPopulateEmpty() {
-            var kl = new KeyedList<DayOfWeek, HasInterface> {
+            var kl = new PrimaryKeyedList<DayOfWeek, HasInterface> {
                 new HasInterface(DayOfWeek.Monday),
                 new HasInterface(DayOfWeek.Tuesday)
             };
 
             var json = JsonConvert.SerializeObject(kl);
 
-            var kl2 = new KeyedList<DayOfWeek, HasInterface>();
+            var kl2 = new PrimaryKeyedList<DayOfWeek, HasInterface>();
 
             Assert.That(kl2, Is.Not.EqualTo(kl));
 

@@ -4,54 +4,88 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.Serialization;
 
+using BrandonUtils.Standalone.Optional;
+
+using JetBrains.Annotations;
+
 using Newtonsoft.Json;
 
 namespace BrandonUtils.Standalone.Collections {
     /// <summary>
     /// A simple implementation of <see cref="KeyedCollection{TKey,TItem}"/>.
     /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
+    /// <remarks>
+    /// Though a <see cref="KeyedList{TKey,TValue}"/> resembles an <see cref="Dictionary{TKey,TValue}"/> in many ways, it does <b>not</b>
+    /// implement <see cref="IDictionary{TKey,TValue}"/>.
+    /// <br/>
+    /// This is intentional, as doing so would introduce ambiguity when using <see cref="Enumerable"/> extension methods.
+    /// <br/>
+    /// For example, calling <see cref="Enumerable.ToList{TSource}"/> on a <see cref="KeyedCollection{TKey,TValue}"/> returns a <see cref="List{T}"/>
+    /// of <typeparamref name="TValue"/>, but calling it on an <see cref="IDictionary{TKey,TValue}"/> returns a <see cref="List{T}"/> of <see cref="KeyValuePair{TKey,TValue}"/>.
+    /// </remarks>
+    /// <typeparam name="TKey">the type of the <see cref="Keys"/></typeparam>
+    /// <typeparam name="TValue">the type of the <see cref="Values"/></typeparam>
+    [PublicAPI]
     [Serializable]
-    public class KeyedList<TKey, TValue> : KeyedCollection<TKey, TValue> where TValue : class, IPrimaryKeyed<TKey> {
+    public class KeyedList<TKey, TValue> : KeyedCollection<TKey, TValue> {
+        [NotNull] protected readonly Func<TValue, TKey> KeyExtractor;
+
         protected override TKey GetKeyForItem(TValue item) {
-            return item.PrimaryKey;
+            return KeyExtractor.Invoke(item);
+        }
+
+        public void Add(TKey key, TValue value) {
+            throw new NotImplementedException();
+        }
+
+        public bool ContainsKey(TKey key) {
+            throw new NotImplementedException();
+        }
+
+        public bool TryGetValue(TKey key, out TValue value) {
+            throw new NotImplementedException();
         }
 
         public new TValue this[TKey key] {
             get => base[key];
             set => Put(value);
         }
+        public ICollection<TKey>   Keys   { get; }
+        public ICollection<TValue> Values { get; }
 
-        public KeyedList(IEnumerable<TValue> collection) {
+        public KeyedList(Func<TValue, TKey> keyExtractor, IEnumerable<TValue> collection) : this(keyExtractor) {
             foreach (TValue item in collection) {
                 this.Add(item);
             }
         }
 
-        public KeyedList() : base() { }
+        public KeyedList(Func<TValue, TKey> keyExtractor) : base() {
+            KeyExtractor = keyExtractor;
+        }
 
         public KeyedList<TKey, TValue> Copy() {
-            return new KeyedList<TKey, TValue>(this);
+            return new KeyedList<TKey, TValue>(KeyExtractor);
         }
 
         public void ForEach(Action<TValue> action) {
             this.ToList().ForEach(action);
         }
 
-        public new void Add(TValue item) {
-            base.Add(item);
+        public TValue Grab(TKey key) {
+            var found = this[key];
+            Remove(key);
+            return found;
         }
 
         /// <summary>
-        /// If the <see cref="GetKeyForItem">primary key</see> of <paramref name="item"/> already exists, update it.
+        /// If the <see cref="GetKeyForItem">primary key</see> of <paramref name="item"/> already exists, <b>replace</b> it.
         /// <br/>
-        /// If not, <see cref="Add"/> it.
+        /// If not, <see cref="Collection{T}.Add"/> it.
         /// </summary>
-        /// <param name="item"></param>
-        /// <returns>The old item with the primary key matching <paramref name="item"/> if it existed; otherwise, <see langword="null"/>.</returns>
-        public TValue Put(TValue item) {
-            TValue oldItem = null;
+        /// <param name="item">the item to <i>maybe</i> <see cref="Collection{T}.Add"/> to this <see cref="KeyedList{TKey,TValue}"/></param>
+        /// <returns>the old item with the primary key matching <paramref name="item"/> if it existed; otherwise, <see langword="null"/>.</returns>
+        public Optional<TValue> Put(TValue item) {
+            Optional<TValue> oldItem = default;
             if (Contains(GetKeyForItem(item))) {
                 oldItem = this[GetKeyForItem(item)];
             }
@@ -72,11 +106,21 @@ namespace BrandonUtils.Standalone.Collections {
         }
 
         /// <summary>
-        /// A parameterless override for <see cref="Enumerable.ToDictionary{TSource,TKey}(System.Collections.Generic.IEnumerable{TSource},System.Func{TSource,TKey})"/> that uses <see cref="GetKeyForItem"/> as the selector.
+        /// A parameterless overload for <see cref="Enumerable.ToDictionary{TSource,TKey}(System.Collections.Generic.IEnumerable{TSource},System.Func{TSource,TKey})"/> that uses <see cref="GetKeyForItem"/> as the selector.
         /// </summary>
+        /// <remarks>
+        /// <see cref="KeyedList{TKey,TValue}"/> <b>intentionally</b> does not implement the <see cref="IDictionary{TKey,TValue}"/> interface,
+        /// because doing so would create ambiguity when calling <see cref="Enumerable"/> extension methods.
+        /// <p/>
+        /// For example, when using <see cref="Enumerable.ToList{TSource}"/>:
+        /// <ul>
+        /// <li><see cref="KeyedList{TKey,TValue}"/> returns a <see cref="List{T}"/> of <typeparamref name="TValue"/></li>
+        /// <li><see cref="IDictionary{TKey,TValue}"/> returns a <see cref="List{T}"/> of <see cref="KeyValuePair{TKey,TValue}"/></li>
+        /// </ul>
+        /// </remarks>
         /// <returns>A <i>new</i> <see cref="Dictionary{TKey,TValue}"/> where:
-        /// <li>The <see cref="Dictionary{TKey,TValue}.Values"/> are the <see cref="KeyedList{TKey,TValue}"/>'s items</li>
-        /// <li>The <see cref="Dictionary{TKey,TValue}.Keys"/> are the <see cref="KeyedList{TKey,TValue}"/>'s <see cref="GetKeyForItem"/>s.</li>
+        /// <li>The <see cref="Dictionary{TKey,TValue}.Values"/> are the <see cref="KeyedList{TKey,TValue}"/>'s <see cref="Values"/></li>
+        /// <li>The <see cref="Dictionary{TKey,TValue}.Keys"/> are the <see cref="KeyedList{TKey,TValue}"/>'s <see cref="Keys"/></li>
         /// </returns>
         /// <seealso cref="Enumerable.ToDictionary{TSource,TKey}(System.Collections.Generic.IEnumerable{TSource},System.Func{TSource,TKey})"/>
         public Dictionary<TKey, TValue> ToDictionary() {
