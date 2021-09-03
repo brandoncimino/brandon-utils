@@ -344,22 +344,22 @@ namespace BrandonUtils.Standalone.Optional {
 
         #region Function Fallbacks
 
-        public static IOptional<TOut> FirstWithValue<TOut>(IEnumerable<Func<IOptional<TOut>>> functions) {
+        public static Optional<TOut> FirstWithValue<TOut>(IEnumerable<Func<Optional<TOut>>> functions) {
             return functions.Select(fn => fn.Invoke())
                             .FirstOrDefault(it => it.HasValue);
         }
 
-        public static IOptional<TOut> FirstWithValue<TOut>(params Func<IOptional<TOut>>[] functions) {
-            return FirstWithValue(functions as IEnumerable<Func<IOptional<TOut>>>);
+        public static Optional<TOut> FirstWithValue<TOut>(params Func<Optional<TOut>>[] functions) {
+            return FirstWithValue(functions as IEnumerable<Func<Optional<TOut>>>);
         }
 
-        public static IOptional<TOut> FirstWithValue<TIn, TOut>(TIn input, IEnumerable<Func<TIn, IOptional<TOut>>> functions) {
+        public static Optional<TOut> FirstWithValue<TIn, TOut>(TIn input, IEnumerable<Func<TIn, Optional<TOut>>> functions) {
             return functions.Select(fn => fn.Invoke(input))
                             .FirstOrDefault(it => it.HasValue);
         }
 
-        public static IOptional<TOut> FirstWithValue<TIn, TOut>(TIn input, params Func<TIn, IOptional<TOut>>[] functions) {
-            return FirstWithValue(input, functions as IEnumerable<Func<TIn, IOptional<TOut>>>);
+        public static Optional<TOut> FirstWithValue<TIn, TOut>(TIn input, params Func<TIn, Optional<TOut>>[] functions) {
+            return FirstWithValue(input, functions as IEnumerable<Func<TIn, Optional<TOut>>>);
         }
 
         #endregion Function Fallbacks
