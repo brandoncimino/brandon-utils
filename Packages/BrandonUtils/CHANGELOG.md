@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+> **Note:** Dates are in `mm/dd/yyyy` format.
+
+## [2.20.0] - 9/4/2021
+
+# Changed
+
+- Updated `FowlFever.Conjugal` to `v0.1.2`
+- Added `Conjugal` and `Humanizer` references to all `.asmdef`s
+
 ## [2.19.1] - 9/3/2021
 
 ### Changed

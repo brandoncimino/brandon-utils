@@ -9,7 +9,9 @@
   "precompiledReferences": [
     "Newtonsoft.Json.dll",
     "nunit.framework.dll",
-    "JetBrains.Annotations.dll"
+    "JetBrains.Annotations.dll",
+    "FowlFever.Conjugal.dll",
+    "Humanizer.dll"
   ],
   "autoReferenced": true,
   "defineConstraints": [],

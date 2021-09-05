@@ -16,7 +16,9 @@
   "overrideReferences": true,
   "precompiledReferences": [
     "nunit.framework.dll",
-    "Newtonsoft.Json.dll"
+    "Newtonsoft.Json.dll",
+    "FowlFever.Conjugal.dll",
+    "Humanizer.dll"
   ],
   "autoReferenced": false,
   "defineConstraints": [],

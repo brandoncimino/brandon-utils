@@ -10,7 +10,9 @@
   "allowUnsafeCode": false,
   "overrideReferences": true,
   "precompiledReferences": [
-    "Newtonsoft.Json.dll"
+    "Newtonsoft.Json.dll",
+    "FowlFever.Conjugal.dll",
+    "Humanizer.dll"
   ],
   "autoReferenced": true,
   "defineConstraints": [],

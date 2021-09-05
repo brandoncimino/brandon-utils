@@ -4,6 +4,7 @@ namespace BrandonUtils.Standalone.Strings {
     /// <summary>
     /// A class for handling noun conjugations consistently.
     /// </summary>
+    [Obsolete("Please use FowlFever.Conjugal.Plurable instead.")]
     [Serializable]
     public class Noun {
         public string Singular;
