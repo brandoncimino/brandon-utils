@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
+using BrandonUtils.Standalone.Attributes;
+using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Exceptions;
+using BrandonUtils.Standalone.Reflection;
+using BrandonUtils.Standalone.Strings;
+using BrandonUtils.Standalone.Strings.Prettifiers;
 
 using JetBrains.Annotations;
 
@@ -35,47 +41,42 @@ namespace BrandonUtils.Standalone {
         /// Some methods, such as <see cref="GetVariables"/>, specifically filter out backing fields.
         /// </remarks>
         public const BindingFlags VariablesBindingFlags =
-            BindingFlags.Default |
-            BindingFlags.Instance |
+            BindingFlags.Default   |
+            BindingFlags.Instance  |
             BindingFlags.NonPublic |
-            BindingFlags.Public |
+            BindingFlags.Public    |
             BindingFlags.Static;
 
         public const BindingFlags ConstructorBindingFlags =
             BindingFlags.Instance |
-            BindingFlags.Public |
+            BindingFlags.Public   |
+            BindingFlags.NonPublic;
+
+        public const BindingFlags AutoPropertyBackingFieldBindingFlags =
+            BindingFlags.Instance |
+            BindingFlags.Static   |
             BindingFlags.NonPublic;
 
         private const string PropertyCaptureGroupName = "property";
 
         #region Variables
 
-        private static ArgumentException NotVariableException(MemberInfo memberInfo, Exception innerException = null) {
-            return new ArgumentException($"{nameof(MemberInfo)} {memberInfo.DeclaringType}.{memberInfo.Name} isn't a 'Variable' (either a property or a non-backing-field)!", innerException);
-        }
-
-        private static void ValidateIsVariable(MemberInfo memberInfo) {
-            if (!memberInfo.IsVariable()) {
-                throw NotVariableException(memberInfo);
-            }
-        }
-
         /// <summary>
-        /// Returns all of the <see cref="VariablesBindingFlags">"variables"</see> from the given <paramref name="type"/>.
+        /// Returns all of the <see cref="IsVariable"/> <see cref="MemberInfo"/>s from the given <paramref name="type"/>.
         /// </summary>
         /// <remarks>
         /// "Variables" includes both <see cref="Type.GetProperties()"/> and <see cref="Type.GetFields()"/>.
-        /// It does <b>not</b> include <see cref="IsBackingField">backing fields</see>.
+        /// It does <b>not</b> include <see cref="IsAutoPropertyBackingField">backing fields</see>.
         /// </remarks>
         /// <param name="type">The <see cref="Type"/> to retrieve the fields and properties of.</param>
         /// <returns>
         /// </returns>
-        public static List<MemberInfo> GetVariables(this Type type) {
-            // TODO: There's some warning here that I should probably resolve, about co-variant types or something...
-            MemberInfo[] properties = type.GetProperties(VariablesBindingFlags);
-            MemberInfo[] fields     = type.GetFields(VariablesBindingFlags);
-            return properties.Union(fields).Where(it => !it.IsBackingField()).ToList();
-            ;
+        [NotNull]
+        [ItemNotNull]
+        public static IEnumerable<MemberInfo> GetVariables([NotNull] this Type type) {
+            var properties = type.GetProperties(VariablesBindingFlags).Cast<MemberInfo>();
+            var fields     = type.GetFields(VariablesBindingFlags).Cast<MemberInfo>();
+            return properties.Union(fields).Where(IsVariable);
         }
 
         /// <summary>
@@ -86,21 +87,21 @@ namespace BrandonUtils.Standalone {
         /// <returns>The <see cref="FieldInfo"/> or <see cref="PropertyInfo"/> named <paramref name="variableName"/></returns>
         /// <exception cref="MissingMemberException">If <paramref name="variableName"/> couldn't be retrieved</exception>
         [Pure]
+        [NotNull]
         public static MemberInfo GetVariableInfo(this Type type, string variableName) {
             var prop = type.GetProperty(variableName, VariablesBindingFlags);
-            if (!(prop is null)) {
+
+            if (prop != null) {
                 return prop;
             }
 
             var field = type.GetField(variableName, VariablesBindingFlags);
-            if (!(field is null)) {
-                return field;
-            }
-
-            throw new MissingMemberException($"The {nameof(type)} {type} did not have a field or property named {variableName}!");
+            return field ?? throw ReflectionException.VariableNotFoundException(type, variableName);
         }
 
         public static T ResetAllVariables<T>(this T objectWithVariables) where T : class {
+            throw new NotImplementedException();
+
             var variables         = objectWithVariables.GetType().GetVariables();
             var settableVariables = variables.Where(IsSettable);
             foreach (var vInfo in settableVariables) {
@@ -110,6 +111,8 @@ namespace BrandonUtils.Standalone {
             return objectWithVariables;
         }
 
+        /// <param name="fieldOrProperty">either a <see cref="FieldInfo"/> or <see cref="PropertyInfo"/></param>
+        /// <returns>true if the <paramref name="fieldOrProperty"/> <see cref="IsSettable(FieldInfo)"/> / <see cref="IsSettable(PropertyInfo)"/></returns>
         public static bool IsSettable(this MemberInfo fieldOrProperty) {
             return fieldOrProperty switch {
                 PropertyInfo p => IsSettable(p),
@@ -118,12 +121,15 @@ namespace BrandonUtils.Standalone {
             };
         }
 
+        /// <param name="propertyInfo">a <see cref="PropertyInfo"/></param>
+        /// <returns><see cref="PropertyInfo.CanWrite"/></returns>
         private static bool IsSettable(this PropertyInfo propertyInfo) {
             return propertyInfo.CanWrite;
         }
 
+        /// TODO: Should this have some way of actually checking for the <c>readonly</c> keyword...?
         private static bool IsSettable(this FieldInfo fieldInfo) {
-            return !fieldInfo.IsBackingField();
+            return !IsAutoPropertyBackingField(fieldInfo);
         }
 
         /// <summary>
@@ -138,10 +144,20 @@ namespace BrandonUtils.Standalone {
             return typeof(T).GetVariableInfo(variableName);
         }
 
+        /// <summary>
+        /// Checks if a <see cref="MemberInfo"/> is a "variable", and therefore appropriate for use with "variable"-referencing methods like <see cref="GetVariableValue{T}"/>.
+        /// </summary>
+        /// <remarks>
+        /// "Variables" includes both <see cref="Type.GetProperties()"/> and <see cref="Type.GetFields()"/>.
+        /// It does <b>not</b> include <see cref="IsAutoPropertyBackingField">backing fields</see>.
+        /// </remarks>
+        /// <param name="memberInfo">a <see cref="MemberInfo"/></param>
+        /// <returns>true if the <see cref="MemberInfo"/> is a variable</returns>
+        [Pure]
         public static bool IsVariable(this MemberInfo memberInfo) {
             return memberInfo switch {
-                PropertyInfo p => true,
-                FieldInfo f    => !f.IsBackingField(),
+                PropertyInfo _ => true,
+                FieldInfo f    => !IsAutoPropertyBackingField(f),
                 _              => false
             };
         }
@@ -169,25 +185,19 @@ namespace BrandonUtils.Standalone {
         /// <exception cref="MissingMemberException"><inheritdoc cref="GetVariableInfo"/></exception>
         [Pure]
         public static T GetVariableValue<T>(object obj, string variableName) {
-            var v = obj.GetType().GetVariableInfo(variableName);
-            switch (v) {
-                case PropertyInfo prop:
-                    try {
-                        return (T)prop.GetValue(obj);
-                    }
-                    catch (InvalidCastException e) {
-                        throw new InvalidCastException($"A property named {variableName} was found for the {obj.GetType().Name} {obj}, but it couldn't be cast to a {typeof(T).Name}!", e);
-                    }
-                case FieldInfo field:
-                    try {
-                        return (T)field.GetValue(obj);
-                    }
-                    catch (InvalidCastException e) {
-                        throw new InvalidCastException($"A field named {variableName} was found for the {obj.GetType().Name} {obj}, but it couldn't be cast to a {typeof(T).Name}!", e);
-                    }
-            }
+            var variableInfo = obj.GetType().GetVariableInfo(variableName);
+            var value = variableInfo switch {
+                PropertyInfo p => p.GetValue(obj),
+                FieldInfo f    => f.GetValue(obj),
+                _              => throw ReflectionException.NotAVariableException(variableInfo)
+            };
 
-            throw new MissingMemberException($"Couldn't find a field or property named {variableName} for the type {obj.GetType().Name}!");
+            try {
+                return (T)value;
+            }
+            catch (InvalidCastException e) {
+                throw e.ModifyMessage($"A member for {variableInfo.Prettify(PrettificationFlags.IncludeTypeLabels)} was found on the [{obj.GetType().Name}]'{obj}', but it couldn't be cast to a {typeof(T).PrettifyType()}!");
+            }
         }
 
         /// <summary>
@@ -201,44 +211,186 @@ namespace BrandonUtils.Standalone {
             return GetVariableValue<object>(obj, variableName);
         }
 
-        public static void SetVariableValue<T>(object obj, string variableName, T value) {
+        public static void SetVariableValue<T>(object obj, string variableName, T newValue) {
             var v = obj.GetType().GetVariableInfo(variableName);
             switch (v) {
                 case PropertyInfo prop:
-                    prop.SetValue(obj, value);
+                    prop.SetValue(obj, newValue);
                     return;
                 case FieldInfo field:
-                    field.SetValue(obj, value);
+                    field.SetValue(obj, newValue);
                     return;
                 default:
-                    throw new BrandonException($"Couldn't find a field or property named {variableName} for the type {obj.GetType()}!");
+                    throw new MemberAccessException($"Unable to set the value of {v.Prettify()}!");
             }
         }
 
         #endregion
 
-        [Pure]
-        public static bool IsEmpty(object thing) {
-            if (null == thing) {
-                return true;
-            }
-
-            switch (thing) {
-                case string str:
-                    return string.IsNullOrWhiteSpace(str);
-                case IEnumerable<object> enumerable:
-                    return !enumerable.Any();
-                default:
-                    return false;
-            }
-        }
-
-        [Pure]
-        public static bool IsNotEmpty(object thing) {
-            return !IsEmpty(thing);
-        }
-
         #region Backing Fields
+
+        #region Operations on Fields
+
+        [NotNull]
+        [ItemNotNull]
+        [Pure]
+        [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
+        private static IEnumerable<string> Get_BackingFieldFor_Names([NotNull] FieldInfo fieldInfo) {
+            return fieldInfo.GetCustomAttributes<BackingFieldForAttribute>().Select(it => it.BackedPropertyName);
+        }
+
+        [Pure]
+        [NotNull]
+        [ItemNotNull]
+        private static IEnumerable<PropertyInfo> Get_BackingFieldFor_Properties([NotNull] FieldInfo fieldInfo, Type owningType = default) {
+            owningType ??= GetOwningType(fieldInfo);
+            var backedPropertyNames = Get_BackingFieldFor_Names(fieldInfo);
+            return owningType.GetProperties()
+                             .Where(it => backedPropertyNames.Contains(it.Name));
+        }
+
+        /// <param name="memberInfo"></param>
+        /// <returns><c>true</c> if <paramref name="memberInfo"/> is an <a href="https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/auto-implemented-properties">Auto-Property Backing Field</a></returns>
+        [Pure]
+        internal static bool IsAutoPropertyBackingField([NotNull] this FieldInfo memberInfo) {
+            return Regex.IsMatch(memberInfo.Name, GetAutoPropertyBackingFieldNamePattern());
+        }
+
+        [Pure]
+        [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
+        private static bool UsedIn_BackedBy([NotNull] FieldInfo fieldInfo) {
+            // TODO: pass to other method
+            var owningType = fieldInfo.ReflectedType ?? fieldInfo.DeclaringType ?? throw ReflectionException.NoOwningTypeException(fieldInfo);
+            return owningType.GetProperties(VariablesBindingFlags)
+                             .Select(Get_BackedBy_BackingFieldName)
+                             .Any(it => it == fieldInfo.Name);
+        }
+
+        [Pure]
+        private static bool IsAnnotatedBackingField([NotNull] FieldInfo fieldInfo) {
+            return Get_BackingFieldFor_Names(fieldInfo).IsNotEmpty() || UsedIn_BackedBy(fieldInfo);
+        }
+
+        [PublicAPI]
+        [Pure]
+        public static bool IsBackingField([NotNull] this MemberInfo fieldInfo) {
+            return (fieldInfo as FieldInfo)?.IsBackingField() ?? throw ReflectionException.NotAFieldException(fieldInfo);
+        }
+
+        [PublicAPI]
+        [Pure]
+        public static bool IsBackingField([NotNull] this FieldInfo fieldInfo) {
+            return IsAutoPropertyBackingField(fieldInfo) || IsAnnotatedBackingField(fieldInfo);
+        }
+
+        [CanBeNull]
+        [Pure]
+        [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
+        internal static string Get_BackedAutoProperty_Name([NotNull] FieldInfo fieldInfo) {
+            var matches = Regex.Match(fieldInfo.Name, GetAutoPropertyBackingFieldNamePattern());
+            return matches.Success ? matches.Groups[PropertyCaptureGroupName].Value : null;
+        }
+
+        [CanBeNull]
+        [Pure]
+        private static PropertyInfo Get_BackedAutoProperty([NotNull] FieldInfo fieldInfo, Type owningType = default) {
+            owningType ??= GetOwningType(fieldInfo);
+            var autoPropertyName = Get_BackedAutoProperty_Name(fieldInfo);
+            return autoPropertyName == null ? null : owningType.GetProperty(autoPropertyName);
+        }
+
+        [NotNull]
+        [ItemNotNull]
+        [Pure]
+        [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
+        private static IEnumerable<PropertyInfo> Get_PropertiesAnnotatedWith_BackedBy([NotNull] FieldInfo fieldInfo, Type owningType = default) {
+            owningType ??= GetOwningType(fieldInfo);
+            return owningType.GetProperties(VariablesBindingFlags)
+                             .Where(it => Get_BackedBy_BackingFieldName(it) == fieldInfo.Name);
+        }
+
+        [NotNull]
+        [ItemNotNull]
+        [PublicAPI]
+        public static IEnumerable<PropertyInfo> BackedProperties([NotNull] this FieldInfo fieldInfo) {
+            var owningType = GetOwningType(fieldInfo);
+
+            var propertiesFromFieldAnnotations = Get_BackingFieldFor_Properties(fieldInfo, owningType);
+            var propertiesReferencingThisField = Get_PropertiesAnnotatedWith_BackedBy(fieldInfo, owningType);
+            var autoProperty                   = Get_BackedAutoProperty(fieldInfo, owningType);
+
+            return propertiesFromFieldAnnotations
+                   .Union(propertiesReferencingThisField)
+                   .Append(autoProperty)
+                   .NonNull();
+        }
+
+        #endregion
+
+        #region Operations on Properties
+
+        [CanBeNull]
+        [Pure]
+        [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
+        private static string Get_BackedBy_BackingFieldName([NotNull] PropertyInfo propertyInfo) {
+            return propertyInfo.GetCustomAttribute<BackedByAttribute>()?.BackingFieldName;
+        }
+
+        [NotNull]
+        [ItemNotNull]
+        [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
+        private static IEnumerable<FieldInfo> Get_FieldsAnnotatedWith_BackingFieldFor([NotNull] PropertyInfo propertyInfo, Type owningType = default) {
+            owningType ??= GetOwningType(propertyInfo);
+            return owningType.GetFields(VariablesBindingFlags)
+                             .Where(it => Get_BackingFieldFor_Names(it).Contains(propertyInfo.Name));
+        }
+
+        [CanBeNull]
+        private static FieldInfo Get_BackedBy_Field([NotNull] PropertyInfo propertyInfo, Type owningType = default) {
+            owningType ??= GetOwningType(propertyInfo);
+            var backingFieldName = Get_BackedBy_BackingFieldName(propertyInfo);
+            return backingFieldName == null ? null : owningType.GetField(backingFieldName, VariablesBindingFlags);
+        }
+
+        [Pure]
+        [NotNull]
+        [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
+        private static string GetAutoPropertyBackingFieldName([NotNull] PropertyInfo propertyInfo) {
+            return $"<{propertyInfo.Name}>k__BackingField";
+        }
+
+        [Pure]
+        [CanBeNull]
+        [PublicAPI]
+        public static FieldInfo BackingField([NotNull] this MemberInfo memberInfo) {
+            return (memberInfo as PropertyInfo)?.BackingField() ?? throw ReflectionException.NotAPropertyException(memberInfo);
+        }
+
+        /// <summary>
+        /// Returns the "backing field" for a <see cref="PropertyInfo"/>.
+        ///
+        /// A "backing field" can be:
+        /// <ul>
+        /// <li>an <a href="https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/auto-implemented-properties">Auto-Property backing field</a></li>
+        /// <li><paramref name="propertyInfo"/>'s [<see cref="BackedByAttribute"/>].<see cref="BackedByAttribute.BackingFieldName"/></li>
+        /// <li>any <see cref="FieldInfo"/> whose [<see cref="BackingFieldForAttribute"/>].<see cref="BackingFieldForAttribute.BackedProperty"/> matches <paramref name="propertyInfo"/></li>
+        /// </ul>
+        /// TODO: Improve this so that the <see cref="BackedByAttribute"/> can reference <see cref="PropertyInfo"/>s, which can then "chain" down into a <see cref="FieldInfo"/>
+        /// </summary>
+        /// <param name="propertyInfo">this <see cref="PropertyInfo"/></param>
+        /// <returns>the <see cref="FieldInfo"/> that backs <paramref name="propertyInfo"/>, if found; otherwise, null</returns>
+        [CanBeNull]
+        [PublicAPI]
+        [Pure]
+        public static FieldInfo BackingField([NotNull] this PropertyInfo propertyInfo) {
+            var owningType = GetOwningType(propertyInfo);
+
+            return GetAutoPropertyBackingField(propertyInfo, owningType) ??
+                   Get_BackedBy_Field(propertyInfo, owningType) ??
+                   Get_FieldsAnnotatedWith_BackingFieldFor(propertyInfo, owningType).Single();
+        }
+
+        #endregion
 
         /// <remarks>
         /// <paramref name="propertyNamePattern"/> will be stored in a capture group named <see cref="PropertyCaptureGroupName"/>.
@@ -246,50 +398,26 @@ namespace BrandonUtils.Standalone {
         /// <param name="propertyNamePattern">A pattern to match the auto-property. Defaults to <c>.*</c></param>
         /// <returns>A <see cref="Regex"/> pattern that will match <a href="https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/auto-implemented-properties">Auto-Property backing names</a>.</returns>
         [Pure]
-        private static string GetBackingFieldNamePattern(
-            //TODO: fix this annotation
-            //[RegexPattern]
+        [NotNull]
+        private static string GetAutoPropertyBackingFieldNamePattern(
+            [RegexPattern] [NotNull]
             string propertyNamePattern = ".*"
         ) {
             return $"<(?<{PropertyCaptureGroupName}>{propertyNamePattern})>k__BackingField";
         }
 
-        [Pure]
-        private static string BackingFieldName(
-            this MemberInfo memberInfo
-        ) {
-            return memberInfo.MemberType != MemberTypes.Property ? null : $"<{memberInfo.Name}>k__BackingField";
-        }
-
-        /// <param name="memberInfo"></param>
-        /// <returns><c>true</c> if <paramref name="memberInfo"/> is an <a href="https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/auto-implemented-properties">Auto-Property Backing Field</a></returns>
-        [Pure]
-        public static bool IsBackingField(this MemberInfo memberInfo) {
-            return memberInfo.MemberType == MemberTypes.Field && Regex.IsMatch(memberInfo.Name, GetBackingFieldNamePattern());
-        }
-
-        [Pure]
-        public static string GetBackedPropertyName([NotNull] this MemberInfo memberInfo) {
-            return Regex.Match(memberInfo.Name, GetBackingFieldNamePattern()).Groups[PropertyCaptureGroupName].Value;
-        }
-
-        [Pure]
-        public static FieldInfo BackingField([NotNull] this MemberInfo memberInfo) {
-            if (memberInfo.DeclaringType == null) {
-                throw new BrandonException($"The provided {nameof(MemberInfo)}, {memberInfo.Name}, does not have a {nameof(MemberInfo.DeclaringType)}!");
-            }
-
-            return memberInfo.MemberType != MemberTypes.Property
-                       ? null
-                       : memberInfo.DeclaringType.GetField(
-                           memberInfo.BackingFieldName(),
-                           BindingFlags.Instance |
-                           BindingFlags.Static |
-                           BindingFlags.NonPublic
-                       );
+        [CanBeNull]
+        [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
+        private static FieldInfo GetAutoPropertyBackingField([NotNull] PropertyInfo propertyInfo, Type owningType = default) {
+            owningType ??= GetOwningType(propertyInfo);
+            return owningType.GetField(GetAutoPropertyBackingFieldName(propertyInfo), AutoPropertyBackingFieldBindingFlags);
         }
 
         #endregion
+
+        private static Type GetOwningType(MemberInfo memberInfo) {
+            return memberInfo.ReflectedType ?? memberInfo.DeclaringType ?? throw ReflectionException.NoOwningTypeException(memberInfo);
+        }
 
         #region Constructors
 

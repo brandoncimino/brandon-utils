@@ -7,13 +7,15 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
-## Unreleased ([2.22.0])
+## [2.22.0] - 9/6/2021
 
 ### Added
 
-- Attributes to track backing field relationships
-  - `[BackedBy]`
-  - `[BackingFieldFor]`
+- Support for backing fields in `ReflectionUtils`!
+  - Attributes to track backing field relationships
+    - `[BackedBy]`
+    - `[BackingFieldFor]`
+  - Methods to go between backing fields and backed properties
 - Prettifier for `MemberInfo`
 
 ### Changed

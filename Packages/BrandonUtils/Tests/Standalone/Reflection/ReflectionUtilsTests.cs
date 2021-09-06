@@ -11,8 +11,8 @@ using NUnit.Framework;
 // ReSharper disable UnusedAutoPropertyAccessor.Local
 // ReSharper disable AutoPropertyCanBeMadeGetOnly.Local
 
-namespace BrandonUtils.Tests.Standalone {
-    public partial class ReflectionUtilsTests {
+namespace BrandonUtils.Tests.Standalone.Reflection {
+    public class ReflectionUtilsTests {
         private const int Prop_Static_Get_Only_Default_Value = 5;
 
         #region Variables
@@ -92,20 +92,20 @@ namespace BrandonUtils.Tests.Standalone {
 
                 #region Instance Fields
 
-                new VariableInfo() {Name = nameof(Field_Public), MemberType    = MemberTypes.Field},
-                new VariableInfo() {Name = nameof(Field_Private), MemberType   = MemberTypes.Field},
-                new VariableInfo() {Name = nameof(Field_Protected), MemberType = MemberTypes.Field},
+                new VariableInfo() { Name = nameof(Field_Public), MemberType    = MemberTypes.Field },
+                new VariableInfo() { Name = nameof(Field_Private), MemberType   = MemberTypes.Field },
+                new VariableInfo() { Name = nameof(Field_Protected), MemberType = MemberTypes.Field },
 
                 #endregion
 
                 #region Instance Properties
 
-                new VariableInfo() {Name = nameof(Prop_Public), MemberType               = MemberTypes.Property, Gettable = true, Settable = true},
-                new VariableInfo() {Name = nameof(Prop_Private), MemberType              = MemberTypes.Property, Gettable = true, Settable = true},
-                new VariableInfo() {Name = nameof(Prop_Protected), MemberType            = MemberTypes.Property, Gettable = true, Settable = true},
-                new VariableInfo() {Name = nameof(Prop_Mixed_Private_Getter), MemberType = MemberTypes.Property, Gettable = true, Settable = true},
-                new VariableInfo() {Name = nameof(Prop_Mixed_Private_Setter), MemberType = MemberTypes.Property, Gettable = true, Settable = true},
-                new VariableInfo() {Name = nameof(Prop_Get_Only), MemberType             = MemberTypes.Property, Gettable = true, Settable = false},
+                new VariableInfo() { Name = nameof(Prop_Public), MemberType               = MemberTypes.Property, Gettable = true, Settable = true },
+                new VariableInfo() { Name = nameof(Prop_Private), MemberType              = MemberTypes.Property, Gettable = true, Settable = true },
+                new VariableInfo() { Name = nameof(Prop_Protected), MemberType            = MemberTypes.Property, Gettable = true, Settable = true },
+                new VariableInfo() { Name = nameof(Prop_Mixed_Private_Getter), MemberType = MemberTypes.Property, Gettable = true, Settable = true },
+                new VariableInfo() { Name = nameof(Prop_Mixed_Private_Setter), MemberType = MemberTypes.Property, Gettable = true, Settable = true },
+                new VariableInfo() { Name = nameof(Prop_Get_Only), MemberType             = MemberTypes.Property, Gettable = true, Settable = false },
 
                 #endregion
 
@@ -115,20 +115,20 @@ namespace BrandonUtils.Tests.Standalone {
 
                 #region Static Fields
 
-                new VariableInfo() {Name = nameof(Field_Static_Public), MemberType    = MemberTypes.Field},
-                new VariableInfo() {Name = nameof(Field_Static_Private), MemberType   = MemberTypes.Field},
-                new VariableInfo() {Name = nameof(Field_Static_Protected), MemberType = MemberTypes.Field},
+                new VariableInfo() { Name = nameof(Field_Static_Public), MemberType    = MemberTypes.Field },
+                new VariableInfo() { Name = nameof(Field_Static_Private), MemberType   = MemberTypes.Field },
+                new VariableInfo() { Name = nameof(Field_Static_Protected), MemberType = MemberTypes.Field },
 
                 #endregion
 
                 #region Static Properties
 
-                new VariableInfo() {Name = nameof(Prop_Static_Public), MemberType               = MemberTypes.Property, Gettable = true, Settable = true},
-                new VariableInfo() {Name = nameof(Prop_Static_Private), MemberType              = MemberTypes.Property, Gettable = true, Settable = true},
-                new VariableInfo() {Name = nameof(Prop_Static_Protected), MemberType            = MemberTypes.Property, Gettable = true, Settable = true},
-                new VariableInfo() {Name = nameof(Prop_Static_Mixed_Private_Getter), MemberType = MemberTypes.Property, Gettable = true, Settable = true},
-                new VariableInfo() {Name = nameof(Prop_Static_Mixed_Private_Setter), MemberType = MemberTypes.Property, Gettable = true, Settable = true},
-                new VariableInfo() {Name = nameof(Prop_Static_Get_Only), MemberType             = MemberTypes.Property, Gettable = true, Settable = false},
+                new VariableInfo() { Name = nameof(Prop_Static_Public), MemberType               = MemberTypes.Property, Gettable = true, Settable = true },
+                new VariableInfo() { Name = nameof(Prop_Static_Private), MemberType              = MemberTypes.Property, Gettable = true, Settable = true },
+                new VariableInfo() { Name = nameof(Prop_Static_Protected), MemberType            = MemberTypes.Property, Gettable = true, Settable = true },
+                new VariableInfo() { Name = nameof(Prop_Static_Mixed_Private_Getter), MemberType = MemberTypes.Property, Gettable = true, Settable = true },
+                new VariableInfo() { Name = nameof(Prop_Static_Mixed_Private_Setter), MemberType = MemberTypes.Property, Gettable = true, Settable = true },
+                new VariableInfo() { Name = nameof(Prop_Static_Get_Only), MemberType             = MemberTypes.Property, Gettable = true, Settable = false },
 
                 #endregion
 
@@ -226,7 +226,7 @@ namespace BrandonUtils.Tests.Standalone {
 
             Console.WriteLine($"propInfo: {backingFieldInfo}");
             Console.WriteLine(backingFieldInfo.Name);
-            Assert.That(backingFieldInfo.GetBackedPropertyName(), Is.EqualTo(propertyWithBackingField.Name));
+            Assert.That(ReflectionUtils.Get_BackedAutoProperty_Name(backingFieldInfo), Is.EqualTo(propertyWithBackingField.Name));
         }
 
         [Test]

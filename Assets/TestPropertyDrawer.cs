@@ -6,11 +6,15 @@ using BrandonUtils.Standalone.Attributes;
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Strings;
 
+using FowlFever.Conjugal;
+
 using UnityEngine;
 
 public class TestPropertyDrawer : MonoBehaviour {
-    public Noun       Noun;
-    public List<Noun> NounList;
+    [SerializeField]
+    public (int, string) Tuple2;
+    public Plurable       Plurable;
+    public List<Plurable> PlurableList;
 
     public Author       Author;
     public List<Author> AuthorList;
