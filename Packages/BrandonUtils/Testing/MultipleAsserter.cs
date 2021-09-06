@@ -18,11 +18,16 @@ namespace BrandonUtils.Testing {
         /// </summary>
         public Optional<TActual> Actual;
 
+        private TActual GetActual() => Actual.Value;
+
         [CanBeNull]
         public Func<string> HeadingSupplier { get; set; }
 
         [ItemNotNull]
         public IList<Action> Actions { get; } = new List<Action>();
+
+        [ItemNotNull]
+        public IList<Action<TActual>> ActionsAgainstActual { get; } = new List<Action<TActual>>();
 
         [ItemNotNull]
         public IList<IResolveConstraint> Constraints { get; } = new List<IResolveConstraint>();
@@ -46,12 +51,17 @@ namespace BrandonUtils.Testing {
         }
 
         public TSelf And([CanBeNull] Action action) {
-            Actions.Add(action);
+            Actions.AddNonNull(action);
             return Self;
         }
 
         public TSelf And([CanBeNull] [ItemCanBeNull] IEnumerable<Action> actions) {
             Actions.AddNonNull(actions);
+            return Self;
+        }
+
+        public TSelf And([CanBeNull] Action<TActual> action) {
+            ActionsAgainstActual.AddNonNull(action);
             return Self;
         }
 
@@ -75,22 +85,49 @@ namespace BrandonUtils.Testing {
             return Self;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <remarks>
+        /// This method returns <see cref="IAssertable"/> instead of <see cref="Assertable"/> to make it play nice with the typed <see cref="Assertable{TActual}"/>,
+        /// which would be returned by <see cref="TestConstraint"/>.
+        /// </remarks>
+        /// <param name="action"></param>
+        /// <returns></returns>
         private static IAssertable TestAction([NotNull] Action action) {
             return new Assertable(action);
         }
 
+        private IAssertable TestActionAgainstActual([NotNull] Action<TActual> action) {
+            if (Actual.IsEmpty()) {
+                throw ActualIsEmptyException($"Could not execute the {action.GetType().Prettify()} {action.Method.Name}");
+            }
+
+            return new Assertable<TActual>(Actual.Value, action);
+        }
+
         private IAssertable TestConstraint([NotNull] IResolveConstraint constraint) {
             if (Actual.IsEmpty()) {
-                throw new InvalidOperationException($"Could not convert the {constraint.GetType().Name} to an {nameof(Action)} because this {GetType().Name} doesn't have an {nameof(Actual)} value!");
+                throw ActualIsEmptyException(constraint);
             }
 
             return new Assertable<TActual>(Actual.Value, constraint, ConstraintResolver);
         }
 
+        private InvalidOperationException ActualIsEmptyException(IResolveConstraint constraint) {
+            return ActualIsEmptyException($"Could not convert the {constraint.GetType().Name} to an {nameof(Action)}");
+        }
+
+        private InvalidOperationException ActualIsEmptyException(string message) {
+            return new InvalidOperationException($"{message}: this {GetType().Prettify()} doesn't have {nameof(Actual)} value!");
+        }
+
         private IEnumerable<IAssertable> TestEverything() {
-            var actionFailures     = Actions.Select(TestAction);
-            var constraintFailures = Constraints.Select(TestConstraint);
-            return actionFailures.Concat(constraintFailures);
+            var actionFailures              = Actions.Select(TestAction);
+            var actionAgainstActualFailures = ActionsAgainstActual.Select(TestActionAgainstActual);
+            var constraintFailures          = Constraints.Select(TestConstraint);
+            return actionFailures
+                   .Concat(actionAgainstActualFailures)
+                   .Concat(constraintFailures);
         }
 
         public void ShortCircuit(Exception shortCircuitException) {

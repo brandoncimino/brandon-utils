@@ -33,6 +33,21 @@ namespace BrandonUtils.Testing {
             }
         }
 
+        public Assertable([CanBeNull] TActual actual, [NotNull] Action<TActual> assertion) {
+            Nickname = assertion.Method.Name;
+
+            try {
+                assertion.Invoke(actual);
+                _excuse = default;
+            }
+            catch (SuccessException) {
+                _excuse = default;
+            }
+            catch (Exception e) {
+                _excuse = e;
+            }
+        }
+
         public override string ToString() {
             return this.FormatAssertable().JoinLines();
         }

@@ -7,6 +7,13 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.21.0] - 9/6/2021
+
+### Added
+
+- Ability to instantiate `Assertable<T>` based on an `Action<T>`
+- Ability to include `Action<T>`s, which run against `MultipleAsserter.Actual`, to `MultipleAsserter`s
+
 ## [2.20.1] - 9/6/2021
 
 ### Added
