@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -40,7 +39,7 @@ namespace BrandonUtils.Standalone.Hierarchic {
                 _dependants.Add(orphan);
             }
 
-            return (TGuardian) this;
+            return (TGuardian)this;
         }
 
         /// <summary>
@@ -58,16 +57,12 @@ namespace BrandonUtils.Standalone.Hierarchic {
                 ValidateGuardianship(pariah, $"Couldn't {nameof(Disown)} the {nameof(pariah)}!");
             }
 
-            return (TGuardian) this;
+            return (TGuardian)this;
         }
 
-        private BrandonException ValidateGuardianship(TDependant dependant, string prefix = default, string suffix = default) {
-            var msg = new[] {
-                    prefix,
-                    $"[{dependant.GetType().Name}]{dependant} isn't one of [{GetType().Name}]{this}'s {nameof(Dependants)}!",
-                    suffix,
-                }.Where(it => !string.IsNullOrWhiteSpace(it))
-                 .JoinString(" ");
+        public BrandonException ValidateGuardianship(TDependant dependant, string prefix = default, string suffix = default) {
+            var msg = new[] { prefix, $"[{dependant.GetType().Name}]{dependant} isn't one of [{GetType().Name}]{this}'s {nameof(Dependants)}!", suffix, }.Where(it => !string.IsNullOrWhiteSpace(it))
+                                                                                                                                                         .JoinString(" ");
 
             return new BrandonException(msg);
         }
