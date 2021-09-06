@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Strings.Prettifiers;
@@ -15,7 +16,8 @@ namespace BrandonUtils.Standalone.Strings {
                 new Prettifier<KeyedList<object, object>>(InnerPretty.PrettifyKeyedList),
                 new Prettifier<(object, object)>(InnerPretty.Tuple2),
                 new Prettifier<IEnumerable<object>>(InnerPretty.PrettifyEnumerableT),
-                new Prettifier<IEnumerable>(InnerPretty.PrettifyEnumerable)
+                new Prettifier<IEnumerable>(InnerPretty.PrettifyEnumerable),
+                new Prettifier<MemberInfo>(InnerPretty.PrettifyMemberInfo),
             };
         }
     }

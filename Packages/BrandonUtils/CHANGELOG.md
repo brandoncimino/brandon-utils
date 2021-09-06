@@ -7,13 +7,26 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
-## [2.21.1]
+## Unreleased ([2.22.0])
 
-## Removed
+### Added
+
+- Attributes to track backing field relationships
+  - `[BackedBy]`
+  - `[BackingFieldFor]`
+- Prettifier for `MemberInfo`
+
+### Changed
+
+- Moved `PrettificationFlags` into their own class
+
+## [2.21.1] - 2/6/2021
+
+### Removed
 
 - `CollectionUtils.FirstNonEmptyValue`, 'cus it was weird and confusing
 
-## Fixed
+### Fixed
 
 - Some javadocs, obsolete references, and possible multiple enumerations in `CollectionUtils`
 

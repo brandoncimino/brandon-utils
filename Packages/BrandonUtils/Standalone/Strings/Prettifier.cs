@@ -9,7 +9,7 @@ namespace BrandonUtils.Standalone.Strings {
     public class Prettifier<T> : IPrettifier<T>, IPrimaryKeyed<Type> {
         private Func<T, PrettificationSettings, string> PrettificationFunction { get; }
 
-        public Type PrettifierType { get; } = typeof(T).IsGenericType ? typeof(T).GetGenericTypeDefinition() : typeof(T);
+        public Type PrettifierType { get; } = typeof(T).IsGenericTypeOrDefinition() ? typeof(T).GetGenericTypeDefinition() : typeof(T);
 
         public Type PrimaryKey => PrettifierType;
 
@@ -38,14 +38,6 @@ namespace BrandonUtils.Standalone.Strings {
             if (cinderella is T princess) {
                 return princess;
             }
-
-            // if (
-            //     PrettifierType.IsGenericType &&
-            //     cinderella.GetType().IsGenericType &&
-            //     PrettifierType.GetGenericTypeDefinition() == cinderella.GetType().GetGenericTypeDefinition()
-            // ) {
-            //     return
-            // }
 
             throw new InvalidCastException($"Couldn't prettify [{cinderella.GetType().PrettifyType()}]{cinderella} because it wasn't the right type, {PrettifierType.PrettifyType()}!");
         }

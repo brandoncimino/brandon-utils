@@ -16,7 +16,7 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
                 PrettificationSettings.LineStyle.Multi   => PrettifyEnumerable_MultiLine(enumerable, enumerable.GetType(), settings),
                 PrettificationSettings.LineStyle.Single  => PrettifyEnumerable_SingleLine(enumerable, enumerable.GetType(), settings),
                 PrettificationSettings.LineStyle.Dynamic => PrettifyEnumerable_DynamicLine(enumerable, enumerable.GetType(), settings),
-                _                                        => throw EnumUtils.InvalidEnumArgumentException(nameof(PrettificationSettings.PreferredLineStyle), lineStyle)
+                _                                        => throw BEnum.InvalidEnumArgumentException(nameof(PrettificationSettings.PreferredLineStyle), lineStyle)
             };
         }
 
@@ -45,7 +45,7 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
                                 .Append("]")
                                 .JoinLines();
 
-            if (prettificationSettings?.Flags.HasFlag(PrettificationSettings.PrettificationFlags.IncludeTypeLabels) == true) {
+            if (prettificationSettings?.Flags.HasFlag(PrettificationFlags.IncludeTypeLabels) == true) {
                 var typeLabel = enumerableType.PrettifyType();
                 str = $"{typeLabel}{str}";
             }
@@ -61,7 +61,7 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
                 PrettificationSettings.LineStyle.Dynamic => PrettifyEnumerable_DynamicLine(asObjects, enumerableType, settings),
                 PrettificationSettings.LineStyle.Multi   => PrettifyEnumerable_MultiLine(asObjects, enumerableType, settings),
                 PrettificationSettings.LineStyle.Single  => PrettifyEnumerable_SingleLine(asObjects, enumerableType, settings),
-                _                                        => throw EnumUtils.InvalidEnumArgumentException(nameof(PrettificationSettings.PreferredLineStyle), lineStyle)
+                _                                        => throw BEnum.InvalidEnumArgumentException(nameof(PrettificationSettings.PreferredLineStyle), lineStyle)
             };
         }
 
@@ -76,7 +76,7 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
             var joined = enumerable.Select(it => it.Prettify()).JoinString(", ");
             var str    = $"[{joined}]";
 
-            if (prettificationSettings?.Flags.HasFlag(PrettificationSettings.PrettificationFlags.IncludeTypeLabels) == true) {
+            if (prettificationSettings?.Flags.HasFlag(PrettificationFlags.IncludeTypeLabels) == true) {
                 var typeLabel = enumerableType.PrettifyType();
                 str = $"{typeLabel}{str}";
             }

@@ -10,12 +10,6 @@ namespace BrandonUtils.Standalone.Strings {
             Single,
         }
 
-        [Flags]
-        public enum PrettificationFlags {
-            None = 0,
-            IncludeTypeLabels
-        }
-
         /// <summary>
         /// When the <see cref="PreferredLineStyle"/> is <see cref="LineStyle.Dynamic"/>, <see cref="LineLengthLimit"/> is used to decide between <see cref="LineStyle.Multi"/> and <see cref="LineStyle.Single"/>.
         /// </summary>
@@ -33,15 +27,11 @@ namespace BrandonUtils.Standalone.Strings {
         public LineStyle? PreferredLineStyle { get; set; }
 
         public static implicit operator PrettificationSettings(LineStyle lineStyle) {
-            return new PrettificationSettings() {
-                PreferredLineStyle = lineStyle
-            };
+            return new PrettificationSettings() { PreferredLineStyle = lineStyle };
         }
 
         public static implicit operator PrettificationSettings(PrettificationFlags flags) {
-            return new PrettificationSettings() {
-                Flags = flags
-            };
+            return new PrettificationSettings() { Flags = flags };
         }
     }
 }

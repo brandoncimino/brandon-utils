@@ -52,9 +52,7 @@ namespace BrandonUtils.Tests.Standalone.Strings {
 
         [Test]
         public void PrettifyFallsBackToToString() {
-            var obj = new HasToStringOverride() {
-                Value = DayOfWeek.Friday
-            };
+            var obj = new HasToStringOverride() { Value = DayOfWeek.Friday };
 
             Assert.That(
                 obj.Prettify(),
@@ -68,11 +66,7 @@ namespace BrandonUtils.Tests.Standalone.Strings {
 
         [Test]
         public void PrettifyDictionary() {
-            var dic = new Dictionary<string, DayOfWeek> {
-                { "one", DayOfWeek.Monday },
-                { "two", DayOfWeek.Tuesday },
-                { "three", DayOfWeek.Wednesday }
-            };
+            var dic = new Dictionary<string, DayOfWeek> { { "one", DayOfWeek.Monday }, { "two", DayOfWeek.Tuesday }, { "three", DayOfWeek.Wednesday } };
 
             var expectedString = @"
 String DayOfWeek
@@ -84,20 +78,7 @@ three  Wednesday";
             Assert.That(dic.Prettify(), Is.EqualTo(expectedString.TrimStart()));
         }
 
-        private static Expectation[] Tuple2Expectations = new[] {
-            new Expectation() {
-                Original = ("one", 1),
-                Expected = "(one, 1)"
-            },
-            new Expectation() {
-                Original = (new List<double>() { 1, 99, double.PositiveInfinity }, ("yolo", 80085)),
-                Expected = $"([1, 99, {double.PositiveInfinity}], (yolo, 80085))"
-            },
-            new Expectation() {
-                Original = (double.PositiveInfinity, "beyond"),
-                Expected = $"({double.PositiveInfinity}, beyond)"
-            }
-        };
+        private static Expectation[] Tuple2Expectations = new[] { new Expectation() { Original = ("one", 1), Expected = "(one, 1)" }, new Expectation() { Original = (new List<double>() { 1, 99, double.PositiveInfinity }, ("yolo", 80085)), Expected = $"([1, 99, {double.PositiveInfinity}], (yolo, 80085))" }, new Expectation() { Original = (double.PositiveInfinity, "beyond"), Expected = $"({double.PositiveInfinity}, beyond)" } };
 
         [Test]
         public void PrettifyTuple2([ValueSource(nameof(Tuple2Expectations))] Expectation expectation) {
@@ -110,11 +91,7 @@ three  Wednesday";
         public void PrettifyKeyedList() {
             var prettifier = new Prettifier<KeyedList<object, object>>(InnerPretty.PrettifyKeyedList);
 
-            var keyedList = new KeyedList<int, (int, string)>(it => it.Item1) {
-                (1, "one"),
-                (2, "two"),
-                (99, "ninety-nine")
-            };
+            var keyedList = new KeyedList<int, (int, string)>(it => it.Item1) { (1, "one"), (2, "two"), (99, "ninety-nine") };
 
             var expectedString = $@"
 Int32 (Int32, String)  
@@ -129,11 +106,7 @@ Int32 (Int32, String)
 
         [Test]
         public void FindGenericallyTypedPrettifier() {
-            var keyedList = new KeyedList<int, (int, string)>(it => it.Item1) {
-                (1, "one"),
-                (2, "two"),
-                (99, "ninety-nine")
-            };
+            var keyedList = new KeyedList<int, (int, string)>(it => it.Item1) { (1, "one"), (2, "two"), (99, "ninety-nine") };
 
             var genTypeDef = keyedList.GetType().GetGenericTypeDefinition();
             Console.WriteLine($"gen def ass from real: {genTypeDef.IsInstanceOfType(keyedList)}");
@@ -246,21 +219,11 @@ Int32 (Int32, String)
         private static Expectation[] EnumerableExpectations() {
             var ls = new List<int>() { 1, 2, 3 };
             return new[] {
+                new Expectation() { Original = ls, Expected = "[1, 2, 3]" },
+                new Expectation() { Original = ls, Settings = PrettificationFlags.IncludeTypeLabels, Expected = "List<Int32>[1, 2, 3]" },
                 new Expectation() {
                     Original = ls,
-                    Expected = "[1, 2, 3]"
-                },
-                new Expectation() {
-                    Original = ls,
-                    Settings = PrettificationSettings.PrettificationFlags.IncludeTypeLabels,
-                    Expected = "List<Int32>[1, 2, 3]"
-                },
-                new Expectation() {
-                    Original = ls,
-                    Settings = new PrettificationSettings() {
-                        PreferredLineStyle = PrettificationSettings.LineStyle.Multi,
-                        Flags              = PrettificationSettings.PrettificationFlags.IncludeTypeLabels
-                    },
+                    Settings = new PrettificationSettings() { PreferredLineStyle = PrettificationSettings.LineStyle.Multi, Flags = PrettificationFlags.IncludeTypeLabels },
                     Expected = @"
 List<Int32>[
   1
