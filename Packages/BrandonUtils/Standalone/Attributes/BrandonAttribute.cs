@@ -3,6 +3,8 @@ using System.Reflection;
 
 using BrandonUtils.Standalone.Exceptions;
 
+using JetBrains.Annotations;
+
 namespace BrandonUtils.Standalone.Attributes {
     /// <summary>
     /// The parent class for <see cref="BrandonUtils"/> <see cref="Attribute"/>s like <see cref="EditorInvocationButtonAttribute"/>.
@@ -26,8 +28,9 @@ namespace BrandonUtils.Standalone.Attributes {
         /// <param name="methodInfo"></param>
         /// <returns></returns>
         /// <exception cref="InvalidAttributeTargetException{T}">If <paramref name="methodInfo"/> fails validation.</exception>
+        [UsedImplicitly]
         public virtual void ValidateMethodInfo(MethodInfo methodInfo) {
-            //to be implemented by inheritors, if necessary
+            // to be implemented by inheritors, if necessary
         }
     }
 }

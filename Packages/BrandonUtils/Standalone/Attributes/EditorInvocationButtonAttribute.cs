@@ -3,6 +3,8 @@ using System.Reflection;
 
 using BrandonUtils.Standalone.Exceptions;
 
+using JetBrains.Annotations;
+
 namespace BrandonUtils.Standalone.Attributes {
     /// <summary>
     /// Creates a button in the Unity editor that will execute the annotated <see cref="AttributeTargets.Method"/>.
@@ -16,6 +18,7 @@ namespace BrandonUtils.Standalone.Attributes {
     /// <li>While it is theoretically possible to pass values to the <c>MonoBehaviourEditor</c> invocation, it is currently unsupported.</li>
     /// <li><see cref="ValidateMethodInfo"/> will throw an exception if the given <c>"MonoBehaviourEditor"</c> is invalid - which in this case would be anything that contains parameters.</li>
     /// </remarks>
+    [MeansImplicitUse]
     [AttributeUsage(AttributeTargets.Method)]
     public class EditorInvocationButtonAttribute : BrandonAttribute {
         public override void ValidateMethodInfo(MethodInfo methodInfo) {
