@@ -7,6 +7,16 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.21.1]
+
+## Removed
+
+- `CollectionUtils.FirstNonEmptyValue`, 'cus it was weird and confusing
+
+## Fixed
+
+- Some javadocs, obsolete references, and possible multiple enumerations in `CollectionUtils`
+
 ## [2.21.0] - 9/6/2021
 
 ### Added

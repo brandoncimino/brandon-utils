@@ -339,7 +339,7 @@ namespace BrandonUtils.Standalone.Collections {
         }
 
         /// <summary>
-        /// Calls <see cref="RemoveAll{TKey,TValue}(System.Collections.Generic.IDictionary{TKey,TValue},System.Collections.Generic.IEnumerable{TKey})"/> using <paramref name="IDictionaryWithKeysToRemove"/>'s <see cref="IDictionary{TKey,TValue}.Keys"/>.
+        /// Calls <see cref="RemoveAll{TKey,TValue}(System.Collections.Generic.IDictionary{TKey,TValue},System.Collections.Generic.IEnumerable{TKey})"/> using <paramref name="dictionaryWithKeysToRemove"/>'s <see cref="IDictionary{TKey,TValue}.Keys"/>.
         /// </summary>
         /// <param name="original"></param>
         /// <param name="dictionaryWithKeysToRemove"></param>
@@ -351,7 +351,7 @@ namespace BrandonUtils.Standalone.Collections {
         }
 
         /// <summary>
-        /// The method by which <see cref="CollectionUtils.JoinDictionaries{TKey,TValue}"/> will handle conflicts caused by duplicate <see cref="IDictionary{TKey,TValue}.Keys"/>.
+        /// The method by which <see cref="CollectionUtils.JoinDictionaries{TKey,TValue}(System.Collections.Generic.IEnumerable{System.Collections.Generic.IDictionary{TKey,TValue}},BrandonUtils.Standalone.Collections.CollectionUtils.ConflictResolution)"/> will handle conflicts caused by duplicate <see cref="IDictionary{TKey,TValue}.Keys"/>.
         /// </summary>
         public enum ConflictResolution {
             /// <summary>
@@ -395,7 +395,7 @@ namespace BrandonUtils.Standalone.Collections {
                 case ConflictResolution.FavorNew:
                     return overlappingKeys.ToDictionary(key => key, key => additional[key]);
                 default:
-                    throw EnumUtils.InvalidEnumArgumentException(nameof(ConflictResolution), conflictResolution);
+                    throw BEnum.InvalidEnumArgumentException(nameof(ConflictResolution), conflictResolution);
             }
         }
 
@@ -435,24 +435,30 @@ namespace BrandonUtils.Standalone.Collections {
             IEnumerable<IDictionary<TKey, TValue>> dictionaries,
             ConflictResolution                     conflictResolution = ConflictResolution.Fail
         ) {
-            var allKeys = dictionaries.SelectMany(dic => dic.Keys);
+            var dicList = dictionaries.ToList();
+            var allKeys = dicList.SelectMany(dic => dic.Keys).ToList();
 
             if (!allKeys.IsSingleton()) {
                 switch (conflictResolution) {
                     case ConflictResolution.Fail:
                         throw new ArgumentException($"Could not join the dictionaries because they had duplicate keys and the {nameof(conflictResolution)} method was set to {ConflictResolution.Fail}");
                     case ConflictResolution.FavorNew:
-                        dictionaries = dictionaries.Reverse();
+                        dicList.Reverse();
                         break;
                     case ConflictResolution.FavorOriginal:
                         //don't need to do nu'n
                         break;
                     default:
-                        throw EnumUtils.InvalidEnumArgumentException(nameof(conflictResolution), conflictResolution);
+                        throw BEnum.InvalidEnumArgumentException(nameof(conflictResolution), conflictResolution);
                 }
             }
 
-            return allKeys.Distinct().ToDictionary(key => key, dictionaries.FirstNonEmptyValue);
+            return allKeys.Distinct()
+                          .ToDictionary(
+                              key => key,
+                              key => dicList
+                                  .First(it => it.ContainsKey(key) && it[key] != null)[key]
+                          );
         }
 
         /// <summary>
@@ -495,14 +501,6 @@ namespace BrandonUtils.Standalone.Collections {
             TKey                                       key
         ) {
             return dictionaries.First(dic => dic.ContainsKey(key))[key];
-        }
-
-        [System.Diagnostics.Contracts.Pure]
-        public static TValue FirstNonEmptyValue<TKey, TValue>(
-            this IEnumerable<IDictionary<TKey, TValue>> dictionaries,
-            TKey                                        key
-        ) {
-            return dictionaries.First(dic => dic.ContainsKey(key) && ReflectionUtils.IsNotEmpty(dic[key]))[key];
         }
 
         /// <summary>
