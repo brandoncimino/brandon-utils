@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
@@ -119,33 +120,33 @@ namespace BrandonUtils.Standalone {
 
         #region IsPositive
 
-        public static bool IsPositive(this short value) => value >= 0;
-        public static bool IsPositive(this int value) => value >= 0;
-        public static bool IsPositive(this long value) => value >= 0;
-        public static bool IsPositive(this float value) => value >= 0;
-        public static bool IsPositive(this double value) => value >= 0;
+        public static bool IsPositive(this short   value) => value >= 0;
+        public static bool IsPositive(this int     value) => value >= 0;
+        public static bool IsPositive(this long    value) => value >= 0;
+        public static bool IsPositive(this float   value) => value >= 0;
+        public static bool IsPositive(this double  value) => value >= 0;
         public static bool IsPositive(this decimal value) => value >= 0;
 
         #endregion
 
         #region IsStrictlyPositive
 
-        public static bool IsStrictlyPositive(int value) => value > 0;
-        public static bool IsStrictlyPositive(short value) => value > 0;
-        public static bool IsStrictlyPositive(long value) => value > 0;
-        public static bool IsStrictlyPositive(float value) => value > 0;
-        public static bool IsStrictlyPositive(double value) => value > 0;
+        public static bool IsStrictlyPositive(int     value) => value > 0;
+        public static bool IsStrictlyPositive(short   value) => value > 0;
+        public static bool IsStrictlyPositive(long    value) => value > 0;
+        public static bool IsStrictlyPositive(float   value) => value > 0;
+        public static bool IsStrictlyPositive(double  value) => value > 0;
         public static bool IsStrictlyPositive(decimal value) => value > 0;
 
         #endregion
 
         #region IsNegative
 
-        public static bool IsNegative(this int value) => value < 0;
-        public static bool IsNegative(this long value) => value < 0;
-        public static bool IsNegative(this float value) => value < 0;
-        public static bool IsNegative(this double value) => value < 0;
-        public static bool IsNegative(this short value) => value < 0;
+        public static bool IsNegative(this int     value) => value < 0;
+        public static bool IsNegative(this long    value) => value < 0;
+        public static bool IsNegative(this float   value) => value < 0;
+        public static bool IsNegative(this double  value) => value < 0;
+        public static bool IsNegative(this short   value) => value < 0;
         public static bool IsNegative(this decimal value) => value < 0;
 
         #endregion
@@ -158,27 +159,14 @@ namespace BrandonUtils.Standalone {
         /// See <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/integral-numeric-types">Integral Numeric Types</a>
         /// </summary>
         private static readonly ReadOnlyCollection<Type> IntegralTypes = Array.AsReadOnly(
-            new[] {
-                typeof(byte),
-                typeof(sbyte),
-                typeof(ushort),
-                typeof(short),
-                typeof(int),
-                typeof(uint),
-                typeof(long),
-                typeof(ulong),
-            }
+            new[] { typeof(byte), typeof(sbyte), typeof(ushort), typeof(short), typeof(int), typeof(uint), typeof(long), typeof(ulong), }
         );
 
         /// <summary>
         /// See <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/floating-point-numeric-types">Floating-Point Numeric Types</a>
         /// </summary>
         private static readonly ReadOnlyCollection<Type> FloatingPointTypes = Array.AsReadOnly(
-            new[] {
-                typeof(float),
-                typeof(double),
-                typeof(decimal)
-            }
+            new[] { typeof(float), typeof(double), typeof(decimal) }
         );
 
         /// <summary>
@@ -197,6 +185,20 @@ namespace BrandonUtils.Standalone {
         /// <returns>true if the value is of a numeric type</returns>
         public static bool IsNumber(this object value) {
             return NumericTypes.Contains(value.GetType());
+        }
+
+        #endregion
+
+        #region Kind of a joke
+
+        /// <summary>
+        /// This is...kind of a joke
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
+        public static bool NOT(this bool value) {
+            return !value;
         }
 
         #endregion

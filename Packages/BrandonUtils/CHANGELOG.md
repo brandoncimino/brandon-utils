@@ -7,6 +7,13 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.20.1] - 9/6/2021
+
+### Added
+
+- `RegexUtils.DoesNotMatch` methods
+- The kind-of-a-joke `bool` extension method `bool.NOT()`
+
 ## [2.20.0] - 9/4/2021
 
 # Changed
