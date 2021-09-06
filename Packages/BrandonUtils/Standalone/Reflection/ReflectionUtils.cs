@@ -8,13 +8,12 @@ using System.Text.RegularExpressions;
 using BrandonUtils.Standalone.Attributes;
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Exceptions;
-using BrandonUtils.Standalone.Reflection;
 using BrandonUtils.Standalone.Strings;
 using BrandonUtils.Standalone.Strings.Prettifiers;
 
 using JetBrains.Annotations;
 
-namespace BrandonUtils.Standalone {
+namespace BrandonUtils.Standalone.Reflection {
     /// <summary>
     /// Contains utilities for <see cref="System.Reflection"/>.
     /// </summary>
@@ -372,12 +371,12 @@ namespace BrandonUtils.Standalone {
         /// A "backing field" can be:
         /// <ul>
         /// <li>an <a href="https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/auto-implemented-properties">Auto-Property backing field</a></li>
-        /// <li><paramref name="propertyInfo"/>'s [<see cref="BackedByAttribute"/>].<see cref="BackedByAttribute.BackingFieldName"/></li>
-        /// <li>any <see cref="FieldInfo"/> whose [<see cref="BackingFieldForAttribute"/>].<see cref="BackingFieldForAttribute.BackedProperty"/> matches <paramref name="propertyInfo"/></li>
+        /// <li><paramref name="propertyInfo"/>'s [<see cref="BackedByAttribute.BackingFieldName"/>].<see cref="BackedByAttribute"/></li>
+        /// <li>any <see cref="BackingFieldForAttribute"/> whose [<see cref="BackingFieldForAttribute.BackedProperty"/>].<see cref="BackingFieldForAttribute"/> matches <paramref name="propertyInfo"/></li>
         /// </ul>
-        /// TODO: Improve this so that the <see cref="BackedByAttribute"/> can reference <see cref="PropertyInfo"/>s, which can then "chain" down into a <see cref="FieldInfo"/>
+        /// TODO: Improve this so that the <see cref="PropertyInfo"/> can reference <see cref="FieldInfo"/>s, which can then "chain" down into a <see cref="FieldInfo"/>
         /// </summary>
-        /// <param name="propertyInfo">this <see cref="PropertyInfo"/></param>
+        /// <param name="propertyInfo">this <see cref="FieldInfo"/></param>
         /// <returns>the <see cref="FieldInfo"/> that backs <paramref name="propertyInfo"/>, if found; otherwise, null</returns>
         [CanBeNull]
         [PublicAPI]

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
+using BrandonUtils.Standalone.Reflection;
 using BrandonUtils.Standalone.Strings;
 
 namespace BrandonUtils.Standalone.Exceptions {
@@ -8,7 +9,7 @@ namespace BrandonUtils.Standalone.Exceptions {
         private static readonly MethodInfo ModifyMessageMethod = typeof(ExceptionUtils).GetMethod(
             nameof(ModifyMessage_Internal),
             BindingFlags.Default |
-            BindingFlags.Static |
+            BindingFlags.Static  |
             BindingFlags.NonPublic
         );
 
@@ -32,7 +33,7 @@ namespace BrandonUtils.Standalone.Exceptions {
         /// <returns>a new copy of <paramref name="exception"/> with the <see cref="Exception.Message"/> changed to <paramref name="newMessage"/></returns>
         public static Exception ModifyMessage(this Exception exception, string newMessage) {
             var genericModifyMessage = ModifyMessageMethod.MakeGenericMethod(exception.GetType());
-            return genericModifyMessage.Invoke(null, new object[] {exception, newMessage}) as Exception;
+            return genericModifyMessage.Invoke(null, new object[] { exception, newMessage }) as Exception;
         }
 
         /**

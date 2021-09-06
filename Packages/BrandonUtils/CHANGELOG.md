@@ -21,6 +21,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - Moved `PrettificationFlags` into their own class
+- Moved `ReflectionUtils` into a dedicated `Reflection` package
 
 ## [2.21.1] - 2/6/2021
 

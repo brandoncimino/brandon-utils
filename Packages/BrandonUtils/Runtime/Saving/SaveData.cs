@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 using BrandonUtils.Logging;
-using BrandonUtils.Standalone;
+using BrandonUtils.Standalone.Reflection;
 using BrandonUtils.Timing;
 
 using JetBrains.Annotations;
@@ -39,11 +39,7 @@ namespace BrandonUtils.Saving {
         public const int BackupSaveSlots = 10;
 
         /// <returns>A <b>new</b> instance of the default <see cref="CurrentJsonSerializerSettings"/></returns>
-        public static JsonSerializerSettings GetDefaultSerializerSettings() => new JsonSerializerSettings {
-            ObjectCreationHandling = ObjectCreationHandling.Replace,
-            Formatting             = Formatting.Indented,
-            TypeNameHandling       = TypeNameHandling.Auto,
-        };
+        public static JsonSerializerSettings GetDefaultSerializerSettings() => new JsonSerializerSettings { ObjectCreationHandling = ObjectCreationHandling.Replace, Formatting = Formatting.Indented, TypeNameHandling = TypeNameHandling.Auto, };
 
         /// <summary>
         /// The actual <see cref="JsonSerializerSettings"/> being used.
@@ -350,10 +346,10 @@ namespace BrandonUtils.Saving {
             if (useReSaveDelay && saveTime - saveData.LastSaveTime_Exact < SaveData.ReSaveDelay) {
                 throw new ReSaveDelayException(
                     saveData,
-                    $"The save file {nickname} was saved too recently!" +
+                    $"The save file {nickname} was saved too recently!"                         +
                     $"\n\t{nameof(saveData.LastSaveTime_Exact)}: {saveData.LastSaveTime_Exact}" +
-                    $"\n\tNew {nameof(saveTime)}: {saveTime}" +
-                    $"\n\t{nameof(SaveData.ReSaveDelay)}: {SaveData.ReSaveDelay}" +
+                    $"\n\tNew {nameof(saveTime)}: {saveTime}"                                   +
+                    $"\n\t{nameof(SaveData.ReSaveDelay)}: {SaveData.ReSaveDelay}"               +
                     $"\n\tDelta: {saveTime - saveData.LastSaveTime_Exact}"
                 );
             }
@@ -380,7 +376,7 @@ namespace BrandonUtils.Saving {
                 throw new SaveDataException(
                     saveData,
                     $"When saving {nickname}, we failed to create a new file!" +
-                    $"\n\t{nameof(previousFileCount)} = {previousFileCount}" +
+                    $"\n\t{nameof(previousFileCount)} = {previousFileCount}"   +
                     $"\n\tcurrentFileCount = {saveData.AllSaveFilePaths.Length}"
                 );
             }

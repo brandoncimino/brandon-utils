@@ -3,6 +3,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 
 using BrandonUtils.Standalone.Collections;
+using BrandonUtils.Standalone.Reflection;
 
 using JetBrains.Annotations;
 
