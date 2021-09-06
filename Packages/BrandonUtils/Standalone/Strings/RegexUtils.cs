@@ -5,10 +5,13 @@ using System.Text.RegularExpressions;
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Optional;
 
+using JetBrains.Annotations;
+
 namespace BrandonUtils.Standalone.Strings {
     /// <summary>
     /// Mostly contains extension method version of basic <see cref="Regex"/> stuff.
     /// </summary>
+    [PublicAPI]
     public static class RegexUtils {
         #region Match
 
@@ -73,6 +76,16 @@ namespace BrandonUtils.Standalone.Strings {
         }
 
         /// <summary>
+        /// Inverse of <see cref="Matches(string,string)"/>
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="pattern"></param>
+        /// <returns></returns>
+        public static bool DoesNotMatch(this string str, string pattern) {
+            return !str.Matches(pattern);
+        }
+
+        /// <summary>
         /// <inheritdoc cref="Matches(string,string)"/>
         /// </summary>
         /// <remarks>
@@ -86,10 +99,31 @@ namespace BrandonUtils.Standalone.Strings {
             return Regex.IsMatch(str, pattern, options);
         }
 
+        /// <summary>
+        /// Inverse of <see cref="Matches(string,string,RegexOptions)"/>
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="pattern"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static bool DoesNotMatch(this string str, string pattern, RegexOptions options) {
+            return !str.Matches(pattern, options);
+        }
+
         /// <inheritdoc cref="Matches(string,string)"/>
         /// <returns><see cref="Regex.IsMatch(string)"/></returns>
         public static bool Matches(this string str, Regex pattern) {
             return pattern.IsMatch(str);
+        }
+
+        /// <summary>
+        /// Inverse of <see cref="Matches(string,Regex)"/>
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="pattern"></param>
+        /// <returns></returns>
+        public static bool DoesNotMatch(this string str, Regex pattern) {
+            return !str.Matches(pattern);
         }
 
         #endregion
