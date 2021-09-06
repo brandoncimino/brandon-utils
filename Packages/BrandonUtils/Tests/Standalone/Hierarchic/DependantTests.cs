@@ -1,16 +1,11 @@
-﻿using System;
-
-using BrandonUtils.Standalone.Exceptions;
+﻿using BrandonUtils.Standalone.Exceptions;
 using BrandonUtils.Standalone.Hierarchic;
-using BrandonUtils.Testing;
 
 using NUnit.Framework;
 
 namespace BrandonUtils.Tests.Standalone.Hierarchic {
     public class DependantTests {
-        public class Parent : Guardian<Parent, Child> {
-
-        }
+        public class Parent : Guardian<Parent, Child> { }
 
         public class Child : Dependant<Parent, Child> {
             public Child(Parent guardian) : base(guardian) { }
