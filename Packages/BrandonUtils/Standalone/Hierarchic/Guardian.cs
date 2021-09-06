@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -8,9 +9,9 @@ using BrandonUtils.Standalone.Exceptions;
 using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone.Hierarchic {
-    public abstract class Guardian<TGuardian, TDependant>
-        where TGuardian : Guardian<TGuardian, TDependant>
-        where TDependant : Dependant<TGuardian, TDependant> {
+    [Obsolete("not thrilled")]
+    public abstract class Guardian<TGuardian, TDependant> : IGuardian<TGuardian, TDependant> where TGuardian : Guardian<TGuardian, TDependant>
+                                                                                             where TDependant : Dependant<TGuardian, TDependant> {
         private readonly List<TDependant> _dependants = new List<TDependant>();
 
         /// <summary>
@@ -20,8 +21,6 @@ namespace BrandonUtils.Standalone.Hierarchic {
         /// This is a <see cref="ReadOnlyCollection{T}"/>, which (I think?) is a <i>copy</i> of the backing <see cref="List{T}"/>, <see cref="_dependants"/>.
         /// </remarks>
         public ReadOnlyCollection<TDependant> Dependants => _dependants.AsReadOnly();
-
-        public TDependant this[int index] => Dependants[index];
 
         /// <summary>
         /// Creates non-transferable <a href="https://en.wikipedia.org/wiki/Filiation">filiation</a> between an <see cref="orphan"/> and a <see cref="Guardian{TGuardian,TDependant}"/>.
