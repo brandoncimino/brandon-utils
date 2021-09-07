@@ -7,6 +7,12 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.22.1] - 9/6/2021
+
+### Added
+
+- `[Serializeable]` attribute to `Rate`
+
 ## [2.22.0] - 9/6/2021
 
 ### Added

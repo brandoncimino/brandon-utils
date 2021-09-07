@@ -2,6 +2,8 @@
 
 using JetBrains.Annotations;
 
+using Newtonsoft.Json;
+
 namespace BrandonUtils.Standalone.Chronic {
     /// <summary>
     /// Represents an arbitrary quantity over time.
@@ -10,17 +12,20 @@ namespace BrandonUtils.Standalone.Chronic {
     /// The primary purpose of this is to avoid the ambiguity between manipulating a value as "X (per second)" vs. "X seconds per each".
     /// </remarks>
     [PublicAPI]
+    [Serializable]
     public struct Rate {
         private static readonly TimeSpan OneSecond = TimeSpan.FromSeconds(1);
 
         /// <summary>
         /// The amount per 1 <see cref="TimeUnit.Seconds"/>.
         /// </summary>
+        [JsonProperty]
         public double Hertz { get; set; }
 
         /// <summary>
         /// The <see cref="TimeSpan"/> of 1 "event" (e.g. 2 <see cref="Hertz"/> = 0.5 <see cref="TimeUnit.Seconds"/>)
         /// </summary>
+        [JsonIgnore]
         public TimeSpan Interval {
             get => HertzToInterval(Hertz);
             set => Hertz = IntervalToHertz(value);
