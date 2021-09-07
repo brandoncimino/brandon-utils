@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using JetBrains.Annotations;
 
@@ -10,6 +11,7 @@ namespace BrandonUtils.Standalone.Collections {
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
     [PublicAPI]
+    [Serializable]
     public class PrimaryKeyedList<TKey, TValue> : KeyedList<TKey, TValue> where TValue : IPrimaryKeyed<TKey> {
         public PrimaryKeyedList(IEnumerable<TValue> collection) : base(it => it.PrimaryKey, collection) { }
         public PrimaryKeyedList() : base(it => it.PrimaryKey) { }

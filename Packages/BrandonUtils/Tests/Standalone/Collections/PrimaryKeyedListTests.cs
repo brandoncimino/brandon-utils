@@ -40,7 +40,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
             public AlsoHasInterface(DayOfWeek dayOfWeek) : base(dayOfWeek) { }
         }
 
-        private static KeyedList<DayOfWeek, HasInterface> _keyedList = new PrimaryKeyedList<DayOfWeek, HasInterface> {
+        private static KeyedList<DayOfWeek, HasInterface> NewListOfDays() => new PrimaryKeyedList<DayOfWeek, HasInterface> {
             new HasInterface(DayOfWeek.Monday),
             new HasInterface(DayOfWeek.Tuesday),
             new HasInterface(DayOfWeek.Wednesday),
@@ -65,21 +65,17 @@ namespace BrandonUtils.Tests.Standalone.Collections {
             }
         }
 
-        private static KeyedList<string, StringKey> StringKeyedList = new PrimaryKeyedList<string, StringKey>() {
-            new StringKey("one",   1),
-            new StringKey("two",   2),
-            new StringKey("three", 3)
-        };
+        private static KeyedList<string, StringKey> StringKeyedList = new PrimaryKeyedList<string, StringKey>() { new StringKey("one", 1), new StringKey("two", 2), new StringKey("three", 3) };
 
         [Test]
         public void KeyedListSerializes() {
-            string json = JsonConvert.SerializeObject(_keyedList, Formatting.Indented);
+            string json = JsonConvert.SerializeObject(NewListOfDays(), Formatting.Indented);
 
             Console.WriteLine(json);
 
-            var kl = JsonConvert.DeserializeObject<KeyedList<DayOfWeek, HasInterface>>(json);
+            var kl = JsonConvert.DeserializeObject<PrimaryKeyedList<DayOfWeek, HasInterface>>(json);
 
-            Assert.That(_keyedList, Is.EqualTo(kl));
+            Assert.That(NewListOfDays, Is.EqualTo(kl));
         }
 
         [Test]
@@ -88,14 +84,14 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
             Console.WriteLine(json);
 
-            var kl = JsonConvert.DeserializeObject<KeyedList<string, StringKey>>(json);
+            var kl = JsonConvert.DeserializeObject<PrimaryKeyedList<string, StringKey>>(json);
 
             Assert.That(kl, Is.EqualTo(StringKeyedList));
         }
 
         [Test]
         public void KeyedListPassAsList() {
-            GimmeAList(_keyedList);
+            GimmeAList(NewListOfDays());
         }
 
         private void GimmeAList<T>(IList<T> list) {
@@ -104,33 +100,31 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
         [Test]
         public void GetViaKey() {
-            Assert.That(_keyedList[DayOfWeek.Monday], Is.EqualTo(new HasInterface(DayOfWeek.Monday)));
+            Assert.That(NewListOfDays()[DayOfWeek.Monday], Is.EqualTo(new HasInterface(DayOfWeek.Monday)));
         }
 
         [Test]
         public void Cloneable() {
-            var copy = _keyedList.Copy();
+            var ls = NewListOfDays();
 
-            Assert.That(copy, Is.EqualTo(_keyedList));
+            Assert.That(ls, Is.EqualTo(NewListOfDays()));
         }
 
         [Test]
         public void UpdateViaKey() {
-            var copy = _keyedList.Copy();
+            var ls = NewListOfDays();
 
             const string updatedInfo = "UPDATED";
-            copy[DayOfWeek.Monday].Info = updatedInfo;
+            ls[DayOfWeek.Monday].Info = updatedInfo;
 
-            for (int i = 0; i > _keyedList.Count; i++) {
-                Assert.That(copy.ElementAt(i).Info, Is.EqualTo(_keyedList.ElementAt(i).PrimaryKey == DayOfWeek.Monday ? updatedInfo : _keyedList.ElementAt(i).Info));
+            for (int i = 0; i > NewListOfDays().Count; i++) {
+                Assert.That(ls.ElementAt(i).Info, Is.EqualTo(NewListOfDays().ElementAt(i).PrimaryKey == DayOfWeek.Monday ? updatedInfo : NewListOfDays().ElementAt(i).Info));
             }
         }
 
         [Test]
         public void AddViaKey() {
-            var kl = new PrimaryKeyedList<DayOfWeek, HasInterface>() {
-                new HasInterface(DayOfWeek.Monday)
-            };
+            var kl = new PrimaryKeyedList<DayOfWeek, HasInterface>() { new HasInterface(DayOfWeek.Monday) };
 
             int initialCount = kl.Count;
 
@@ -142,62 +136,42 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
         [Test]
         public void ErrorAddingDuplicateKey() {
-            var copy = _keyedList.Copy();
-            Assert.Throws<ArgumentException>(() => copy.Add(new HasInterface(DayOfWeek.Monday)));
+            var ls = NewListOfDays();
+            Assert.Throws<ArgumentException>(() => ls.Add(new HasInterface(DayOfWeek.Monday)));
         }
 
         [Test]
         public void ErrorCreatingFromDuplicateList() {
-            var ls = new List<HasInterface> {
-                new HasInterface(DayOfWeek.Monday),
-                new HasInterface(DayOfWeek.Tuesday),
-                new HasInterface(DayOfWeek.Tuesday),
-                new HasInterface(DayOfWeek.Tuesday)
-            };
+            var ls = new List<HasInterface> { new HasInterface(DayOfWeek.Monday), new HasInterface(DayOfWeek.Tuesday), new HasInterface(DayOfWeek.Tuesday), new HasInterface(DayOfWeek.Tuesday) };
             Assert.Throws<ArgumentException>(() => new PrimaryKeyedList<DayOfWeek, HasInterface>(ls));
         }
 
         [Test]
         public void CanCreateFromValidList() {
-            var ls = new List<HasInterface> {
-                new HasInterface(DayOfWeek.Monday),
-                new HasInterface(DayOfWeek.Tuesday),
-                new HasInterface(DayOfWeek.Wednesday)
-            };
+            var ls = new List<HasInterface> { new HasInterface(DayOfWeek.Monday), new HasInterface(DayOfWeek.Tuesday), new HasInterface(DayOfWeek.Wednesday) };
 
-            var kl = new PrimaryKeyedList<DayOfWeek, HasInterface> {
-                new HasInterface(DayOfWeek.Monday),
-                new HasInterface(DayOfWeek.Tuesday),
-                new HasInterface(DayOfWeek.Wednesday)
-            };
+            var kl = new PrimaryKeyedList<DayOfWeek, HasInterface> { new HasInterface(DayOfWeek.Monday), new HasInterface(DayOfWeek.Tuesday), new HasInterface(DayOfWeek.Wednesday) };
 
             Assert.That(new PrimaryKeyedList<DayOfWeek, HasInterface>(ls), Is.EqualTo(kl));
         }
 
         [Test]
         public void ErrorOnMissingKey() {
-            var kl = new PrimaryKeyedList<DayOfWeek, HasInterface>() {
-                new HasInterface(DayOfWeek.Tuesday)
-            };
+            var kl = new PrimaryKeyedList<DayOfWeek, HasInterface>() { new HasInterface(DayOfWeek.Tuesday) };
 
             Assert.Throws<KeyNotFoundException>(() => kl[DayOfWeek.Monday].Info = "yolo");
         }
 
         [Test]
         public void ErrorOnRemovingMissingKey() {
-            var kl = new PrimaryKeyedList<DayOfWeek, HasInterface>() {
-                new HasInterface(DayOfWeek.Tuesday)
-            };
+            var kl = new PrimaryKeyedList<DayOfWeek, HasInterface>() { new HasInterface(DayOfWeek.Tuesday) };
 
             Assert.False(kl.Remove(DayOfWeek.Monday));
         }
 
         [Test]
         public void TestRemove() {
-            var kl = new PrimaryKeyedList<DayOfWeek, HasInterface>() {
-                new HasInterface(DayOfWeek.Monday),
-                new HasInterface(DayOfWeek.Tuesday)
-            };
+            var kl = new PrimaryKeyedList<DayOfWeek, HasInterface>() { new HasInterface(DayOfWeek.Monday), new HasInterface(DayOfWeek.Tuesday) };
 
             var initialLength = kl.Count;
 
@@ -209,10 +183,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
         [Test]
         public void TestJsonPopulateWithSameData() {
-            var kl = new PrimaryKeyedList<DayOfWeek, HasInterface> {
-                new HasInterface(DayOfWeek.Monday),
-                new HasInterface(DayOfWeek.Tuesday)
-            };
+            var kl = new PrimaryKeyedList<DayOfWeek, HasInterface> { new HasInterface(DayOfWeek.Monday), new HasInterface(DayOfWeek.Tuesday) };
 
             var json = JsonConvert.SerializeObject(kl);
             JsonConvert.PopulateObject(json, kl);
@@ -220,10 +191,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
         [Test]
         public void TestJsonPopulateEmpty() {
-            var kl = new PrimaryKeyedList<DayOfWeek, HasInterface> {
-                new HasInterface(DayOfWeek.Monday),
-                new HasInterface(DayOfWeek.Tuesday)
-            };
+            var kl = new PrimaryKeyedList<DayOfWeek, HasInterface> { new HasInterface(DayOfWeek.Monday), new HasInterface(DayOfWeek.Tuesday) };
 
             var json = JsonConvert.SerializeObject(kl);
 

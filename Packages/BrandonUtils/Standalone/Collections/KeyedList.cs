@@ -15,6 +15,14 @@ namespace BrandonUtils.Standalone.Collections {
     /// A simple implementation of <see cref="KeyedCollection{TKey,TItem}"/>.
     /// </summary>
     /// <remarks>
+    /// <p>
+    /// <b>NOTE:
+    /// <br/>
+    /// You <i>cannot</i> properly deserialize a <see cref="KeyedList{TKey,TValue}"/>!
+    /// If you need to support serialization, use a <see cref="PrimaryKeyedList{TKey,TValue}"/> instead!
+    /// </b>
+    /// </p>
+    /// <p/>
     /// Though a <see cref="KeyedList{TKey,TValue}"/> resembles an <see cref="Dictionary{TKey,TValue}"/> in many ways, it does <b>not</b>
     /// implement <see cref="IDictionary{TKey,TValue}"/>.
     /// <br/>
@@ -26,7 +34,6 @@ namespace BrandonUtils.Standalone.Collections {
     /// <typeparam name="TKey">the type of the <see cref="Keys"/></typeparam>
     /// <typeparam name="TValue">the type of the <see cref="Values"/></typeparam>
     [PublicAPI]
-    [Serializable]
     public class KeyedList<TKey, TValue> : KeyedCollection<TKey, TValue> {
         [NotNull] protected readonly Func<TValue, TKey> KeyExtractor;
 

@@ -7,6 +7,14 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.22.2] = 9/7/2021
+
+### Fixed
+
+- Fixed some PrimaryKeyedListTests.cs
+- Moved `[Serializable]` from `KeyedList` -> `PrimaryKeyedList`
+- Added javadocs explaining that `KeyedList` is **NOT** serializable
+
 ## [2.22.1] - 9/6/2021
 
 ### Added
