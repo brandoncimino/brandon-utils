@@ -7,7 +7,14 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
-## [2.22.2] = 9/7/2021
+## [2.23.0] - 9/10/2021
+
+### Added
+
+- `TimePeriod`, for measuring `TimeSpan`s between specific points in time
+- `TestUtils.SerialCompare`, to make sure that information is retained over multiple serializations
+
+## [2.22.2] - 9/7/2021
 
 ### Fixed
 

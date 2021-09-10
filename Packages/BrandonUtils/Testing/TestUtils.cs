@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using BrandonUtils.Standalone;
 using BrandonUtils.Standalone.Chronic;
 using BrandonUtils.Standalone.Enums;
+using BrandonUtils.Standalone.Strings;
 
 using JetBrains.Annotations;
 
+using Newtonsoft.Json;
+
+using NUnit.Framework;
 using NUnit.Framework.Constraints;
 
 using UnityEngine;
@@ -76,6 +81,41 @@ namespace BrandonUtils.Testing {
 
         public static WaitForSecondsRealtime WaitForRealtime(TimeSpan timeSpan, double multiplier = 1) {
             return new WaitForSecondsRealtime((float)timeSpan.Multiply(multiplier).TotalSeconds);
+        }
+
+        /// <summary>
+        /// Converts <paramref name="original"/> to a JSON and then back into a <typeparamref name="T"/> to ensure that
+        /// no information is lost.
+        /// </summary>
+        /// <param name="original">the <typeparamref name="T"/> instance we started with</param>
+        /// <param name="simulacra">the number of recursive simulacra to be produced</param>
+        /// <typeparam name="T">the type of the <paramref name="original"/></typeparam>
+        /// <returns>the de-serialized simulacrum of <paramref name="original"/>, in case you want it</returns>
+        public static T SerialCompare<T>(T original, int simulacra = 3) where T : IEquatable<T> {
+            T simulacrum = default;
+            simulacra.Repeat(
+                i => {
+                    Console.WriteLine($"Simulacrum [#{i + 1}/{simulacra}]");
+
+                    var json = JsonConvert.SerializeObject(original);
+                    simulacrum = JsonConvert.DeserializeObject<T>(json);
+
+                    Console.WriteLine(
+                        new Dictionary<string, object> {
+                            [nameof(original)]   = original,
+                            [nameof(json)]       = json,
+                            [nameof(simulacrum)] = simulacrum
+                        }.Prettify()
+                    );
+                    Console.WriteLine();
+
+                    AssertAll.Of(
+                        () => Assert.That(original, NUnit.Framework.Is.EqualTo(simulacrum)),
+                        () => Assert.True(original.Equals(simulacrum), "original.Equals(simulacrum)")
+                    );
+                }
+            );
+            return simulacrum;
         }
     }
 }
