@@ -2,6 +2,7 @@
 using System.Linq;
 
 using BrandonUtils.Standalone.Collections;
+using BrandonUtils.Standalone.Exceptions;
 using BrandonUtils.Standalone.Optional;
 using BrandonUtils.Standalone.Reflection;
 
@@ -29,31 +30,19 @@ namespace BrandonUtils.Standalone.Strings {
                 return false;
             }
 
-            var t1_ofObjs = MakeGenericOfObjects(t1);
-            var t2_ofObjs = MakeGenericOfObjects(t2);
-
-            return t1_ofObjs == t2_ofObjs || t1_ofObjs.IsAssignableFrom(t2_ofObjs) || t2_ofObjs.IsAssignableFrom(t1_ofObjs);
-
-            var def1 = t1.GetGenericTypeDefinition();
-            var def2 = t2.GetGenericTypeDefinition();
-
-            var defs = def1 == def2 || def1.IsAssignableFrom(def2) || def2.IsAssignableFrom(def1);
-
-            if (defs) {
-                return defs;
+            if (t1.GenericTypeArguments.Length != t2.GenericTypeArguments.Length) {
+                return false;
             }
 
-            var ofObj1 = def1.MakeGenericType(typeof(object));
-            var ofObj2 = def2.MakeGenericType(typeof(object));
+            try {
+                var t1_ofObjs = MakeGenericOfObjects(t1);
+                var t2_ofObjs = MakeGenericOfObjects(t2);
 
-            var ofObjs = ofObj1 == ofObj2 || ofObj1.IsAssignableFrom(ofObj2) || ofObj2.IsAssignableFrom(ofObj1);
-
-            if (ofObjs) {
-                Console.WriteLine("ofObjs was a match");
-                return ofObjs;
+                return t1_ofObjs == t2_ofObjs || t1_ofObjs.IsAssignableFrom(t2_ofObjs) || t2_ofObjs.IsAssignableFrom(t1_ofObjs);
             }
-
-            return false;
+            catch (Exception e) {
+                throw e.ModifyMessage($"Unable to compare the generic types {t1} and {t2}!\n{e.Message}");
+            }
         }
 
         private static Type MakeGenericOfObjects(Type type) {

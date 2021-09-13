@@ -9,16 +9,17 @@ using BrandonUtils.Standalone.Exceptions;
 
 namespace BrandonUtils.Standalone.Enums {
     /// <summary>
-    /// A wrapper around a <see cref="IList{T}"/> of <see cref="Enum"/> <typeparamref name="T"/> values.
+    /// A singleton collection of <see cref="Enum"/> <typeparamref name="T"/> values.
     /// <br/>
     /// Use this to "restrict" an existing <see cref="Enum"/>.
     /// </summary>
     /// <example>
     /// <see cref="EnumSubset{T}"/> Weekends = new <see cref="EnumSubset{T}"/>(<see cref="DayOfWeek.Saturday"/>, <see cref="DayOfWeek.Sunday"/>);
     /// <p/>
-    /// Weekends.<see cref="Validate"/>(<see cref="DayOfWeek.Monday"/>); //this throws an <see cref="EnumNotInSubsetException{T}"/>
+    /// Weekends.<see cref="Validate"/>(<see cref="DayOfWeek.Monday"/>); //this throws an <see cref="EnumNotInSetException{T}"/>
     /// </example>
     /// <typeparam name="T"></typeparam>
+    [Obsolete("Please use " + nameof(EnumSet) + " instead, which is a proper " + nameof(HashSet<object>) + " implementation")]
     public class EnumSubset<T> : ICollection<T> where T : Enum {
         /// <summary>
         /// The backing <see cref="IList{T}"/> for the <see cref="EnumSubset{T}"/>.
@@ -93,21 +94,49 @@ namespace BrandonUtils.Standalone.Enums {
         #region Meaningful Stuff
 
         /// <summary>
-        /// Checks if <see cref="Subset"/> <see cref="Contains"/> <paramref name="valuesToValidate"/>.
+        /// Throws an exception unless <see cref="Subset"/> contains <b>all</b> of the <paramref name="expectedValue"/>.
         /// </summary>
         /// <remarks>
         /// This should only be used when you want strict validation that throws an <see cref="Exception"/> on failure.
         /// <br/>If you want to "test" whether or not a value is in an <see cref="EnumSubset{T}"/>, use <see cref="Contains"/>.
         /// </remarks>
-        /// <param name="valuesToValidate">The <see cref="T"/> <see cref="Enum"/> value that should be within this <see cref="EnumSubset{T}"/>.</param>
-        /// <returns><paramref name="valuesToValidate"/>, if <see cref="Contains">Contains</see>(<paramref name="valuesToValidate"/>) returns <c>true</c>.</returns>
-        /// <exception cref="EnumNotInSubsetException{T}">if <see cref="Contains">Contains</see>(<paramref name="valuesToValidate"/>) returns <c>false</c>.</exception>
-        public void Validate(params T[] valuesToValidate) {
-            if (!valuesToValidate.All(Contains)) {
-                throw new EnumNotInSubsetException<T>(
-                    this,
-                    valuesToValidate
-                );
+        /// <param name="expectedValue">The <see cref="T"/> <see cref="Enum"/> value that should be within this <see cref="EnumSubset{T}"/>.</param>
+        /// <returns><paramref name="expectedValue"/>, if <see cref="Contains">Contains</see>(<paramref name="expectedValue"/>) returns <c>true</c>.</returns>
+        /// <exception cref="EnumNotInSetException{T}">if <see cref="Contains">Contains</see>(<paramref name="expectedValue"/>) returns <c>false</c>.</exception>
+        public void MustContain(params T[] expectedValue) {
+            if (this.IsSupersetOf(expectedValue) == false) {
+                throw new EnumNotInSetException<T>(this, expectedValue);
+            }
+        }
+
+        /**
+         * <inheritdoc cref="MustContain(T[])"/>
+         */
+        public void MustContain(IEnumerable<T> expectedValues) {
+            MustContain(expectedValues.ToArray());
+        }
+
+        /// <summary>
+        /// If this <see cref="CollectionUtils.DoesNotContain{T}"/> <paramref name="expectedValue"/>, then throw the exception created by <paramref name="exceptionOnFailure"/>.
+        /// </summary>
+        /// <param name="expectedValue">the <typeparamref name="T"/> value that this MUST contain</param>
+        /// <param name="exceptionOnFailure">a <see cref="Func{TResult}"/> that generates the <see cref="Exception"/> when <paramref name="expectedValue"/> wasn't found</param>
+        /// <exception cref="Exception"></exception>
+        public void MustContain(T expectedValue, Func<Exception> exceptionOnFailure) {
+            if (this.DoesNotContain(expectedValue)) {
+                throw exceptionOnFailure.Invoke();
+            }
+        }
+
+        /// <summary>
+        /// <inheritdoc cref="MustContain(T, Func{Exception})"/>
+        /// </summary>
+        /// <param name="expectedValue"><inheritdoc cref="MustContain(T, Func{Exception})"/></param>
+        /// <param name="exceptionOnFailure">a <see cref="Func{TIn,TResult}"/> that consumes <paramref name="expectedValue"/> and produces an <see cref="Exception"/></param>
+        /// <exception cref="Exception"></exception>
+        public void MustContain(T expectedValue, Func<T, Exception> exceptionOnFailure) {
+            if (this.DoesNotContain(expectedValue)) {
+                throw exceptionOnFailure.Invoke(expectedValue);
             }
         }
 
@@ -121,13 +150,14 @@ namespace BrandonUtils.Standalone.Enums {
         /// ]]></code>
         /// </example>
         public EnumSubset<T> Inverse() {
-            var possibleValues = BEnum.Values<T>();
+            var possibleValues = BEnum.GetValues<T>();
             return possibleValues.Where(it => this.ContainsNone(it)).ToEnumSubset();
         }
 
         #endregion
     }
 
+    [Obsolete(nameof(EnumSubset<DayOfWeek>) + " is obsolete; please use " + nameof(EnumSet<DayOfWeek>))]
     public static class EnumSubsetExtensions {
         public static EnumSubset<T> ToEnumSubset<T>(this IEnumerable<T> source) where T : Enum {
             return new EnumSubset<T>(source);

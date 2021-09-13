@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Enums;
@@ -10,40 +11,28 @@ using static UnityEngine.KeyCode;
 
 namespace BrandonUtils.Input {
     public static class KeyboardUtils {
-        public static readonly EnumSubset<KeyCode> ArrowKeys = new EnumSubset<KeyCode>(
-            new[] {
-                UpArrow,
-                LeftArrow,
-                DownArrow,
-                RightArrow
-            },
-            true
+        public static readonly EnumSet<KeyCode> ArrowKeys = EnumSet.Of(
+            UpArrow,
+            LeftArrow,
+            DownArrow,
+            RightArrow
         );
 
-        public static readonly EnumSubset<KeyCode> WASDKeys = new EnumSubset<KeyCode>(
-            new[] {
-                W,
-                A,
-                S,
-                D
-            },
-            true
+        public static readonly EnumSet<KeyCode> WASDKeys = EnumSet.Of(
+            W,
+            A,
+            S,
+            D
         );
 
-        public static readonly EnumSubset<KeyCode> DirectionalKeys = new EnumSubset<KeyCode>(
-            new[] {
-                ArrowKeys,
-                WASDKeys
-            },
-            true
-        );
+        public static readonly EnumSet<KeyCode> DirectionalKeys = ArrowKeys.Union(WASDKeys).ToEnumSet();
 
         public static readonly ReadOnlyDictionary<KeyCode, KeyCode> ArrowToWASD = new ReadOnlyDictionary<KeyCode, KeyCode>(
             new Dictionary<KeyCode, KeyCode> {
-                {UpArrow, W},
-                {DownArrow, S},
-                {LeftArrow, A},
-                {RightArrow, D}
+                { UpArrow, W },
+                { DownArrow, S },
+                { LeftArrow, A },
+                { RightArrow, D }
             }
         );
 
@@ -62,13 +51,13 @@ namespace BrandonUtils.Input {
         }
 
         public static KeyCode ToWASD(this KeyCode arrowKey) {
-            ArrowKeys.Validate(arrowKey);
+            ArrowKeys.MustContain(arrowKey);
 
             return ArrowToWASD[arrowKey];
         }
 
         public static KeyCode ToArrowKey(this KeyCode wasd) {
-            WASDKeys.Validate(wasd);
+            WASDKeys.MustContain(wasd);
 
             return WASDToArrow[wasd];
         }

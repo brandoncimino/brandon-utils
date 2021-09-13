@@ -19,8 +19,8 @@ namespace BrandonUtils.Tests.EditMode {
             F4,
         };
 
-        private static KeyCode[] WASD      = {W, A, S, D};
-        private static KeyCode[] ArrowKeys = {UpArrow, DownArrow, LeftArrow, RightArrow};
+        private static KeyCode[] WASD      = { W, A, S, D };
+        private static KeyCode[] ArrowKeys = { UpArrow, DownArrow, LeftArrow, RightArrow };
 
         [Test]
         public void InvalidArrowKeyToWASD(
@@ -28,7 +28,7 @@ namespace BrandonUtils.Tests.EditMode {
             KeyCode nonArrowKey
         ) {
             Assume.That(ArrowKeys, Does.Not.Contains(nonArrowKey));
-            Assert.Throws<EnumNotInSubsetException<KeyCode>>(() => nonArrowKey.ToWASD());
+            Assert.Throws<EnumNotInSetException<KeyCode>>(() => nonArrowKey.ToWASD());
         }
 
         [Test]
@@ -37,7 +37,7 @@ namespace BrandonUtils.Tests.EditMode {
             KeyCode nonWASDKey
         ) {
             Assume.That(WASD, Does.Not.Contains(nonWASDKey));
-            Assert.Throws<EnumNotInSubsetException<KeyCode>>(() => nonWASDKey.ToArrowKey());
+            Assert.Throws<EnumNotInSetException<KeyCode>>(() => nonWASDKey.ToArrowKey());
         }
 
         [TestCase(W, UpArrow)]

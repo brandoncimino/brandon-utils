@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 using BrandonUtils.Standalone.Collections;
+using BrandonUtils.Standalone.Enums;
 using BrandonUtils.Standalone.Strings;
 using BrandonUtils.Standalone.Strings.Prettifiers;
 using BrandonUtils.Testing;
@@ -249,8 +250,13 @@ List<Int32>[
             Console.WriteLine(typesMatch);
         }
 
-        #region Sketchbook
-
-        #endregion
+        [Test]
+        [TestCase(new[] { DayOfWeek.Monday, DayOfWeek.Friday }, "[Monday, Friday]")]
+        public void PrettifyEnumSet(DayOfWeek[] set, string expectedString) {
+            var enumSet = new EnumSet<DayOfWeek>(set);
+            var pretty  = enumSet.Prettify();
+            Console.WriteLine(pretty);
+            Assert.That(pretty, Is.EqualTo(expectedString));
+        }
     }
 }

@@ -12,11 +12,18 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Some inverse functions like `CollectionUtils.IsNotSupersetOf()`
+- Added `EnumSet<T>`, which is a proper `HashSet<T>` implementation
 
 ### Changed
 
 - Renamed `BEnum.Values()` to `BEnum.GetValues()`, to match the C# naming precedent of `Enum.GetValues()`
 - Renamed `SupersetOf` / `SubsetOf` -> `IsSupersetOf` / `IsSubsetOf`
+- Deprecated `EnumSubset` in favor of `EnumSet`
+- Renamed `EnumNotInSubsetException` -> `EnumNotInSetException`
+
+### Fixed
+
+- Checked for generic type arity in `Prettification`
 
 ## [2.23.0] - 9/10/2021
 
