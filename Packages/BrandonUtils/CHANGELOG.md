@@ -7,6 +7,12 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.24.0] - 9/13/2021
+
+### Changed
+
+- Renamed `BEnum.Values()` to `BEnum.GetValues()`, to match the C# naming precedent of `Enum.GetValues()`
+
 ## [2.23.0] - 9/10/2021
 
 ### Added
