@@ -608,14 +608,14 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="subset">the items that might be in the <paramref name="superset"/></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static bool ContainsAll<T>(this IEnumerable<T> superset, IEnumerable<T> subset) {
+        public static bool ContainsAll<T>([NotNull] this IEnumerable<T> superset, [NotNull] IEnumerable<T> subset) {
             return subset.All(superset.Contains);
         }
 
         /**
          * <inheritdoc cref="ContainsAll{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
          */
-        public static bool ContainsAll<T>(this IEnumerable<T> enumerable, params T[] others) {
+        public static bool ContainsAll<T>([NotNull] this IEnumerable<T> enumerable, [NotNull] params T[] others) {
             return ContainsAll(enumerable, (IEnumerable<T>)others);
         }
 
@@ -630,16 +630,27 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T">the <see cref="Type"/> of each individual item</typeparam>
         /// <returns></returns>
         /// <seealso cref="ContainsAll{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
-        /// <seealso cref="SubsetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
-        public static bool SupersetOf<T>(this IEnumerable<T> superset, IEnumerable<T> subset) {
+        /// <seealso cref="IsSubsetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
+        public static bool IsSupersetOf<T>([NotNull] this IEnumerable<T> superset, [NotNull] IEnumerable<T> subset) {
             return ContainsAll(superset, subset);
         }
 
         /**
-         * <inheritdoc cref="SupersetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
+         * <inheritdoc cref="IsSupersetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
          */
-        public static bool SupersetOf<T>(this IEnumerable<T> superset, params T[] subset) {
+        public static bool IsSupersetOf<T>(this IEnumerable<T> superset, params T[] subset) {
             return ContainsAll(superset, subset);
+        }
+
+        /// <summary>
+        /// Inverse of <see cref="IsSupersetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>.
+        /// </summary>
+        /// <param name="superset"></param>
+        /// <param name="subset"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>inverse of <see cref="IsSupersetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/></returns>
+        public static bool IsNotSupersetOf<T>([NotNull] this IEnumerable<T> superset, [NotNull] IEnumerable<T> subset) {
+            return !IsSupersetOf(superset, subset);
         }
 
         /// <summary>
@@ -649,14 +660,28 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="superset">the <b>larger</b> set</param>
         /// <typeparam name="T">the <see cref="Type"/> of each individual item</typeparam>
         /// <returns></returns>
-        public static bool SubsetOf<T>(this IEnumerable<T> subset, IEnumerable<T> superset) {
+        public static bool IsSubsetOf<T>([NotNull] this IEnumerable<T> subset, [NotNull] IEnumerable<T> superset) {
             return ContainsAll(superset, subset);
         }
 
+        /// <summary>
+        /// Inverse of <see cref="IsSubsetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
+        /// </summary>
+        /// <remarks>
+        /// Equivalent to <see cref="DoesNotContainAll{T}"/>
+        /// </remarks>
+        /// <param name="subset"></param>
+        /// <param name="superset"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>inverse of <see cref="IsSubsetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/></returns>
+        public static bool IsNotSubsetOf<T>([ItemNotNull] this IEnumerable<T> subset, [ItemNotNull] IEnumerable<T> superset) {
+            return !IsSubsetOf(superset, subset);
+        }
+
         /**
-         * <inheritdoc cref="SubsetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
+         * <inheritdoc cref="IsSubsetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
          */
-        public static bool SubsetOf<T>(this IEnumerable<T> subset, params T[] superset) {
+        public static bool IsSubsetOf<T>(this IEnumerable<T> subset, params T[] superset) {
             return ContainsAll(superset, subset);
         }
 

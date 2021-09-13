@@ -9,9 +9,14 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [2.24.0] - 9/13/2021
 
+### Added
+
+- Some inverse functions like `CollectionUtils.IsNotSupersetOf()`
+
 ### Changed
 
 - Renamed `BEnum.Values()` to `BEnum.GetValues()`, to match the C# naming precedent of `Enum.GetValues()`
+- Renamed `SupersetOf` / `SubsetOf` -> `IsSupersetOf` / `IsSubsetOf`
 
 ## [2.23.0] - 9/10/2021
 
