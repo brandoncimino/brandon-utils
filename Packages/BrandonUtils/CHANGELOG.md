@@ -7,6 +7,12 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.24.2] - 9/13/2021
+
+### Added
+
+- Extension methods for `string.IsNullOrEmpty()` and `string.IsNullOrWhitespace()` (aka `string.IsBlank()`)
+
 ## [2.24.1] - 9/13/2021
 
 ### Added

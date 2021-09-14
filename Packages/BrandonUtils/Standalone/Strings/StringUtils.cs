@@ -513,5 +513,36 @@ namespace BrandonUtils.Standalone.Strings {
         public static string ToString([CanBeNull] this object obj, string nullPlaceholder) {
             return obj == null ? nullPlaceholder : obj.ToString();
         }
+
+        #region Lapelle deux Vid
+
+        /// <summary>
+        /// An extension method for <see cref="string.IsNullOrEmpty"/>
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static bool IsNullOrEmpty([CanBeNull] this string str) {
+            return string.IsNullOrEmpty(str);
+        }
+
+        /// <summary>
+        /// An extension method for <see cref="string.IsNullOrWhiteSpace"/>
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static bool IsNullOrWhiteSpace([CanBeNull] this string str) {
+            return string.IsNullOrWhiteSpace(str);
+        }
+
+        /// <summary>
+        /// An alias for <see cref="IsNullOrWhiteSpace"/> matching Java's <a href="https://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/StringUtils.html#isBlank-java.lang.CharSequence-">StringUtils.isBlank()</a>
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static bool IsBlank([CanBeNull] this string str) {
+            return str.IsNullOrWhiteSpace();
+        }
+
+        #endregion
     }
 }
