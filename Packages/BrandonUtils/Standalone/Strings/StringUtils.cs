@@ -521,6 +521,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
+        [ContractAnnotation("null => true", true)]
         public static bool IsNullOrEmpty([CanBeNull] this string str) {
             return string.IsNullOrEmpty(str);
         }
@@ -530,6 +531,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
+        [ContractAnnotation("null => true", true)]
         public static bool IsNullOrWhiteSpace([CanBeNull] this string str) {
             return string.IsNullOrWhiteSpace(str);
         }
@@ -539,6 +541,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
+        [ContractAnnotation("null => true", true)]
         public static bool IsBlank([CanBeNull] this string str) {
             return str.IsNullOrWhiteSpace();
         }
