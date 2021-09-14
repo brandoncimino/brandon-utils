@@ -44,23 +44,99 @@ namespace BrandonUtils.Standalone.Enums {
 
         #region MustContain
 
-        public void MustContain(params T[] valuesThatShouldBeThere) {
-            if (!IsSupersetOf(valuesThatShouldBeThere)) {
-                var badValues = valuesThatShouldBeThere.Except(this);
-                var prettySettings = new PrettificationSettings() {
-                    Flags = PrettificationFlags.IncludeTypeLabels
-                };
-                var mapStuff = new Dictionary<object, object>() {
-                    [GetType().PrettifyType(prettySettings)] = this,
-                    [nameof(valuesThatShouldBeThere)]        = valuesThatShouldBeThere,
-                    ["Disallowed values"]                    = badValues
-                };
-                throw new EnumNotInSetException<T>(this, valuesThatShouldBeThere, $"The {GetType().PrettifyType()} didn't contain all of the {nameof(valuesThatShouldBeThere)}!\n{mapStuff.Prettify(prettySettings)}");
+        /// <summary>
+        /// Throws an <see cref="EnumNotInSetException{T}"/> if this doesn't contain <b>all</b> of the <see cref="expectedValues"/>.
+        ///
+        /// In other words, throws an exception unless this <see cref="HashSet{T}.IsSupersetOf"/> <paramref name="expectedValues"/>.
+        /// </summary>
+        /// <param name="expectedValues">this invocation's must-have <typeparamref name="T"/> values</param>
+        /// <exception cref="EnumNotInSetException{T}"></exception>
+        public void MustContain(params T[] expectedValues) {
+            if (!IsSupersetOf(expectedValues)) {
+                var mustContainMessage = BuildMustContainMessage(expectedValues);
+                throw new EnumNotInSetException<T>(this, expectedValues, $"The {GetType().PrettifyType()} didn't contain all of the {nameof(expectedValues)}!\n{mustContainMessage}");
             }
+        }
+
+        /**
+         * <inheritdoc cref="MustContain(T[])"/>
+         */
+        public void MustContain(IEnumerable<T> expectedValues) {
+            MustContain(expectedValues.ToArray());
+        }
+
+        /**
+         * <inheritdoc cref="MustContain(T[])"/>
+         */
+        public void MustContain(IEnumerable<T> expectedValues, Func<Exception> exceptionProvider) {
+            if (!IsSupersetOf(expectedValues)) {
+                throw exceptionProvider.Invoke();
+            }
+        }
+
+        /**
+         * <inheritdoc cref="MustContain(T[])"/>
+         */
+        public void MustContain(IEnumerable<T> expectedValues, Func<EnumNotInSetException<T>, Exception> exceptionTransformer) {
+            try {
+                MustContain(expectedValues);
+            }
+            catch (EnumNotInSetException<T> e) {
+                throw exceptionTransformer.Invoke(e);
+            }
+        }
+
+        /**
+         * <inheritdoc cref="MustContain(T[])"/>
+         */
+        public void MustContain(T expectedValue) {
+            if (!Contains(expectedValue)) {
+                throw new EnumNotInSetException<T>(this, expectedValue);
+            }
+        }
+
+        /**
+         * <inheritdoc cref="MustContain(T[])"/>
+         */
+        public void MustContain(T expectedValue, Func<Exception> exceptionProvider) {
+            if (!Contains(expectedValue)) {
+                throw exceptionProvider.Invoke();
+            }
+        }
+
+        /**
+         * <inheritdoc cref="MustContain(T[])"/>
+         */
+        public void MustContain(T expectedValue, Func<EnumNotInSetException<T>, Exception> exceptionTransformer) {
+            try {
+                MustContain(expectedValue);
+            }
+            catch (EnumNotInSetException<T> e) {
+                throw exceptionTransformer.Invoke(e);
+            }
+        }
+
+
+        private string BuildMustContainMessage(T[] valuesThatShouldBeThere) {
+            PrettificationSettings prettySettings = new PrettificationSettings() {
+                Flags = PrettificationFlags.IncludeTypeLabels
+            };
+
+            var badValues = valuesThatShouldBeThere.Except(this);
+            var mapStuff = new Dictionary<object, object>() {
+                [GetType().PrettifyType(prettySettings)] = this,
+                [nameof(valuesThatShouldBeThere)]        = valuesThatShouldBeThere,
+                ["Disallowed values"]                    = badValues
+            };
+            return mapStuff.Prettify(prettySettings);
         }
 
         #endregion
 
+        /// <summary>
+        /// Creates a <b>new</b> <see cref="EnumSet{T}"/> containing
+        /// </summary>
+        /// <returns></returns>
         public EnumSet<T> Copy() {
             return new EnumSet<T>(this);
         }

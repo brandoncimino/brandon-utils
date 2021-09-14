@@ -7,6 +7,12 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.24.1] - 9/13/2021
+
+### Added
+
+- Additional overloads for `EnumSet.MustContain()`
+
 ## [2.24.0] - 9/13/2021
 
 ### Added
