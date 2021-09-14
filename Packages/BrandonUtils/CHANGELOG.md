@@ -7,6 +7,15 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.25.0] - 9/13/2021
+
+### Added
+
+- `CustomFileInfo` and `CustomDirectoryInfo`, to let me pretend that `FileInfo` and `DirectoryInfo` aren't `sealed`
+  classes
+- An extension method for `FileSystemInfo.BaseName()` which mimics Powershell's `FileSystemInfo.BaseName` Script
+  Property
+
 ## [2.24.2] - 9/13/2021
 
 ### Added
