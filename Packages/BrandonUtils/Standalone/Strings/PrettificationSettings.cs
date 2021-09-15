@@ -1,6 +1,4 @@
-﻿using System;
-
-using BrandonUtils.Standalone.Optional;
+﻿using BrandonUtils.Standalone.Optional;
 
 namespace BrandonUtils.Standalone.Strings {
     public class PrettificationSettings {
@@ -18,8 +16,8 @@ namespace BrandonUtils.Standalone.Strings {
         /// <summary>
         /// Assorted mutually exclusive <see cref="PrettificationFlags"/>.
         /// </summary>
-        public PrettificationFlags Flags { get; set; }
-        public Optional<string> NullPlaceholder => throw new NotImplementedException();
+        public PrettificationFlags Flags { get;        set; }
+        public Optional<string> NullPlaceholder { get; set; }
 
         /// <summary>
         /// The preferred <see cref="LineStyle"/>.

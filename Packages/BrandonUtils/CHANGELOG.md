@@ -7,6 +7,14 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.25.1] - 9/13/2021
+
+### Changed
+
+- Improved `IOptional<T>.ToString()`
+- (Partially) implemented `PrettificationSettings.NullPlaceholder`
+- Implemented a default `NullPlaceholder`, `⛔`
+
 ## [2.25.0] - 9/13/2021
 
 ### Added

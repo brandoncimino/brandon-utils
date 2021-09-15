@@ -11,7 +11,8 @@ using JetBrains.Annotations;
 namespace BrandonUtils.Standalone.Strings {
     [PublicAPI]
     public static class Prettification {
-        private static readonly KeyedList<Type, IPrettifier> Prettifiers = PrettifierDatabase.GetDefaultPrettifiers();
+        private const           string                       DefaultNullPlaceholder = "⛔";
+        private static readonly KeyedList<Type, IPrettifier> Prettifiers            = PrettifierDatabase.GetDefaultPrettifiers();
 
         public static void RegisterPrettifier(IPrettifier prettifier) {
             Prettifiers.Add(prettifier);
@@ -78,7 +79,7 @@ namespace BrandonUtils.Standalone.Strings {
 
         public static string Prettify([CanBeNull] this object cinderella, PrettificationSettings settings = default) {
             if (cinderella == null) {
-                return "";
+                return settings?.NullPlaceholder.HasValue == true ? settings.NullPlaceholder.Value : DefaultNullPlaceholder;
             }
 
             return FindPrettifier(cinderella.GetType())

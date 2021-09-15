@@ -4,6 +4,7 @@ using System.Linq;
 
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Enums;
+using BrandonUtils.Standalone.Strings;
 
 using JetBrains.Annotations;
 
@@ -13,6 +14,9 @@ namespace BrandonUtils.Standalone.Optional {
     /// </summary>
     [PublicAPI]
     public static class Optional {
+        private const string NullPlaceholder  = "⛔";
+        private const string EmptyPlaceholder = "🈳";
+
         /// <summary>
         /// Creates an <see cref="Optional{T}"/> without ugly type parameters.
         /// </summary>
@@ -212,6 +216,17 @@ namespace BrandonUtils.Standalone.Optional {
         /// <typeparam name="T">the underlying type of the <see cref="IOptional{T}"/></typeparam>
         /// <returns>a <see cref="object.ToString"/> representation of the given <see cref="IOptional{T}"/></returns>
         public static string ToString<T>([CanBeNull] IOptional<T> optional) {
+            var realType   = optional?.GetType() ?? typeof(T);
+            var prettyType = realType.Prettify();
+            if (optional == null) {
+                return $"({prettyType}){NullPlaceholder}";
+            }
+            else {
+                var valueString = optional.HasValue ? optional.Value.Prettify(new PrettificationSettings() { NullPlaceholder = NullPlaceholder }) : EmptyPlaceholder;
+                return $"{prettyType}[{valueString}]";
+            }
+
+            var typeToPrettify = optional?.GetType() ?? typeof(IOptional<T>);
             return optional == null
                        ? $"(IOptional<{typeof(T).Name}>)null"
                        : $"{optional.GetType().Name}<{typeof(T).Name}>[{(optional.HasValue ? (optional.Value == null ? "null" : optional.Value + "") : "")}]";
