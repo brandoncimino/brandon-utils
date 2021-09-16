@@ -7,6 +7,8 @@ using System.Text.RegularExpressions;
 
 using BrandonUtils.Standalone.Collections;
 
+using FowlFever.Conjugal.Affixing;
+
 using JetBrains.Annotations;
 
 using Newtonsoft.Json;
@@ -544,6 +546,26 @@ namespace BrandonUtils.Standalone.Strings {
         [ContractAnnotation("null => true", true)]
         public static bool IsBlank([CanBeNull] this string str) {
             return str.IsNullOrWhiteSpace();
+        }
+
+        #endregion
+
+        #region {x}IfMissing
+
+        public static string PrependIfMissing(this string str, string prefix) {
+            return PrefixIfMissing(str, prefix);
+        }
+
+        public static string PrefixIfMissing(this string str, string prefix) {
+            return str.StartsWith(prefix) ? str : str.Prefix(prefix);
+        }
+
+        public static string AppendIfMissing(this string str, string suffix) {
+            return SuffixIfMissing(str, suffix);
+        }
+
+        public static string SuffixIfMissing(this string str, string suffix) {
+            return str.EndsWith(suffix) ? str : str.Suffix(suffix);
         }
 
         #endregion
