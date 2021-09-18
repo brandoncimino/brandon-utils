@@ -7,6 +7,26 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.26.0] - 9/18/2021
+
+### Added
+
+- `BrandonUtils.Standalone.Clerical` package
+  - `BPath`, to overcome the shortcomings of `Path`
+    - Validation methods
+      - `ValidateFileName`
+      - `ValidatePath`
+      - `IsValidFileName`
+      - `IsValidPath`
+    - Multi-extension handling
+      - `GetExtensions`
+      - `GetFullExtension`
+      - `GetFileNameWithoutExtensions`
+      - Corresponding `FileInfoExtensions`
+        - `.Extensions`
+        - `.FullExtension`
+        - `.FileNameWithoutExtensions`
+
 ## [2.25.3] - 9/18/2021
 
 ### Added

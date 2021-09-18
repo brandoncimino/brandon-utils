@@ -13,5 +13,21 @@ namespace BrandonUtils.Standalone.Clerical {
         public static string BaseName(this FileSystemInfo fileSystemInfo) {
             return Path.GetFileNameWithoutExtension(fileSystemInfo.Name);
         }
+
+        #region BPath Extensions
+
+        public static string[] Extensions(this FileSystemInfo fileSystemInfo) {
+            return BPath.GetExtensions(fileSystemInfo.Name);
+        }
+
+        public static string FullExtension(this FileSystemInfo fileSystemInfo) {
+            return BPath.GetFullExtension(fileSystemInfo.Name);
+        }
+
+        public static string FileNameWithoutExtensions(this FileSystemInfo fileSystemInfo) {
+            return BPath.GetFileNameWithoutExtensions(fileSystemInfo.Name);
+        }
+
+        #endregion
     }
 }
