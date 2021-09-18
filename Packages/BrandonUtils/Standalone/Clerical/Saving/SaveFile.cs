@@ -13,7 +13,7 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
 
         public SaveFolder SaveFolder { get; }
 
-        public override FileInfo FileInfo { get; }
+        public override FileInfo File { get; }
 
         public SaveFile([NotNull] SaveFolder folder, [NotNull] string nickname, DateTime timeStamp, string extension = SaveFileName.DefaultExtension)
             : this(
@@ -27,11 +27,11 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
 
         public SaveFile([NotNull] SaveFolder folder, [NotNull] SaveFileName saveFileName) {
             SaveFolder = folder;
-            FileInfo   = new FileInfo(Path.Combine(SaveFolder.FullName, _saveFileName.Rendered));
+            File       = new FileInfo(Path.Combine(SaveFolder.FullName, _saveFileName.Rendered));
         }
 
         public SaveFile([NotNull] FileInfo fileInfo) {
-            FileInfo      = fileInfo;
+            File          = fileInfo;
             _saveFileName = SaveFileName.Parse(fileInfo);
         }
     }

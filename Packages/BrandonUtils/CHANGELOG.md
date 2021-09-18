@@ -7,6 +7,14 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.27.1] - 9/18/2021
+
+### Added
+
+- Interfaces for consistent access to `System.IO` classes:
+  - `IHasFileInfo`
+  - `IHasDirectoryInfo`
+
 ## [2.27.0] - 9/18/2021
 
 ### Added

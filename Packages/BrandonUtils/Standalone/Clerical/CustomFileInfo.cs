@@ -10,13 +10,13 @@ namespace BrandonUtils.Standalone.Clerical {
     /// This is probably a really really bad idea for reasons far beyond mortal comprehension.
     /// </remarks>
     /// <seealso cref="CustomDirectoryInfo"/>
-    public abstract class CustomFileInfo : FileSystemInfo {
-        public abstract FileInfo FileInfo { get; }
+    public abstract class CustomFileInfo : FileSystemInfo, IHasFileInfo {
+        public abstract FileInfo File { get; }
 
         /// <summary>Gets the name of the file.</summary>
         /// <returns>The name of the file.</returns>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.Name?view=netframework-4.7.1">`FileInfo.Name` on docs.microsoft.com</a></footer>
-        public override string Name => FileInfo.Name;
+        public override string Name => File.Name;
 
         /// <summary>Gets the size, in bytes, of the current file.</summary>
         /// <returns>The size of the current file in bytes.</returns>
@@ -24,7 +24,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <see cref="M:System.IO.FileSystemInfo.Refresh" /> cannot update the state of the file or directory. </exception>
         /// <exception cref="T:System.IO.FileNotFoundException">The file does not exist.-or- The <see langword="Length" /> property is called for a directory. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.Length?view=netframework-4.7.1">`FileInfo.Length` on docs.microsoft.com</a></footer>
-        public long Length => FileInfo.Length;
+        public long Length => File.Length;
 
         /// <summary>Gets a string representing the directory's full path.</summary>
         /// <returns>A string representing the directory's full path.</returns>
@@ -33,14 +33,14 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.IO.PathTooLongException">The fully qualified path is 260 or more characters.</exception>
         /// <exception cref="T:System.Security.SecurityException">The caller does not have the required permission. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.DirectoryName?view=netframework-4.7.1">`FileInfo.DirectoryName` on docs.microsoft.com</a></footer>
-        public string DirectoryName => FileInfo.DirectoryName;
+        public string DirectoryName => File.DirectoryName;
 
         /// <summary>Gets an instance of the parent directory.</summary>
         /// <returns>A <see cref="T:System.IO.DirectoryInfo" /> object representing the parent directory of this file.</returns>
         /// <exception cref="T:System.IO.DirectoryNotFoundException">The specified path is invalid, such as being on an unmapped drive. </exception>
         /// <exception cref="T:System.Security.SecurityException">The caller does not have the required permission. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.Directory?view=netframework-4.7.1">`FileInfo.Directory` on docs.microsoft.com</a></footer>
-        public DirectoryInfo Directory => FileInfo.Directory;
+        public DirectoryInfo Directory => File.Directory;
 
         /// <summary>Gets or sets a value that determines if the current file is read only.</summary>
         /// <returns>
@@ -51,8 +51,8 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.ArgumentException">The user does not have write permission, but attempted to set this property to <see langword="false" />.</exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.IsReadOnly?view=netframework-4.7.1">`FileInfo.IsReadOnly` on docs.microsoft.com</a></footer>
         public bool IsReadOnly {
-            get => FileInfo.IsReadOnly;
-            set => FileInfo.IsReadOnly = value;
+            get => File.IsReadOnly;
+            set => File.IsReadOnly = value;
         }
 
         /// <summary>Creates a <see cref="T:System.IO.StreamReader" /> with UTF8 encoding that reads from an existing text file.</summary>
@@ -64,7 +64,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.IO.DirectoryNotFoundException">The specified path is invalid, such as being on an unmapped drive. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.OpenText?view=netframework-4.7.1">`FileInfo.OpenText` on docs.microsoft.com</a></footer>
         [SecuritySafeCritical]
-        public StreamReader OpenText() => FileInfo.OpenText();
+        public StreamReader OpenText() => File.OpenText();
 
         /// <summary>Creates a <see cref="T:System.IO.StreamWriter" /> that writes a new text file.</summary>
         /// <returns>A new <see langword="StreamWriter" />.</returns>
@@ -72,12 +72,12 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.IO.IOException">The disk is read-only. </exception>
         /// <exception cref="T:System.Security.SecurityException">The caller does not have the required permission. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.CreateText?view=netframework-4.7.1">`FileInfo.CreateText` on docs.microsoft.com</a></footer>
-        public StreamWriter CreateText() => FileInfo.CreateText();
+        public StreamWriter CreateText() => File.CreateText();
 
         /// <summary>Creates a <see cref="T:System.IO.StreamWriter" /> that appends text to the file represented by this instance of the <see cref="T:System.IO.FileInfo" />.</summary>
         /// <returns>A new <see langword="StreamWriter" />.</returns>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.AppendText?view=netframework-4.7.1">`FileInfo.AppendText` on docs.microsoft.com</a></footer>
-        public StreamWriter AppendText() => FileInfo.AppendText();
+        public StreamWriter AppendText() => File.AppendText();
 
         /// <summary>Copies an existing file to a new file, disallowing the overwriting of an existing file.</summary>
         /// <param name="destFileName">The name of the new file to copy to. </param>
@@ -94,7 +94,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.NotSupportedException">
         /// <paramref name="destFileName" /> contains a colon (:) within the string but does not specify the volume. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.CopyTo?view=netframework-4.7.1">`FileInfo.CopyTo` on docs.microsoft.com</a></footer>
-        public FileInfo CopyTo(string destFileName) => FileInfo.CopyTo(destFileName);
+        public FileInfo CopyTo(string destFileName) => File.CopyTo(destFileName);
 
         /// <summary>Copies an existing file to a new file, allowing the overwriting of an existing file.</summary>
         /// <param name="destFileName">The name of the new file to copy to. </param>
@@ -113,12 +113,12 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.NotSupportedException">
         /// <paramref name="destFileName" /> contains a colon (:) in the middle of the string. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.CopyTo?view=netframework-4.7.1">`FileInfo.CopyTo` on docs.microsoft.com</a></footer>
-        public FileInfo CopyTo(string destFileName, bool overwrite) => FileInfo.CopyTo(destFileName, overwrite);
+        public FileInfo CopyTo(string destFileName, bool overwrite) => File.CopyTo(destFileName, overwrite);
 
         /// <summary>Creates a file.</summary>
         /// <returns>A new file.</returns>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.Create?view=netframework-4.7.1">`FileInfo.Create` on docs.microsoft.com</a></footer>
-        public FileStream Create() => FileInfo.Create();
+        public FileStream Create() => File.Create();
 
         /// <summary>Permanently deletes a file.</summary>
         /// <exception cref="T:System.IO.IOException">The target file is open or memory-mapped on a computer running Microsoft Windows NT.-or-There is an open handle on the file, and the operating system is Windows XP or earlier. This open handle can result from enumerating directories and files. For more information, see How to: Enumerate Directories and Files. </exception>
@@ -126,7 +126,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.UnauthorizedAccessException">The path is a directory. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.Delete?view=netframework-4.7.1">`FileInfo.Delete` on docs.microsoft.com</a></footer>
         [SecuritySafeCritical]
-        public override void Delete() => FileInfo.Delete();
+        public override void Delete() => File.Delete();
 
         /// <summary>Decrypts a file that was encrypted by the current account using the <see cref="M:System.IO.FileInfo.Encrypt" /> method.</summary>
         /// <exception cref="T:System.IO.DriveNotFoundException">An invalid drive was specified. </exception>
@@ -137,7 +137,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.UnauthorizedAccessException">The file described by the current <see cref="T:System.IO.FileInfo" /> object is read-only.-or- This operation is not supported on the current platform.-or- The caller does not have the required permission.</exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.Decrypt?view=netframework-4.7.1">`FileInfo.Decrypt` on docs.microsoft.com</a></footer>
         [ComVisible(false)]
-        public void Decrypt() => FileInfo.Decrypt();
+        public void Decrypt() => File.Decrypt();
 
         /// <summary>Encrypts a file so that only the account used to encrypt the file can decrypt it.</summary>
         /// <exception cref="T:System.IO.DriveNotFoundException">An invalid drive was specified. </exception>
@@ -148,13 +148,13 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.UnauthorizedAccessException">The file described by the current <see cref="T:System.IO.FileInfo" /> object is read-only.-or- This operation is not supported on the current platform.-or- The caller does not have the required permission.</exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.Encrypt?view=netframework-4.7.1">`FileInfo.Encrypt` on docs.microsoft.com</a></footer>
         [ComVisible(false)]
-        public void Encrypt() => FileInfo.Encrypt();
+        public void Encrypt() => File.Encrypt();
 
         /// <summary>Gets a value indicating whether a file exists.</summary>
         /// <returns>
         /// <see langword="true" /> if the file exists; <see langword="false" /> if the file does not exist or if the file is a directory.</returns>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.Exists?view=netframework-4.7.1">`FileInfo.Exists` on docs.microsoft.com</a></footer>
-        public override bool Exists => FileInfo.Exists;
+        public override bool Exists => File.Exists;
 
         /// <summary>Opens a file in the specified mode.</summary>
         /// <param name="mode">A <see cref="T:System.IO.FileMode" /> constant specifying the mode (for example, <see langword="Open" /> or <see langword="Append" />) in which to open the file. </param>
@@ -164,7 +164,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.IO.DirectoryNotFoundException">The specified path is invalid, such as being on an unmapped drive. </exception>
         /// <exception cref="T:System.IO.IOException">The file is already open. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.Open?view=netframework-4.7.1">`FileInfo.Open` on docs.microsoft.com</a></footer>
-        public FileStream Open(FileMode mode) => FileInfo.Open(mode);
+        public FileStream Open(FileMode mode) => File.Open(mode);
 
         /// <summary>Opens a file in the specified mode with read, write, or read/write access.</summary>
         /// <param name="mode">A <see cref="T:System.IO.FileMode" /> constant specifying the mode (for example, <see langword="Open" /> or <see langword="Append" />) in which to open the file. </param>
@@ -177,7 +177,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.IO.DirectoryNotFoundException">The specified path is invalid, such as being on an unmapped drive. </exception>
         /// <exception cref="T:System.IO.IOException">The file is already open. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.Open?view=netframework-4.7.1">`FileInfo.Open` on docs.microsoft.com</a></footer>
-        public FileStream Open(FileMode mode, FileAccess access) => FileInfo.Open(mode, access);
+        public FileStream Open(FileMode mode, FileAccess access) => File.Open(mode, access);
 
         /// <summary>Opens a file in the specified mode with read, write, or read/write access and the specified sharing option.</summary>
         /// <param name="mode">A <see cref="T:System.IO.FileMode" /> constant specifying the mode (for example, <see langword="Open" /> or <see langword="Append" />) in which to open the file. </param>
@@ -191,7 +191,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.IO.DirectoryNotFoundException">The specified path is invalid, such as being on an unmapped drive. </exception>
         /// <exception cref="T:System.IO.IOException">The file is already open. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.Open?view=netframework-4.7.1">`FileInfo.Open` on docs.microsoft.com</a></footer>
-        public FileStream Open(FileMode mode, FileAccess access, FileShare share) => FileInfo.Open(mode, access, share);
+        public FileStream Open(FileMode mode, FileAccess access, FileShare share) => File.Open(mode, access, share);
 
         /// <summary>Creates a read-only <see cref="T:System.IO.FileStream" />.</summary>
         /// <returns>A new read-only <see cref="T:System.IO.FileStream" /> object.</returns>
@@ -200,14 +200,14 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.IO.DirectoryNotFoundException">The specified path is invalid, such as being on an unmapped drive. </exception>
         /// <exception cref="T:System.IO.IOException">The file is already open. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.OpenRead?view=netframework-4.7.1">`FileInfo.OpenRead` on docs.microsoft.com</a></footer>
-        public FileStream OpenRead() => FileInfo.OpenRead();
+        public FileStream OpenRead() => File.OpenRead();
 
         /// <summary>Creates a write-only <see cref="T:System.IO.FileStream" />.</summary>
         /// <returns>A write-only unshared <see cref="T:System.IO.FileStream" /> object for a new or existing file.</returns>
         /// <exception cref="T:System.UnauthorizedAccessException">The path specified when creating an instance of the <see cref="T:System.IO.FileInfo" /> object is read-only or is a directory.  </exception>
         /// <exception cref="T:System.IO.DirectoryNotFoundException">The path specified when creating an instance of the <see cref="T:System.IO.FileInfo" /> object is invalid, such as being on an unmapped drive. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.OpenWrite?view=netframework-4.7.1">`FileInfo.OpenWrite` on docs.microsoft.com</a></footer>
-        public FileStream OpenWrite() => FileInfo.OpenWrite();
+        public FileStream OpenWrite() => File.OpenWrite();
 
         /// <summary>Moves a specified file to a new location, providing the option to specify a new file name.</summary>
         /// <param name="destFileName">The path to move the file to, which can specify a different file name. </param>
@@ -226,7 +226,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <paramref name="destFileName" /> contains a colon (:) in the middle of the string. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.MoveTo?view=netframework-4.7.1">`FileInfo.MoveTo` on docs.microsoft.com</a></footer>
         [SecuritySafeCritical]
-        public void MoveTo(string destFileName) => FileInfo.MoveTo(destFileName);
+        public void MoveTo(string destFileName) => File.MoveTo(destFileName);
 
         /// <summary>Replaces the contents of a specified file with the file described by the current <see cref="T:System.IO.FileInfo" /> object, deleting the original file, and creating a backup of the replaced file.</summary>
         /// <param name="destinationFileName">The name of a file to replace with the current file.</param>
@@ -238,7 +238,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.PlatformNotSupportedException">The current operating system is not Microsoft Windows NT or later.</exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.Replace?view=netframework-4.7.1">`FileInfo.Replace` on docs.microsoft.com</a></footer>
         [ComVisible(false)]
-        public FileInfo Replace(string destinationFileName, string destinationBackupFileName) => FileInfo.Replace(destinationFileName, destinationBackupFileName);
+        public FileInfo Replace(string destinationFileName, string destinationBackupFileName) => File.Replace(destinationFileName, destinationBackupFileName);
 
         /// <summary>Replaces the contents of a specified file with the file described by the current <see cref="T:System.IO.FileInfo" /> object, deleting the original file, and creating a backup of the replaced file.  Also specifies whether to ignore merge errors. </summary>
         /// <param name="destinationFileName">The name of a file to replace with the current file.</param>
@@ -256,11 +256,11 @@ namespace BrandonUtils.Standalone.Clerical {
             string destinationFileName,
             string destinationBackupFileName,
             bool   ignoreMetadataErrors
-        ) => FileInfo.Replace(destinationFileName, destinationBackupFileName, ignoreMetadataErrors);
+        ) => File.Replace(destinationFileName, destinationBackupFileName, ignoreMetadataErrors);
 
         /// <summary>Returns the path as a string.</summary>
         /// <returns>A string representing the path.</returns>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.FileInfo.ToString?view=netframework-4.7.1">`FileInfo.ToString` on docs.microsoft.com</a></footer>
-        public override string ToString() => FileInfo.ToString();
+        public override string ToString() => File.ToString();
     }
 }
