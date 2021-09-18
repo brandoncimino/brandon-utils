@@ -624,6 +624,63 @@ namespace BrandonUtils.Standalone.Strings {
             }
         }
 
+        /// <summary>
+        /// TODO: "Bisect" usually means "cut into two <b>equal</b> parts. I need a better name for <see cref="Bisect"/> and <see cref="BisectLast"/>.
+        ///
+        /// Splits <paramref name="str"/> by the <b>first</b> occurrence of <paramref name="splitter"/>.
+        ///
+        /// <c>null</c> is returned if <b>any</b> of the following is true:
+        /// <ul>
+        /// <li><b>either</b> <paramref name="str"/> or <paramref name="splitter"/> <see cref="IsNullOrEmpty"/></li>
+        /// <li><paramref name="str"/> didn't contain <paramref name="splitter"/></li>
+        /// </ul>
+        ///
+        /// </summary>
+        /// <param name="str">the original <see cref="string"/></param>
+        /// <param name="splitter">the <see cref="string"/> being used to split <paramref name="str"/>, which will <b>not</b> be included in the output</param>
+        /// <returns></returns>
+        [ContractAnnotation("str:null => null")]
+        [ContractAnnotation("splitter:null => null")]
+        public static (string, string)? Bisect([CanBeNull] this string str, [CanBeNull] string splitter) {
+            if (str.IsNullOrEmpty() || splitter.IsNullOrEmpty()) {
+                return null;
+            }
+
+            var matchStart = str.IndexOf(splitter, StringComparison.Ordinal);
+            if (matchStart < 0) {
+                return null;
+            }
+
+            var matchEnd = matchStart + splitter.Length;
+            var before   = str.Substring(0, matchStart);
+            var after    = str.Substring(matchEnd);
+            return (before, after);
+        }
+
+        /// <summary>
+        /// Similar to <see cref="Bisect"/>, except this splits by the <b>last</b> occurrence of <paramref name="splitter"/>.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="splitter"></param>
+        /// <returns></returns>
+        [ContractAnnotation("str:null => null")]
+        [ContractAnnotation("splitter:null => null")]
+        public static (string, string)? BisectLast([CanBeNull] this string str, [CanBeNull] string splitter) {
+            if (str.IsNullOrEmpty() || splitter.IsNullOrEmpty()) {
+                return null;
+            }
+
+            var matchStart = str.LastIndexOf(splitter, StringComparison.Ordinal);
+            if (matchStart < 0) {
+                return null;
+            }
+
+            var matchEnd = matchStart + splitter.Length;
+            var before   = str.Substring(0, matchStart);
+            var after    = str.Substring(matchEnd);
+            return (before, after);
+        }
+
         #endregion
     }
 }

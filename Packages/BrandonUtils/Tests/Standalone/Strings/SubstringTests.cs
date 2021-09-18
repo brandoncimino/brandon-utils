@@ -11,21 +11,36 @@ using Is = NUnit.Framework.Is;
 namespace BrandonUtils.Tests.Standalone.Strings {
     public class SubstringTests {
         [Test]
-        [TestCase("abc",       "b",        "a",    "c")]
-        [TestCase("aabbcc",    "b",        "aa",   "cc")]
-        [TestCase("aabbcc",    "bc",       "aab",  "c")]
-        [TestCase("yolo.swag", ".",        "yolo", "swag")]
-        [TestCase("buttz",     null,       "",     "")]
-        [TestCase("asdfasdf",  "",         "",     "")]
-        [TestCase(null,        "abc",      "",     "")]
-        [TestCase("",          "",         "",     "")]
-        [TestCase(null,        null,       "",     "")]
-        [TestCase("",          "yolo",     "",     "")]
-        [TestCase("yolo",      "yoloswag", "",     "")]
-        public void Substring_Simple(string original, string splitter, string expected_before, string expected_after) {
+        [TestCase("abc",              "b",        "a",    "c",     "a",    "c",               "a",               "c")]
+        [TestCase("aabbcc",           "b",        "aa",   "cc",    "aa",   "bcc",             "aab",             "cc")]
+        [TestCase("aabbcc",           "bc",       "aab",  "c",     "aab",  "c",               "aab",             "c")]
+        [TestCase("yolo.swag",        ".",        "yolo", "swag",  "yolo", "swag",            "yolo",            "swag")]
+        [TestCase("one.two.three",    ".",        "one",  "three", "one",  "two.three",       "one.two",         "three")]
+        [TestCase("one!!two!!!three", "!!",       "one",  "three", "one",  "two!!!three",     "one!!two",        "three")]
+        [TestCase("!extreme thirst!", "!",        "",     "",      "",     "extreme thirst!", "!extreme thirst", "")]
+        [TestCase("buttz",            null,       "",     "",      null,   null,              null,              null)]
+        [TestCase("asdfasdf",         "",         "",     "",      null,   null,              null,              null)]
+        [TestCase(null,               "abc",      "",     "",      null,   null,              null,              null)]
+        [TestCase("",                 "",         "",     "",      null,   null,              null,              null)]
+        [TestCase(null,               null,       "",     "",      null,   null,              null,              null)]
+        [TestCase("",                 "yolo",     "",     "",      null,   null,              null,              null)]
+        [TestCase("yolo",             "yoloswag", "",     "",      null,   null,              null,              null)]
+        [TestCase("#yolo",            "#",        "",     "yolo",  "",     "yolo",            "",                "yolo")]
+        public void Substring_Simple(
+            string original,
+            string splitter,
+            string substring_before,
+            string substring_after,
+            string bisect_before,
+            string bisect_after,
+            string bisectLast_before,
+            string bisectLast_after
+        ) {
             AssertAll.Of(
-                () => Assert.That(original.SubstringBefore(splitter), Is.EqualTo(expected_before)),
-                () => Assert.That(original.SubstringAfter(splitter),  Is.EqualTo(expected_after))
+                () => Assert.That(original.SubstringBefore(splitter), Is.EqualTo(substring_before)),
+                () => Assert.That(original.SubstringAfter(splitter),  Is.EqualTo(substring_after)),
+                () => Assert.That(original.Bisect(splitter)?.Item1,   Is.EqualTo(bisect_before)),
+                () => Assert.That(original.Bisect(splitter)?.Item2,   Is.EqualTo(bisect_after))
             );
         }
 

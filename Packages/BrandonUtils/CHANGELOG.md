@@ -7,6 +7,12 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.26.1] - 9/18/2021
+
+### Added
+
+- `StringUtils.Bisect` & `StringUtils.BisectLast`
+
 ## [2.26.0] - 9/18/2021
 
 ### Added
