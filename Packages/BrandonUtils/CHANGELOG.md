@@ -7,6 +7,16 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.27.0] - 9/18/2021
+
+### Added
+
+- `BrandonUtils.Standalone.Clerical.Saving` package
+  - `SaveFile`
+  - `SaveFileName`
+  - `SaveFolder`
+  - `SaveManager`
+
 ## [2.26.1] - 9/18/2021
 
 ### Added
