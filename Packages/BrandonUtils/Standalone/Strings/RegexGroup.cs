@@ -9,8 +9,8 @@ namespace BrandonUtils.Standalone.Strings {
     /// <example>
     /// <ul>
     /// <li><see cref="GroupName"/> = <c>"phoneNumber";</c></li>
-    /// <li><see cref="GroupPattern"/> = new <see cref="Regex"/><c>(@"\d{3}-\d{3}-\d{4}");</c></li>
-    /// <li><see cref="GroupRegex"/> => <c><![CDATA[(?<phoneNumber>\d{3}-\d{3}-\d{4})]]></c></li>
+    /// <li><see cref="GroupPattern"/> = new <see cref="System.Text.RegularExpressions.Regex"/><c>(@"\d{3}-\d{3}-\d{4}");</c></li>
+    /// <li><see cref="Regex"/> => <c><![CDATA[(?<phoneNumber>\d{3}-\d{3}-\d{4})]]></c></li>
     /// </ul>
     /// </example>
     [PublicAPI]
@@ -19,7 +19,7 @@ namespace BrandonUtils.Standalone.Strings {
         [RegexPattern]
         public readonly Regex GroupPattern;
         [RegexPattern]
-        public Regex GroupRegex => new Regex($@"(?<{GroupName}>{GroupPattern})");
+        public Regex Regex => new Regex($@"(?<{GroupName}>{GroupPattern})");
 
         public RegexGroup(string groupName, [RegexPattern] string groupPattern) : this(groupName, new Regex(groupPattern)) { }
 
@@ -29,7 +29,7 @@ namespace BrandonUtils.Standalone.Strings {
         }
 
         public override string ToString() {
-            return GroupRegex.ToString();
+            return Regex.ToString();
         }
     }
 }

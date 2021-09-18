@@ -7,6 +7,18 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.25.3] - 9/18/2021
+
+### Added
+
+- `StringUtils.SubstringBefore()`
+- `StringUtils.SubstringAfter()`
+- `Mathb.IsBetween()` / `Mathb.IsInRange()`
+
+### Changed
+
+- Moved some extension methods from `PrimitiveUtils` -> `Mathb`
+
 ## [2.25.2] - 9/16/2021
 
 ### Added

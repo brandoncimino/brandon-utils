@@ -14,7 +14,7 @@ namespace BrandonUtils.Standalone {
     /// GET IT! <see cref="Mathb"/>! Like <c>"Mathf"</c>!
     /// </remarks>
     [PublicAPI]
-    public static class Mathb {
+    public static partial class Mathb {
         #region Clamp
 
         public static short   Clamp(this short   value, short   min, short   max) => value <= min ? min : value >= max ? max : value;

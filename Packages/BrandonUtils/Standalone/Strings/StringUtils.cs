@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
 using BrandonUtils.Standalone.Collections;
+using BrandonUtils.Standalone.Enums;
 
 using FowlFever.Conjugal.Affixing;
 
@@ -13,7 +15,7 @@ using JetBrains.Annotations;
 
 using Newtonsoft.Json;
 
-// using UnityEngine;
+using Pure = System.Diagnostics.Contracts.PureAttribute;
 
 namespace BrandonUtils.Standalone.Strings {
     [PublicAPI]
@@ -259,7 +261,7 @@ namespace BrandonUtils.Standalone.Strings {
                 -1 => self.FillRight(desiredLength, filler),
                 0  => self,
                 1  => self.Truncate(desiredLength, trail),
-                _  => throw new ArgumentException($"This should be unreachable, because we used a {nameof(int.CompareTo)} function AND got the {nameof(PrimitiveUtils.Sign)} of it, so we definitely should've only had the possibilities of -1, 0, or 1.")
+                _  => throw new ArgumentException($"This should be unreachable, because we used a {nameof(int.CompareTo)} function AND got the {nameof(Mathb.Sign)} of it, so we definitely should've only had the possibilities of -1, 0, or 1.")
             };
         }
 
@@ -566,6 +568,60 @@ namespace BrandonUtils.Standalone.Strings {
 
         public static string SuffixIfMissing(this string str, string suffix) {
             return str.EndsWith(suffix) ? str : str.Suffix(suffix);
+        }
+
+        #endregion
+
+        #region Substrings
+
+        [NotNull, Pure]
+        public static string SubstringBefore([CanBeNull] this string str, [CanBeNull] string splitter) {
+            if (splitter.IsNullOrEmpty()) {
+                return "";
+            }
+
+            var first = str?.IndexOf(splitter, StringComparison.Ordinal);
+            return first > 0 ? str.Substring(0, first.Value) : "";
+        }
+
+        [NotNull, Pure]
+        public static string SubstringAfter([CanBeNull] this string str, [CanBeNull] string splitter) {
+            if (str.IsNullOrEmpty() || splitter.IsNullOrEmpty()) {
+                return "";
+            }
+
+            var last = str.LastIndexOf(splitter, StringComparison.Ordinal) + splitter.Length;
+            return last.IsBetween(0, str.Length, Clusivity.Exclusive) ? str.Substring(last, str.Length - last) : "";
+        }
+
+        [NotNull, Pure]
+        public static string SubstringBefore([CanBeNull] this string str, [NotNull] Regex pattern) {
+            if (str.IsNullOrEmpty()) {
+                return "";
+            }
+
+            var match = pattern.Match(str);
+            return match.Success ? str.Substring(0, match.Index) : "";
+        }
+
+        [NotNull, Pure]
+        public static string SubstringAfter([CanBeNull] this string str, [NotNull] Regex pattern) {
+            if (str.IsNullOrEmpty()) {
+                return "";
+            }
+
+            var rightToLeftPattern = new Regex(pattern.ToString(), pattern.Options | RegexOptions.RightToLeft);
+            var match              = rightToLeftPattern.Match(str);
+            if (match.Success) {
+                // the substring starts from the END of the match
+                var subStart  = match.Index + match.Length;
+                var subEnd    = str.Length;
+                var subLength = subEnd - subStart;
+                return str.Substring(subStart, subLength);
+            }
+            else {
+                return "";
+            }
         }
 
         #endregion
