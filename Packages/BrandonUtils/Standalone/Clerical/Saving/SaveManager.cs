@@ -6,7 +6,7 @@ using System.Linq;
 using BrandonUtils.Standalone.Strings;
 
 namespace BrandonUtils.Standalone.Clerical.Saving {
-    public class SaveManager {
+    public class SaveManager<TData> where TData : ISaveData {
         private readonly SaveFolder SaveFolder;
         public           string     AutoSaveName      { get; set; } = "AutoSave";
         public           string     SaveFileExtension { get; set; } = SaveFileName.DefaultExtension;
@@ -16,17 +16,17 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
             SaveFolder = saveFolder;
         }
 
-        public SaveFile GetSaveFile(string nickname, DateTime timeStamp) {
-            return new SaveFile(SaveFolder, nickname, timeStamp, SaveFileExtension);
+        public SaveFile<TData> GetSaveFile(string nickname, DateTime timeStamp) {
+            return new SaveFile<TData>(SaveFolder, nickname, timeStamp, SaveFileExtension);
         }
 
-        public IEnumerable<SaveFile> GetAllSaveFiles(string nicknamePattern = "*") {
+        public IEnumerable<SaveFile<TData>> GetAllSaveFiles(string nicknamePattern = "*") {
             return SaveFolder.EnumerateFiles($"{nicknamePattern}_*{SaveFileExtension}", SearchOption.TopDirectoryOnly)
                              .Where(it => it.BaseName().Matches(SaveFileName.BaseFileNamePattern))
-                             .Select(it => new SaveFile(it));
+                             .Select(it => new SaveFile<TData>(it));
         }
 
-        public SaveFileName GetSaveFileName(string nickname, DateTime timeStamp) {
+        internal SaveFileName GetSaveFileName(string nickname, DateTime timeStamp) {
             return new SaveFileName() {
                 Nickname      = nickname,
                 TimeStamp     = timeStamp,

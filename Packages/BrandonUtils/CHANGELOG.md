@@ -7,6 +7,27 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.28.0] - 9/19/2021
+
+### Added
+
+- A bunch of `FileInfoExtensions` for `System.IO.File` methods:
+  - `Read` / `ReadLines`
+  - `Write` / `WriteLines`
+  - `Append` / `AppendLines`
+  - `CreateDirectory`
+  - `EnsureDirectory`
+- Basic serialization of `SaveFile`s!
+  - `SaveFileExtensions.Save()`
+  - `SaveFileExtensions.Load()`
+  - A separate object to hold the serialized portion of a `SaveFile`:
+    - `ISaveData`
+    - `SaveData`
+
+### Fixed
+
+- Missing `Clerical.meta` file
+
 ## [2.27.1] - 9/18/2021
 
 ### Added

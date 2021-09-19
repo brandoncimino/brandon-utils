@@ -10,10 +10,9 @@ using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone.Clerical.Saving {
     /// <summary>
-    /// A builder for names of <see cref="SaveFile"/>s.
+    /// A builder for names of <see cref="SaveFile{TData}"/>s.
     /// </summary>
-    [PublicAPI]
-    public class SaveFileName {
+    internal class SaveFileName {
         private string _nickname;
         public string Nickname {
             get => _nickname;
