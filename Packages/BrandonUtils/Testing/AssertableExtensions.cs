@@ -28,6 +28,8 @@ namespace BrandonUtils.Testing {
                                                                                                  new StringFilter()
                                                                                                      .Matching(@"^\s*(in|at) NUnit")
                                                                                                      .Matching($@"^\s*(in|at) {typeof(AssertAll)}")
+                                                                                                     .Matching(@"^\s*(in|at) System\.Reflection")
+                                                                                                     .Matching(@"^\s*(in|at) System\.RuntimeMethodHandle")
                                                                                              )
                                                                                              .TruncateLines(10);
     }
