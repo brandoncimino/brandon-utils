@@ -39,7 +39,7 @@ namespace BrandonUtils.Tests.Standalone.Reflection {
             Asserter
                 .WithHeading($"All of the {nameof(propertyInfos)} should be backed by {expectedBackingField.Prettify()}")
                 .And(propertyInfos?.Select<PropertyInfo, Action>(it => () => it.IsBackedBy(expectedBackingField)))
-                .Execute();
+                .Invoke();
         }
 
         private static void BacksProperty([CanBeNull] this FieldInfo backingField, [CanBeNull] [ItemCanBeNull] params PropertyInfo[] expectedBackedProperties) {
