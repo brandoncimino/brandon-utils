@@ -8,20 +8,28 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
     /// <summary>
     /// Joins together a <see cref="System.IO.FileInfo"/> with the <see cref="ISaveData"/> it contains.
     /// </summary>
-    /// <typeparam name="TData"></typeparam>
+    /// <typeparam name="TData">the type of the serialized <see cref="Data"/></typeparam>
     [PublicAPI]
-    public interface ISaveFile<TData> : IHasFileInfo where TData : ISaveData {
-        [JsonProperty]
-        [CanBeNull]
-        public TData Data { get; }
+    public interface ISaveFile<out TData> : IHasFileInfo where TData : ISaveData {
+        [NotNull] public SaveFolder SaveFolder { get; }
 
-        [JsonIgnore]
-        public DateTime TimeStamp { get; set; }
+        [CanBeNull] public TData Data { get; }
 
         /// <summary>
-        /// Internal-only setter for <see cref="TData"/>. Used by <see cref="SaveFileExtensions.Load{TFile,TData}"/>.
+        /// The <see cref="DateTime"/> at which the <b><see cref="Data"/> refers to</b>.
         /// </summary>
-        /// <param name="data"></param>
-        internal void SetDataInternal([CanBeNull] TData data);
+        public DateTime TimeStamp { get; }
+
+        /// <summary>
+        /// Serializes <see cref="Data"/> to <see cref="ISaveFile{TData}.File"/>.
+        /// </summary>
+        /// <param name="duplicateFileResolution">determines what we should do when a file already exists</param>
+        /// <param name="settings">optional <see cref="JsonSerializerSettings"/></param>
+        /// <returns></returns>
+        public void Save(DuplicateFileResolution duplicateFileResolution, JsonSerializerSettings settings = default);
+
+        public void Save(SaveManagerSettings    saveSettings = default);
+        public void Load(JsonSerializerSettings jsonSettings = default);
+        public void Load(SaveManagerSettings    saveSettings = default);
     }
 }
