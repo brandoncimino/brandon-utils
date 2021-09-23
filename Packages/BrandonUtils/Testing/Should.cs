@@ -12,7 +12,7 @@ namespace BrandonUtils.Testing {
 
     [SuppressMessage("ReSharper", "AccessToStaticMemberViaDerivedType")]
     public static class ShouldExtensions {
-        public static bool ToBool(this Should should) {
+        public static bool Boolean(this Should should) {
             return should switch {
                 Should.Pass => true,
                 Should.Fail => false,
@@ -20,7 +20,7 @@ namespace BrandonUtils.Testing {
             };
         }
 
-        public static Constraint ToCondition(this Should should) {
+        public static Constraint Constrain(this Should should) {
             return should switch {
                 Should.Pass => Is.True,
                 Should.Fail => Is.False,
