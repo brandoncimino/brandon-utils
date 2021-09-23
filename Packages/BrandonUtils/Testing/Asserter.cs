@@ -7,8 +7,9 @@ using NUnit.Framework.Constraints;
 
 namespace BrandonUtils.Testing {
     public class Asserter<T> : MultipleAsserter<Asserter<T>, T> {
-        protected override Action<string>                ActionOnFailure    => Assert.Fail;
-        protected override Action<T, IResolveConstraint> ConstraintResolver => Assert.That;
+        protected override Action<string>                     ActionOnFailure          => Assert.Fail;
+        protected override Action<T, IResolveConstraint>      ConstraintResolver       => Assert.That;
+        protected override Action<object, IResolveConstraint> ObjectConstraintResolver => Assert.That;
 
         public Asserter() { }
         public Asserter(T actual) : base(actual) { }

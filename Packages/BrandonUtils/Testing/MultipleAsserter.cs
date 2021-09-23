@@ -35,8 +35,9 @@ namespace BrandonUtils.Testing {
 
         internal IList<(Func<TActual, object>, IResolveConstraint)> Constraints_AgainstTransformation { get; } = new List<(Func<TActual, object>, IResolveConstraint)>();
 
-        protected abstract Action<string>                      ActionOnFailure    { get; }
-        protected abstract Action<TActual, IResolveConstraint> ConstraintResolver { get; }
+        protected abstract Action<string>                      ActionOnFailure          { get; }
+        protected abstract Action<TActual, IResolveConstraint> ConstraintResolver       { get; }
+        protected abstract Action<object, IResolveConstraint>  ObjectConstraintResolver { get; }
 
         private Optional<Exception> ShortCircuitException;
 
@@ -189,7 +190,7 @@ namespace BrandonUtils.Testing {
         }
 
         private IAssertable Test_Constraint_AgainstAnything([CanBeNull] object actual, [NotNull] IResolveConstraint constraint) {
-            return new Assertable<object>(actual, constraint, new Action<object, IResolveConstraint>(ConstraintResolver));
+            return new Assertable<object>(actual, constraint, ObjectConstraintResolver);
         }
 
         private IAssertable Test_Constraint_AgainstAnything((object, IResolveConstraint) constraint) {
