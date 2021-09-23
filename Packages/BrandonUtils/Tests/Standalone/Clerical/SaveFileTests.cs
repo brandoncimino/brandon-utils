@@ -1,17 +1,14 @@
 ﻿using System;
+using System.IO;
 
 using BrandonUtils.Standalone.Clerical.Saving;
 using BrandonUtils.Testing;
 
 using NUnit.Framework;
 
-using UnityEditor;
-
-using UnityEngine;
-
-namespace BrandonUtils.Tests.EditMode.Clerical {
+namespace BrandonUtils.Tests.Standalone.Clerical {
     public class SaveFileTests {
-        private static readonly SaveFolder SaveFolder = new SaveFolder(Application.persistentDataPath, nameof(SaveFileTests));
+        private static readonly SaveFolder TestFolder = new SaveFolder(Path.GetTempPath(), nameof(SaveFileTests));
 
         private static class Validate {
             public static void SaveFile_Basic<T>(SaveFile<T> saveFile, string expectedName, DateTime expectedTimeStamp) where T : ISaveData {
@@ -27,9 +24,8 @@ namespace BrandonUtils.Tests.EditMode.Clerical {
         [Test]
         public void Save_NullData() {
             var bDay     = new DateTime(1993, 7, 1);
-            var today    = DateTime.Today;
-            var nickname = nameof(Save_NullData) + GUID.Generate();
-            var saveFile = new SaveFile<TestSaveData>(SaveFolder, nickname, bDay);
+            var nickname = nameof(Save_NullData) + Guid.NewGuid();
+            var saveFile = new SaveFile<TestSaveData>(TestFolder, nickname, bDay);
 
             AssertAll.Of(
                 () => Assert.That(saveFile, Has.Property(nameof(saveFile.Data)).Null),
@@ -38,13 +34,28 @@ namespace BrandonUtils.Tests.EditMode.Clerical {
                 () => Validate.SaveFile_Basic(saveFile, nickname, bDay)
             );
 
-            saveFile.Save(today);
+            saveFile.Save();
 
             AssertAll.Of(
                 () => Assert.That(saveFile, Has.Property(nameof(saveFile.Data)).Null),
                 () => Assert.That(saveFile, Has.Property(nameof(saveFile.File)).Exist),
                 () => Assert.That(saveFile, Has.Property(nameof(saveFile.Exists)).True),
-                () => Validate.SaveFile_Basic(saveFile, nickname, today)
+                () => Validate.SaveFile_Basic(saveFile, nickname, bDay)
+            );
+        }
+
+        private static ISaveSlot<TestSaveData> GetUniqueSlot() {
+            return new SimpleSaveSlot<TestSaveData>(TestFolder, nameof(SimpleSaveSlot<TestSaveData>) + Guid.NewGuid());
+        }
+
+        [Test]
+        public void NewSaveSlotIsEmpty() {
+            var saveSlot = GetUniqueSlot();
+
+            AssertAll.Of(
+                saveSlot,
+                Has.Property(nameof(saveSlot.SaveFileCount)).EqualTo(0),
+                Has.Property(nameof(saveSlot.SaveFileCount)).EqualTo(0)
             );
         }
     }

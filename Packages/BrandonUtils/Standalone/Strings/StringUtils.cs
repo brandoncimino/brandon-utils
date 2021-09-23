@@ -514,7 +514,8 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="obj">the original object</param>
         /// <param name="nullPlaceholder">the <see cref="string"/> returned when <paramref name="obj"/> is <c>null</c></param>
         /// <returns>the <see cref="object.ToString"/> representation of <paramref name="obj"/>, or <c>null</c></returns>
-        public static string ToString([CanBeNull] this object obj, string nullPlaceholder) {
+        public static string ToString([CanBeNull] this object obj, [CanBeNull] string nullPlaceholder) {
+            nullPlaceholder ??= Prettification.DefaultNullPlaceholder;
             return obj == null ? nullPlaceholder : obj.ToString();
         }
 
