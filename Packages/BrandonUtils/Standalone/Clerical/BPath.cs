@@ -6,11 +6,16 @@ using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Optional;
 using BrandonUtils.Standalone.Strings;
 
+using JetBrains.Annotations;
+
 namespace BrandonUtils.Standalone.Clerical {
     /// <summary>
     /// TODO: There is almost certainly a cross-platform library to use for this that I can get from Nuget
     /// </summary>
+    [PublicAPI]
     public static class BPath {
+        internal static readonly RegexGroup ExtensionGroup = new RegexGroup(nameof(ExtensionGroup), @"(\.[^.]+?)+$");
+
         public static Failable ValidatePath(string maybePath) {
             Action action = () => _ = Path.GetFullPath(maybePath);
             return action.Try();
@@ -39,7 +44,6 @@ namespace BrandonUtils.Standalone.Clerical {
             return ValidateFileName(maybeFileName).Failed == false;
         }
 
-        private static readonly RegexGroup ExtensionGroup = new RegexGroup(nameof(ExtensionGroup), @"(\.[^.]+?)+$");
 
         /// <summary>
         /// This method is similar to <see cref="Path.GetExtension"/>, except that it can retrieve multiple extensions, i.e. <c>game.sav.json</c> -> <c>[.sav, .json]</c>

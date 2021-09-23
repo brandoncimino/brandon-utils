@@ -9,6 +9,8 @@ using BrandonUtils.Testing;
 
 using NUnit.Framework;
 
+using static BrandonUtils.Testing.Should;
+
 using Is = NUnit.Framework.Is;
 
 namespace BrandonUtils.Tests.Standalone.Clerical {
@@ -37,40 +39,74 @@ namespace BrandonUtils.Tests.Standalone.Clerical {
             );
         }
 
-        public enum Should {
-            Pass,
-            Fail
-        }
-
-        [TestCase("this is really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really long", Should.Fail, Should.Fail)]
+        [TestCase("this is really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really really long", Fail, Fail)]
         [Test]
-        [TestCase("abc",          Should.Pass, Should.Pass)]
-        [TestCase(".ssh",         Should.Pass, Should.Pass)]
-        [TestCase("a|b",          Should.Fail, Should.Fail)]
-        [TestCase("%$@#%!@:$#%[", Should.Fail, Should.Fail)]
-        [TestCase(null,           Should.Fail, Should.Fail)]
-        [TestCase("",             Should.Fail, Should.Fail)]
-        [TestCase("\n",           Should.Fail, Should.Fail)]
-        [TestCase("C:/",          Should.Pass, Should.Fail)]
-        [TestCase("C:D:E",        Should.Fail, Should.Fail)]
+        [TestCase("abc",          Pass, Pass)]
+        [TestCase(".ssh",         Pass, Pass)]
+        [TestCase("a|b",          Fail, Fail)]
+        [TestCase("%$@#%!@:$#%[", Fail, Fail)]
+        [TestCase(null,           Fail, Fail)]
+        [TestCase("",             Fail, Fail)]
+        [TestCase("\n",           Fail, Fail)]
+        [TestCase("C:/",          Pass, Fail)]
+        [TestCase("C:D:E",        Fail, Fail)]
         // [TestCase("//yolo",       Should.Pass, Should.Fail)]
         // [TestCase(@"\\yolo",      Should.Pass, Should.Fail)]
         // [TestCase("a/b",          Should.Pass, Should.Fail)]
-        [TestCase(@"a\b",  Should.Pass, Should.Fail)]
-        [TestCase(@":\\c", Should.Fail, Should.Fail)]
+        [TestCase(@"a\b",  Pass, Fail)]
+        [TestCase(@":\\c", Fail, Fail)]
         public void IsValidFilename(string path, Should pathShould, Should fileNameShould) {
             AssertAll.Of(
                 () => AssertAll.Of(
                     "Path Validation",
-                    () => Assert.That(BPath.IsValidPath(path),  Is.EqualTo(pathShould                                    == Should.Pass)),
-                    () => Assert.That(BPath.ValidatePath(path), Has.Property(nameof(Failable.Failed)).EqualTo(pathShould == Should.Fail))
+                    () => Assert.That(BPath.IsValidPath(path),  Is.EqualTo(pathShould                                    == Pass)),
+                    () => Assert.That(BPath.ValidatePath(path), Has.Property(nameof(Failable.Failed)).EqualTo(pathShould == Fail))
                 ),
                 () => AssertAll.Of(
                     "FileName Validation",
-                    () => Assert.That(BPath.IsValidFileName(path),  Is.EqualTo(fileNameShould                                    == Should.Pass)),
-                    () => Assert.That(BPath.ValidateFileName(path), Has.Property(nameof(Failable.Failed)).EqualTo(fileNameShould == Should.Fail))
+                    () => Assert.That(BPath.IsValidFileName(path),  Is.EqualTo(fileNameShould                                    == Pass)),
+                    () => Assert.That(BPath.ValidateFileName(path), Has.Property(nameof(Failable.Failed)).EqualTo(fileNameShould == Fail))
                 )
             );
+        }
+
+        [TestCase("a")]
+        [TestCase("a/b/c")]
+        [TestCase("")]
+        [TestCase("/")]
+        [TestCase("/./..//a")]
+        public void Directory_To_Uri(string directory) {
+            var di  = new DirectoryInfo(directory);
+            var uri = di.Uri();
+            AssertAll.Of(
+                () => Assert.That(uri.IsFile,     Is.False),
+                () => Assert.That(uri.ToString(), Is.EqualTo(directory.AppendIfMissing("/")))
+            );
+        }
+
+        public void File_To_Uri(string file) {
+            var fi  = new FileInfo(file);
+            var uri = fi.Uri();
+            AssertAll.Of(
+                () => Assert.That(uri,            Is.True),
+                () => Assert.That(uri.ToString(), Is.EqualTo(file))
+            );
+        }
+
+        [Test]
+        [TestCase("a",     "b",           Fail)]
+        [TestCase("a",     "a/b",         Pass)]
+        [TestCase("a/b/c", @"a\b/c\d",    Pass)]
+        [TestCase("a/",    "a/c",         Pass)]
+        [TestCase("/a",    "a",           Fail)]
+        [TestCase("a",     "a",           Fail)]
+        [TestCase(@"\a",   "/a.txt",      Fail)]
+        [TestCase(@".ssh", ".ssh/id_rsa", Pass)]
+        public void IsParentOf(string parentDirPath, string childFilePath, Should should) {
+            Assume.That(Path.GetFileName(childFilePath), Is.Not.Empty);
+            var parentDir = new DirectoryInfo(parentDirPath);
+            var childFile = new FileInfo(childFilePath);
+            Assert.That(parentDir.IsParentOf(childFile), should.Constrain());
         }
     }
 }
