@@ -7,6 +7,12 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.28.1] - 9/22/2021
+
+### Added
+
+- Variations of `CollectionUtils.NonNull` and `CollectionUtils.AddNonNull` that work with `Nullable<T>`
+
 ## [2.28.0] - 9/19/2021
 
 ### Added
