@@ -7,6 +7,19 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.31.0] - 9/22/2021
+
+### Added
+
+- `FileSystemInfoExtensions`
+  - `Uri()`
+  - `IsParentOf` / `MustBeParentOf`
+  - `IsChildOf` / `MustBeChildOf`
+  - `MustExist`
+  - `MustNotExist`
+- `DuplicateFileResolution`
+  - Utilized in `NewtonsoftJson` `FileInfoExtensions`
+
 ## [2.30.0] - 9/22/2021
 
 ### Added
@@ -200,7 +213,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Moved `PrettificationFlags` into their own class
 - Moved `ReflectionUtils` into a dedicated `Reflection` package
 
-## [2.21.1] - 2/6/2021
+## [2.21.1] - 9/6/2021
 
 ### Removed
 
@@ -226,7 +239,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [2.20.0] - 9/4/2021
 
-# Changed
+### Changed
 
 - Updated `FowlFever.Conjugal` to `v0.1.2`
 - Added `Conjugal` and `Humanizer` references to all `.asmdef`s

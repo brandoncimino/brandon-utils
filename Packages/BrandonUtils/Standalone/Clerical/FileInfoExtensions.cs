@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
+using BrandonUtils.Standalone.Enums;
 using BrandonUtils.Standalone.Strings;
 
 using JetBrains.Annotations;
@@ -179,8 +180,54 @@ namespace BrandonUtils.Standalone.Clerical {
 
         #region NewtonsoftJson Extensions
 
-        public static T    Deserialize<T>(this FileInfo fileInfo, [CanBeNull] JsonSerializerSettings settings                                         = default) => JsonConvert.DeserializeObject<T>(fileInfo.Read(), settings);
-        public static void Serialize<T>(this   FileInfo fileInfo, [CanBeNull] T                      obj, [CanBeNull] JsonSerializerSettings settings = default) => fileInfo.Write(JsonConvert.SerializeObject(obj, settings!));
+        public static T Deserialize<T>(
+            [NotNull] this FileInfo               fileInfo,
+            [CanBeNull]    JsonSerializerSettings settings = default
+        ) {
+            fileInfo.MustExist();
+            return JsonConvert.DeserializeObject<T>(
+                fileInfo.Read(),
+                settings
+            );
+        }
+
+        public static void Serialize<T>(
+            [NotNull] this FileInfo            fileInfo,
+            [CanBeNull]    T                   obj,
+            DuplicateFileResolution            duplicateFileResolution = DuplicateFileResolution.Error,
+            [CanBeNull] JsonSerializerSettings settings                = default
+        ) {
+            switch (duplicateFileResolution) {
+                case DuplicateFileResolution.Error:
+                    fileInfo.SerializeCautiously(obj, settings);
+                    break;
+                case DuplicateFileResolution.Overwrite:
+                    fileInfo.SerializeForcefully(obj, settings);
+                    break;
+                case DuplicateFileResolution.Backup:
+                    throw new NotImplementedException();
+                    break;
+                default:
+                    throw BEnum.InvalidEnumArgumentException(nameof(duplicateFileResolution), duplicateFileResolution);
+            }
+        }
+
+        public static void SerializeCautiously<T>(
+            [NotNull] this FileInfo               fileInfo,
+            [CanBeNull]    T                      obj,
+            [CanBeNull]    JsonSerializerSettings settings = default
+        ) {
+            fileInfo.MustNotExist();
+            fileInfo.Write(JsonConvert.SerializeObject(obj, settings!));
+        }
+
+        public static void SerializeForcefully<T>(
+            [NotNull] this FileInfo               fileInfo,
+            [CanBeNull]    T                      obj,
+            [CanBeNull]    JsonSerializerSettings settings = default
+        ) {
+            fileInfo.Write(JsonConvert.SerializeObject(obj, settings!));
+        }
 
         #endregion
     }
