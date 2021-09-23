@@ -8,7 +8,7 @@ namespace BrandonUtils.Standalone.Clerical {
     /// "Meaningful" here meaning that the implementer is a wrapper around <see cref="FileInfo"/>, or manages a specific <see cref="FileInfo"/> instance, etc.
     /// </remarks>
     /// <seealso cref="IHasDirectoryInfo"/>
-    public interface IHasFileInfo : IHasDirectoryInfo {
+    public interface IHasFileInfo : IHasFileSystemInfo {
         /// <summary>
         /// The <see cref="FileInfo"/> that this object cares about.
         /// </summary>

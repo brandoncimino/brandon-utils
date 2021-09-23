@@ -7,6 +7,16 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.30.0] - 9/22/2021
+
+### Added
+
+- `IHasFileSystemInfo`
+
+### Changed
+
+- No longer mixed `IHasFileInfo` with `IHasDirectoryInfo` hierarchy
+
 ## [2.29.0] - 9/22/2021
 
 ### Added

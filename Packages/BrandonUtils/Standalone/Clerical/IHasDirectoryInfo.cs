@@ -6,7 +6,7 @@ namespace BrandonUtils.Standalone.Clerical {
     /// <summary>
     /// Indicates that the implementer contains a meaningful <see cref="DirectoryInfo"/> reference, stored in <see cref="Directory"/>.
     /// </summary>
-    public interface IHasDirectoryInfo {
+    public interface IHasDirectoryInfo : IHasFileSystemInfo {
         /// <summary>
         /// The <see cref="DirectoryInfo"/> that this object cares about.
         /// </summary>
