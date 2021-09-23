@@ -11,7 +11,7 @@ using JetBrains.Annotations;
 namespace BrandonUtils.Standalone.Strings {
     [PublicAPI]
     public static class Prettification {
-        private const           string                       DefaultNullPlaceholder = "⛔";
+        internal const          string                       DefaultNullPlaceholder = "⛔";
         private static readonly KeyedList<Type, IPrettifier> Prettifiers            = PrettifierDatabase.GetDefaultPrettifiers();
 
         public static void RegisterPrettifier(IPrettifier prettifier) {
