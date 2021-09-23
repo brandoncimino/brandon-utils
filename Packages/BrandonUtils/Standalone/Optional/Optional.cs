@@ -351,6 +351,8 @@ namespace BrandonUtils.Standalone.Optional {
         // }
 
         /// <returns>negation of <see cref="Nullable{T}.HasValue"/></returns>
+        [ContractAnnotation("null => true")]
+        [ContractAnnotation("notnull => false")]
         public static bool IsEmpty<T>(this T? nullable) where T : struct {
             return !nullable.HasValue;
         }
