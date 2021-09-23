@@ -10,25 +10,25 @@ namespace BrandonUtils.Standalone.Clerical {
     /// This is probably a really really bad idea for reasons far beyond mortal comprehension.
     /// </remarks>
     /// <seealso cref="CustomFileInfo"/>
-    public abstract class CustomDirectoryInfo : FileSystemInfo {
-        // private readonly DirectoryInfo _info;
-        public abstract DirectoryInfo DirectoryInfo { get; }
+    public abstract class CustomDirectoryInfo : FileSystemInfo, IHasDirectoryInfo {
+        public abstract DirectoryInfo  Directory      { get; }
+        public          FileSystemInfo FileSystemInfo => Directory;
 
         /// <summary>Gets the name of this <see cref="T:System.IO.DirectoryInfo" /> instance.</summary>
         /// <returns>The directory name.</returns>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.Name?view=netframework-4.7.1">`DirectoryInfo.Name` on docs.microsoft.com</a></footer>
-        public override string Name => DirectoryInfo.Name;
+        public override string Name => Directory.Name;
 
         /// <summary>Gets the full path of the directory.</summary>
         /// <returns>A string containing the full path.</returns>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.FullName?view=netframework-4.7.1">`DirectoryInfo.FullName` on docs.microsoft.com</a></footer>
-        public override string FullName => DirectoryInfo.FullName;
+        public override string FullName => Directory.FullName;
 
         /// <summary>Gets the parent directory of a specified subdirectory.</summary>
         /// <returns>The parent directory, or <see langword="null" /> if the path is null or if the file path denotes a root (such as "\", "C:", or * "\\server\share").</returns>
         /// <exception cref="T:System.Security.SecurityException">The caller does not have the required permission. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.Parent?view=netframework-4.7.1">`DirectoryInfo.Parent` on docs.microsoft.com</a></footer>
-        public DirectoryInfo Parent => DirectoryInfo.Parent;
+        public DirectoryInfo Parent => Directory.Parent;
 
         /// <summary>Creates a subdirectory or subdirectories on the specified path. The specified path can be relative to this instance of the <see cref="T:System.IO.DirectoryInfo" /> class.</summary>
         /// <param name="path">The specified path. This cannot be a different disk volume or Universal Naming Convention (UNC) name. </param>
@@ -44,18 +44,18 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.NotSupportedException">
         /// <paramref name="path" /> contains a colon character (:) that is not part of a drive label ("C:\").</exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.CreateSubdirectory?view=netframework-4.7.1">`DirectoryInfo.CreateSubdirectory` on docs.microsoft.com</a></footer>
-        public DirectoryInfo CreateSubdirectory(string path) => DirectoryInfo.CreateSubdirectory(path);
+        public DirectoryInfo CreateSubdirectory(string path) => Directory.CreateSubdirectory(path);
 
         /// <summary>Creates a directory.</summary>
         /// <exception cref="T:System.IO.IOException">The directory cannot be created. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.Create?view=netframework-4.7.1">`DirectoryInfo.Create` on docs.microsoft.com</a></footer>
-        public void Create() => DirectoryInfo.Create();
+        public void Create() => Directory.Create();
 
         /// <summary>Gets a value indicating whether the directory exists.</summary>
         /// <returns>
         /// <see langword="true" /> if the directory exists; otherwise, <see langword="false" />.</returns>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.Exists?view=netframework-4.7.1">`DirectoryInfo.Exists` on docs.microsoft.com</a></footer>
-        public override bool Exists => DirectoryInfo.Exists;
+        public override bool Exists => Directory.Exists;
 
         /// <summary>Returns a file list from the current directory matching the given search pattern.</summary>
         /// <param name="searchPattern">The search string to match against the names of files.  This parameter can contain a combination of valid literal path and wildcard (* and ?) characters (see Remarks), but doesn't support regular expressions. The default pattern is "*", which returns all files.</param>
@@ -67,7 +67,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.IO.DirectoryNotFoundException">The path is invalid (for example, it is on an unmapped drive). </exception>
         /// <exception cref="T:System.Security.SecurityException">The caller does not have the required permission. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.GetFiles?view=netframework-4.7.1">`DirectoryInfo.GetFiles` on docs.microsoft.com</a></footer>
-        public FileInfo[] GetFiles(string searchPattern) => DirectoryInfo.GetFiles(searchPattern);
+        public FileInfo[] GetFiles(string searchPattern) => Directory.GetFiles(searchPattern);
 
         /// <summary>Returns a file list from the current directory matching the given search pattern and using a value to determine whether to search subdirectories.</summary>
         /// <param name="searchPattern">The search string to match against the names of files.  This parameter can contain a combination of valid literal path and wildcard (* and ?) characters (see Remarks), but doesn't support regular expressions. The default pattern is "*", which returns all files.</param>
@@ -82,13 +82,13 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.IO.DirectoryNotFoundException">The path is invalid (for example, it is on an unmapped drive). </exception>
         /// <exception cref="T:System.Security.SecurityException">The caller does not have the required permission. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.GetFiles?view=netframework-4.7.1">`DirectoryInfo.GetFiles` on docs.microsoft.com</a></footer>
-        public FileInfo[] GetFiles(string searchPattern, SearchOption searchOption) => DirectoryInfo.GetFiles(searchPattern, searchOption);
+        public FileInfo[] GetFiles(string searchPattern, SearchOption searchOption) => Directory.GetFiles(searchPattern, searchOption);
 
         /// <summary>Returns a file list from the current directory.</summary>
         /// <returns>An array of type <see cref="T:System.IO.FileInfo" />.</returns>
         /// <exception cref="T:System.IO.DirectoryNotFoundException">The path is invalid, such as being on an unmapped drive. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.GetFiles?view=netframework-4.7.1">`DirectoryInfo.GetFiles` on docs.microsoft.com</a></footer>
-        public FileInfo[] GetFiles() => DirectoryInfo.GetFiles();
+        public FileInfo[] GetFiles() => Directory.GetFiles();
 
         /// <summary>Returns the subdirectories of the current directory.</summary>
         /// <returns>An array of <see cref="T:System.IO.DirectoryInfo" /> objects.</returns>
@@ -96,7 +96,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.Security.SecurityException">The caller does not have the required permission. </exception>
         /// <exception cref="T:System.UnauthorizedAccessException">The caller does not have the required permission. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.GetDirectories?view=netframework-4.7.1">`DirectoryInfo.GetDirectories` on docs.microsoft.com</a></footer>
-        public DirectoryInfo[] GetDirectories() => DirectoryInfo.GetDirectories();
+        public DirectoryInfo[] GetDirectories() => Directory.GetDirectories();
 
         /// <summary>Retrieves an array of strongly typed <see cref="T:System.IO.FileSystemInfo" /> objects representing the files and subdirectories that match the specified search criteria.</summary>
         /// <param name="searchPattern">The search string to match against the names of directories and files.  This parameter can contain a combination of valid literal path and wildcard (* and ?) characters (see Remarks), but doesn't support regular expressions. The default pattern is "*", which returns all files.</param>
@@ -108,7 +108,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.IO.DirectoryNotFoundException">The specified path is invalid (for example, it is on an unmapped drive). </exception>
         /// <exception cref="T:System.Security.SecurityException">The caller does not have the required permission. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.GetFileSystemInfos?view=netframework-4.7.1">`DirectoryInfo.GetFileSystemInfos` on docs.microsoft.com</a></footer>
-        public FileSystemInfo[] GetFileSystemInfos(string searchPattern) => DirectoryInfo.GetFileSystemInfos(searchPattern);
+        public FileSystemInfo[] GetFileSystemInfos(string searchPattern) => Directory.GetFileSystemInfos(searchPattern);
 
         /// <summary>Retrieves an array of <see cref="T:System.IO.FileSystemInfo" /> objects that represent the files and subdirectories matching the specified search criteria.</summary>
         /// <param name="searchPattern">The search string to match against the names of directories and files.  This parameter can contain a combination of valid literal path and wildcard (* and ?) characters (see Remarks), but doesn't support regular expressions. The default pattern is "*", which returns all files.</param>
@@ -126,13 +126,13 @@ namespace BrandonUtils.Standalone.Clerical {
         public FileSystemInfo[] GetFileSystemInfos(
             string       searchPattern,
             SearchOption searchOption
-        ) => DirectoryInfo.GetFileSystemInfos(searchPattern, searchOption);
+        ) => Directory.GetFileSystemInfos(searchPattern, searchOption);
 
         /// <summary>Returns an array of strongly typed <see cref="T:System.IO.FileSystemInfo" /> entries representing all the files and subdirectories in a directory.</summary>
         /// <returns>An array of strongly typed <see cref="T:System.IO.FileSystemInfo" /> entries.</returns>
         /// <exception cref="T:System.IO.DirectoryNotFoundException">The path is invalid (for example, it is on an unmapped drive). </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.GetFileSystemInfos?view=netframework-4.7.1">`DirectoryInfo.GetFileSystemInfos` on docs.microsoft.com</a></footer>
-        public FileSystemInfo[] GetFileSystemInfos() => DirectoryInfo.GetFileSystemInfos();
+        public FileSystemInfo[] GetFileSystemInfos() => Directory.GetFileSystemInfos();
 
         /// <summary>Returns an array of directories in the current <see cref="T:System.IO.DirectoryInfo" /> matching the given search criteria.</summary>
         /// <param name="searchPattern">The search string to match against the names of directories.  This parameter can contain a combination of valid literal path and wildcard (* and ?) characters (see Remarks), but doesn't support regular expressions. The default pattern is "*", which returns all files.</param>
@@ -144,7 +144,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.IO.DirectoryNotFoundException">The path encapsulated in the <see langword="DirectoryInfo" /> object is invalid (for example, it is on an unmapped drive). </exception>
         /// <exception cref="T:System.UnauthorizedAccessException">The caller does not have the required permission. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.GetDirectories?view=netframework-4.7.1">`DirectoryInfo.GetDirectories` on docs.microsoft.com</a></footer>
-        public DirectoryInfo[] GetDirectories(string searchPattern) => DirectoryInfo.GetDirectories(searchPattern);
+        public DirectoryInfo[] GetDirectories(string searchPattern) => Directory.GetDirectories(searchPattern);
 
         /// <summary>Returns an array of directories in the current <see cref="T:System.IO.DirectoryInfo" /> matching the given search criteria and using a value to determine whether to search subdirectories.</summary>
         /// <param name="searchPattern">The search string to match against the names of directories.  This parameter can contain a combination of valid literal path and wildcard (* and ?) characters (see Remarks), but doesn't support regular expressions. The default pattern is "*", which returns all files.</param>
@@ -162,14 +162,14 @@ namespace BrandonUtils.Standalone.Clerical {
         public DirectoryInfo[] GetDirectories(
             string       searchPattern,
             SearchOption searchOption
-        ) => DirectoryInfo.GetDirectories(searchPattern, searchOption);
+        ) => Directory.GetDirectories(searchPattern, searchOption);
 
         /// <summary>Returns an enumerable collection of directory information in the current directory.</summary>
         /// <returns>An enumerable collection of directories in the current directory.</returns>
         /// <exception cref="T:System.IO.DirectoryNotFoundException">The path encapsulated in the <see cref="T:System.IO.DirectoryInfo" /> object is invalid (for example, it is on an unmapped drive). </exception>
         /// <exception cref="T:System.Security.SecurityException">The caller does not have the required permission. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.EnumerateDirectories?view=netframework-4.7.1">`DirectoryInfo.EnumerateDirectories` on docs.microsoft.com</a></footer>
-        public IEnumerable<DirectoryInfo> EnumerateDirectories() => DirectoryInfo.EnumerateDirectories();
+        public IEnumerable<DirectoryInfo> EnumerateDirectories() => Directory.EnumerateDirectories();
 
         /// <summary>Returns an enumerable collection of directory information that matches a specified search pattern.</summary>
         /// <param name="searchPattern">The search string to match against the names of directories.  This parameter can contain a combination of valid literal path and wildcard (* and ?) characters (see Remarks), but doesn't support regular expressions. The default pattern is "*", which returns all files.</param>
@@ -181,7 +181,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.EnumerateDirectories?view=netframework-4.7.1">`DirectoryInfo.EnumerateDirectories` on docs.microsoft.com</a></footer>
         public IEnumerable<DirectoryInfo> EnumerateDirectories(
             string searchPattern
-        ) => DirectoryInfo.EnumerateDirectories(searchPattern);
+        ) => Directory.EnumerateDirectories(searchPattern);
 
         /// <summary>Returns an enumerable collection of directory information that matches a specified search pattern and search subdirectory option. </summary>
         /// <param name="searchPattern">The search string to match against the names of directories.  This parameter can contain a combination of valid literal path and wildcard (* and ?) characters (see Remarks), but doesn't support regular expressions. The default pattern is "*", which returns all files.</param>
@@ -197,14 +197,14 @@ namespace BrandonUtils.Standalone.Clerical {
         public IEnumerable<DirectoryInfo> EnumerateDirectories(
             string       searchPattern,
             SearchOption searchOption
-        ) => DirectoryInfo.EnumerateDirectories(searchPattern, searchOption);
+        ) => Directory.EnumerateDirectories(searchPattern, searchOption);
 
         /// <summary>Returns an enumerable collection of file information in the current directory.</summary>
         /// <returns>An enumerable collection of the files in the current directory.</returns>
         /// <exception cref="T:System.IO.DirectoryNotFoundException">The path encapsulated in the <see cref="T:System.IO.DirectoryInfo" /> object is invalid (for example, it is on an unmapped drive). </exception>
         /// <exception cref="T:System.Security.SecurityException">The caller does not have the required permission. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.EnumerateFiles?view=netframework-4.7.1">`DirectoryInfo.EnumerateFiles` on docs.microsoft.com</a></footer>
-        public IEnumerable<FileInfo> EnumerateFiles() => DirectoryInfo.EnumerateFiles();
+        public IEnumerable<FileInfo> EnumerateFiles() => Directory.EnumerateFiles();
 
         /// <summary>Returns an enumerable collection of file information that matches a search pattern.</summary>
         /// <param name="searchPattern">The search string to match against the names of files.  This parameter can contain a combination of valid literal path and wildcard (* and ?) characters (see Remarks), but doesn't support regular expressions. The default pattern is "*", which returns all files.</param>
@@ -214,7 +214,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.IO.DirectoryNotFoundException">The path encapsulated in the <see cref="T:System.IO.DirectoryInfo" /> object is invalid, (for example, it is on an unmapped drive). </exception>
         /// <exception cref="T:System.Security.SecurityException">The caller does not have the required permission. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.EnumerateFiles?view=netframework-4.7.1">`DirectoryInfo.EnumerateFiles` on docs.microsoft.com</a></footer>
-        public IEnumerable<FileInfo> EnumerateFiles(string searchPattern) => DirectoryInfo.EnumerateFiles(searchPattern);
+        public IEnumerable<FileInfo> EnumerateFiles(string searchPattern) => Directory.EnumerateFiles(searchPattern);
 
         /// <summary>Returns an enumerable collection of file information that matches a specified search pattern and search subdirectory option.</summary>
         /// <param name="searchPattern">The search string to match against the names of files.  This parameter can contain a combination of valid literal path and wildcard (* and ?) characters (see Remarks), but doesn't support regular expressions. The default pattern is "*", which returns all files.</param>
@@ -230,14 +230,14 @@ namespace BrandonUtils.Standalone.Clerical {
         public IEnumerable<FileInfo> EnumerateFiles(
             string       searchPattern,
             SearchOption searchOption
-        ) => DirectoryInfo.EnumerateFiles(searchPattern, searchOption);
+        ) => Directory.EnumerateFiles(searchPattern, searchOption);
 
         /// <summary>Returns an enumerable collection of file system information in the current directory.</summary>
         /// <returns>An enumerable collection of file system information in the current directory. </returns>
         /// <exception cref="T:System.IO.DirectoryNotFoundException">The path encapsulated in the <see cref="T:System.IO.DirectoryInfo" /> object is invalid (for example, it is on an unmapped drive). </exception>
         /// <exception cref="T:System.Security.SecurityException">The caller does not have the required permission. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.EnumerateFileSystemInfos?view=netframework-4.7.1">`DirectoryInfo.EnumerateFileSystemInfos` on docs.microsoft.com</a></footer>
-        public IEnumerable<FileSystemInfo> EnumerateFileSystemInfos() => DirectoryInfo.EnumerateFileSystemInfos();
+        public IEnumerable<FileSystemInfo> EnumerateFileSystemInfos() => Directory.EnumerateFileSystemInfos();
 
         /// <summary>Returns an enumerable collection of file system information that matches a specified search pattern.</summary>
         /// <param name="searchPattern">The search string to match against the names of directories.  This parameter can contain a combination of valid literal path and wildcard (* and ?) characters (see Remarks), but doesn't support regular expressions. The default pattern is "*", which returns all files.</param>
@@ -249,7 +249,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.EnumerateFileSystemInfos?view=netframework-4.7.1">`DirectoryInfo.EnumerateFileSystemInfos` on docs.microsoft.com</a></footer>
         public IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(
             string searchPattern
-        ) => DirectoryInfo.EnumerateFileSystemInfos(searchPattern);
+        ) => Directory.EnumerateFileSystemInfos(searchPattern);
 
         /// <summary>Returns an enumerable collection of file system information that matches a specified search pattern and search subdirectory option.</summary>
         /// <param name="searchPattern">The search string to match against the names of directories.  This parameter can contain a combination of valid literal path and wildcard (* and ?) characters (see Remarks), but doesn't support regular expressions. The default pattern is "*", which returns all files.</param>
@@ -265,13 +265,13 @@ namespace BrandonUtils.Standalone.Clerical {
         public IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(
             string       searchPattern,
             SearchOption searchOption
-        ) => DirectoryInfo.EnumerateFileSystemInfos(searchPattern, searchOption);
+        ) => Directory.EnumerateFileSystemInfos(searchPattern, searchOption);
 
         /// <summary>Gets the root portion of the directory.</summary>
         /// <returns>An object that represents the root of the directory.</returns>
         /// <exception cref="T:System.Security.SecurityException">The caller does not have the required permission. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.Root?view=netframework-4.7.1">`DirectoryInfo.Root` on docs.microsoft.com</a></footer>
-        public DirectoryInfo Root => DirectoryInfo.Root;
+        public DirectoryInfo Root => Directory.Root;
 
         /// <summary>Moves a <see cref="T:System.IO.DirectoryInfo" /> instance and its contents to a new path.</summary>
         /// <param name="destDirName">The name and path to which to move this directory. The destination cannot be another disk volume or a directory with the identical name. It can be an existing directory to which you want to add this directory as a subdirectory. </param>
@@ -285,7 +285,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.IO.DirectoryNotFoundException">The destination directory cannot be found.</exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.MoveTo?view=netframework-4.7.1">`DirectoryInfo.MoveTo` on docs.microsoft.com</a></footer>
         [SecuritySafeCritical]
-        public void MoveTo(string destDirName) => DirectoryInfo.MoveTo(destDirName);
+        public void MoveTo(string destDirName) => Directory.MoveTo(destDirName);
 
         /// <summary>Deletes this <see cref="T:System.IO.DirectoryInfo" /> if it is empty.</summary>
         /// <exception cref="T:System.UnauthorizedAccessException">The directory contains a read-only file.</exception>
@@ -294,7 +294,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.Security.SecurityException">The caller does not have the required permission. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.Delete?view=netframework-4.7.1">`DirectoryInfo.Delete` on docs.microsoft.com</a></footer>
         [SecuritySafeCritical]
-        public override void Delete() => DirectoryInfo.Delete();
+        public override void Delete() => Directory.Delete();
 
         /// <summary>Deletes this instance of a <see cref="T:System.IO.DirectoryInfo" />, specifying whether to delete subdirectories and files.</summary>
         /// <param name="recursive">
@@ -305,11 +305,11 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="T:System.Security.SecurityException">The caller does not have the required permission. </exception>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.Delete?view=netframework-4.7.1">`DirectoryInfo.Delete` on docs.microsoft.com</a></footer>
         [SecuritySafeCritical]
-        public void Delete(bool recursive) => DirectoryInfo.Delete(recursive);
+        public void Delete(bool recursive) => Directory.Delete(recursive);
 
         /// <summary>Returns the original path that was passed by the user.</summary>
         /// <returns>Returns the original path that was passed by the user.</returns>
         /// <footer><a href="https://docs.microsoft.com/en-us/dotnet/api/System.IO.DirectoryInfo.ToString?view=netframework-4.7.1">`DirectoryInfo.ToString` on docs.microsoft.com</a></footer>
-        public override string ToString() => DirectoryInfo.ToString();
+        public override string ToString() => Directory.ToString();
     }
 }

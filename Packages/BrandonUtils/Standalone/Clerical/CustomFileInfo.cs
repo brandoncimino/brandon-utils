@@ -11,7 +11,8 @@ namespace BrandonUtils.Standalone.Clerical {
     /// </remarks>
     /// <seealso cref="CustomDirectoryInfo"/>
     public abstract class CustomFileInfo : FileSystemInfo, IHasFileInfo {
-        public abstract FileInfo File { get; }
+        public abstract FileInfo       File           { get; }
+        public          FileSystemInfo FileSystemInfo => File;
 
         /// <summary>Gets the name of the file.</summary>
         /// <returns>The name of the file.</returns>
