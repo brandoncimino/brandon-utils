@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics.Contracts;
 using System.Linq;
 
 using BrandonUtils.Standalone.Enums;
@@ -10,6 +11,8 @@ using BrandonUtils.Standalone.Randomization;
 using BrandonUtils.Standalone.Strings;
 
 using JetBrains.Annotations;
+
+using Pure = System.Diagnostics.Contracts.PureAttribute;
 
 namespace BrandonUtils.Standalone.Collections {
     /// <summary>
@@ -724,6 +727,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="bookend">the <typeparamref name="T"/> element to be both <see cref="Enumerable.Append{TSource}">appended</see> and <see cref="Enumerable.Prepend{TSource}">prepended</see></param>
         /// <typeparam name="T">the type of the elements of <paramref name="source"/></typeparam>
         /// <returns>a new sequence that begins <b>and</b> ends with <paramref name="bookend"/></returns>
+        [Pure]
         public static IEnumerable<T> Bookend<T>(this IEnumerable<T> source, T bookend) {
             return source
                    .Prepend(bookend)
@@ -737,6 +741,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="valueThatMightBeNull">the additional element to maybe add</param>
         /// <typeparam name="T">the type of the elements of <paramref name="source"/></typeparam>
         /// <returns>a new sequence that ends with <paramref name="valueThatMightBeNull"/> if it wasn't <c>null</c></returns>
+        [Pure]
         public static IEnumerable<T> AppendNonNull<T>([NotNull] this IEnumerable<T> source, [CanBeNull] T valueThatMightBeNull) {
             return valueThatMightBeNull == null ? source : source.Append(valueThatMightBeNull);
         }
@@ -748,6 +753,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="additionalValuesThatMightBeNull">a sequence of values that might be <c>null</c></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
+        [Pure]
         public static IEnumerable<T> AppendNonNull<T>([NotNull] this IEnumerable<T> source, [CanBeNull] [ItemCanBeNull] IEnumerable<T> additionalValuesThatMightBeNull) {
             return additionalValuesThatMightBeNull == null ? source : source.Concat(additionalValuesThatMightBeNull.NonNull());
         }
@@ -755,6 +761,7 @@ namespace BrandonUtils.Standalone.Collections {
         /**
          * <inheritdoc cref="AppendNonNull{T}(System.Collections.Generic.IEnumerable{T},T)"/>
          */
+        [Pure]
         public static IEnumerable<T> AppendNonNull<T>([NotNull] this IEnumerable<T> source, [CanBeNull] T? valueThatMightBeNull) where T : struct {
             return valueThatMightBeNull.IsEmpty() ? source : source.Append(valueThatMightBeNull.Value);
         }
@@ -762,6 +769,7 @@ namespace BrandonUtils.Standalone.Collections {
         /**
          * <inheritdoc cref="AppendNonNull{T}(System.Collections.Generic.IEnumerable{T},IEnumerable{T})"/>
          */
+        [Pure]
         public static IEnumerable<T> AppendNonNull<T>([NotNull] this IEnumerable<T> source, [CanBeNull] [ItemCanBeNull] IEnumerable<T?> additionalValuesThatMightBeNull) where T : struct {
             return source.Concat(additionalValuesThatMightBeNull.NonNull());
         }
