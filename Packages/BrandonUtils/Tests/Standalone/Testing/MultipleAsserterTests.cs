@@ -33,7 +33,7 @@ namespace BrandonUtils.Tests.Standalone.Testing {
                            .And(() => throw new NullReferenceException())
                            .And(Is.Null);
 
-            Assert.Throws<TException>(asserter.Execute);
+            Assert.Throws<TException>(asserter.Invoke);
         }
 
         [Test]
@@ -58,7 +58,7 @@ namespace BrandonUtils.Tests.Standalone.Testing {
                            .And(() => Console.WriteLine("yolo action"))
                            .And(Assert.Pass);
 
-            Assert.DoesNotThrow(asserter.Execute);
+            Assert.DoesNotThrow(asserter.Invoke);
         }
 
         #region {x}All.Of() classes

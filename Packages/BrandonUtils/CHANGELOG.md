@@ -7,6 +7,15 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.29.0] - 9/22/2021
+
+### Added
+
+- More styles of `MultipleAsserter` assertions:
+  - `(object, IResolveConstraint)` → constraints against arbitrary values, like `(5, Is.NotEqualTo(9))`
+  - `(Func<TActual, object>, IResolveConstraint)` → constraints against **transformations** of `actual`,
+    like `(it => it * 2, Is.GreaterThan(3))`
+
 ## [2.28.1] - 9/22/2021
 
 ### Added

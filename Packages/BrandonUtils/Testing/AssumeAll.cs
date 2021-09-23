@@ -10,7 +10,7 @@ namespace BrandonUtils.Testing {
         public static void Of(string heading, params Action[] assumptions) {
             Assumer.WithHeading(heading)
                    .And(assumptions)
-                   .Execute();
+                   .Invoke();
         }
 
         public static void Of(params Action[] assumptions) {
@@ -21,7 +21,7 @@ namespace BrandonUtils.Testing {
             Assumer.Against(actual)
                    .WithHeading(heading)
                    .And(assumptions)
-                   .Execute();
+                   .Invoke();
         }
 
         public static void Of<T>(T actual, params IResolveConstraint[] assumptions) {

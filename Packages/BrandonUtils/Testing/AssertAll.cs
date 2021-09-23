@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 using JetBrains.Annotations;
 
@@ -41,7 +40,9 @@ namespace BrandonUtils.Testing {
         /// <param name="assertions"></param>
         /// <exception cref="AssertionException">if any of the <see cref="assertions"/> <see cref="Action"/>s throws an <see cref="Exception"/></exception>
         public static void Of(string heading, params Action[] assertions) {
-            MultipleAssertions.ExecuteMultipleAssertions(heading, assertions, Assert.Fail);
+            Asserter.WithHeading(heading)
+                    .And(assertions)
+                    .Invoke();
         }
 
         /**
@@ -51,19 +52,31 @@ namespace BrandonUtils.Testing {
             Of(null, assertions);
         }
 
+        public static void Of(params (object, IResolveConstraint)[] assertions) {
+            Asserter.WithHeading(null)
+                    .And(assertions)
+                    .Invoke();
+        }
+
+        public static void Of<T>(T actual, params (Func<T, object>, IResolveConstraint)[] transformativeConstraints) {
+            Asserter.Against(actual)
+                    .And(transformativeConstraints)
+                    .Invoke();
+        }
+
         /// <summary>
         /// <see cref="Assert"/>s multiple <see cref="Constraint"/>s against <see cref="actual"/>, returning <b>all</b> of the results.
         /// </summary>
         /// <remarks>
-        /// Constructions an <see cref="Action"/> for each <see cref="Constraint"/> and passes it to <see cref="Of(Action[])"/>
+        /// Constructs an <see cref="Action"/> for each <see cref="Constraint"/> and passes it to <see cref="Of(Action[])"/>
         /// </remarks>
         /// <param name="actual">the actual value being tested</param>
         /// <param name="assertions">an array of <see cref="Constraint"/>s to be applied as <b>individual <see cref="Assert"/>ions</b></param>
         /// <typeparam name="T">the <see cref="Type"/> of the `<paramref name="actual"/>` value</typeparam>
         public static void Of<T>(T actual, params Constraint[] assertions) {
-            var assActions = assertions.Select<Constraint, Action>(ass => () => Assert.That(actual, ass)).ToArray();
-            var asses      = assertions.Select(ass => MultipleAssertions.ConstraintToAction(actual, ass, Assert.That));
-            Of(assActions);
+            Asserter.Against(actual)
+                    .And(assertions)
+                    .Invoke();
         }
 
         /**
@@ -72,8 +85,10 @@ namespace BrandonUtils.Testing {
          */
         [SuppressMessage("ReSharper", "InvalidXmlDocComment")]
         public static void Of<T>(string heading, T actual, params Constraint[] assertions) {
-            var assActions = assertions.Select<Constraint, Action>(ass => () => Assert.That(actual, ass)).ToArray();
-            Of(heading, assActions);
+            Asserter.WithHeading(heading)
+                    .Against(actual)
+                    .And(assertions)
+                    .Invoke();
         }
     }
 }

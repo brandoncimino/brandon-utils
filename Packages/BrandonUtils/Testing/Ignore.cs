@@ -68,7 +68,7 @@ namespace BrandonUtils.Testing {
         public static void Unless(string heading, params Action[] ignoreActions) {
             Ignorer.WithHeading(heading)
                    .And(ignoreActions)
-                   .Execute();
+                   .Invoke();
         }
 
         public static void Unless(params Action[] assertions) {
@@ -79,19 +79,19 @@ namespace BrandonUtils.Testing {
             Ignorer.Against(actual)
                    .WithHeading(heading)
                    .And(constraints)
-                   .Execute();
+                   .Invoke();
         }
 
         public static void Unless<T>(T actual, params IResolveConstraint[] constraints) {
             Ignorer.Against(actual)
                    .And(constraints)
-                   .Execute();
+                   .Invoke();
         }
 
         public static void Unless<T>(ActualValueDelegate<T> actual, params IResolveConstraint[] constraints) {
             Ignorer.Against(actual)
                    .And(constraints)
-                   .Execute();
+                   .Invoke();
         }
     }
 }
