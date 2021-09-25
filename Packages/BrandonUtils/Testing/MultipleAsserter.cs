@@ -121,6 +121,12 @@ namespace BrandonUtils.Testing {
             return Self;
         }
 
+        [MustUseReturnValue]
+        public TSelf And([CanBeNull] object actual, [CanBeNull] IResolveConstraint constraint) {
+            Constraints_AgainstAnything.AddNonNull((actual, constraint));
+            return Self;
+        }
+
         #endregion
 
         #region Constraints_AgainstTransformation
