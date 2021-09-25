@@ -47,6 +47,14 @@ namespace BrandonUtils.Testing {
             Actual = actual;
         }
 
+        /// <summary>
+        /// A factory-method equivalent to a no-argument constructor.
+        /// </summary>
+        /// <returns>a new <see cref="TSelf"/> instance</returns>
+        public static TSelf New() {
+            return new TSelf();
+        }
+
         private TSelf Self => this as TSelf;
 
         #region Builder
