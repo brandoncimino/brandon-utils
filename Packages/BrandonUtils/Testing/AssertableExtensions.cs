@@ -13,12 +13,12 @@ namespace BrandonUtils.Testing {
 
         internal static IEnumerable<string> FormatAssertable(this IAssertable failure) {
             if (!failure.Failed) {
-                return new[] { $"{failure.Nickname}: Passed" };
+                return new[] { $"✅ {failure.Nickname}: Passed" };
             }
 
             return new[] {
-                       $"{failure.Nickname} failed!",
-                       $"{failure.Excuse}"
+                       $"💣 {failure.Nickname} failed!",
+                       $"🙇 {failure.Excuse}"
                    }
                    .Concat(FilterStackTrace(failure.Excuse))
                    .Bookend(HorizontalRule);
