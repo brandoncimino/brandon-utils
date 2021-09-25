@@ -17,7 +17,7 @@ namespace BrandonUtils.Standalone.Clerical {
         [ContractAnnotation("null => null")]
         [ContractAnnotation("notnull => notnull")]
         [CanBeNull]
-        public static Uri Uri([CanBeNull] this FileSystemInfo fileSystemInfo) {
+        public static Uri ToUri([CanBeNull] this FileSystemInfo fileSystemInfo) {
             return fileSystemInfo switch {
                 null              => null,
                 DirectoryInfo dir => new Uri(dir.FullName.AppendIfMissing(Path.DirectorySeparatorChar.ToString())),
@@ -29,8 +29,8 @@ namespace BrandonUtils.Standalone.Clerical {
         [ContractAnnotation("null => null")]
         [ContractAnnotation("notnull => notnull")]
         [CanBeNull]
-        public static Uri Uri([CanBeNull] this IHasFileSystemInfo hasFileSystemInfo) {
-            return hasFileSystemInfo?.FileSystemInfo.Uri();
+        public static Uri ToUri([CanBeNull] this IHasFileSystemInfo hasFileSystemInfo) {
+            return hasFileSystemInfo?.FileSystemInfo.ToUri();
         }
 
         #endregion
@@ -51,7 +51,7 @@ namespace BrandonUtils.Standalone.Clerical {
                 throw new ArgumentNullException(nameof(child));
             }
 
-            return parent.Uri().IsBaseOf(child.Uri());
+            return parent.ToUri().IsBaseOf(child.ToUri());
         }
 
         [ContractAnnotation("parent:null => stop")]
