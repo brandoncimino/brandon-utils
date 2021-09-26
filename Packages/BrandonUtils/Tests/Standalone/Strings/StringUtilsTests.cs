@@ -332,5 +332,89 @@ a
         }
 
         #endregion
+
+        #region Indent
+
+        [Test]
+        [TestCase("a",  1, 2, ' ', "  a")]
+        [TestCase(" b", 3, 1, ' ', "    b")]
+        public void IndentString(string original, int indentCount, int indentSize, char indentChar, string expectedString) {
+            Assert.That(original.Indent(indentCount, indentSize, indentChar), Is.EqualTo(expectedString));
+        }
+
+        public class IndentExpectation {
+            public IEnumerable<string> OriginalLines;
+            public IEnumerable<string> ExpectedLines;
+            public int                 IndentCount;
+            public int                 IndentSize;
+            public char                IndentChar;
+
+            public IEnumerable<string> ActualLines => OriginalLines.Indent(IndentCount, IndentSize, IndentChar);
+        }
+
+        public static IEnumerable<IndentExpectation> GetIndentExpectations() {
+            return new IndentExpectation[] {
+                new IndentExpectation() {
+                    OriginalLines = new[] {
+                        "a",
+                        "b",
+                        "c",
+                        " d"
+                    },
+                    ExpectedLines = new[] {
+                        "  a",
+                        "  b",
+                        "  c",
+                        "   d"
+                    },
+                    IndentChar  = StringUtils.DefaultIndentChar,
+                    IndentCount = 1,
+                    IndentSize  = StringUtils.DefaultIndentSize
+                },
+                new IndentExpectation() {
+                    OriginalLines = new[] {
+                        "  a",
+                        "    b"
+                    },
+                    IndentChar  = '%',
+                    IndentCount = 3,
+                    IndentSize  = 4,
+                    ExpectedLines = new[] {
+                        "%%%%%%%%%%%%  a",
+                        "%%%%%%%%%%%%    b"
+                    }
+                }
+            };
+        }
+
+        [Test]
+        public void IndentLines([ValueSource(nameof(GetIndentExpectations))] IndentExpectation expectation) {
+            Assert.That(expectation.ActualLines, Is.EqualTo(expectation.ExpectedLines));
+        }
+
+        [Test]
+        public void NestedIndent() {
+            var t1 = 2.Repeat("t1");
+            var t2 = 2.Repeat("t2");
+            var actualLines = t1
+                              .Indent(0)
+                              .Concat(t2.Indent(1))
+                              .Indent(1)
+                              .ToArray();
+
+            var expectedLines = new[] {
+                "  t1",
+                "  t1",
+                "    t2",
+                "    t2"
+            };
+
+            Console.WriteLine($"\n{nameof(actualLines)}\n{actualLines.JoinLines()}");
+            Console.WriteLine($"\n{nameof(expectedLines)}\n{expectedLines.JoinLines()}");
+
+            Assert.That(actualLines, Is.EqualTo(expectedLines));
+        }
+
+        #endregion
     }
 }
