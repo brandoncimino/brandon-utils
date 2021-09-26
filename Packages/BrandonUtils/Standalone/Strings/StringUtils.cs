@@ -20,6 +20,8 @@ using Pure = System.Diagnostics.Contracts.PureAttribute;
 namespace BrandonUtils.Standalone.Strings {
     [PublicAPI]
     public static class StringUtils {
+        public const int DefaultIndentSize = 2;
+
         /// <summary>
         /// A <see cref="string"/> for a single-glyph <a href="https://en.wikipedia.org/wiki/Ellipsis">ellipsis</a>, i.e. <c>'…'</c>.
         ///
@@ -29,6 +31,17 @@ namespace BrandonUtils.Standalone.Strings {
         /// </ul>
         /// </summary>
         internal const string Ellipsis = "…";
+
+        /// <summary>
+        /// A <see cref="string"/> for the glyph representing the <a href="https://en.wikipedia.org/wiki/Tab_key#Unicode">"tab" key</a>, i.e. one indent.
+        ///
+        /// <ul>
+        /// <li><b>Unicode:</b> <c>U+21E5 ⇥ RIGHTWARDS ARROW TO BAR</c></li>
+        /// </ul>
+        /// </summary>
+        internal const string TabArrow = "⇥";
+
+        internal const char DefaultIndentChar = ' ';
 
         /// <summary>
         /// Valid strings for <a href="https://en.wikipedia.org/wiki/Newline">line breaks</a>, in <b>order of precedence</b> as required by <see cref="string.Split(string[], StringSplitOptions)"/>:
@@ -44,15 +57,19 @@ namespace BrandonUtils.Standalone.Strings {
         internal static readonly string[] LineBreakSplitters = { "\r\n", "\r", "\n" };
 
         /// <summary>
-        /// Prepends <paramref name="toIndent" />.
+        /// Prepends <paramref name="toIndent"/>.
         /// </summary>
         /// <param name="toIndent">The <see cref="string" /> to be indented.</param>
         /// <param name="indentCount">The number of indentations (i.e. number of times hitting "tab").</param>
-        /// <param name="indentSize">The size of each individual indentation.</param>
-        /// <param name="indentChar">The character to use for indentation.</param>
-        /// <returns></returns>
-        public static string Indent(this string toIndent, int indentCount = 1, int indentSize = 2, char indentChar = ' ') {
-            return indentChar.ToString().Repeat(indentSize).Repeat(indentCount) + toIndent;
+        /// <param name="indentSize">The <see cref="string.Length"/> of each individual indentation. Defaults to <see cref="DefaultIndentSize"/>.</param>
+        /// <param name="indentChar">The <see cref="char"/> that is <see cref="Repeat(char,int,string)"/>ed to build a single indentation. Defaults to <see cref="DefaultIndentChar"/>.</param>
+        /// <returns>The indented <see cref="string"/>.</returns>
+        /// <seealso cref="Indent(IEnumerable{string},int,int,char)"/>
+        public static string Indent([CanBeNull] this string toIndent, int indentCount = 1, int indentSize = DefaultIndentSize, char indentChar = ' ') {
+            return indentChar
+                   .Repeat(indentSize)
+                   .Repeat(indentCount)
+                   .Suffix(toIndent);
         }
 
         /// <summary>
@@ -415,6 +432,19 @@ namespace BrandonUtils.Standalone.Strings {
             return str.SplitLines().Max(it => it.Length);
         }
 
+        /// <summary>
+        /// <see cref="Indent(string,int,int,char)"/>s each <see cref="string"/> in <paramref name="lines"/>.
+        /// </summary>
+        /// <param name="lines">a collection of <see cref="string"/>s which are treated as separate lines</param>
+        /// <param name="numberOfIndents">how many "indents" to add, i.e. how many times the "tab" key should be hit</param>
+        /// <param name="indentSize">the <see cref="string.Length"/> of a single indent. Defaults to <see cref="DefaultIndentSize"/></param>
+        /// <param name="indentChar">the <see cref="char"/> that is <see cref="Repeat(char,int,string)"/>ed to form a single indent. Defaults to <see cref="DefaultIndentChar"/></param>
+        /// <returns>the indented <see cref="string"/>s</returns>
+        /// <seealso cref="Indent(string,int,int,char)"/>
+        public static IEnumerable<string> Indent(this IEnumerable<string> lines, int numberOfIndents = 1, int indentSize = DefaultIndentSize, char indentChar = DefaultIndentChar) {
+            return lines.Select(it => it.Indent(numberOfIndents, indentSize, indentChar)).ToList();
+        }
+
         #region Truncation & Collapsing
 
         /// <summary>
@@ -432,7 +462,7 @@ namespace BrandonUtils.Standalone.Strings {
 
             if (includeMessage) {
                 return lns.Take(lineCount - 1)
-                          .Append($"...[{lns.Length - lineCount} lines omitted]")
+                          .Append($"{Ellipsis}[{lns.Length - lineCount} lines omitted]")
                           .ToArray();
             }
             else {
@@ -471,7 +501,7 @@ namespace BrandonUtils.Standalone.Strings {
                 // Finish collapsing
                 int collapseSize = i - collapseFrom.Value;
 
-                filteredLines.Add(collapseSize == 1 ? "..." : $"...({collapseSize}/{lines.Length} lines omitted)");
+                filteredLines.Add(collapseSize == 1 ? Ellipsis : $"{Ellipsis}({collapseSize}/{lines.Length} lines omitted)");
                 collapseFrom = null;
 
                 filteredLines.Add(lines[i]);
@@ -479,7 +509,7 @@ namespace BrandonUtils.Standalone.Strings {
 
             if (collapseFrom.HasValue) {
                 int collapseSize = lines.Length - collapseFrom.Value;
-                filteredLines.Add(collapseSize == 1 ? "..." : $"...({collapseSize}/{lines.Length} lines omitted)");
+                filteredLines.Add(collapseSize == 1 ? Ellipsis : $"{Ellipsis}({collapseSize}/{lines.Length} lines omitted)");
             }
 
             return filteredLines.ToArray();
