@@ -15,6 +15,18 @@
             <seealso cref="T:FowlFever.Conjugal.Affixing.IAffixed"/>
             <see cref="P:FowlFever.Conjugal.Affixing.Affixation.AffixFlavor"/>
         </member>
+        <member name="P:FowlFever.Conjugal.Affixing.Affixation.Stem">
+            <inheritdoc/>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme">
+            <inheritdoc/>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.Affixation.Joiner">
+            <inheritdoc/>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.Affixation.AffixFlavor">
+            <inheritdoc/>
+        </member>
         <member name="P:FowlFever.Conjugal.Affixing.Affixation.Index">
             <summary>
                 An extra, optional
@@ -259,6 +271,42 @@
             <remarks>Fun fact: "circum" is a <a href="https://en.wikipedia.org/wiki/Libfix">libfix</a>!
             </remarks>
         </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixation.Render">
+            <returns>the final result of this
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+            </returns>
+            <exception cref="T:System.NotImplementedException">if this
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.AffixFlavor"/>
+                hasn't been implemented
+            </exception>
+            <exception cref="T:System.ComponentModel.InvalidEnumArgumentException">if this
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.AffixFlavor"/>
+                is unknown
+            </exception>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixation.Describe">
+            <returns>individual properties of this
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+                for debugging
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixation.ToString">
+            <returns>
+                <see cref="M:FowlFever.Conjugal.Affixing.Affixation.Render"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixation.op_Implicit(FowlFever.Conjugal.Affixing.Affixation)~System.String">
+            <summary>
+                Implicitly<see cref="M:FowlFever.Conjugal.Affixing.Affixation.Render"/>s this<see
+                    cref="T:FowlFever.Conjugal.Affixing.Affixation"/>.
+            </summary>
+            <param name="affixation">this
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+            </param>
+            <returns>
+                <see cref="M:FowlFever.Conjugal.Affixing.Affixation.Render"/>
+            </returns>
+        </member>
         <member name="T:FowlFever.Conjugal.Affixing.AffixedExtensions">
             <summary>
                 Provides "default implementation" methods for<see cref="T:FowlFever.Conjugal.Affixing.IAffixed"/>.
@@ -295,6 +343,25 @@
                 built from the
                 <paramref name="affixedThing"/>
             </returns>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.AffixExtensions">
+            <summary>
+                Extension methods for<see cref="T:FowlFever.Conjugal.Affixing.IAffix"/>.
+            </summary>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixExtensions.AffixTo(FowlFever.Conjugal.Affixing.IAffix,System.String)">
+            <param name="affix">this
+                <see cref="T:FowlFever.Conjugal.Affixing.IAffix"/>
+            </param>
+            <param name="stem">the word that will be affixed</param>
+            <returns>an
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+                combining this
+                <see cref="T:FowlFever.Conjugal.Affixing.IAffix"/>
+                and a
+                <paramref name="stem"/>
+            </returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="T:FowlFever.Conjugal.Affixing.AffixFlavor">
             <summary>
@@ -553,6 +620,67 @@
                 <see cref="T:System.String"/>
                 extension methods that apply <a href="https://en.wikipedia.org/wiki/Affix">affixes</a> to stems.
             </summary>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixer.Suffix(System.String,System.String,System.String)">
+            <summary>
+                Appends
+                <paramref name="suffix"/>
+                to<paramref name="stem"/>.
+            </summary>
+            <param name="stem">the original, "base"
+                <see cref="T:System.String"/>
+            </param>
+            <param name="suffix">the string to be appended to
+                <paramref name="stem"/>
+            </param>
+            <param name="joiner">a
+                <see cref="T:System.String"/>
+                interposed betwixt
+                <paramref name="stem"/>
+                and
+                <paramref name="suffix"/>
+            </param>
+            <returns>the<see cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Suffix"/>ed
+                <see cref="T:System.String"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixer.Prefix(System.String,System.String,System.String)">
+            <summary>
+                Prepends
+                <paramref name="prefix"/>
+                to<paramref name="stem"/>.
+            </summary>
+            <param name="stem">the original, "base"
+                <see cref="T:System.String"/>
+            </param>
+            <param name="prefix">the string to be prepended to
+                <paramref name="stem"/>
+            </param>
+            <param name="joiner">a
+                <see cref="T:System.String"/>
+                interposed betwixt
+                <paramref name="stem"/>
+                and
+                <paramref name="prefix"/>
+            </param>
+            <returns>the<see cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Prefix"/>ed
+                <see cref="T:System.String"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixer.Infix(System.String,System.String,System.Int32,System.String)">
+            <inheritdoc cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Infix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixer.Circumfix(System.String,System.String,System.String,System.String)">
+            <inheritdoc cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Circumfix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixer.Ambifix(System.String,System.String,System.String)">
+            <inheritdoc cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Ambifix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixer.Suffix(System.Collections.Generic.IEnumerable{System.String},System.String,System.String)">
+            <inheritdoc cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Suffix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixer.Prefix(System.Collections.Generic.IEnumerable{System.String},System.String,System.String)">
+            <inheritdoc cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Prefix"/>
         </member>
         <member name="M:FowlFever.Conjugal.Affixing.Affixer.Suffixation(System.String,System.String,System.String)">
             <summary>
