@@ -65,12 +65,12 @@ namespace BrandonUtils.Standalone {
 
         #region IsStrictlyPositive
 
-        public static bool IsStrictlyPositive(int     value) => value > 0;
-        public static bool IsStrictlyPositive(short   value) => value > 0;
-        public static bool IsStrictlyPositive(long    value) => value > 0;
-        public static bool IsStrictlyPositive(float   value) => value > 0;
-        public static bool IsStrictlyPositive(double  value) => value > 0;
-        public static bool IsStrictlyPositive(decimal value) => value > 0;
+        public static bool IsStrictlyPositive(this int     value) => value > 0;
+        public static bool IsStrictlyPositive(this short   value) => value > 0;
+        public static bool IsStrictlyPositive(this long    value) => value > 0;
+        public static bool IsStrictlyPositive(this float   value) => value > 0;
+        public static bool IsStrictlyPositive(this double  value) => value > 0;
+        public static bool IsStrictlyPositive(this decimal value) => value > 0;
 
         #endregion
 
