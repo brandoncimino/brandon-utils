@@ -1,35 +1,34 @@
 ﻿using BrandonUtils.Standalone.Optional;
 
+using JetBrains.Annotations;
+
 namespace BrandonUtils.Standalone.Strings {
     public class PrettificationSettings {
-        public enum LineStyle {
-            Dynamic = default,
-            Multi,
-            Single,
-        }
-
         /// <summary>
         /// When the <see cref="PreferredLineStyle"/> is <see cref="LineStyle.Dynamic"/>, <see cref="LineLengthLimit"/> is used to decide between <see cref="LineStyle.Multi"/> and <see cref="LineStyle.Single"/>.
         /// </summary>
-        public int? LineLengthLimit { get; set; }
+        [NotNull]
+        public Fallback<int> LineLengthLimit { get; } = new Fallback<int>(50);
 
-        /// <summary>
-        /// Assorted mutually exclusive <see cref="PrettificationFlags"/>.
-        /// </summary>
-        public PrettificationFlags Flags { get;        set; }
-        public Optional<string> NullPlaceholder { get; set; }
+        [NotNull] public Fallback<string> NullPlaceholder { get; } = new Fallback<string>("⛔");
 
         /// <summary>
         /// The preferred <see cref="LineStyle"/>.
         /// </summary>
-        public LineStyle? PreferredLineStyle { get; set; }
+        [NotNull]
+        public Fallback<LineStyle> PreferredLineStyle { get; } = new Fallback<LineStyle>(LineStyle.Dynamic);
+        [NotNull] public Fallback<TypeNameStyle> TypeLabelStyle { get; } = new Fallback<TypeNameStyle>(TypeNameStyle.Full);
 
         public static implicit operator PrettificationSettings(LineStyle lineStyle) {
-            return new PrettificationSettings() { PreferredLineStyle = lineStyle };
+            return new PrettificationSettings() {
+                PreferredLineStyle = { Value = lineStyle }
+            };
         }
 
-        public static implicit operator PrettificationSettings(PrettificationFlags flags) {
-            return new PrettificationSettings() { Flags = flags };
+        public static implicit operator PrettificationSettings(TypeNameStyle typeLabelStyle) {
+            return new PrettificationSettings() {
+                TypeLabelStyle = { Value = typeLabelStyle }
+            };
         }
     }
 }

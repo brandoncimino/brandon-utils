@@ -118,9 +118,7 @@ namespace BrandonUtils.Standalone.Enums {
 
 
         private string BuildMustContainMessage(T[] valuesThatShouldBeThere) {
-            PrettificationSettings prettySettings = new PrettificationSettings() {
-                Flags = PrettificationFlags.IncludeTypeLabels
-            };
+            PrettificationSettings prettySettings = TypeNameStyle.Full;
 
             var badValues = valuesThatShouldBeThere.Except(this);
             var mapStuff = new Dictionary<object, object>() {

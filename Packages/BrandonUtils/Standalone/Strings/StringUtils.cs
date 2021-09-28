@@ -65,7 +65,22 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="indentChar">The <see cref="char"/> that is <see cref="Repeat(char,int,string)"/>ed to build a single indentation. Defaults to <see cref="DefaultIndentChar"/>.</param>
         /// <returns>The indented <see cref="string"/>.</returns>
         /// <seealso cref="Indent(IEnumerable{string},int,int,char)"/>
-        public static string Indent([CanBeNull] this string toIndent, int indentCount = 1, int indentSize = DefaultIndentSize, char indentChar = ' ') {
+        public static string Indent(
+            [CanBeNull] this string toIndent,
+            [NonNegativeValue]
+            int indentCount = 1,
+            [NonNegativeValue]
+            int indentSize = DefaultIndentSize,
+            char indentChar = ' '
+        ) {
+            if (indentCount.IsPositive() == false) {
+                throw new ArgumentOutOfRangeException(nameof(indentCount));
+            }
+
+            if (indentSize.IsPositive() == false) {
+                throw new ArgumentOutOfRangeException(nameof(indentSize));
+            }
+
             return indentChar
                    .Repeat(indentSize)
                    .Repeat(indentCount)
@@ -79,7 +94,18 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="repetitions">The number of times <paramref name="toRepeat" /> should be repeated.</param>
         /// <param name="separator">An optional character, analogous to </param>
         /// <returns></returns>
-        public static string Repeat(this string toRepeat, int repetitions, string separator = "") {
+        [ContractAnnotation("toRepeat:null => null")]
+        [ContractAnnotation("toRepeat:notnull => notnull")]
+        [CanBeNull]
+        public static string Repeat([CanBeNull] this string toRepeat, [NonNegativeValue] int repetitions, [CanBeNull] string separator = "") {
+            if (repetitions.IsPositive() == false) {
+                throw new ArgumentOutOfRangeException(nameof(repetitions));
+            }
+
+            if (toRepeat == null) {
+                return null;
+            }
+
             var list = new List<string>();
             for (var i = 0; i < repetitions; i++) {
                 list.Add(toRepeat);
@@ -89,7 +115,12 @@ namespace BrandonUtils.Standalone.Strings {
         }
 
         /// <inheritdoc cref="Repeat(string,int,string)" />
-        public static string Repeat(this char toRepeat, int repetitions, string separator = "") {
+        [NotNull]
+        public static string Repeat(this char toRepeat, [NonNegativeValue] int repetitions, string separator = "") {
+            if (repetitions.IsPositive() == false) {
+                throw new ArgumentOutOfRangeException(nameof(repetitions));
+            }
+
             return Repeat(toRepeat.ToString(), repetitions, separator);
         }
 
@@ -127,6 +158,7 @@ namespace BrandonUtils.Standalone.Strings {
 
         #region Prettification
 
+        [Obsolete]
         public static string Prettify(object thing, bool recursive = true, int recursionCount = 0) {
             const int recursionMax = 10;
             var       type         = thing.GetType().ToString();
@@ -436,13 +468,45 @@ namespace BrandonUtils.Standalone.Strings {
         /// <see cref="Indent(string,int,int,char)"/>s each <see cref="string"/> in <paramref name="lines"/>.
         /// </summary>
         /// <param name="lines">a collection of <see cref="string"/>s which are treated as separate lines</param>
-        /// <param name="numberOfIndents">how many "indents" to add, i.e. how many times the "tab" key should be hit</param>
+        /// <param name="indentCount">how many "indents" to add, i.e. how many times the "tab" key should be hit</param>
         /// <param name="indentSize">the <see cref="string.Length"/> of a single indent. Defaults to <see cref="DefaultIndentSize"/></param>
         /// <param name="indentChar">the <see cref="char"/> that is <see cref="Repeat(char,int,string)"/>ed to form a single indent. Defaults to <see cref="DefaultIndentChar"/></param>
         /// <returns>the indented <see cref="string"/>s</returns>
         /// <seealso cref="Indent(string,int,int,char)"/>
-        public static IEnumerable<string> Indent(this IEnumerable<string> lines, int numberOfIndents = 1, int indentSize = DefaultIndentSize, char indentChar = DefaultIndentChar) {
-            return lines.Select(it => it.Indent(numberOfIndents, indentSize, indentChar)).ToList();
+        [ContractAnnotation("lines:null => null")]
+        [CanBeNull]
+        public static IEnumerable<string> Indent(
+            [CanBeNull] [ItemCanBeNull]
+            this IEnumerable<string> lines,
+            [NonNegativeValue]
+            int indentCount = 1,
+            [NonNegativeValue]
+            int indentSize = DefaultIndentSize,
+            char indentChar = DefaultIndentChar
+        ) {
+            if (indentCount.IsPositive() == false) {
+                throw new ArgumentOutOfRangeException(nameof(indentCount));
+            }
+
+            if (indentSize.IsPositive() == false) {
+                throw new ArgumentOutOfRangeException(nameof(indentSize));
+            }
+
+            return lines?.Select(it => it.Indent(indentCount, indentSize, indentChar)).ToList();
+        }
+
+        [ContractAnnotation("lines:null => null")]
+        [CanBeNull]
+        public static IEnumerable<string> IndentWithLabel([CanBeNull] this IEnumerable<string> lines, [CanBeNull] string label, [CanBeNull] string joiner = " ") {
+            if (lines == null) {
+                return null;
+            }
+
+            var firstLinePrefix = $"{label}{joiner}";
+            var otherLinePrefix = $" ".Repeat(firstLinePrefix.Length);
+            return lines.Select(
+                (line, i) => i == 0 ? $"{firstLinePrefix}{line}" : $"{otherLinePrefix}{line}"
+            );
         }
 
         #region Truncation & Collapsing

@@ -14,8 +14,8 @@ namespace BrandonUtils.Standalone.Optional {
     /// </summary>
     [PublicAPI]
     public static class Optional {
-        private const string NullPlaceholder  = "⛔";
-        private const string EmptyPlaceholder = "🈳";
+        internal const string NullPlaceholder  = "⛔";
+        internal const string EmptyPlaceholder = "🈳";
 
         /// <summary>
         /// Creates an <see cref="Optional{T}"/> without ugly type parameters.
@@ -222,14 +222,9 @@ namespace BrandonUtils.Standalone.Optional {
                 return $"({prettyType}){NullPlaceholder}";
             }
             else {
-                var valueString = optional.HasValue ? optional.Value.Prettify(new PrettificationSettings() { NullPlaceholder = NullPlaceholder }) : EmptyPlaceholder;
+                var valueString = optional.HasValue ? optional.Value.Prettify() : EmptyPlaceholder;
                 return $"{prettyType}[{valueString}]";
             }
-
-            var typeToPrettify = optional?.GetType() ?? typeof(IOptional<T>);
-            return optional == null
-                       ? $"(IOptional<{typeof(T).Name}>)null"
-                       : $"{optional.GetType().Name}<{typeof(T).Name}>[{(optional.HasValue ? (optional.Value == null ? "null" : optional.Value + "") : "")}]";
         }
 
         #region IfPresentOrElse

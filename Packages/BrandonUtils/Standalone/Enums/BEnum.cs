@@ -40,8 +40,13 @@ namespace BrandonUtils.Standalone.Enums {
         /// <param name="enumValue"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(string argumentName, T enumValue) where T : Enum {
+        public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(string argumentName, T enumValue) where T : struct, Enum {
             return new InvalidEnumArgumentException(argumentName, (int)(object)enumValue, typeof(T));
+        }
+
+        public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(string argumentName, T? enumValue) where T : struct, Enum {
+            //return enumValue == null ? new InvalidEnumArgumentException(argumentName, -1, typeof(T)) : InvalidEnumArgumentException(argumentName, enumValue.Value, typeof(T));
+            return new InvalidEnumArgumentException(argumentName, -1, typeof(T));
         }
     }
 }

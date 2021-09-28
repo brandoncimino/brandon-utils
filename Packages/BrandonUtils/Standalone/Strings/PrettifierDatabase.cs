@@ -17,6 +17,8 @@ namespace BrandonUtils.Standalone.Strings {
                 new Prettifier<(object, object)>(InnerPretty.Tuple2),
                 new Prettifier<IEnumerable<object>>(InnerPretty.PrettifyEnumerableT),
                 new Prettifier<IEnumerable>(InnerPretty.PrettifyEnumerable),
+                new Prettifier<MethodInfo>(InnerPretty.PrettifyMethodInfo),
+                new Prettifier<ParameterInfo>(InnerPretty.PrettifyParameterInfo),
                 new Prettifier<MemberInfo>(InnerPretty.PrettifyMemberInfo),
             };
         }

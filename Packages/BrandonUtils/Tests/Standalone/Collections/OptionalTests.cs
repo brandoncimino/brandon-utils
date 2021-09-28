@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Optional;
+using BrandonUtils.Standalone.Strings;
 using BrandonUtils.Testing;
 
 using NUnit.Framework;
@@ -61,7 +62,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
             AssertAll.Of(
                 () => Assert.That(a.Equals(str), "a.Equals(str)"),
                 () => Assert.That(a,             Is.EqualTo(str)),
-                () => Assert.That(a == str,      "a == str"),
+                () => Assert.That(a   == str,    "a == str"),
                 () => Assert.That(str == a,      "str == a"),
                 () => Assert.That(str,           Is.EqualTo(a)),
                 () => Assert.That(a.Equals(str), "a.Equals(str)")
@@ -79,10 +80,10 @@ namespace BrandonUtils.Tests.Standalone.Collections {
             AssertAll.Of(
                 () => Assert.That(iOpt == i, "iOpt == i"),
                 // () => Assert.That(iOpt == l, "iOpt == l"),
-                () => Assert.That(lOpt == i, "lOpt == i"),
-                () => Assert.That(lOpt == l, "lOpt == l"),
-                () => Assert.That(i == iOpt, "i == iOpt"),
-                () => Assert.That(i == lOpt, "i == lOpt"),
+                () => Assert.That(lOpt == i,    "lOpt == i"),
+                () => Assert.That(lOpt == l,    "lOpt == l"),
+                () => Assert.That(i    == iOpt, "i == iOpt"),
+                () => Assert.That(i    == lOpt, "i == lOpt"),
                 // () => Assert.That(l == iOpt, "l == iOpt"),
                 () => Assert.That(l == lOpt, "l == lOpt")
             );
@@ -166,13 +167,13 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
             AssertAll.Of(
                 // vs. nullValue
-                () => Assert.That(ofNull == nullValue,                            "ofNull == nullValue"),
-                () => Assert.That(ofNull != nullValue,                            Is.False, "ofNull != nullValue"),
+                () => Assert.That(ofNull                == nullValue,             "ofNull == nullValue"),
+                () => Assert.That(ofNull                != nullValue,             Is.False, "ofNull != nullValue"),
                 () => Assert.That((ofNull == nullValue) == (nullValue == ofNull), "(ofNull == nullValue) == (nullValue == ofNull)"),
                 () => Assert.That((ofNull != nullValue) == (nullValue != ofNull), "(ofNull != nullValue) == (nullValue != ofNull)"),
                 // vs. nullOptional
-                () => Assert.That(ofNull == nullOptional,                               "ofNull == nullOptional"),
-                () => Assert.That(ofNull != nullOptional,                               Is.False, "ofNull != nullOptional"),
+                () => Assert.That(ofNull                   == nullOptional,             "ofNull == nullOptional"),
+                () => Assert.That(ofNull                   != nullOptional,             Is.False, "ofNull != nullOptional"),
                 () => Assert.That((ofNull == nullOptional) == (nullOptional == ofNull), "(ofNull == nullOptional) == (nullOptional == ofNull)"),
                 () => Assert.That((ofNull != nullOptional) == (nullOptional != ofNull), "(ofNull != nullOptional) == (nullOptional != ofNull)"),
                 // vs. nullInterface
@@ -208,6 +209,25 @@ namespace BrandonUtils.Tests.Standalone.Collections {
         public void ToOptional_MultipleItems() {
             var ls       = new[] { 1, 2, 3 };
             var optional = ls.ToOptional();
+        }
+
+        #endregion
+
+        #region ToString
+
+        public static (Optional<object>, string)[] GetOptionalToStringExpectations() {
+            return new[] {
+                (new Optional<object>(5), "Optional<Object>[5]"),
+                (new Optional<object>(), $"Optional<Object>[{Optional.EmptyPlaceholder}]"),
+                (new Optional<object>(null), $"Optional<Object>[{new PrettificationSettings().NullPlaceholder.Value}]"),
+                (new Optional<object>(new Optional<object>(new Optional<object>("yolo"))), "Optional<Object>[Optional<Object>[Optional<Object>[yolo]]]")
+            };
+        }
+
+        [Test]
+        public void OptionalToString([ValueSource(nameof(GetOptionalToStringExpectations))] (Optional<object>, string) expectation) {
+            var (optional, expectedString) = expectation;
+            Assert.That(optional.ToString(), Is.EqualTo(expectedString));
         }
 
         #endregion

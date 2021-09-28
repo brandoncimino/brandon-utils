@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone.Reflection {
     public static class ReflectionException {
-        private static readonly PrettificationSettings PrettificationSettings = PrettificationFlags.IncludeTypeLabels;
+        private static readonly PrettificationSettings PrettificationSettings = TypeNameStyle.Full;
 
         internal static ArgumentException NotAFieldException([NotNull] MemberInfo notField, Exception innerException = null) {
             // TODO: Put the DeclaringType.Name pattern into a prettifier

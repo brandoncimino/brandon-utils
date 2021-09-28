@@ -12,15 +12,17 @@ using NUnit.Framework.Constraints;
 
 namespace BrandonUtils.Testing {
     [PublicAPI]
-    public abstract class MultipleAsserter<TSelf, TActual> where TSelf : MultipleAsserter<TSelf, TActual>, new() {
+    public abstract class MultipleAsserter<TSelf, TActual> : IMultipleAsserter where TSelf : MultipleAsserter<TSelf, TActual>, new() {
+        private const string HeadingIcon = "🧪";
+
         /// <summary>
         /// The actual value being asserted against (if there is one)
         /// </summary>
-        public Optional<TActual> Actual;
-
-        private TActual GetActual() => Actual.Value;
+        private Optional<ActualValueDelegate<TActual>> Actual;
 
         [CanBeNull] public Func<string> HeadingSupplier { get; set; }
+
+        public int Indent { get; set; }
 
         [ItemNotNull]
         internal IList<Action> Actions_AgainstAnything { get; } = new List<Action>();
@@ -31,28 +33,28 @@ namespace BrandonUtils.Testing {
         [ItemNotNull]
         internal IList<IResolveConstraint> Constraints_AgainstActual { get; } = new List<IResolveConstraint>();
 
-        internal IList<(object, IResolveConstraint)> Constraints_AgainstAnything { get; } = new List<(object, IResolveConstraint)>();
+        internal IList<(object, IResolveConstraint)>                      Constraints_AgainstAnything { get; } = new List<(object, IResolveConstraint)>();
+        internal IList<(ActualValueDelegate<object>, IResolveConstraint)> Constraints_AgainstDelegate { get; } = new List<(ActualValueDelegate<object>, IResolveConstraint)>();
+
+        internal IList<IMultipleAsserter> Asserters { get; } = new List<IMultipleAsserter>();
 
         internal IList<(Func<TActual, object>, IResolveConstraint)> Constraints_AgainstTransformation { get; } = new List<(Func<TActual, object>, IResolveConstraint)>();
 
-        protected abstract Action<string>                      ActionOnFailure          { get; }
-        protected abstract Action<TActual, IResolveConstraint> ConstraintResolver       { get; }
-        protected abstract Action<object, IResolveConstraint>  ObjectConstraintResolver { get; }
+        protected abstract Action<string>                                          ActionOnFailure            { get; }
+        protected abstract Action<TActual, IResolveConstraint>                     ConstraintResolver         { get; }
+        protected abstract Action<ActualValueDelegate<object>, IResolveConstraint> DelegateConstraintResolver { get; }
+        protected abstract Action<object, IResolveConstraint>                      ObjectConstraintResolver   { get; }
 
         private Optional<Exception> ShortCircuitException;
 
         protected MultipleAsserter() { }
 
-        protected MultipleAsserter(TActual actual) {
-            Actual = actual;
+        protected MultipleAsserter(TActual actual) : this(() => actual) {
+            Actual = new Optional<ActualValueDelegate<TActual>>(() => actual);
         }
 
-        /// <summary>
-        /// A factory-method equivalent to a no-argument constructor.
-        /// </summary>
-        /// <returns>a new <see cref="TSelf"/> instance</returns>
-        public static TSelf New() {
-            return new TSelf();
+        protected MultipleAsserter(ActualValueDelegate<TActual> actualValueDelegate) {
+            Actual = actualValueDelegate;
         }
 
         private TSelf Self => this as TSelf;
@@ -61,7 +63,13 @@ namespace BrandonUtils.Testing {
 
         [MustUseReturnValue]
         public TSelf Against([CanBeNull] TActual actual) {
-            Actual = actual;
+            Actual = new Optional<ActualValueDelegate<TActual>>(() => actual);
+            return Self;
+        }
+
+        [MustUseReturnValue]
+        public TSelf Against([NotNull] ActualValueDelegate<TActual> actualValueDelegate) {
+            Actual = actualValueDelegate;
             return Self;
         }
 
@@ -137,7 +145,22 @@ namespace BrandonUtils.Testing {
 
         #endregion
 
+        #region Constraints_AgainstDelegate
+
+        [MustUseReturnValue]
+        public TSelf And(ActualValueDelegate<object> testDelegate, IResolveConstraint constraint) {
+            Constraints_AgainstDelegate.AddNonNull((testDelegate, constraint));
+            return Self;
+        }
+
+        #endregion
+
         #region Constraints_AgainstTransformation
+
+        [MustUseReturnValue]
+        public TSelf And(Func<TActual, object> actualTransformation, IResolveConstraint constraint) {
+            return And((actualTransformation, constraint));
+        }
 
         [MustUseReturnValue]
         public TSelf And((Func<TActual, object>, IResolveConstraint) constraint) {
@@ -148,6 +171,22 @@ namespace BrandonUtils.Testing {
         [MustUseReturnValue]
         public TSelf And([CanBeNull] IEnumerable<(Func<TActual, object>, IResolveConstraint)> constraints) {
             Constraints_AgainstTransformation.AddNonNull(constraints);
+            return Self;
+        }
+
+        #endregion
+
+        #region Asserters
+
+        [MustUseReturnValue]
+        public TSelf And([CanBeNull] IMultipleAsserter asserter) {
+            Asserters.AddNonNull(asserter);
+            return Self;
+        }
+
+        [MustUseReturnValue]
+        public TSelf And([CanBeNull] [ItemCanBeNull] IEnumerable<IMultipleAsserter> asserters) {
+            Asserters.AddNonNull(asserters);
             return Self;
         }
 
@@ -171,6 +210,16 @@ namespace BrandonUtils.Testing {
 
         #endregion
 
+        #region With Indent
+
+        [MustUseReturnValue]
+        public TSelf WithIndent(int indent) {
+            Indent = indent;
+            return Self;
+        }
+
+        #endregion
+
         #endregion
 
         #region Executing Test Assertions
@@ -188,41 +237,54 @@ namespace BrandonUtils.Testing {
         }
 
         private IAssertable Test_Action_AgainstActual([NotNull] Action<TActual> action) {
-            if (Actual.IsEmpty()) {
-                throw ActualIsEmptyException($"Could not execute the {action.GetType().Prettify()} {action.Method.Name}");
-            }
-
-            return new Assertable<TActual>(Actual.Value, action);
+            var actualValue = MustGetActualValue($"Could not execute the {action.GetType().Prettify()} {action.Method.Name}");
+            return new Assertable<TActual>(actualValue, action);
         }
 
         private IAssertable Test_Constraint_AgainstActual([NotNull] IResolveConstraint constraint) {
+            var actualValue = MustGetActualValue(constraint);
+            return new Assertable<TActual>(actualValue, constraint, ConstraintResolver);
+        }
+
+        private IAssertable Test_Constraint_AgainstAnything((object, IResolveConstraint) constraint_againstAnything) {
+            var (actual, resolveConstraint) = constraint_againstAnything;
+            return new Assertable<object>(actual, resolveConstraint, ObjectConstraintResolver);
+        }
+
+        private IAssertable Test_Constraint_AgainstDelegate((ActualValueDelegate<object>, IResolveConstraint) constraint_againstDelegate) {
+            var (tDelegate, constraint) = constraint_againstDelegate;
+            return new Assertable<object>(tDelegate, constraint, DelegateConstraintResolver);
+        }
+
+        private IAssertable Test_Constraint_AgainstTransformation((Func<TActual, object>, IResolveConstraint) constraintAgainstTransformation) {
+            var (transformation, constraint) = constraintAgainstTransformation;
+            var actualValue = MustGetActualValue(constraint);
+            return new Assertable<object>(() => transformation.Invoke(actualValue), constraint, DelegateConstraintResolver);
+        }
+
+        private IAssertable Test_Asserter(IMultipleAsserter asserter) {
+            return Test_Action_AgainstAnything(asserter.Invoke);
+        }
+
+        #endregion
+
+        #region Validations / Exceptions
+
+        private TActual MustGetActualValue(string message) {
+            if (Actual.IsEmpty()) {
+                throw ActualIsEmptyException(message);
+            }
+
+            return Actual.Value.Invoke();
+        }
+
+        private TActual MustGetActualValue(IResolveConstraint constraint) {
             if (Actual.IsEmpty()) {
                 throw ActualIsEmptyException(constraint);
             }
 
-            return new Assertable<TActual>(Actual.Value, constraint, ConstraintResolver);
+            return Actual.Value.Invoke();
         }
-
-        private IAssertable Test_Constraint_AgainstAnything([CanBeNull] object actual, [NotNull] IResolveConstraint constraint) {
-            return new Assertable<object>(actual, constraint, ObjectConstraintResolver);
-        }
-
-        private IAssertable Test_Constraint_AgainstAnything((object, IResolveConstraint) constraint) {
-            var (actual, resolveConstraint) = constraint;
-            return Test_Constraint_AgainstAnything(actual, resolveConstraint);
-        }
-
-        private IAssertable Test_Constraint_AgainstTransformation((Func<TActual, object>, IResolveConstraint) constraint) {
-            var (transformation, resolveConstraint) = constraint;
-            if (Actual.IsEmpty()) {
-                throw ActualIsEmptyException(resolveConstraint);
-            }
-
-            var transformed = Actual.Select(transformation.Invoke);
-            return Test_Constraint_AgainstAnything(transformed, resolveConstraint);
-        }
-
-        #endregion
 
         private InvalidOperationException ActualIsEmptyException(IResolveConstraint constraint) {
             return ActualIsEmptyException($"Could not convert the {constraint.GetType().Name} to an {nameof(Action)}");
@@ -232,14 +294,19 @@ namespace BrandonUtils.Testing {
             return new InvalidOperationException($"{message}: this {GetType().Prettify()} doesn't have {nameof(Actual)} value!");
         }
 
+        #endregion
+
         private IEnumerable<IAssertable> TestEverything() {
             return Actions_AgainstAnything.Select(Test_Action_AgainstAnything)
                                           .Concat(Actions_AgainstActual.Select(Test_Action_AgainstActual))
                                           .Concat(Constraints_AgainstActual.Select(Test_Constraint_AgainstActual))
                                           .Concat(Constraints_AgainstAnything.Select(Test_Constraint_AgainstAnything))
-                                          .Concat(Constraints_AgainstTransformation.Select(Test_Constraint_AgainstTransformation));
+                                          .Concat(Constraints_AgainstTransformation.Select(Test_Constraint_AgainstTransformation))
+                                          .Concat(Constraints_AgainstDelegate.Select(Test_Constraint_AgainstDelegate))
+                                          .Concat(Asserters.Select(Test_Asserter));
         }
 
+        [ContractAnnotation("=> stop")]
         public void ShortCircuit(Exception shortCircuitException) {
             ShortCircuitException = shortCircuitException;
             Invoke();
@@ -247,12 +314,12 @@ namespace BrandonUtils.Testing {
 
         #region formatting
 
-        private static IEnumerable<string> FormatFailures([InstantHandle] IEnumerable<IAssertable> testResults) {
+        private IEnumerable<string> FormatFailures([InstantHandle] IEnumerable<IAssertable> testResults) {
             testResults = testResults.ToList();
             var failures = testResults.Where(it => it.Failed).ToList();
             return new List<string>()
                    .Append($"[{failures.Count}/{testResults.Count()}] assertions failed:")
-                   .Concat(testResults.SelectMany(AssertableExtensions.FormatAssertable));
+                   .Concat(testResults.SelectMany(it => it.FormatAssertable(Indent + 1)));
         }
 
         private string FormatMultipleAssertionMessage(IEnumerable<IAssertable> failures) {
@@ -261,6 +328,7 @@ namespace BrandonUtils.Testing {
                    .Concat(FormatShortCircuitException())
                    .Concat(FormatFailures(failures))
                    .ToStringLines()
+                   .Indent(Indent)
                    .JoinLines();
         }
 

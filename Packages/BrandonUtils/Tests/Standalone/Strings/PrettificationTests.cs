@@ -29,26 +29,47 @@ namespace BrandonUtils.Tests.Standalone.Strings {
         }
 
         [Test]
-        [TestCase(typeof(int), nameof(Int32))]
+        [TestCase(typeof(int), nameof(Int32), nameof(Int32), nameof(Int32))]
         [TestCase(
             typeof(KeyValuePair<DayOfWeek, string>),
-            "KeyValuePair<DayOfWeek, String>"
+            "KeyValuePair<DayOfWeek, String>",
+            "KeyValuePair<,>",
+            "KeyValuePair<>"
         )]
         [TestCase(
             typeof(List<KeyValuePair<Collection<short>, uint>>),
-            "List<KeyValuePair<Collection<Int16>, UInt32>>"
+            "List<KeyValuePair<Collection<Int16>, UInt32>>",
+            "List<>",
+            "List<>"
         )]
-        public void PrettifyType(Type actualType, string expectedString) {
+        public void PrettifyType(Type actualType, string expected_full, string expected_short, string expected_none) {
+            var settings_full = new PrettificationSettings() {
+                TypeLabelStyle = { Value = TypeNameStyle.Full }
+            };
+            var settings_short = new PrettificationSettings() {
+                TypeLabelStyle = { Value = TypeNameStyle.Short }
+            };
+            var settings_none = new PrettificationSettings() {
+                TypeLabelStyle = { Value = TypeNameStyle.None }
+            };
             Console.WriteLine(
                 new[] {
                     $"ToString: {actualType}",
                     $"Name:     {actualType.Name}",
                     $"FullName: {actualType.FullName}",
                     $"Prettify: {actualType.Prettify()}",
-                    $"DeclaringType:    {actualType.DeclaringType}"
+                    $"P. type:  {actualType.PrettifyType()}",
+                    $"Full:     {actualType.PrettifyType(settings_full)}",
+                    $"Short:    {actualType.PrettifyType(settings_short)}",
+                    $"None:     {actualType.PrettifyType(settings_none)}",
+                    $"DeclaringType:    {actualType.DeclaringType}",
                 }.JoinLines()
             );
-            Assert.That(actualType.Prettify(), Is.EqualTo(expectedString));
+            Asserter.Against(actualType)
+                    .And(it => it.PrettifyType(settings_full),  Is.EqualTo(expected_full))
+                    .And(it => it.PrettifyType(settings_none),  Is.EqualTo(expected_none))
+                    .And(it => it.PrettifyType(settings_short), Is.EqualTo(expected_short))
+                    .Invoke();
         }
 
         [Test]
@@ -221,10 +242,19 @@ Int32 (Int32, String)
             var ls = new List<int>() { 1, 2, 3 };
             return new[] {
                 new Expectation() { Original = ls, Expected = "[1, 2, 3]" },
-                new Expectation() { Original = ls, Settings = PrettificationFlags.IncludeTypeLabels, Expected = "List<Int32>[1, 2, 3]" },
                 new Expectation() {
                     Original = ls,
-                    Settings = new PrettificationSettings() { PreferredLineStyle = PrettificationSettings.LineStyle.Multi, Flags = PrettificationFlags.IncludeTypeLabels },
+                    Settings = new PrettificationSettings() {
+                        TypeLabelStyle = { Value = TypeNameStyle.Full }
+                    },
+                    Expected = "List<Int32>[1, 2, 3]"
+                },
+                new Expectation() {
+                    Original = ls,
+                    Settings = new PrettificationSettings() {
+                        PreferredLineStyle = { Value = LineStyle.Multi },
+                        TypeLabelStyle     = { Value = TypeNameStyle.Full }
+                    },
                     Expected = @"
 List<Int32>[
   1
@@ -257,6 +287,22 @@ List<Int32>[
             var pretty  = enumSet.Prettify();
             Console.WriteLine(pretty);
             Assert.That(pretty, Is.EqualTo(expectedString));
+        }
+
+        [Test]
+        public void TypeLabelStyle([Values] TypeNameStyle style) {
+            var settings = new PrettificationSettings() {
+                TypeLabelStyle = { Value = style }
+            };
+            var type = typeof(Dictionary<int, List<string>>);
+            Console.WriteLine(
+                new Dictionary<object, object>() {
+                    [nameof(type)]      = type,
+                    [nameof(type.Name)] = type.Name,
+                    ["pretty"]          = type.PrettifyType(settings),
+                    ["style"]           = style
+                }.Prettify(settings)
+            );
         }
     }
 }

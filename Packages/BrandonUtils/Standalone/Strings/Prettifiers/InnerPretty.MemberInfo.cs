@@ -1,15 +1,30 @@
-﻿using System.Reflection;
+﻿using System.Linq;
+using System.Reflection;
+
+using BrandonUtils.Standalone.Collections;
+
+using FowlFever.Conjugal.Affixing;
 
 namespace BrandonUtils.Standalone.Strings.Prettifiers {
     internal static partial class InnerPretty {
         public static string PrettifyMemberInfo(MemberInfo memberInfo, PrettificationSettings settings = default) {
-            var str = $"{memberInfo.DeclaringType}.{memberInfo.Name}";
+            var typeName   = memberInfo.DeclaringType?.PrettifyType().Suffix(".");
+            var memberName = memberInfo.Name;
+            return $"{typeName}{memberName}".WithTypeLabel(memberInfo.GetType(), settings);
+        }
 
-            if (settings?.Flags.HasFlag(PrettificationFlags.IncludeTypeLabels) == true) {
-                str = $"[{memberInfo.GetType().PrettifyType()}]{str}";
-            }
+        public static string PrettifyMethodInfo(MethodInfo methodInfo, PrettificationSettings settings = default) {
+            return $"{PrettifyMemberInfo(methodInfo)}({PrettifyParameters(methodInfo)})";
+        }
 
-            return str;
+        private static string PrettifyParameters(MethodBase methodInfo, PrettificationSettings settings = default) {
+            return methodInfo.GetParameters()
+                             .Select(it => PrettifyParameterInfo(it, settings))
+                             .JoinString(", ");
+        }
+
+        public static string PrettifyParameterInfo(ParameterInfo parameterInfo, PrettificationSettings settings = default) {
+            return WithTypeLabel(parameterInfo.Name, parameterInfo.ParameterType, settings);
         }
     }
 }

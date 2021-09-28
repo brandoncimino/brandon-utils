@@ -28,8 +28,8 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
             keys.Insert(0, keyType);
             vals.Insert(0, valType);
 
-            var keyLines = keys.Select(it => it.Prettify(PrettificationSettings.LineStyle.Single)).ToList();
-            var valLines = vals.Select(it => it.Prettify(PrettificationSettings.LineStyle.Single)).ToList();
+            var keyLines = keys.Select(it => it.Prettify(LineStyle.Single)).ToList();
+            var valLines = vals.Select(it => it.Prettify(LineStyle.Single)).ToList();
 
             var keyWidth = Math.Min(keyLines.LongestLine(), maxColWidth);
             var valWidth = Math.Min(valLines.LongestLine(), maxColWidth);
@@ -54,8 +54,8 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
             keys.Insert(0, keyType);
             vals.Insert(0, valType);
 
-            var keyLines = keys.Select(it => it.Prettify(PrettificationSettings.LineStyle.Single)).ToList();
-            var valLines = vals.Select(it => it.Prettify(PrettificationSettings.LineStyle.Single)).ToList();
+            var keyLines = keys.Select(it => it.Prettify(LineStyle.Single)).ToList();
+            var valLines = vals.Select(it => it.Prettify(LineStyle.Single)).ToList();
 
             var keyWidth = Math.Min(keyLines.LongestLine(), maxColWidth);
             var valWidth = Math.Min(valLines.LongestLine(), maxColWidth);
@@ -74,7 +74,7 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
         }
 
         private static string PrettifyCell(object cellValue, int columnWidth) {
-            var str = cellValue.Prettify(PrettificationSettings.LineStyle.Single);
+            var str = cellValue.Prettify(LineStyle.Single);
             return str.ForceToLength(columnWidth);
         }
 

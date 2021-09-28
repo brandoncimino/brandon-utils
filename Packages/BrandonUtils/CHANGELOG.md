@@ -7,6 +7,17 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.32.0]
+
+### Added
+
+- Prettifiers for `MethodInfo` and `ParameterInfo`
+- Improved prettification of `Type`s
+- `TypeNameStyle` enum
+- Deprecated `PrettificationFlags`
+- Made multiple assertion messages look nicer
+- Made `IOptional.ToString()`s look better
+
 ## [2.31.1] - 9/25/2021
 
 ### Added

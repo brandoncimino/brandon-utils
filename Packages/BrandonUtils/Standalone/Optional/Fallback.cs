@@ -42,7 +42,7 @@ namespace BrandonUtils.Standalone.Optional {
 
         public int Count => ExplicitValue.Count;
 
-        public Fallback(T fallbackValue = default) {
+        public Fallback([CanBeNull] T fallbackValue = default) {
             FallbackValue = fallbackValue;
         }
 

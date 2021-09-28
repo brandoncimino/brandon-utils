@@ -34,11 +34,10 @@ namespace BrandonUtils.Standalone.Exceptions {
         /// <param name="messagePrefix">A user-provided message, which will be <b>prepended</b> to the built-in message.</param>
         /// <param name="innerException">The <see cref="Exception"/> that caused this, if any.</param>
         public EnumNotInSetException(
-            [NotNull] IEnumerable<T> superset,
-            [CanBeNull]
-            IEnumerable<T> expectedValues,
-            string    messagePrefix  = null,
-            Exception innerException = null
+            [NotNull]   IEnumerable<T> superset,
+            [CanBeNull] IEnumerable<T> expectedValues,
+            string                     messagePrefix  = null,
+            Exception                  innerException = null
         ) : base(messagePrefix, innerException) {
             _baseMessage  = BuildMessage(superset, expectedValues);
             MessagePrefix = messagePrefix;
@@ -53,7 +52,7 @@ namespace BrandonUtils.Standalone.Exceptions {
 
         private string BuildMessage([NotNull] IEnumerable<T> superset, [CanBeNull] IEnumerable<T> valuesThatShouldBeThere) {
             PrettificationSettings prettySettings = new PrettificationSettings() {
-                Flags = PrettificationFlags.IncludeTypeLabels
+                TypeLabelStyle = { Value = TypeNameStyle.Full }
             };
 
             var badValues = valuesThatShouldBeThere?.Except(superset);

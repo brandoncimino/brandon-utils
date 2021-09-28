@@ -36,7 +36,7 @@ namespace BrandonUtils.Standalone.Enums {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         [Obsolete("Please use " + nameof(BEnum) + "." + nameof(BEnum.InvalidEnumArgumentException) + " instead")]
-        public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(string argumentName, T enumValue) where T : Enum {
+        public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(string argumentName, T enumValue) where T : struct, Enum {
             return BEnum.InvalidEnumArgumentException(argumentName, enumValue);
         }
 

@@ -195,7 +195,7 @@ namespace BrandonUtils.Standalone.Reflection {
                 return (T)value;
             }
             catch (InvalidCastException e) {
-                throw e.ModifyMessage($"A member for {variableInfo.Prettify(PrettificationFlags.IncludeTypeLabels)} was found on the [{obj.GetType().Name}]'{obj}', but it couldn't be cast to a {typeof(T).PrettifyType()}!");
+                throw e.ModifyMessage($"A member for {variableInfo.Prettify(TypeNameStyle.Full)} was found on the [{obj.GetType().Name}]'{obj}', but it couldn't be cast to a {typeof(T).PrettifyType()}!");
             }
         }
 

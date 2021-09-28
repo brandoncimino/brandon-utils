@@ -65,7 +65,7 @@ namespace BrandonUtils.Standalone.Optional {
             return ((IEnumerable)GetEnumerable()).GetEnumerator();
         }
 
-        public bool Equals(T other) => Optional.AreEqual(this,            other);
+        public bool Equals(T            other) => Optional.AreEqual(this, other);
         public bool Equals(IOptional<T> other) => Optional.AreEqual(this, other);
 
         public static bool operator ==(Optional<T> a, IOptional<T> b) => Optional.AreEqual(a, b);
@@ -82,7 +82,6 @@ namespace BrandonUtils.Standalone.Optional {
         public static bool operator !=(Optional<T> a, T b) => !Optional.AreEqual(a, b);
 
         public override string ToString() {
-            // return $"{GetType().Name}<{this.ItemType().Name}>[{(HasValue ? (Value == null ? "null" : Value+"") : "")}]";
             return Optional.ToString(this);
         }
 
