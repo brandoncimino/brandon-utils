@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Reflection;
 
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Optional;
+using BrandonUtils.Standalone.Strings;
 
 using NUnit.Framework;
 
@@ -21,7 +23,7 @@ namespace BrandonUtils.Testing {
         public string Nickname { get; }
 
         public Assertable(Action assertion) {
-            Nickname = assertion.Method.Name;
+            Nickname = GetNickname(assertion.Method);
 
             try {
                 assertion.Invoke();
@@ -35,8 +37,12 @@ namespace BrandonUtils.Testing {
             }
         }
 
+        private static string GetNickname(MethodInfo methodInfo) {
+            return methodInfo.Prettify(AssertableExtensions.AssertablePrettificationSettings);
+        }
+
         public override string ToString() {
-            return this.FormatAssertable().JoinLines();
+            return this.FormatAssertable().JoinLines() ?? base.ToString();
         }
     }
 }
