@@ -484,7 +484,7 @@ namespace BrandonUtils.Standalone.Reflection {
 
         /// <param name="type">a <see cref="Type"/> that might be generic</param>
         /// <returns><see cref="Type.IsGenericType"/> || <see cref="Type.IsGenericTypeDefinition"/></returns>
-        public static bool IsGenericTypeOrDefinition(this Type type) {
+        public static bool IsGenericTypeOrDefinition([NotNull] this Type type) {
             return type.IsGenericType || type.IsGenericTypeDefinition;
         }
 
@@ -514,7 +514,7 @@ namespace BrandonUtils.Standalone.Reflection {
         /// </remarks>
         /// <param name="type">a <see cref="Type"/></param>
         /// <returns>true if the given <see cref="Type"/> is one of the <see cref="Tuple{T}"/> or <see cref="ValueTuple{T1}"/> types</returns>
-        public static bool IsTupleType(this Type type) {
+        public static bool IsTupleType([NotNull] this Type type) {
             return type.IsGenericTypeOrDefinition() && TupleTypes.Any(it => type.GetGenericTypeDefinition().IsAssignableFrom(it));
         }
 
