@@ -4,6 +4,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
+using JetBrains.Annotations;
+
+using Pure = System.Diagnostics.Contracts.PureAttribute;
+
 namespace BrandonUtils.Standalone {
     public static class PrimitiveUtils {
         #region Truthiness
@@ -100,7 +104,11 @@ namespace BrandonUtils.Standalone {
         /// </summary>
         /// <param name="value">some random junk</param>
         /// <returns>true if the value is of a numeric type</returns>
-        public static bool IsNumber(this object value) {
+        public static bool IsNumber([NotNull] this object value) {
+            if (value == null) {
+                throw new ArgumentNullException(nameof(value));
+            }
+
             return NumericTypes.Contains(value.GetType());
         }
 
