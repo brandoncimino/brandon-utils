@@ -72,24 +72,25 @@ namespace BrandonUtils.Tests.Standalone.Clerical {
 
         [TestCase("a")]
         [TestCase("a/b/c")]
-        [TestCase("")]
         [TestCase("/")]
         [TestCase("/./..//a")]
         public void Directory_To_Uri(string directory) {
-            var di  = new DirectoryInfo(directory);
-            var uri = di.Uri();
+            var di = new DirectoryInfo(directory);
             AssertAll.Of(
-                () => Assert.That(uri.IsFile,     Is.False),
-                () => Assert.That(uri.ToString(), Is.EqualTo(directory.AppendIfMissing("/")))
+                () => Assert.That(di.ToUri(),              Has.Property(nameof(Uri.IsFile)).True),
+                () => Assert.That(di.ToUri().AbsolutePath, Is.EqualTo(BPath.EnsureTrailingSeparator(di.FullName)))
             );
         }
 
+        [TestCase("a")]
+        [TestCase("a/b/c")]
+        [TestCase("/")]
+        [TestCase("/./..//a")]
         public void File_To_Uri(string file) {
-            var fi  = new FileInfo(file);
-            var uri = fi.Uri();
+            var fi = new FileInfo(file);
             AssertAll.Of(
-                () => Assert.That(uri,            Is.True),
-                () => Assert.That(uri.ToString(), Is.EqualTo(file))
+                () => Assert.That(fi.ToUri(),              Has.Property(nameof(Uri.IsFile)).True),
+                () => Assert.That(fi.ToUri().AbsolutePath, Is.EqualTo(BPath.NormalizeSeparators(fi.FullName)))
             );
         }
 

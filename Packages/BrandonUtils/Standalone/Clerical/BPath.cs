@@ -6,6 +6,8 @@ using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Optional;
 using BrandonUtils.Standalone.Strings;
 
+using FowlFever.Conjugal.Affixing;
+
 using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone.Clerical {
@@ -15,6 +17,7 @@ namespace BrandonUtils.Standalone.Clerical {
     [PublicAPI]
     public static class BPath {
         internal static readonly RegexGroup ExtensionGroup = new RegexGroup(nameof(ExtensionGroup), @"(\.[^.]+?)+$");
+        internal static          char[]     Separators     = Enum.GetValues(typeof(DirectorySeparator)).Cast<DirectorySeparator>().Select(DirectorySeparatorExtensions.ToChar).ToArray();
 
         public static Failable ValidatePath(string maybePath) {
             Action action = () => _ = Path.GetFullPath(maybePath);
@@ -69,6 +72,35 @@ namespace BrandonUtils.Standalone.Clerical {
             var fileName    = Path.GetFileName(path);
             var firstPeriod = fileName.IndexOf(".", StringComparison.Ordinal);
             return firstPeriod < 0 ? fileName : fileName.Substring(0, firstPeriod);
+        }
+
+        [ContractAnnotation("null => false")]
+        public static bool EndsWithSeparator([CanBeNull] string path) {
+            path = path?.TrimEnd();
+            return path != null && Separators.Any(it => path.EndsWith(it.ToString()));
+        }
+
+        [ContractAnnotation("null => false")]
+        public static bool StartsWithSeparator([CanBeNull] string path) {
+            path = path?.TrimStart();
+            return path != null && Separators.Any(it => path.StartsWith(it.ToString()));
+        }
+
+        public static string EnsureTrailingSeparator(string path, DirectorySeparator separator = DirectorySeparator.Universal) {
+            path = NormalizeSeparators(path, separator);
+            return EndsWithSeparator(path) ? path : path.TrimEnd().Suffix(separator.ToChar().ToString());
+        }
+
+        public static string StripLeadingSeparator(string path, DirectorySeparator separator = DirectorySeparator.Universal) {
+            path = NormalizeSeparators(path, separator);
+            return StartsWithSeparator(path) ? path.TrimStart().Prefix(separator.ToChar().ToString()) : path;
+        }
+
+        public static string NormalizeSeparators(string path, DirectorySeparator separator = DirectorySeparator.Universal) {
+            return Separators.Aggregate(
+                path.Trim(),
+                (current, c) => current.Replace(c, separator.ToChar())
+            );
         }
     }
 }

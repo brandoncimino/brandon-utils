@@ -7,7 +7,13 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
-## [2.32.0]
+## [2.32.1] - 9/27/2021
+
+### Added
+
+- `BPath` methods to handle separators
+
+## [2.32.0] - 9/27/2021
 
 ### Added
 
