@@ -238,8 +238,10 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="separator"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static string JoinString<T>(this IEnumerable<T> enumerable, string separator = "") {
-            return string.Join(separator, enumerable);
+        [ContractAnnotation("enumerable:null => null")]
+        [CanBeNull]
+        public static string JoinString<T>([CanBeNull] [ItemCanBeNull] this IEnumerable<T> enumerable, string separator = "") {
+            return enumerable == null ? null : string.Join(separator, enumerable);
         }
 
         /// <summary>
@@ -248,8 +250,10 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="enumerable">the <see cref="IEnumerable{T}"/> whose entries will be joined</param>
         /// <typeparam name="T">the type of each <see cref="IEnumerable{T}"/> entry </typeparam>
         /// <returns>the result of <see cref="string.Join(string,System.Collections.Generic.IEnumerable{string})"/></returns>
-        public static string JoinLines<T>(this IEnumerable<T> enumerable) {
-            return string.Join("\n", enumerable);
+        [CanBeNull]
+        [ContractAnnotation("enumerable:null => null")]
+        public static string JoinLines<T>([CanBeNull] [ItemCanBeNull] this IEnumerable<T> enumerable) {
+            return enumerable == null ? null : string.Join("\n", enumerable);
         }
 
         /// <summary>
