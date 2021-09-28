@@ -6,7 +6,6 @@ using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone.Strings {
     public enum TypeNameStyle {
-        Default,
         None,
         Full,
         Short
