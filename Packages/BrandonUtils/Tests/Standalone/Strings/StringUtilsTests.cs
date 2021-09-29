@@ -415,6 +415,51 @@ a
             Assert.That(actualLines, Is.EqualTo(expectedLines));
         }
 
+        [Test]
+        public void IndentWithLabel() {
+            var lines = new[] {
+                "a",
+                "b",
+                "c",
+                " d"
+            };
+
+            var label  = "YOLO";
+            var joiner = " - ";
+
+            var expectedLines = new[] {
+                "YOLO - a",
+                "       b",
+                "       c",
+                "        d"
+            };
+
+
+            var actualLines = lines.IndentWithLabel(label, joiner).ToArray();
+            Console.WriteLine($"{nameof(actualLines)}\n{actualLines.JoinLines()}");
+            Console.WriteLine($"{nameof(expectedLines)}\n{expectedLines.JoinLines()}");
+
+            Assert.That(actualLines, Is.EqualTo(expectedLines));
+        }
+
+        [Test]
+        public void FormatNUnitException() {
+            var exc = GetNUnitFailure(8, 5);
+
+            Console.WriteLine($"message:\n{exc.Message}\n");
+            Console.WriteLine($"stack:\n{exc.StackTrace}\n");
+        }
+
+        private Exception GetNUnitFailure(object actual, object expected) {
+            try {
+                Assert.That(actual, Is.EqualTo(expected));
+                return null;
+            }
+            catch (Exception e) {
+                return e;
+            }
+        }
+
         #endregion
     }
 }

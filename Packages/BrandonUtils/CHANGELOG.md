@@ -7,6 +7,17 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.33.0] - 9/29/2021
+
+### Added
+
+- Tons of fancy new `Clerical` stuff:
+  - `SaveManagerSettings`
+  - `ISaveSlot`
+    - `SaveSlot`
+    - `SimpleSaveSlot`
+  - Actual ability to `Save` and `Load` (as seen on TV / in `SaveFileTests`!)
+
 ## [2.32.1] - 9/27/2021
 
 ### Added

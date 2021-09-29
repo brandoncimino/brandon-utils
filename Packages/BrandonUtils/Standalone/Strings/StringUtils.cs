@@ -608,6 +608,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="obj">the original object</param>
         /// <param name="nullPlaceholder">the <see cref="string"/> returned when <paramref name="obj"/> is <c>null</c></param>
         /// <returns>the <see cref="object.ToString"/> representation of <paramref name="obj"/>, or <c>null</c></returns>
+        [NotNull]
         public static string ToString([CanBeNull] this object obj, [CanBeNull] string nullPlaceholder) {
             nullPlaceholder ??= Prettification.DefaultNullPlaceholder;
             return obj == null ? nullPlaceholder : obj.ToString();
@@ -649,19 +650,27 @@ namespace BrandonUtils.Standalone.Strings {
 
         #region {x}IfMissing
 
-        public static string PrependIfMissing(this string str, string prefix) {
+        [NotNull]
+        public static string PrependIfMissing([CanBeNull] this string str, [CanBeNull] string prefix) {
             return PrefixIfMissing(str, prefix);
         }
 
-        public static string PrefixIfMissing(this string str, string prefix) {
-            return str.StartsWith(prefix) ? str : str.Prefix(prefix);
+        [NotNull]
+        public static string PrefixIfMissing([CanBeNull] this string str, [CanBeNull] string prefix) {
+            str    ??= "";
+            prefix ??= "";
+            return str?.StartsWith(prefix) == true ? str : str.Prefix(prefix);
         }
 
-        public static string AppendIfMissing(this string str, string suffix) {
+        [NotNull]
+        public static string AppendIfMissing([CanBeNull] this string str, [CanBeNull] string suffix) {
             return SuffixIfMissing(str, suffix);
         }
 
-        public static string SuffixIfMissing(this string str, string suffix) {
+        [NotNull]
+        public static string SuffixIfMissing([CanBeNull] this string str, [CanBeNull] string suffix) {
+            str    ??= "";
+            suffix ??= "";
             return str.EndsWith(suffix) ? str : str.Suffix(suffix);
         }
 

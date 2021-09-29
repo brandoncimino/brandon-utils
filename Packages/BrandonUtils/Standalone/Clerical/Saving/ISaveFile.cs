@@ -11,6 +11,9 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
     /// <typeparam name="TData">the type of the serialized <see cref="Data"/></typeparam>
     [PublicAPI]
     public interface ISaveFile<out TData> : IHasFileInfo where TData : ISaveData {
+        [NotNull] public string Nickname { get; }
+        public           bool   Exists   { get; }
+
         [NotNull] public SaveFolder SaveFolder { get; }
 
         [CanBeNull] public TData Data { get; }
@@ -26,10 +29,14 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
         /// <param name="duplicateFileResolution">determines what we should do when a file already exists</param>
         /// <param name="settings">optional <see cref="JsonSerializerSettings"/></param>
         /// <returns></returns>
-        public void Save(DuplicateFileResolution duplicateFileResolution, JsonSerializerSettings settings = default);
+        public void Save(DuplicateFileResolution duplicateFileResolution, [CanBeNull] JsonSerializerSettings settings = default);
 
-        public void Save(SaveManagerSettings    saveSettings = default);
-        public void Load(JsonSerializerSettings jsonSettings = default);
-        public void Load(SaveManagerSettings    saveSettings = default);
+        /**
+         * <inheritdoc cref="Save(BrandonUtils.Standalone.Clerical.DuplicateFileResolution,Newtonsoft.Json.JsonSerializerSettings)"/>
+         */
+        public void Save([CanBeNull] SaveManagerSettings saveSettings = default);
+
+        [NotNull]
+        public ISaveFile<TData> Load([CanBeNull] SaveManagerSettings saveSettings = default);
     }
 }

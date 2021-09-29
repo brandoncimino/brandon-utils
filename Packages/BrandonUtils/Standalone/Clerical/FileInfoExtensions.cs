@@ -180,6 +180,14 @@ namespace BrandonUtils.Standalone.Clerical {
 
         #region NewtonsoftJson Extensions
 
+        /// <summary>
+        /// <see cref="Read(System.IO.FileInfo)"/>s a <paramref name="fileInfo"/> and then <see cref="JsonConvert.DeserializeObject{T}(string)"/>s its content.
+        /// </summary>
+        /// <param name="fileInfo">the <see cref="FileInfo"/> being <see cref="Read(System.IO.FileInfo)"/> from</param>
+        /// <param name="settings">optional <see cref="JsonSerializerSettings"/></param>
+        /// <typeparam name="T">the <see cref="Type"/> that the content will be deserialized as</typeparam>
+        /// <returns>a new <typeparamref name="T"/> instance</returns>
+        [CanBeNull]
         public static T Deserialize<T>(
             [NotNull] this FileInfo               fileInfo,
             [CanBeNull]    JsonSerializerSettings settings = default
@@ -210,6 +218,8 @@ namespace BrandonUtils.Standalone.Clerical {
                 default:
                     throw BEnum.InvalidEnumArgumentException(nameof(duplicateFileResolution), duplicateFileResolution);
             }
+
+            Console.WriteLine($"💾 → {fileInfo.ToUri()}");
         }
 
         public static void SerializeCautiously<T>(
