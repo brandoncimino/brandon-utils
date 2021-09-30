@@ -240,7 +240,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <returns></returns>
         [ContractAnnotation("enumerable:null => null")]
         [CanBeNull]
-        public static string JoinString<T>([CanBeNull] [ItemCanBeNull] this IEnumerable<T> enumerable, string separator = "") {
+        public static string JoinString<T>([CanBeNull] [ItemCanBeNull] this IEnumerable<T> enumerable, [CanBeNull] string separator = "") {
             return enumerable == null ? null : string.Join(separator, enumerable);
         }
 
