@@ -365,6 +365,30 @@ namespace BrandonUtils.Standalone.Strings {
             return $"{hRule}\n{middle}\n{hRule}";
         }
 
+        public static string Trim(this string input, string trimString) {
+            var esc   = Regex.Escape(trimString);
+            var reg   = new Regex($"^({esc})*(?<trimmed>.*?)({esc})*$");
+            var match = reg.Match(input);
+
+            return match.Success ? match.Groups["trimmed"].Value : input;
+        }
+
+        public static string TrimEnd(this string input, string trimString) {
+            var esc   = Regex.Escape(trimString);
+            var reg   = new Regex($@"^(?<trimmed>.*?)({esc})*$");
+            var match = reg.Match(input);
+
+            return match.Success ? match.Groups["trimmed"].Value : input;
+        }
+
+        public static string TrimStart(this string input, string trimString) {
+            var esc   = Regex.Escape(trimString);
+            var reg   = new Regex(@$"^({esc})*(?<trimmed>.*?)$");
+            var match = reg.Match(input);
+
+            return match.Success ? match.Groups["trimmed"].Value : input;
+        }
+
         #endregion
 
         /// <summary>
@@ -595,7 +619,9 @@ namespace BrandonUtils.Standalone.Strings {
                 return e.SelectMany(it => it.ToStringLines(nullPlaceholder)).SplitLines();
             }
 
-            return obj?.ToString().SplitLines() ?? new[] { nullPlaceholder };
+            return obj?.ToString().SplitLines() ?? new[] {
+                nullPlaceholder
+            };
         }
 
         #endregion
@@ -639,11 +665,21 @@ namespace BrandonUtils.Standalone.Strings {
         /// <summary>
         /// An alias for <see cref="IsNullOrWhiteSpace"/> matching Java's <a href="https://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/StringUtils.html#isBlank-java.lang.CharSequence-">StringUtils.isBlank()</a>
         /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
+        /// <param name="str">a <see cref="string"/></param>
+        /// <returns><see cref="IsNullOrWhiteSpace"/></returns>
         [ContractAnnotation("null => true", true)]
         public static bool IsBlank([CanBeNull] this string str) {
             return str.IsNullOrWhiteSpace();
+        }
+
+        /// <summary>
+        /// An alias for <see cref="IsNullOrWhiteSpace"/> matching Java's <a href="https://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/StringUtils.html#isBlank-java.lang.CharSequence-">StringUtils.isBlank()</a>
+        /// </summary>
+        /// <param name="str">a <see cref="string"/></param>
+        /// <returns><see cref="IsNullOrWhiteSpace"/></returns>
+        [ContractAnnotation("null => false", true)]
+        public static bool IsNotBlank([CanBeNull] this string str) {
+            return !str.IsBlank();
         }
 
         #endregion
@@ -672,6 +708,17 @@ namespace BrandonUtils.Standalone.Strings {
             str    ??= "";
             suffix ??= "";
             return str.EndsWith(suffix) ? str : str.Suffix(suffix);
+        }
+
+        internal static string JoinIfMissing([CanBeNull] this string first, [CanBeNull] string second, [NotNull] string separator) {
+            if (first.IsBlank() || second.IsBlank()) {
+                return $"{first}{second}".Trim();
+            }
+
+            var separatorPattern = Regex.Escape(separator);
+            // var endingPattern    = new Regex($"{}")
+
+            return first + second.SubstringAfter(separator);
         }
 
         #endregion

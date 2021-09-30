@@ -461,5 +461,36 @@ a
         }
 
         #endregion
+
+        #region Trim
+
+        [Test]
+        [TestCase("KEEPabc",     "abc", "KEEP")]
+        [TestCase("bcONEbcbc",   "bc",  "bcONE")]
+        [TestCase("bTWObbcbc",   "bc",  "bTWOb")]
+        [TestCase("a..........", ".",   "a")]
+        public void TrimEnd(string input, string trimString, string expected) {
+            Assert.That(input.TrimEnd(trimString), Is.EqualTo(expected));
+        }
+
+        [Test]
+        [TestCase("abcKEEP",     "abc", "KEEP")]
+        [TestCase("bcbcONEbcbc", "bc",  "ONEbcbc")]
+        [TestCase("5.[t]JK",     "5.",  "[t]JK")]
+        [TestCase("\\.\\.!!",    "\\.", "!!")]
+        public void TrimStart(string input, string trimString, string expected) {
+            Assert.That(input.TrimStart(trimString), Is.EqualTo(expected));
+        }
+
+        [Test]
+        [TestCase("--a--",                 "-",    "a")]
+        [TestCase("``jk`",                 "`",    "jk")]
+        [TestCase("#yolo",                 "yolo", "#")]
+        [TestCase("abc.abc.abc.!abc.abc.", "abc.", "!")]
+        public void Trim(string input, string trimString, string expected) {
+            Assert.That(input.Trim(trimString), Is.EqualTo(expected));
+        }
+
+        #endregion
     }
 }
