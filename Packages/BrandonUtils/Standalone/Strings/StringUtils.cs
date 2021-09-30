@@ -365,7 +365,14 @@ namespace BrandonUtils.Standalone.Strings {
             return $"{hRule}\n{middle}\n{hRule}";
         }
 
-        public static string Trim(this string input, string trimString) {
+        [CanBeNull]
+        [ContractAnnotation("input:null => null")]
+        [Pure]
+        public static string Trim([CanBeNull] this string input, [NotNull] string trimString) {
+            if (input == null) {
+                return null;
+            }
+
             var esc   = Regex.Escape(trimString);
             var reg   = new Regex($"^({esc})*(?<trimmed>.*?)({esc})*$");
             var match = reg.Match(input);
@@ -373,7 +380,14 @@ namespace BrandonUtils.Standalone.Strings {
             return match.Success ? match.Groups["trimmed"].Value : input;
         }
 
-        public static string TrimEnd(this string input, string trimString) {
+        [CanBeNull]
+        [ContractAnnotation("input:null => null")]
+        [Pure]
+        public static string TrimEnd([CanBeNull] this string input, [NotNull] string trimString) {
+            if (input == null) {
+                return null;
+            }
+
             var esc   = Regex.Escape(trimString);
             var reg   = new Regex($@"^(?<trimmed>.*?)({esc})*$");
             var match = reg.Match(input);
@@ -381,7 +395,14 @@ namespace BrandonUtils.Standalone.Strings {
             return match.Success ? match.Groups["trimmed"].Value : input;
         }
 
-        public static string TrimStart(this string input, string trimString) {
+        [CanBeNull]
+        [ContractAnnotation("input:null => null")]
+        [Pure]
+        public static string TrimStart([CanBeNull] this string input, string trimString) {
+            if (input == null) {
+                return null;
+            }
+
             var esc   = Regex.Escape(trimString);
             var reg   = new Regex(@$"^({esc})*(?<trimmed>.*?)$");
             var match = reg.Match(input);
