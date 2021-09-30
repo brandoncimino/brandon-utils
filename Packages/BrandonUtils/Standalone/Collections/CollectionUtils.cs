@@ -536,7 +536,8 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="enumerable"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static Type ItemType<T>(this IEnumerable<T> enumerable) {
+        [Pure]
+        public static Type ItemType<T>([CanBeNull] [ItemCanBeNull] this IEnumerable<T> enumerable) {
             return typeof(T);
         }
 
@@ -547,7 +548,8 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T">the <see cref="ItemType{T}"/></typeparam>
         /// <returns>the inverse of <see cref="Enumerable.Any{TSource}(System.Collections.Generic.IEnumerable{TSource})"/></returns>
         /// TODO: Experiment on whether it makes sense to have a special version of <see cref="IsEmpty{T}"/> as an <see cref="IOptional{T}"/> extension method, which would return the inverse of <see cref="IOptional{T}.HasValue"/>. The problem is that this method causes ambiguity with the <see cref="IEnumerable{T}"/> version of <see cref="IOptional{T}"/>
-        public static bool IsEmpty<T>(this IEnumerable<T> enumerable) {
+        [Pure]
+        public static bool IsEmpty<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> enumerable) {
             return !enumerable.Any();
         }
 
@@ -557,7 +559,8 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="enumerable"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static bool IsNotEmpty<T>(this IEnumerable<T> enumerable) {
+        [Pure]
+        public static bool IsNotEmpty<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> enumerable) {
             return enumerable.Any();
         }
 
@@ -566,7 +569,8 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="predicate"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns>true if none of the items in <paramref name="enumerable"/> satisfy <paramref name="predicate"/></returns>
-        public static bool None<T>(this IEnumerable<T> enumerable, Func<T, bool> predicate) {
+        [Pure]
+        public static bool None<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> enumerable, [NotNull] Func<T, bool> predicate) {
             return !enumerable.Any(predicate);
         }
 
@@ -579,14 +583,16 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="others"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static bool ContainsAny<T>(this IEnumerable<T> enumerable, IEnumerable<T> others) {
+        [Pure]
+        public static bool ContainsAny<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> enumerable, [NotNull] [ItemCanBeNull] IEnumerable<T> others) {
             return others.Any(enumerable.Contains);
         }
 
         /**
          * <inheritdoc cref="ContainsAny{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
          */
-        public static bool ContainsAny<T>(this IEnumerable<T> enumerable, params T[] others) {
+        [Pure]
+        public static bool ContainsAny<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> enumerable, [NotNull] [ItemCanBeNull] params T[] others) {
             return ContainsAny(enumerable, (IEnumerable<T>)others);
         }
 
@@ -597,14 +603,16 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="others"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static bool ContainsNone<T>(this IEnumerable<T> enumerable, IEnumerable<T> others) {
+        [Pure]
+        public static bool ContainsNone<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> enumerable, [NotNull] [ItemCanBeNull] IEnumerable<T> others) {
             return others.None(enumerable.Contains);
         }
 
         /**
          * <inheritdoc cref="ContainsNone{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
          */
-        public static bool ContainsNone<T>(this IEnumerable<T> enumerable, params T[] others) {
+        [Pure]
+        public static bool ContainsNone<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> enumerable, [NotNull] [ItemCanBeNull] params T[] others) {
             return ContainsNone(enumerable, (IEnumerable<T>)others);
         }
 
@@ -615,14 +623,16 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="subset">the items that might be in the <paramref name="superset"/></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static bool ContainsAll<T>([NotNull] this IEnumerable<T> superset, [NotNull] IEnumerable<T> subset) {
+        [Pure]
+        public static bool ContainsAll<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> superset, [NotNull] [ItemCanBeNull] IEnumerable<T> subset) {
             return subset.All(superset.Contains);
         }
 
         /**
          * <inheritdoc cref="ContainsAll{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
          */
-        public static bool ContainsAll<T>([NotNull] this IEnumerable<T> enumerable, [NotNull] params T[] others) {
+        [Pure]
+        public static bool ContainsAll<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> enumerable, [NotNull] [ItemCanBeNull] params T[] others) {
             return ContainsAll(enumerable, (IEnumerable<T>)others);
         }
 
@@ -638,14 +648,16 @@ namespace BrandonUtils.Standalone.Collections {
         /// <returns></returns>
         /// <seealso cref="ContainsAll{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
         /// <seealso cref="IsSubsetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
-        public static bool IsSupersetOf<T>([NotNull] this IEnumerable<T> superset, [NotNull] IEnumerable<T> subset) {
+        [Pure]
+        public static bool IsSupersetOf<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> superset, [NotNull] [ItemCanBeNull] IEnumerable<T> subset) {
             return ContainsAll(superset, subset);
         }
 
         /**
          * <inheritdoc cref="IsSupersetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
          */
-        public static bool IsSupersetOf<T>(this IEnumerable<T> superset, params T[] subset) {
+        [Pure]
+        public static bool IsSupersetOf<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> superset, [NotNull] [ItemCanBeNull] params T[] subset) {
             return ContainsAll(superset, subset);
         }
 
@@ -656,7 +668,8 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="subset"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns>inverse of <see cref="IsSupersetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/></returns>
-        public static bool IsNotSupersetOf<T>([NotNull] this IEnumerable<T> superset, [NotNull] IEnumerable<T> subset) {
+        [Pure]
+        public static bool IsNotSupersetOf<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> superset, [NotNull] [ItemCanBeNull] IEnumerable<T> subset) {
             return !IsSupersetOf(superset, subset);
         }
 
@@ -667,7 +680,8 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="superset">the <b>larger</b> set</param>
         /// <typeparam name="T">the <see cref="Type"/> of each individual item</typeparam>
         /// <returns></returns>
-        public static bool IsSubsetOf<T>([NotNull] this IEnumerable<T> subset, [NotNull] IEnumerable<T> superset) {
+        [Pure]
+        public static bool IsSubsetOf<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> subset, [NotNull] [ItemCanBeNull] IEnumerable<T> superset) {
             return ContainsAll(superset, subset);
         }
 
@@ -681,14 +695,16 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="superset"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns>inverse of <see cref="IsSubsetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/></returns>
-        public static bool IsNotSubsetOf<T>([ItemNotNull] this IEnumerable<T> subset, [ItemNotNull] IEnumerable<T> superset) {
+        [Pure]
+        public static bool IsNotSubsetOf<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> subset, [NotNull] [ItemCanBeNull] IEnumerable<T> superset) {
             return !IsSubsetOf(superset, subset);
         }
 
         /**
          * <inheritdoc cref="IsSubsetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
          */
-        public static bool IsSubsetOf<T>(this IEnumerable<T> subset, params T[] superset) {
+        [Pure]
+        public static bool IsSubsetOf<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> subset, [NotNull] [ItemCanBeNull] params T[] superset) {
             return ContainsAll(superset, subset);
         }
 
@@ -699,7 +715,8 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="value">The value to locate in the sequence.</param>
         /// <typeparam name="T">The type of the elements of <paramref name="source" />.</typeparam>
         /// <returns>the inverse of <see cref="Enumerable.Contains{TSource}(System.Collections.Generic.IEnumerable{TSource},TSource)"/></returns>
-        public static bool DoesNotContain<T>(this IEnumerable<T> source, T value) {
+        [Pure]
+        public static bool DoesNotContain<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> source, [CanBeNull] T value) {
             return !source.Contains(value);
         }
 
@@ -713,8 +730,8 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public static bool AddIfMissing<T>(
-            this        ICollection<T> collection,
-            [CanBeNull] T              newItem
+            [NotNull] this ICollection<T> collection,
+            [CanBeNull]    T              newItem
         ) {
             if (collection.Contains(newItem)) {
                 return false;
@@ -732,7 +749,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T">the type of the elements of <paramref name="source"/></typeparam>
         /// <returns>a new sequence that begins <b>and</b> ends with <paramref name="bookend"/></returns>
         [Pure]
-        public static IEnumerable<T> Bookend<T>(this IEnumerable<T> source, T bookend) {
+        public static IEnumerable<T> Bookend<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> source, [CanBeNull] T bookend) {
             return source
                    .Prepend(bookend)
                    .Append(bookend);
@@ -746,7 +763,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T">the type of the elements of <paramref name="source"/></typeparam>
         /// <returns>a new sequence that ends with <paramref name="valueThatMightBeNull"/> if it wasn't <c>null</c></returns>
         [Pure]
-        public static IEnumerable<T> AppendNonNull<T>([NotNull] this IEnumerable<T> source, [CanBeNull] T valueThatMightBeNull) {
+        public static IEnumerable<T> AppendNonNull<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> source, [CanBeNull] T valueThatMightBeNull) {
             return valueThatMightBeNull == null ? source : source.Append(valueThatMightBeNull);
         }
 
@@ -758,7 +775,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         [Pure]
-        public static IEnumerable<T> AppendNonNull<T>([NotNull] this IEnumerable<T> source, [CanBeNull] [ItemCanBeNull] IEnumerable<T> additionalValuesThatMightBeNull) {
+        public static IEnumerable<T> AppendNonNull<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> source, [CanBeNull] [ItemCanBeNull] IEnumerable<T> additionalValuesThatMightBeNull) {
             return additionalValuesThatMightBeNull == null ? source : source.Concat(additionalValuesThatMightBeNull.NonNull());
         }
 
