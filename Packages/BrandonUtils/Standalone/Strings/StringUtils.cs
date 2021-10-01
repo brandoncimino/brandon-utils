@@ -405,7 +405,7 @@ namespace BrandonUtils.Standalone.Strings {
         [CanBeNull]
         [ContractAnnotation("input:null => null")]
         [Pure]
-        private static string Trim([CanBeNull] string input, [NotNull] Regex trimPattern) {
+        public static string Trim([CanBeNull] this string input, [NotNull] Regex trimPattern) {
             if (input == null) {
                 return null;
             }
@@ -431,7 +431,7 @@ namespace BrandonUtils.Standalone.Strings {
         [CanBeNull]
         [ContractAnnotation("input:null => null")]
         [Pure]
-        private static string TrimEnd([CanBeNull] string input, [NotNull] Regex trimPattern) {
+        public static string TrimEnd([CanBeNull] this string input, [NotNull] Regex trimPattern) {
             if (input == null) {
                 return null;
             }
@@ -457,7 +457,7 @@ namespace BrandonUtils.Standalone.Strings {
         [CanBeNull]
         [ContractAnnotation("input:null => null")]
         [Pure]
-        private static string TrimStart([CanBeNull] string input, [NotNull] Regex pattern) {
+        public static string TrimStart([CanBeNull] this string input, [NotNull] Regex pattern) {
             if (input == null) {
                 return null;
             }

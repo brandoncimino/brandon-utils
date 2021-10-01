@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 using BrandonUtils.Standalone;
 using BrandonUtils.Standalone.Collections;
@@ -489,6 +490,17 @@ a
         [TestCase("abc.abc.abc.!abc.abc.", "abc.", "!")]
         public void Trim(string input, string trimString, string expected) {
             Assert.That(input.Trim(trimString), Is.EqualTo(expected));
+        }
+
+        [Test]
+        [TestCase("123a123", @"\d+", "123a", "a123", "a")]
+        public void Trim_Regex(string input, string trimPattern, string expected_end, string expected_start, string expected_both) {
+            var pattern = new Regex(trimPattern);
+            Asserter.Against(input)
+                    .And(it => it.TrimEnd(pattern),   Is.EqualTo(expected_end))
+                    .And(it => it.TrimStart(pattern), Is.EqualTo(expected_start))
+                    .And(it => it.Trim(pattern),      Is.EqualTo(expected_both))
+                    .Invoke();
         }
 
         #endregion
