@@ -12,6 +12,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - `StringUtils.JoinWith()`
+- `BPath.JoinPath()`
 
 ## [2.33.1] - 9/30/2021
 

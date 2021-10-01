@@ -109,5 +109,34 @@ namespace BrandonUtils.Tests.Standalone.Clerical {
             var childFile = new FileInfo(childFilePath);
             Assert.That(parentDir.IsParentOf(childFile), should.Constrain());
         }
+
+        [Test]
+        [TestCase("a/b",    "a",   "b")]
+        [TestCase("/a/b",   "/a/", "/b")]
+        [TestCase(@"a/b/c", @"a\", "b",  "c")]
+        [TestCase("a/c",    "a",   "",   "c")]
+        [TestCase("a/b",    null,  null, "", "\n", "\t", null, "a", null, "  ", "\n \t", "b")]
+        public void JoinPath(string expectedPath, params string[] parts) {
+            Console.WriteLine(@"\n: " + string.IsNullOrWhiteSpace("\n"));
+            Console.WriteLine(@"\t: " + string.IsNullOrWhiteSpace("\t"));
+            Assert.That(BPath.JoinPath(parts), Is.EqualTo(expectedPath));
+        }
+
+        [TestCase(null,                                      "b",        "b")]
+        [TestCase("a",                                       null,       "a")]
+        [TestCase(null,                                      null,       "")]
+        [TestCase("/",                                       null,       "")]
+        [TestCase("/",                                       @"\",       "")]
+        [TestCase("//a",                                     "//b",      "//a/b")]
+        [TestCase("a",                                       "",         "a")]
+        [TestCase("",                                        "b",        "b")]
+        [TestCase("",                                        "",         "")]
+        [TestCase(@"\/\/\/a/\/\/\/\/\/\/\\////\\\///\/\/\/", @"b\\\///", "//////a/b//////")]
+        public void JonPath_Simple(string parent, string child, string expected) {
+            AssertAll.Of(
+                () => Assert.That(BPath.JoinPath(parent, child),           Is.EqualTo(expected)),
+                () => Assert.That(BPath.JoinPath(new[] { parent, child }), Is.EqualTo(expected))
+            );
+        }
     }
 }
