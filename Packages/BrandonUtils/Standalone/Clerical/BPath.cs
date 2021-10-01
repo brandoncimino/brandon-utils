@@ -130,8 +130,16 @@ namespace BrandonUtils.Standalone.Clerical {
         [NotNull]
         public static string JoinPath(
             [CanBeNull] string parent,
+            [CanBeNull] string child
+        ) {
+            return JoinPath(parent, child, default(DirectorySeparator));
+        }
+
+        [NotNull]
+        public static string JoinPath(
+            [CanBeNull] string parent,
             [CanBeNull] string child,
-            DirectorySeparator separator = DirectorySeparator.Universal
+            DirectorySeparator separator
         ) {
             parent = parent?.Trim().TrimEnd(DirectorySeparatorPattern);
             child  = child?.Trim().TrimStart(DirectorySeparatorPattern);
