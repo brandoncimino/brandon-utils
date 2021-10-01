@@ -492,5 +492,27 @@ a
         }
 
         #endregion
+
+        #region JoinWith
+
+        [Test]
+        [TestCase("a-",        "-b",    "-",    "a-b")]
+        [TestCase("aa-",       "bb",    "-",    "aa-bb")]
+        [TestCase("a",         "b",     "-",    "a-b")]
+        [TestCase(null,        "b",     "-",    "b")]
+        [TestCase("a",         null,    "-",    "a")]
+        [TestCase(null,        null,    "-",    "")]
+        [TestCase("a",         "b",     null,   "ab")]
+        [TestCase("a",         "b",     "a",    "b")]
+        [TestCase("a",         "b",     "b",    "a")]
+        [TestCase("#YO",       "LO",    "YO",   "#YOLO")]
+        [TestCase("_a",        "b_",    "_",    "_a_b_")]
+        [TestCase("a(hi)(hi)", "(hi)b", "(hi)", "a(hi)b")]
+        [TestCase(null,        null,    null,   "")]
+        public void JoinWith(string first, string second, string separator, string expected) {
+            Assert.That(first.JoinWith(second, separator), Is.EqualTo(expected));
+        }
+
+        #endregion
     }
 }

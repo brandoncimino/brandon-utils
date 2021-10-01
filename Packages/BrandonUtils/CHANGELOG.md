@@ -7,6 +7,12 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.33.2] - 9/30/2021
+
+### Added
+
+- `StringUtils.JoinWith()`
+
 ## [2.33.1] - 9/30/2021
 
 ### Fixed

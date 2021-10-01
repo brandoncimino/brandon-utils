@@ -152,8 +152,33 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="stringToJoin"></param>
         /// <param name="separator"></param>
         /// <returns></returns>
-        public static string Join(this string baseString, string stringToJoin, string separator = "") {
-            return string.IsNullOrEmpty(baseString) ? stringToJoin : string.Join(separator, baseString, stringToJoin);
+        [NotNull]
+        public static string Join([CanBeNull] this string baseString, [CanBeNull] string stringToJoin, [CanBeNull] string separator = "") {
+            return string.IsNullOrEmpty(baseString) ? stringToJoin.ToString("") : string.Join(separator, baseString, stringToJoin);
+        }
+
+        /// <summary>
+        /// Joins <paramref name="first"/> and <paramref name="second"/> together by a <b>single instance</b> of <paramref name="separator"/>.
+        /// </summary>
+        /// <example>
+        /// <ul>
+        /// <li><c>"a/".JoinWith("/b","/")  →  "a/b"</c></li>
+        /// <li><c>"a--".JoinWith("b","-")  →  "a-b"</c></li>
+        /// <li><c>"_a".JoinWith("b_","_")  →  "_a_b_"</c></li>
+        /// <li><c>null.JoinWith("b","!!")  →  "b"</c></li>
+        /// </ul>
+        /// </example>
+        /// <param name="first"></param>
+        /// <param name="second"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        [NotNull]
+        public static string JoinWith([CanBeNull] this string first, [CanBeNull] string second, [CanBeNull] string separator) {
+            separator ??= "";
+            first     =   first?.TrimEnd(separator);
+            second    =   second?.TrimStart(separator);
+
+            return new[] { first, second }.Where(it => it.IsNotEmpty()).JoinString(separator) ?? "";
         }
 
         #region Prettification
@@ -649,6 +674,8 @@ namespace BrandonUtils.Standalone.Strings {
 
         #endregion Line Management
 
+        #region "Default" Strings
+
         /// <summary>
         /// A variation on <see cref="object.ToString"/> that returns the specified <paramref name="nullPlaceholder"/> if the original <paramref name="obj"/> is <c>null</c>.
         /// </summary>
@@ -661,13 +688,39 @@ namespace BrandonUtils.Standalone.Strings {
             return obj == null ? nullPlaceholder : obj.ToString();
         }
 
+        /// <summary>
+        /// Returns <paramref name="emptyPlaceholder"/> if this <see cref="string"/> <see cref="IsNullOrEmpty"/>; otherwise, returns this <see cref="string"/>.
+        /// </summary>
+        /// <param name="str">this <see cref="string"/></param>
+        /// <param name="emptyPlaceholder">the fallback string if <paramref name="str"/> <see cref="IsNullOrEmpty"/>. Defaults to <c>""</c></param>
+        /// <returns>this <see cref="string"/> or <paramref name="emptyPlaceholder"/></returns>
+        [NotNull]
+        public static string IfEmpty([CanBeNull] this string str, [CanBeNull] string emptyPlaceholder) {
+            emptyPlaceholder ??= "";
+            return str.IsNullOrEmpty() ? emptyPlaceholder : str;
+        }
+
+        /// <summary>
+        /// Returns <paramref name="blankPlaceholder"/> if this <see cref="string"/> <see cref="IsBlank"/>; otherwise, returns this <see cref="string"/>.
+        /// </summary>
+        /// <param name="str">this <see cref="string"/></param>
+        /// <param name="blankPlaceholder">the fallback string if <paramref name="str"/> <see cref="IsBlank"/>. Defaults to <c>""</c></param>
+        /// <returns>this <see cref="string"/> or <paramref name="blankPlaceholder"/></returns>
+        [NotNull]
+        public static string IfBlank([CanBeNull] this string str, [CanBeNull] string blankPlaceholder) {
+            blankPlaceholder ??= "";
+            return str.IsBlank() ? blankPlaceholder : str;
+        }
+
+        #endregion
+
         #region Lapelle deux Vid
 
         /// <summary>
         /// An extension method for <see cref="string.IsNullOrEmpty"/>
         /// </summary>
         /// <param name="str"></param>
-        /// <returns></returns>
+        /// <returns><see cref="string.IsNullOrEmpty"/></returns>
         [ContractAnnotation("null => true", true)]
         public static bool IsNullOrEmpty([CanBeNull] this string str) {
             return string.IsNullOrEmpty(str);
@@ -676,11 +729,29 @@ namespace BrandonUtils.Standalone.Strings {
         /// <summary>
         /// An extension method for <see cref="string.IsNullOrWhiteSpace"/>
         /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
+        /// <param name="str">this <see cref="string"/></param>
+        /// <returns><see cref="string.IsNullOrWhiteSpace"/></returns>
         [ContractAnnotation("null => true", true)]
         public static bool IsNullOrWhiteSpace([CanBeNull] this string str) {
             return string.IsNullOrWhiteSpace(str);
+        }
+
+        /**
+         * <inheritdoc cref="IsNullOrEmpty"/>
+         */
+        [ContractAnnotation("null => true")]
+        public static bool IsEmpty([CanBeNull] this string str) {
+            return string.IsNullOrEmpty(str);
+        }
+
+        /// <summary>
+        /// The inverse of <see cref="IsEmpty"/>.
+        /// </summary>
+        /// <param name="str">this <see cref="string"/></param>
+        /// <returns>!<see cref="IsEmpty"/></returns>
+        [ContractAnnotation("null => false")]
+        public static bool IsNotEmpty([CanBeNull] this string str) {
+            return !string.IsNullOrEmpty(str);
         }
 
         /// <summary>
@@ -729,17 +800,6 @@ namespace BrandonUtils.Standalone.Strings {
             str    ??= "";
             suffix ??= "";
             return str.EndsWith(suffix) ? str : str.Suffix(suffix);
-        }
-
-        internal static string JoinIfMissing([CanBeNull] this string first, [CanBeNull] string second, [NotNull] string separator) {
-            if (first.IsBlank() || second.IsBlank()) {
-                return $"{first}{second}".Trim();
-            }
-
-            var separatorPattern = Regex.Escape(separator);
-            // var endingPattern    = new Regex($"{}")
-
-            return first + second.SubstringAfter(separator);
         }
 
         #endregion
