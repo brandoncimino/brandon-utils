@@ -196,5 +196,33 @@ namespace BrandonUtils.Standalone.Strings {
         }
 
         #endregion
+
+        #region String Class Methods (like EndsWith())
+
+        /// <summary>
+        /// Similar to <see cref="string.EndsWith(string)"/>, but looks for a <see cref="Regex"/> pattern.
+        /// </summary>
+        /// <param name="input">the input <see cref="string"/></param>
+        /// <param name="pattern">the <see cref="Regex"/> to look for</param>
+        /// <returns>true if <paramref name="input"/> ends with <paramref name="pattern"/></returns>
+        [ContractAnnotation("input:null => false")]
+        [Pure]
+        public static bool EndsWith([CanBeNull] this string input, [NotNull] Regex pattern) {
+            return input != null && new Regex($"{pattern}$").IsMatch(input);
+        }
+
+        /// <summary>
+        /// Similar to <see cref="string.StartsWith(string)"/>, but looks for a <see cref="Regex"/> pattern.
+        /// </summary>
+        /// <param name="input">the input <see cref="string"/></param>
+        /// <param name="pattern">the <see cref="Regex"/> to look for</param>
+        /// <returns>true if <paramref name="input"/> starts with <paramref name="pattern"/></returns>
+        [ContractAnnotation("input:null => false")]
+        [Pure]
+        public static bool StartsWith([CanBeNull] this string input, [NotNull] Regex pattern) {
+            return input != null && new Regex($"^{pattern}").IsMatch(input);
+        }
+
+        #endregion
     }
 }
