@@ -549,8 +549,9 @@ namespace BrandonUtils.Standalone.Collections {
         /// <returns>the inverse of <see cref="Enumerable.Any{TSource}(System.Collections.Generic.IEnumerable{TSource})"/></returns>
         /// TODO: Experiment on whether it makes sense to have a special version of <see cref="IsEmpty{T}"/> as an <see cref="IOptional{T}"/> extension method, which would return the inverse of <see cref="IOptional{T}.HasValue"/>. The problem is that this method causes ambiguity with the <see cref="IEnumerable{T}"/> version of <see cref="IOptional{T}"/>
         [Pure]
-        public static bool IsEmpty<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> enumerable) {
-            return !enumerable.Any();
+        [ContractAnnotation("null => true")]
+        public static bool IsEmpty<T>([CanBeNull] [ItemCanBeNull] this IEnumerable<T> enumerable) {
+            return enumerable == null || !enumerable.Any();
         }
 
         /// <summary>
@@ -560,8 +561,9 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         [Pure]
-        public static bool IsNotEmpty<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> enumerable) {
-            return enumerable.Any();
+        [ContractAnnotation("null => false")]
+        public static bool IsNotEmpty<T>([CanBeNull] [ItemCanBeNull] this IEnumerable<T> enumerable) {
+            return enumerable != null && enumerable.Any();
         }
 
         /// <remarks>Negation of <see cref="Enumerable.Any{TSource}(System.Collections.Generic.IEnumerable{TSource})"/>.</remarks>

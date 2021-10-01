@@ -7,6 +7,12 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.33.1] - 9/30/2021
+
+### Fixed
+
+- Made `CollectionUtils.IsEmpty` & `.IsNotEmpty` `null`-safe
+
 ## [2.33.0] - 9/29/2021
 
 ### Added
