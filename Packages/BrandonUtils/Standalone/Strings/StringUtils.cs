@@ -398,8 +398,19 @@ namespace BrandonUtils.Standalone.Strings {
                 return null;
             }
 
-            var esc   = Regex.Escape(trimString);
-            var reg   = new Regex($"^({esc})*(?<trimmed>.*?)({esc})*$");
+            var pattern = new Regex(Regex.Escape(trimString));
+            return Trim(input, pattern);
+        }
+
+        [CanBeNull]
+        [ContractAnnotation("input:null => null")]
+        [Pure]
+        private static string Trim([CanBeNull] string input, [NotNull] Regex trimPattern) {
+            if (input == null) {
+                return null;
+            }
+
+            var reg   = new Regex($"^({trimPattern})*(?<trimmed>.*?)({trimPattern})*$");
             var match = reg.Match(input);
 
             return match.Success ? match.Groups["trimmed"].Value : input;
@@ -413,8 +424,19 @@ namespace BrandonUtils.Standalone.Strings {
                 return null;
             }
 
-            var esc   = Regex.Escape(trimString);
-            var reg   = new Regex($@"^(?<trimmed>.*?)({esc})*$");
+            var trimPattern = new Regex(Regex.Escape(trimString));
+            return TrimEnd(input, trimPattern);
+        }
+
+        [CanBeNull]
+        [ContractAnnotation("input:null => null")]
+        [Pure]
+        private static string TrimEnd([CanBeNull] string input, [NotNull] Regex trimPattern) {
+            if (input == null) {
+                return null;
+            }
+
+            var reg   = new Regex($@"^(?<trimmed>.*?)({trimPattern})*$");
             var match = reg.Match(input);
 
             return match.Success ? match.Groups["trimmed"].Value : input;
@@ -428,8 +450,19 @@ namespace BrandonUtils.Standalone.Strings {
                 return null;
             }
 
-            var esc   = Regex.Escape(trimString);
-            var reg   = new Regex(@$"^({esc})*(?<trimmed>.*?)$");
+            var pattern = new Regex(Regex.Escape(trimString));
+            return TrimStart(input, pattern);
+        }
+
+        [CanBeNull]
+        [ContractAnnotation("input:null => null")]
+        [Pure]
+        private static string TrimStart([CanBeNull] string input, [NotNull] Regex pattern) {
+            if (input == null) {
+                return null;
+            }
+
+            var reg   = new Regex(@$"^({pattern})*(?<trimmed>.*?)$");
             var match = reg.Match(input);
 
             return match.Success ? match.Groups["trimmed"].Value : input;
@@ -787,7 +820,7 @@ namespace BrandonUtils.Standalone.Strings {
         public static string PrefixIfMissing([CanBeNull] this string str, [CanBeNull] string prefix) {
             str    ??= "";
             prefix ??= "";
-            return str?.StartsWith(prefix) == true ? str : str.Prefix(prefix);
+            return str.StartsWith(prefix) == true ? str : str.Prefix(prefix);
         }
 
         [NotNull]
