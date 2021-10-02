@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 using JetBrains.Annotations;
@@ -72,7 +73,17 @@ namespace BrandonUtils.Standalone.Optional {
             return this;
         }
 
-        public static implicit operator T(Fallback<T> self) {
+        /// <summary>
+        /// Implicitly casts a <see cref="Fallback{T}"/> to a <typeparamref name="T"/> by returning <see cref="Value"/>.
+        /// </summary>
+        /// <param name="self">this <see cref="Fallback{T}"/></param>
+        /// <returns><see cref="Value"/></returns>
+        /// <exception cref="ArgumentNullException">if <paramref name="self"/> is null</exception>
+        public static implicit operator T([NotNull] Fallback<T> self) {
+            if (self == null) {
+                throw new ArgumentNullException(nameof(self));
+            }
+
             return self.Value;
         }
 
