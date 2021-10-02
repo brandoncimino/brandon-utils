@@ -39,7 +39,6 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
             GameName
         );
 
-
         [NotNull]
         public IEnumerable<SaveFile<T>> EnumerateSaveFiles<T>(string searchPattern) where T : ISaveData {
             if (Exists) {
@@ -50,6 +49,10 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
             else {
                 return Enumerable.Empty<SaveFile<T>>();
             }
+        }
+
+        public override string ToString() {
+            return $"📁 {Directory.ToUri()}";
         }
     }
 }

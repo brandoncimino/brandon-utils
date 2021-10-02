@@ -29,7 +29,7 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
         )
             : this(
                 folder,
-                new SaveFileName() {
+                new SaveFileName {
                     Nickname      = nickname,
                     TimeStamp     = timeStamp,
                     FullExtension = extension ?? SaveFileName.DefaultExtension
@@ -76,6 +76,10 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
             saveSettings ??= new SaveManagerSettings();
             Data         =   File.Deserialize<TData>(saveSettings.JsonSerializerSettings.Value);
             return this;
+        }
+
+        public override string ToString() {
+            return $"📄 {File.ToUri()}";
         }
     }
 }
