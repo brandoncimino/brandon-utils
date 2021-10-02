@@ -8,6 +8,9 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
         [NotNull] public string     Nickname   { get; }
         [NotNull] public SaveFolder SaveFolder { get; }
 
+        [NotNull, ItemNotNull]
+        public string[] RelativePath { get; }
+
         [NotNull]
         [ItemNotNull]
         public IEnumerable<SaveFile<TData>> EnumerateSaveFiles();
