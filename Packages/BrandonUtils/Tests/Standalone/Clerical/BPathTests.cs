@@ -77,8 +77,13 @@ namespace BrandonUtils.Tests.Standalone.Clerical {
         public void Directory_To_Uri(string directory) {
             var di = new DirectoryInfo(directory);
             AssertAll.Of(
-                () => Assert.That(di.ToUri(),              Has.Property(nameof(Uri.IsFile)).True),
-                () => Assert.That(di.ToUri().AbsolutePath, Is.EqualTo(BPath.EnsureTrailingSeparator(di.FullName)))
+                () => Assert.That(di.ToUri(), Has.Property(nameof(Uri.IsFile)).True),
+                () => Assert.That(
+                    di.ToUri().AbsolutePath,
+                    Is.EqualTo(
+                        BPath.NormalizeSeparators(BPath.EnsureTrailingSeparator(di.FullName))
+                    )
+                )
             );
         }
 
@@ -137,6 +142,24 @@ namespace BrandonUtils.Tests.Standalone.Clerical {
                 () => Assert.That(BPath.JoinPath(parent, child),           Is.EqualTo(expected)),
                 () => Assert.That(BPath.JoinPath(new[] { parent, child }), Is.EqualTo(expected))
             );
+        }
+
+        [Test]
+        [TestCase("a",        "a/",     "a")]
+        [TestCase("a/",       "a/",     "a/")]
+        [TestCase("a//",      "a/",     "a//")]
+        [TestCase("a/b/c",    "a/b/c/", "a/b/c")]
+        [TestCase(null,       "/",      "")]
+        [TestCase("",         "/",      "")]
+        [TestCase(@"a\",      "a/",     "a/")]
+        [TestCase(@"\a/\b",   "/a//b/", "a//b/")]
+        [TestCase(" ",        "/",      "")]
+        [TestCase(" / ",      "/",      "")]
+        [TestCase("a  ",      "a/",     "a/")]
+        [TestCase(@"\/\/",    "/",      "")]
+        [TestCase(@"\\a/b//", "//a/b/", "a/b/")]
+        public void Fix_Separators(string input, string expected_trail, string expected_strip) {
+            Assert.That(BPath.EnsureTrailingSeparator(input), Is.EqualTo(expected_trail));
         }
     }
 }

@@ -114,17 +114,34 @@ namespace BrandonUtils.Standalone.Clerical {
 
         [NotNull]
         public static string EnsureTrailingSeparator([CanBeNull] string path, DirectorySeparator separator = DirectorySeparator.Universal) {
-            return path.TrimEnd(separator.ToCharString()).Suffix(separator.ToCharString());
+            if (path == null) {
+                return separator.ToCharString();
+            }
+
+            return NormalizeSeparators(
+                path?.Trim()
+                    .TrimEnd(DirectorySeparatorPattern)
+                    .Suffix(separator.ToCharString()),
+                separator
+            );
         }
 
         [NotNull]
         public static string StripLeadingSeparator([CanBeNull] string path, DirectorySeparator separator = DirectorySeparator.Universal) {
-            return NormalizeSeparators(path?.TrimStart(separator.ToCharString()), separator);
+            if (path == null) {
+                return "";
+            }
+
+            return NormalizeSeparators(
+                path?.Trim()
+                    .TrimStart(separator.ToCharString()),
+                separator
+            );
         }
 
         [NotNull]
         public static string NormalizeSeparators([CanBeNull] string path, DirectorySeparator separator = DirectorySeparator.Universal) {
-            return path.IsEmpty() ? "" : DirectorySeparatorPattern.Replace(path, separator.ToCharString());
+            return path.IsBlank() ? "" : DirectorySeparatorPattern.Replace(path.Trim(), separator.ToCharString());
         }
 
         [NotNull]
