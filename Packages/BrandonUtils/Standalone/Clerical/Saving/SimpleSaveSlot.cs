@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Strings;
 
 using JetBrains.Annotations;
@@ -15,22 +16,35 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
     /// </ul>
     /// </summary>
     /// <typeparam name="TData"></typeparam>
+    [PublicAPI]
     public class SimpleSaveSlot<TData> : ISaveSlot<TData> where TData : ISaveData {
-        public string              Nickname { get; }
-        public SaveManagerSettings Settings { get; }
+        public string              Nickname   { get; }
+        public SaveManagerSettings Settings   { get; }
+        public SaveFolder          SaveFolder { get; }
 
-        public SaveFolder SaveFolder { get; }
+        [NotNull, ItemNotNull]
+        private readonly string[] _relativePath;
+        public string[] RelativePath => _relativePath.Copy();
 
         [NotNull] private readonly SaveFileName FileNameTemplate;
         private                    string       FileSearchPattern => FileNameTemplate.GetFileSearchPattern();
 
-        public SimpleSaveSlot(SaveFolder saveFolder, string nickname, SaveManagerSettings settings = default) {
-            settings   ??= new SaveManagerSettings();
-            SaveFolder =   saveFolder;
-            Nickname   =   nickname;
-            Settings   =   settings;
+        public SimpleSaveSlot(
+            [NotNull]   SaveFolder          saveFolder,
+            [NotNull]   string              nickname,
+            [CanBeNull] SaveManagerSettings settings = default
+        ) {
+            if (string.IsNullOrWhiteSpace(nickname)) {
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(nickname));
+            }
 
-            FileNameTemplate = new SaveFileName() {
+            settings      ??= new SaveManagerSettings();
+            SaveFolder    =   saveFolder ?? throw new ArgumentNullException(nameof(saveFolder));
+            Nickname      =   nickname;
+            Settings      =   settings;
+            _relativePath =   new[] { nickname };
+
+            FileNameTemplate = new SaveFileName {
                 Nickname      = nickname,
                 FullExtension = settings.SaveFileExtension,
             };
@@ -53,7 +67,7 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
         }
 
         public override string ToString() {
-            return $"{GetType().Prettify()}: \"{Nickname}\" ({FileNameTemplate})";
+            return $"📥 {GetType().Prettify()}: \"{Nickname}\"";
         }
     }
 }
