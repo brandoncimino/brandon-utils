@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 using BrandonUtils.Standalone.Collections;
+using BrandonUtils.Testing;
 
 using Newtonsoft.Json;
 
 using NUnit.Framework;
+
+using Is = NUnit.Framework.Is;
 
 // ReSharper disable ReturnValueOfPureMethodIsNotUsed
 
@@ -14,15 +17,15 @@ namespace BrandonUtils.Tests.Standalone.Collections {
     [TestOf(typeof(CollectionUtils))]
     public class CollectionUtilsTests {
         private static Dictionary<int, string> ValidDictionary => new Dictionary<int, string> {
-            {1, "one"},
-            {2, "two"},
-            {3, "three"}
+            { 1, "one" },
+            { 2, "two" },
+            { 3, "three" }
         };
 
         private static Dictionary<string, int> ValidDictionary_Inverse => new Dictionary<string, int> {
-            {"one", 1},
-            {"two", 2},
-            {"three", 3}
+            { "one", 1 },
+            { "two", 2 },
+            { "three", 3 }
         };
 
         [Test]
@@ -34,9 +37,9 @@ namespace BrandonUtils.Tests.Standalone.Collections {
         [Test]
         public void InvertInvalidDictionaryWithDuplicateValues() {
             var initialDictionary = new Dictionary<int, string> {
-                {1, "one"},
-                {2, "two"},
-                {3, "two"}
+                { 1, "one" },
+                { 2, "two" },
+                { 3, "two" }
             };
 
             Assert.Throws<ArgumentException>(() => initialDictionary.Inverse());
@@ -45,9 +48,9 @@ namespace BrandonUtils.Tests.Standalone.Collections {
         [Test]
         public void InvertInvalidDictionaryWithNullValues() {
             var initialDictionary = new Dictionary<int, string> {
-                {1, "one"},
-                {2, null},
-                {3, "three"}
+                { 1, "one" },
+                { 2, null },
+                { 3, "three" }
             };
 
             Assert.Throws<ArgumentNullException>(() => initialDictionary.Inverse());
@@ -84,51 +87,51 @@ namespace BrandonUtils.Tests.Standalone.Collections {
         [Test]
         public void JoinWithoutOverlap() {
             var dic1 = new Dictionary<int, int> {
-                {1, 1},
-                {2, 1}
+                { 1, 1 },
+                { 2, 1 }
             };
 
             var dic2 = new Dictionary<int, int> {
-                {3, 2},
-                {4, 2}
+                { 3, 2 },
+                { 4, 2 }
             };
 
             var expected = new Dictionary<int, int> {
-                {1, 1},
-                {2, 1},
-                {3, 2},
-                {4, 2}
+                { 1, 1 },
+                { 2, 1 },
+                { 3, 2 },
+                { 4, 2 }
             };
 
             Assert.That(dic1.JoinDictionaries(dic2), Is.EqualTo(expected));
         }
 
         private static Dictionary<int, int> DicOrigin => new Dictionary<int, int> {
-            {1, 1},
-            {2, 1},
-            {3, 1}
+            { 1, 1 },
+            { 2, 1 },
+            { 3, 1 }
         };
 
         private static Dictionary<int, int> DicOverlap => new Dictionary<int, int> {
-            {3, 2},
-            {4, 2},
-            {5, 2}
+            { 3, 2 },
+            { 4, 2 },
+            { 5, 2 }
         };
 
         private static Dictionary<int, int> ResultFavoringOriginal => new Dictionary<int, int> {
-            {1, 1},
-            {2, 1},
-            {3, 1},
-            {4, 2},
-            {5, 2}
+            { 1, 1 },
+            { 2, 1 },
+            { 3, 1 },
+            { 4, 2 },
+            { 5, 2 }
         };
 
         private static Dictionary<int, int> ResultFavoringNew => new Dictionary<int, int> {
-            {1, 1},
-            {2, 1},
-            {3, 2},
-            {4, 2},
-            {5, 2}
+            { 1, 1 },
+            { 2, 1 },
+            { 3, 2 },
+            { 4, 2 },
+            { 5, 2 }
         };
 
         [Test]
@@ -147,13 +150,13 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
         [Test]
         public void JoinPreferOriginal_Collection() {
-            var jointDic = CollectionUtils.JoinDictionaries(new[] {DicOrigin, DicOverlap}, CollectionUtils.ConflictResolution.FavorOriginal);
+            var jointDic = CollectionUtils.JoinDictionaries(new[] { DicOrigin, DicOverlap }, CollectionUtils.ConflictResolution.FavorOriginal);
             Assert.That(jointDic, Is.EqualTo(ResultFavoringOriginal));
         }
 
         [Test]
         public void JoinPreferNew_Collection() {
-            var jointDic = CollectionUtils.JoinDictionaries(new[] {DicOrigin, DicOverlap}, CollectionUtils.ConflictResolution.FavorNew);
+            var jointDic = CollectionUtils.JoinDictionaries(new[] { DicOrigin, DicOverlap }, CollectionUtils.ConflictResolution.FavorNew);
             Assert.That(jointDic, Is.EqualTo(ResultFavoringNew));
         }
 
@@ -176,7 +179,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
         [Test]
         public void JoinFailure_Collection() {
-            Assert.Throws<ArgumentException>(() => CollectionUtils.JoinDictionaries(new[] {DicOrigin, DicOverlap}, CollectionUtils.ConflictResolution.Fail));
+            Assert.Throws<ArgumentException>(() => CollectionUtils.JoinDictionaries(new[] { DicOrigin, DicOverlap }, CollectionUtils.ConflictResolution.Fail));
         }
 
         [TestCase(CollectionUtils.ConflictResolution.FavorNew)]
@@ -208,7 +211,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
             var dicOrigin  = new Dictionary<int, int>(DicOrigin);
             var dicOverlap = new Dictionary<int, int>(DicOverlap);
 
-            CollectionUtils.JoinDictionaries(new[] {dicOrigin, dicOverlap}, conflictResolution);
+            CollectionUtils.JoinDictionaries(new[] { dicOrigin, dicOverlap }, conflictResolution);
 
             Console.WriteLine(
                 new[] {
@@ -221,6 +224,31 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
             Assert.That(dicOrigin,  Is.EqualTo(DicOrigin));
             Assert.That(dicOverlap, Is.EqualTo(DicOverlap));
+        }
+
+        #endregion
+
+        #region Copy
+
+        [Test]
+        public void Copy_Array() {
+            var original = new int[] { 1, 2, 3 };
+            var dupe     = original.Copy();
+
+            Asserter.Against(dupe)
+                    .And(Is.EqualTo(original))
+                    .And(Is.Not.SameAs(original))
+                    .Invoke();
+
+            original[0]           = 99;
+            dupe[dupe.Length - 1] = -99;
+
+            Asserter.Against(dupe)
+                    .And(original, Is.EqualTo(new[] { 99, 2, 3 }))
+                    .And(Is.EqualTo(new[] { 1, 2, -99 }))
+                    .And(Is.Not.EqualTo(original))
+                    .And(Is.Not.SameAs(original))
+                    .Invoke();
         }
 
         #endregion

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -7,22 +8,37 @@ using JetBrains.Annotations;
 namespace BrandonUtils.Standalone.Clerical.Saving {
     [PublicAPI]
     public class SaveFolder : CustomDirectoryInfo {
-        private const              string SaveFolderName = "SaveData";
-        [NotNull] private readonly string PersistentDataPath;
-        [NotNull] private readonly string GameName;
+        public const string SaveFolderName = "SaveData";
 
-        public SaveFolder([NotNull] string persistentDataPath, [NotNull] string gameName) {
+        [NotNull] public string PersistentDataPath { get; set; }
+        [NotNull] public string GameName           { get; set; }
+
+        [NotNull] public override DirectoryInfo Directory => new DirectoryInfo(FolderPath);
+
+
+        public SaveFolder(
+            [NotNull] string persistentDataPath,
+            [NotNull] string gameName
+        ) {
+            if (string.IsNullOrWhiteSpace(persistentDataPath)) {
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(persistentDataPath));
+            }
+
+            if (string.IsNullOrWhiteSpace(gameName)) {
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(gameName));
+            }
+
             PersistentDataPath = persistentDataPath;
             GameName           = gameName;
         }
 
-        private string FolderPath => Path.Combine(
+        [NotNull]
+        private string FolderPath => BPath.JoinPath(
             PersistentDataPath,
             SaveFolderName,
             GameName
         );
 
-        public override DirectoryInfo Directory => new DirectoryInfo(FolderPath);
 
         [NotNull]
         public IEnumerable<SaveFile<T>> EnumerateSaveFiles<T>(string searchPattern) where T : ISaveData {
