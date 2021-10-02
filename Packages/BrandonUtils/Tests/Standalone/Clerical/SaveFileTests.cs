@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 
 using BrandonUtils.Standalone.Clerical.Saving;
-using BrandonUtils.Standalone.Strings;
 using BrandonUtils.Testing;
 
 using NUnit.Framework;
-
-using Is = BrandonUtils.Testing.Is;
 
 namespace BrandonUtils.Tests.Standalone.Clerical {
     [SuppressMessage("ReSharper", "AccessToStaticMemberViaDerivedType")]
@@ -24,14 +20,6 @@ namespace BrandonUtils.Tests.Standalone.Clerical {
                     Has.Property(nameof(saveFile.TimeStamp)).EqualTo(expectedTimeStamp),
                     Has.Property(nameof(saveFile.Name)).EqualTo($"{expectedName}_{expectedTimeStamp.Ticks}{SaveFileName.DefaultExtension}")
                 );
-            }
-
-            public static void SaveFile_Unloaded<T>(ISaveFile<T> saveFile) where T : ISaveData {
-                Asserter.Against(saveFile)
-                        .WithHeading($"{nameof(saveFile)} must exist but not be loaded")
-                        .And(Has.Property(nameof(saveFile.Exists)).True)
-                        .And(Has.Property(nameof(saveFile.Data)).Null)
-                        .Invoke();
             }
         }
 
@@ -98,11 +86,9 @@ namespace BrandonUtils.Tests.Standalone.Clerical {
             Asserter.Against(secondSaveFile)
                     .Exists()
                     .And(Has.Property(nameof(secondSaveFile.Data)).Not.Null)
-                    .And(() => Assert.True(firstSaveFile.Data.Equals(secondSaveFile.Data), "firstSaveFile.Data.Equals(secondSaveFile.Data)"))
+                    .And(() => Assert.True(firstSaveFile.Data?.Equals(secondSaveFile.Data), "firstSaveFile.Data.Equals(secondSaveFile.Data)"))
                     .And(Has.Property(nameof(secondSaveFile.Data)).EqualTo(firstSaveFile.Data))
                     .Invoke();
         }
-
-
     }
 }
