@@ -4,7 +4,6 @@ using System.Linq;
 
 using BrandonUtils.Standalone.Clerical.Saving;
 using BrandonUtils.Testing;
-using BrandonUtils.Tests.Standalone.Reflection;
 
 using NUnit.Framework;
 
@@ -15,10 +14,12 @@ namespace BrandonUtils.Tests.Standalone.Clerical {
         private static readonly SaveFolder TestFolder = new SaveFolder(Path.GetTempPath(), nameof(SaveSlotTests));
 
         private static ISaveSlot<TestSaveData> GetUniqueSlot() {
-            return new SimpleSaveSlot<TestSaveData>(TestFolder, nameof(SimpleSaveSlot<TestSaveData>) + Guid.NewGuid());
+            var slot = new SimpleSaveSlot<TestSaveData>(TestFolder, nameof(SimpleSaveSlot<TestSaveData>) + Guid.NewGuid());
+            Console.WriteLine(slot);
+            return slot;
         }
 
-                [Test]
+        [Test]
         public void NewSaveSlotIsEmpty() {
             var saveSlot = GetUniqueSlot();
             Console.WriteLine(saveSlot.SaveFileCount);
