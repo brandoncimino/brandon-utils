@@ -13,6 +13,8 @@ using Newtonsoft.Json;
 namespace BrandonUtils.Standalone.Clerical {
     [PublicAPI]
     public static class FileInfoExtensions {
+        public const string BackupExtension = ".bak";
+
         /// <summary>
         /// An extension method made to mimic Powershell's <see cref="FileInfo"/>.<c>BaseName</c> <a href="https://docs.microsoft.com/en-us/powershell/scripting/developer/cmdlet/extending-properties-for-objects?view=powershell-7.1#script-properties">Script Property</a>.
         /// </summary>
@@ -178,6 +180,29 @@ namespace BrandonUtils.Standalone.Clerical {
 
         #endregion
 
+        #region Backup
+
+        /// <summary>
+        /// If this <see cref="FileInfo.Exists"/>, create a copy of it with <see cref="BackupExtension"/> appended to the <see cref="FileSystemInfo.FullName"/>.
+        /// </summary>
+        /// <param name="fileInfo">The original <see cref="FileInfo"/> that will be copied</param>
+        /// <param name="overwrite">
+        /// <see langword="true" /> to allow an existing <b>backup</b> file to be overwritten; otherwise, <see langword="false" />. </param>
+        /// <returns>A new file, or an overwrite of an existing file if <paramref name="overwrite" /> is <see langword="true" />. If the file exists and <paramref name="overwrite" /> is <see langword="false" />, an <see cref="T:System.IO.IOException" /> is thrown.</returns>
+        /// <exception cref="ArgumentNullException">This <paramref name="fileInfo"/> is <see langword="null"/>.</exception>
+        /// <exception cref="T:System.IO.IOException">An error occurs, or the destination file already exists and <paramref name="overwrite" /> is <see langword="false" />. </exception>
+        [CanBeNull]
+        public static FileInfo Backup([NotNull] this FileInfo fileInfo, bool overwrite = false) {
+            if (fileInfo == null) {
+                throw new ArgumentNullException(nameof(fileInfo));
+            }
+
+            fileInfo.Refresh();
+            return fileInfo.Exists ? fileInfo.CopyTo($"{fileInfo.FullName}{BackupExtension}", overwrite) : null;
+        }
+
+        #endregion
+
         #region NewtonsoftJson Extensions
 
         /// <summary>
@@ -213,7 +238,7 @@ namespace BrandonUtils.Standalone.Clerical {
                     fileInfo.SerializeForcefully(obj, settings);
                     break;
                 case DuplicateFileResolution.Backup:
-                    throw new NotImplementedException();
+                    fileInfo.SerializeSafely(obj, settings);
                     break;
                 default:
                     throw BEnum.InvalidEnumArgumentException(nameof(duplicateFileResolution), duplicateFileResolution);
@@ -237,6 +262,15 @@ namespace BrandonUtils.Standalone.Clerical {
             [CanBeNull]    JsonSerializerSettings settings = default
         ) {
             fileInfo.Write(JsonConvert.SerializeObject(obj, settings!));
+        }
+
+        public static void SerializeSafely<T>(
+            [NotNull] this FileInfo               fileInfo,
+            [CanBeNull]    T                      obj,
+            [CanBeNull]    JsonSerializerSettings settings = default
+        ) {
+            fileInfo.Backup(true);
+            fileInfo.SerializeForcefully(obj, settings);
         }
 
         #endregion
