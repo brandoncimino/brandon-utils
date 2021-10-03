@@ -123,9 +123,12 @@ namespace BrandonUtils.Standalone {
 
         #region Floor
 
-        public static float   Floor(this float   value) => (float)Math.Floor(value);
-        public static double  Floor(this double  value) => Math.Floor(value);
-        public static decimal Floor(this decimal value) => Math.Floor(value);
+        public static float   Floor(this      float   value) => (float)Math.Floor(value);
+        public static double  Floor(this      double  value) => Math.Floor(value);
+        public static decimal Floor(this      decimal value) => Math.Floor(value);
+        public static int     FloorToInt(this float   value) => (int)Math.Floor(value);
+        public static int     FloorToInt(this double  value) => (int)Math.Floor(value);
+        public static int     FloorToInt(this decimal value) => (int)Math.Floor(value);
 
         #endregion
 
