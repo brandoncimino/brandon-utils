@@ -131,9 +131,12 @@ namespace BrandonUtils.Standalone {
 
         #region Ceiling
 
-        public static float   Ceiling(this float   value) => (float)Math.Ceiling(value);
-        public static double  Ceiling(this double  value) => Math.Ceiling(value);
-        public static decimal Ceiling(this decimal value) => Math.Ceiling(value);
+        public static float   Ceiling(this      float   value) => (float)Math.Ceiling(value);
+        public static double  Ceiling(this      double  value) => Math.Ceiling(value);
+        public static decimal Ceiling(this      decimal value) => Math.Ceiling(value);
+        public static int     CeilingToInt(this float   value) => (int)Math.Ceiling(value);
+        public static int     CeilingToInt(this double  value) => (int)Math.Ceiling(value);
+        public static int     CeilingToInt(this decimal value) => (int)Math.Ceiling(value);
 
         #endregion
 
