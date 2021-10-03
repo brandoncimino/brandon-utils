@@ -9,11 +9,11 @@ using NUnit.Framework;
 namespace BrandonUtils.Tests.Standalone.Clerical {
     public static class SaveFileAsserter {
         public static Asserter<ISaveFile<T>> Exists<T>(this Asserter<ISaveFile<T>> self, bool expectedExistence = true) where T : ISaveData {
-            return self.And(Has.Property(nameof(SaveFile<T>.Exists)).EqualTo(expectedExistence));
+            return self.And(Has.Property(nameof(SaveFile<T>.FileSystemInfo.Exists)).EqualTo(expectedExistence));
         }
 
         public static Asserter<SaveFile<T>> Exists<T>(this Asserter<SaveFile<T>> self, bool expectedExistence = true) where T : ISaveData {
-            return self.And(Has.Property(nameof(SaveFile<T>.Exists)).EqualTo(expectedExistence));
+            return self.And(Has.Property(nameof(SaveFile<T>.FileSystemInfo.Exists)).EqualTo(expectedExistence));
         }
 
         public static Asserter<ISaveFile<T>> Nicknamed<T>(this Asserter<ISaveFile<T>> self, string expectedNickname) where T : ISaveData {
