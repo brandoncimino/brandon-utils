@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
 using BrandonUtils.Standalone.Collections;
+using BrandonUtils.Standalone.Exceptions;
+
+using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone.Strings.Prettifiers {
     internal static partial class InnerPretty {
@@ -14,41 +18,29 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
         /// <param name="settings">optional <see cref="PrettificationSettings"/></param>
         /// <returns>a pretty <see cref="string"/></returns>
         public static string PrettifyDictionary(IDictionary dictionary, PrettificationSettings settings = default) {
-            const int    maxColWidth         = 50;
-            const string headerSeparatorChar = "-";
-
             var keys = dictionary.Keys.Cast<object>().ToList();
             var vals = dictionary.Values.Cast<object>().ToList();
 
+            return PrettifyDictionary(keys, vals, settings);
+        }
+
+        private static string PrettifyDictionary(IList<object> keys, IList<object> vals, PrettificationSettings settings) {
             // get the types of the columns, to use as headers
             var keyType = keys.First(it => it != null).GetType();
             var valType = vals.First(it => it != null).GetType();
-
-            // add the headers
-            keys.Insert(0, keyType);
-            vals.Insert(0, valType);
-
-            var keyLines = keys.Select(it => it.Prettify(LineStyle.Single)).ToList();
-            var valLines = vals.Select(it => it.Prettify(LineStyle.Single)).ToList();
-
-            var keyWidth = Math.Min(keyLines.LongestLine(), maxColWidth);
-            var valWidth = Math.Min(valLines.LongestLine(), maxColWidth);
-
-            // add the separators
-            keyLines.Insert(1, headerSeparatorChar.Repeat(keyWidth));
-            valLines.Insert(1, headerSeparatorChar.Repeat(valWidth));
-
-            //NOTE: There is actually a version of select that uses the index! O_O
-            var lines = keyLines.Select<string, string>((it, i) => PrettifyPair(it, valLines[i], keyWidth, valWidth)).ToList();
-            return lines.JoinLines();
+            return PrettifyDictionary(keys, vals, keyType, valType, settings);
         }
 
-        public static string PrettifyDictionary(IDictionary dictionary, Type keyType, Type valType) {
-            const int    maxColWidth         = 50;
-            const string headerSeparatorChar = "-";
-
-            var keys = dictionary.Keys.Cast<object>().ToList();
-            var vals = dictionary.Values.Cast<object>().ToList();
+        private static string PrettifyDictionary(
+            [NotNull, ItemCanBeNull]
+            IList<object> keys,
+            [NotNull, ItemCanBeNull]
+            IList<object> vals,
+            [NotNull]   Type                   keyType,
+            [NotNull]   Type                   valType,
+            [CanBeNull] PrettificationSettings settings
+        ) {
+            settings ??= new PrettificationSettings();
 
             // add the headers
             keys.Insert(0, keyType);
@@ -57,15 +49,54 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
             var keyLines = keys.Select(it => it.Prettify(LineStyle.Single)).ToList();
             var valLines = vals.Select(it => it.Prettify(LineStyle.Single)).ToList();
 
-            var keyWidth = Math.Min(keyLines.LongestLine(), maxColWidth);
-            var valWidth = Math.Min(valLines.LongestLine(), maxColWidth);
+            const string headerSeparatorChar = "-";
+
+            if (keyLines == null) {
+                throw new NullReferenceException($"{nameof(keyLines)} is null");
+            }
+
+            if (valLines == null) {
+                throw new NullReferenceException($"{nameof(valLines)} is null");
+            }
+
+            var unlimitedKeyWidth = keyLines.LongestLine();
+            var unlimitedValWidth = valLines.LongestLine();
+
+            int keyWidth;
+            int valWidth;
+            if (unlimitedKeyWidth + unlimitedValWidth < settings.LineLengthLimit) {
+                keyWidth = unlimitedKeyWidth;
+                valWidth = unlimitedValWidth;
+            }
+            else {
+                var   totalWidth    = unlimitedKeyWidth + unlimitedValWidth;
+                float keyWidthRatio = (float)unlimitedKeyWidth / totalWidth;
+                float valWidthRatio = (float)unlimitedValWidth / totalWidth;
+                var   exactKeyWidth = totalWidth               * keyWidthRatio;
+                var   exactValWidth = totalWidth               * valWidthRatio;
+                if (exactKeyWidth < exactValWidth) {
+                    keyWidth = exactKeyWidth.CeilingToInt();
+                    valWidth = exactValWidth.FloorToInt();
+                }
+                else {
+                    keyWidth = exactKeyWidth.FloorToInt();
+                    valWidth = exactValWidth.CeilingToInt();
+                }
+
+                // checking my work
+                if (keyWidth + valWidth != totalWidth) {
+                    throw new BrandonException($"[{nameof(keyWidth)}] {keyWidth} + [{nameof(valWidth)}] {valWidth} != [{totalWidth}] {totalWidth}!");
+                }
+            }
 
             // add the separators
             keyLines.Insert(1, headerSeparatorChar.Repeat(keyWidth));
             valLines.Insert(1, headerSeparatorChar.Repeat(valWidth));
 
             //NOTE: There is actually a version of select that uses the index! O_O
-            var lines = keyLines.Select<string, string>((it, i) => PrettifyPair(it, valLines[i], keyWidth, valWidth)).ToList();
+            var lines = keyLines.Select((it, i) => PrettifyPair(it, valLines[i], keyWidth, valWidth))
+                                .Bookend("\n")
+                                .ToList();
             return lines.JoinLines();
         }
 
@@ -82,8 +113,14 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
          * <remarks>I would have this operate on <see cref="KeyedCollection{TKey,TItem}"/>, but unfortunately, <see cref="KeyedCollection{TKey,TItem}.GetKeyForItem"/> is <c>protected</c>.</remarks>
          */
         internal static string PrettifyKeyedList<TKey, TValue>(KeyedList<TKey, TValue> keyedList, PrettificationSettings settings = default) {
-            // return PrettifyDictionary(keyedList.ToDictionary(), settings);
-            return InnerPretty.PrettifyDictionary(keyedList.ToDictionary(), typeof(TKey), typeof(TValue));
+            IDictionary dictionary = keyedList.ToDictionary();
+            return PrettifyDictionary(
+                dictionary.Keys.Cast<object>().ToList(),
+                dictionary.Values.Cast<object>().ToList(),
+                typeof(TKey),
+                typeof(TValue),
+                settings
+            );
         }
     }
 }

@@ -304,14 +304,31 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="self">the <see cref="string"/> being truncated</param>
         /// <param name="maxLength">the <b>maximum</b> size of the final string</param>
         /// <param name="trail">a <see cref="string"/> to replace the end bits of <paramref name="self"/> to show that it has been truncated. Defaults to an <see cref="Ellipsis"/></param>
-        /// <returns></returns>
-        public static string Truncate([CanBeNull] this string self, [ValueRange(0, long.MaxValue)] int maxLength, [CanBeNull] string trail = Ellipsis) {
-            if (self == null) {
+        /// <returns>a <see cref="string"/> no longer than <paramref name="maxLength"/></returns>
+        /// <exception cref="ArgumentOutOfRangeException">if <paramref name="maxLength"/> is negative</exception>
+        /// <exception cref="ArgumentOutOfRangeException">if <paramref name="trail"/> is longer than <paramref name="maxLength"/></exception>
+        [NotNull]
+        public static string Truncate(
+            [CanBeNull] this string self,
+            [NonNegativeValue]
+            int maxLength,
+            [CanBeNull] string trail = Ellipsis
+        ) {
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+            if (maxLength < 0) {
+                throw new ArgumentOutOfRangeException(nameof(maxLength), "Must be positive");
+            }
+
+            if (trail?.Length >= maxLength) {
+                throw new ArgumentOutOfRangeException(nameof(trail), $"{nameof(trail)}.{nameof(trail.Length)} [{trail?.Length}] must be less than {nameof(maxLength)} [{maxLength}]");
+            }
+
+            if (self == null || maxLength == 0) {
                 return "";
             }
 
             if (self.Length > maxLength) {
-                var shortened = self.Substring(0, maxLength - trail?.Length ?? 0);
+                var shortened = self.Substring(0, maxLength - (trail?.Length ?? 0));
                 return $"{shortened}{trail}";
             }
 
@@ -740,9 +757,14 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="blankPlaceholder">the fallback string if <paramref name="str"/> <see cref="IsBlank"/>. Defaults to <c>""</c></param>
         /// <returns>this <see cref="string"/> or <paramref name="blankPlaceholder"/></returns>
         [NotNull]
-        public static string IfBlank([CanBeNull] this string str, [CanBeNull] string blankPlaceholder) {
+        public static string IfBlank([CanBeNull] this string str, [NotNull] string blankPlaceholder) {
             blankPlaceholder ??= "";
             return str.IsBlank() ? blankPlaceholder : str;
+        }
+
+        [NotNull]
+        public static string UnlessBlank([CanBeNull] this string str) {
+            return str.IsNotBlank() ? str : throw new ArgumentException($"The string must not be blank! (Actual: [{str ?? Prettification.DefaultNullPlaceholder}]");
         }
 
         #endregion

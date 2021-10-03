@@ -66,7 +66,9 @@ namespace BrandonUtils.Standalone.Strings {
             try {
                 return Prettify(cinderella, settings);
             }
-            catch {
+            catch (Exception e) {
+                var str = $"Error during prettification of [{cinderella}]:\n{e})";
+                Console.WriteLine(str);
                 return Convert.ToString(cinderella);
             }
         }
