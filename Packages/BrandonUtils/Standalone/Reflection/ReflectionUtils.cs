@@ -519,5 +519,113 @@ namespace BrandonUtils.Standalone.Reflection {
         }
 
         #endregion
+
+        #region Type Ancestry
+
+        [NotNull]
+        internal static Type CommonType([CanBeNull, ItemCanBeNull, InstantHandle] IEnumerable<Type> types) {
+            if (types == null) {
+                return typeof(object);
+            }
+
+            types = types.ToList();
+            var baseClass = CommonBaseClass(types);
+            if (baseClass != typeof(object)) {
+                return baseClass;
+            }
+
+            var commonInterfaces = CommonInterfaces(types);
+            return commonInterfaces.FirstOrDefault() ?? typeof(object);
+        }
+
+        internal static Type CommonBaseClass(IEnumerable<Type> types) {
+            Type mostCommonType = default;
+
+            foreach (var t in types) {
+                mostCommonType = CommonBaseClass(mostCommonType, t);
+                if (mostCommonType == typeof(object)) {
+                    return mostCommonType;
+                }
+            }
+
+            return mostCommonType ?? typeof(object);
+        }
+
+        [CanBeNull]
+        public static Type CommonBaseClass([CanBeNull] Type a, [CanBeNull] Type b) {
+            if (a == null || b == null) {
+                return a ?? b;
+            }
+
+            while (true) {
+                if (a == b) {
+                    return a;
+                }
+
+                if (a.IsAssignableFrom(b)) {
+                    return a;
+                }
+
+                if (b.IsAssignableFrom(a)) {
+                    return b;
+                }
+
+                if (a.BaseType == null) {
+                    return typeof(object);
+                }
+
+                a = a.BaseType;
+            }
+        }
+
+        // [CanBeNull]
+        // internal static Type CommonInterface([CanBeNull] Type a, [CanBeNull] Type b) {
+        //     var overlap = CommonInterfaces(a, b).ToList();
+        //     return overlap.FirstOrDefault();
+        // }
+
+        [NotNull]
+        [ItemNotNull]
+        internal static IEnumerable<Type> CommonInterfaces([CanBeNull] Type a, [CanBeNull] Type b) {
+            var aInts = a.GetAllInterfaces();
+            var bInts = b.GetAllInterfaces();
+            return aInts.Intersect(bInts);
+        }
+
+        [NotNull]
+        internal static IEnumerable<Type> CommonInterfaces([NotNull, ItemCanBeNull] IEnumerable<Type> types) {
+            return types.Select(it => it.GetAllInterfaces()).Intersection();
+        }
+
+        #endregion
+
+
+        public static IEnumerable<Type> GetAllInterfaces([CanBeNull] this Type type) {
+            return _GetAllInterfaces(type);
+        }
+
+        private static IEnumerable<Type> _GetAllInterfaces([CanBeNull] this Type type, [CanBeNull] IEnumerable<Type> soFar = default) {
+            var ints = (type?.GetInterfaces()).NonNull().ToList();
+            soFar = soFar.NonNull();
+            if (type?.IsInterface == true) {
+                soFar = soFar.Union(type);
+            }
+
+            return (soFar ?? new List<Type>())
+                   .Union(ints)
+                   .Concat(ints.SelectMany(ti => _GetAllInterfaces(ti, soFar)))
+                   .Distinct();
+        }
+
+        private static IEnumerable<Type> Ancestors(this Type type) {
+            var ancestors = new List<Type>();
+
+            while (type != null) {
+                ancestors.Add(type);
+                type = type.BaseType;
+            }
+
+            return ancestors;
+        }
     }
 }

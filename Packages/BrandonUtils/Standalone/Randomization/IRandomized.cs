@@ -2,7 +2,8 @@
 
 namespace BrandonUtils.Standalone.Randomization {
     public interface IRandomized<out T> {
-        public Func<T> Randomizer { get; }
+        public Func<Random, T> Randomizer { get; }
+        public Random          Generator  { get; }
 
         public T Value { get; }
     }

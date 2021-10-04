@@ -140,15 +140,32 @@ namespace BrandonUtils.Standalone.Clerical {
 
         #endregion
 
+        [NotNull]
+        public static string GetChildPath([NotNull] this DirectoryInfo parent, [CanBeNull] string relativePath) {
+            if (parent == null) {
+                throw new ArgumentNullException(nameof(parent));
+            }
+
+            Console.WriteLine(
+                new Dictionary<object, object>() {
+                    [nameof(parent)]       = parent,
+                    [nameof(relativePath)] = relativePath,
+                    ["joined"]             = BPath.JoinPath(parent, relativePath)
+                }.Prettify(new PrettificationSettings() { LineLengthLimit = { Value = int.MaxValue } })
+            );
+
+            return BPath.JoinPath(parent, relativePath);
+        }
+
         private static InvalidOperationException NotMyChildException(DirectoryInfo parent, FileSystemInfo child) {
             return new InvalidOperationException(
-                $"The {nameof(parent)} {parent.GetType().Prettify()} does not contain the {nameof(child)} {child.GetType().Prettify()}! {FamilyString(parent, child)}"
+                $"The {nameof(parent)} {parent.GetType().Prettify()} does not contain the {nameof(child)} {child.GetType().Prettify()}!\n{FamilyString(parent, child)}"
             );
         }
 
         private static InvalidOperationException NotMyMomException(FileSystemInfo child, DirectoryInfo parent) {
             return new InvalidOperationException(
-                $"The {nameof(child)} {child.GetType().Prettify()} isn't contained by the {nameof(parent)} {parent.GetType().Prettify()}! {FamilyString(parent, child)}"
+                $"The {nameof(child)} {child.GetType().Prettify()} isn't contained by the {nameof(parent)} {parent.GetType().Prettify()}!\n{FamilyString(parent, child)}"
             );
         }
 
@@ -165,7 +182,7 @@ namespace BrandonUtils.Standalone.Clerical {
         }
 
         private static string FamilyString(DirectoryInfo parent, FileSystemInfo child) {
-            return new Dictionary<string, FileSystemInfo>() {
+            return new Dictionary<object, object>() {
                 [nameof(parent)] = parent,
                 [nameof(child)]  = child
             }.Prettify();

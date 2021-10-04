@@ -13,7 +13,7 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
             }
 
             saveFile.FileSystemInfo.Refresh();
-            if (saveFile.Exists == false) {
+            if (saveFile.FileSystemInfo.Exists == false) {
                 throw new FileNotFoundException($"The file referenced by the {saveFile.GetType().Prettify()} {saveFile.Nickname} does not exist!");
             }
         }

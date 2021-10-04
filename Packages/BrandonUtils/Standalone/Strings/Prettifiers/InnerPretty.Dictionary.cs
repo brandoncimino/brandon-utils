@@ -36,15 +36,15 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
             IList<object> keys,
             [NotNull, ItemCanBeNull]
             IList<object> vals,
-            [NotNull]   Type                   keyType,
-            [NotNull]   Type                   valType,
+            [NotNull]   object                 keyHeader,
+            [NotNull]   object                 valHeader,
             [CanBeNull] PrettificationSettings settings
         ) {
             settings ??= new PrettificationSettings();
 
             // add the headers
-            keys.Insert(0, keyType);
-            vals.Insert(0, valType);
+            keys.Insert(0, keyHeader);
+            vals.Insert(0, valHeader);
 
             var keyLines = keys.Select(it => it.Prettify(LineStyle.Single)).ToList();
             var valLines = vals.Select(it => it.Prettify(LineStyle.Single)).ToList();

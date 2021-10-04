@@ -745,9 +745,25 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="emptyPlaceholder">the fallback string if <paramref name="str"/> <see cref="IsNullOrEmpty"/>. Defaults to <c>""</c></param>
         /// <returns>this <see cref="string"/> or <paramref name="emptyPlaceholder"/></returns>
         [NotNull]
-        public static string IfEmpty([CanBeNull] this string str, [CanBeNull] string emptyPlaceholder) {
+        public static string IfEmpty([CanBeNull] this string str, [NotNull] string emptyPlaceholder) {
+            if (emptyPlaceholder == null) {
+                throw new ArgumentNullException(nameof(emptyPlaceholder));
+            }
+
             emptyPlaceholder ??= "";
             return str.IsNullOrEmpty() ? emptyPlaceholder : str;
+        }
+
+        [NotNull]
+        public static string OrNullPlaceholder([CanBeNull] this object obj, [CanBeNull] string nullPlaceholder = Prettification.DefaultNullPlaceholder) {
+            nullPlaceholder ??= Prettification.DefaultNullPlaceholder;
+            return obj?.ToString() ?? nullPlaceholder;
+        }
+
+        [NotNull]
+        public static string OrNullPlaceholder([CanBeNull] this object obj, [CanBeNull] PrettificationSettings settings) {
+            settings ??= new PrettificationSettings();
+            return OrNullPlaceholder(obj, settings.NullPlaceholder);
         }
 
         /// <summary>

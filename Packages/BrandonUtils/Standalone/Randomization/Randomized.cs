@@ -3,15 +3,19 @@ using System.Collections.Generic;
 
 using BrandonUtils.Standalone.Collections;
 
+using JetBrains.Annotations;
+
 namespace BrandonUtils.Standalone.Randomization {
     public class Randomized<T> : IRandomized<T> {
-        public Func<T> Randomizer { get; protected set; }
-        public T       Value      => Randomizer.Invoke();
+        public Func<Random, T> Randomizer { get; protected set; }
+        public Random          Generator  { get; }
+        public T               Value      => Randomizer.Invoke(Generator);
 
         protected Randomized() { }
 
-        public Randomized(Func<T> randomizer) {
-            this.Randomizer = randomizer;
+        public Randomized([NotNull] Func<Random, T> randomizer, [CanBeNull] Random generator = default) {
+            Generator  = generator ?? Brandom.Gen;
+            Randomizer = randomizer;
         }
 
         public static Randomized<T> FromList(ICollection<T> choices) {

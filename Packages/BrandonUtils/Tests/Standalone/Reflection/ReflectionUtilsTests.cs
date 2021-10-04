@@ -1,11 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 
+using BrandonUtils.Standalone;
+using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Reflection;
+using BrandonUtils.Standalone.Strings;
+using BrandonUtils.Testing;
 
 using NUnit.Framework;
+
+using Is = NUnit.Framework.Is;
 
 // ReSharper disable MemberCanBePrivate.Local
 // ReSharper disable UnusedAutoPropertyAccessor.Local
@@ -309,6 +316,62 @@ namespace BrandonUtils.Tests.Standalone.Reflection {
                    .And.Property(nameof(Constructibles.OptionalParamConstructor.OptionalWasProvided))
                    .True
             );
+        }
+
+        #endregion
+
+        #region Type Ancestry
+
+        [TestCase(
+            new[] { typeof(List<object>), typeof(IList<object>), typeof(IEnumerable<object>) },
+            typeof(IEnumerable<object>)
+        )]
+        [TestCase(
+            new[] {
+                typeof(int),
+                typeof(string)
+            },
+            typeof(object)
+        )]
+        [TestCase(
+            new[] {
+                typeof(List<object>),
+                typeof(Collection<object>)
+            },
+            typeof(IEnumerable<object>)
+        )]
+        public void MostCommonType(Type[] types, Type expectedType) {
+            var ass = Asserter.WithHeading($"{nameof(MostCommonType)} for: {types.Prettify()}");
+
+            new[] {
+                (types, "Forward"),
+                (types.Randomize(), "Random"),
+                (types.Reverse(), "Reversed")
+            }.ForEach(
+                it => {
+                    var (typeList, message) = it;
+                    ass.And(() => Assert.That(ReflectionUtils.CommonType(typeList), Is.EqualTo(expectedType), message));
+                }
+            );
+
+            ass.Invoke();
+        }
+
+        public static IEnumerable<KeyValuePair<Type, IEnumerable<Type>>> AllInterfaceExpectations() {
+            return InterfaceExpectations.ExpectedTypes;
+        }
+
+        [Test]
+        public void AllInterfacesTest([ValueSource(nameof(AllInterfaceExpectations))] KeyValuePair<Type, IEnumerable<Type>> expectation) {
+            Assert.That(ReflectionUtils.GetAllInterfaces(expectation.Key).ToList(), Is.EquivalentTo(expectation.Value.Where(it => it.IsInterface).ToList()));
+        }
+
+        [Test]
+        [TestCase(typeof(Duckmobile), typeof(TrainCar), new[] { typeof(ILand), typeof(ICar) })]
+        public void CommonInterface(Type a, Type b, Type[] expectedOptions) {
+            var actual = ReflectionUtils.CommonInterfaces(a, b);
+
+            Assert.That(actual, Is.EquivalentTo(expectedOptions));
         }
 
         #endregion

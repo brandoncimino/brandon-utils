@@ -7,7 +7,6 @@ using System.Linq;
 
 using BrandonUtils.Standalone.Enums;
 using BrandonUtils.Standalone.Optional;
-using BrandonUtils.Standalone.Randomization;
 using BrandonUtils.Standalone.Strings;
 
 using JetBrains.Annotations;
@@ -20,32 +19,6 @@ namespace BrandonUtils.Standalone.Collections {
     /// </summary>
     [PublicAPI]
     public static class CollectionUtils {
-        #region Randomization
-
-        /// <param name="collection"></param>
-        /// <typeparam name="T">The type of the <see cref="Collection{T}"/></typeparam>
-        /// <returns>a random <see cref="Enumerable.ElementAt{TSource}"/> from the given <paramref name="collection"/>.</returns>
-        [Pure]
-        public static T Random<T>(this ICollection<T> collection) {
-            return collection.Count switch {
-                1 => collection.Single(),
-                0 => throw new IndexOutOfRangeException($"Attempted to select a {nameof(Random)} element, but the given collection was empty!"),
-                _ => collection.ElementAt(Brandom.Gen.Next(0, collection.Count))
-            };
-        }
-
-        /// <summary>
-        /// Similar to <see cref="Random{T}"/>, but <b><see cref="Collection{T}.Remove"/>s the item</b>.
-        /// </summary>
-        /// <param name="collection"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns>a <see cref="Random{T}"/> entry from <paramref name="collection"/></returns>
-        public static T GrabRandom<T>(this ICollection<T> collection) {
-            var random = collection.Random();
-            collection.Remove(random);
-            return random;
-        }
-
         /// <summary>
         /// Retrieves and <see cref="ICollection{T}.Remove"/>s the <see cref="Enumerable.ElementAt{TSource}"/> <paramref name="index"/>
         /// </summary>
@@ -59,45 +32,11 @@ namespace BrandonUtils.Standalone.Collections {
             return item;
         }
 
-        /// <summary>
-        /// Randomizes all of the entries in <see cref="oldList"/>.
-        /// </summary>
-        /// <param name="oldList"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static void Randomize<T>(this ICollection<T> oldList) {
-            var backupList = oldList.Copy();
-            oldList.Clear();
-
-            while (backupList.Any()) {
-                oldList.Add(GrabRandom(backupList));
-            }
-
-            // Previously, I was returning the collection, for method chaining; but I couldn't get the generics to be happy about that :(
-            // Having this be void makes me sad, but it's the same as .Sort() :(
-            // return oldList;
-        }
-
-        /// <summary>
-        /// TODO: I would like it if this wasn't limited to <see cref="List{T}"/>, but that would require 2 type parameters...
-        /// </summary>
-        /// <param name="oldList"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        [Pure]
-        public static IList<T> RandomCopy<T>(this List<T> oldList) {
-            var copy = oldList.Copy();
-            copy.Randomize();
-            return copy;
-        }
-
         [Pure]
         // ReSharper disable once ReturnTypeCanBeEnumerable.Global
         public static List<T> ListOf<T>(params T[] stuff) {
             return new List<T>(stuff);
         }
-
-        #endregion
 
         #region Copying
 
@@ -758,6 +697,33 @@ namespace BrandonUtils.Standalone.Collections {
             return true;
         }
 
+        [LinqTunnel]
+        [NotNull]
+        [ContractAnnotation("source:null => stop")]
+        public static IEnumerable<T> Union<T>(
+            [NotNull, ItemCanBeNull]
+            this IEnumerable<T> source,
+            [CanBeNull] T newItem
+        ) {
+            if (source == null) {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            return source.Union(Enumerable.Repeat(newItem, 1));
+        }
+
+        [LinqTunnel]
+        [NotNull]
+        [ContractAnnotation("source:null => stop")]
+        public static IEnumerable<T> Union<T>(
+            [NotNull, ItemCanBeNull]
+            this IEnumerable<T> source,
+            [NotNull, ItemCanBeNull]
+            params T[] others
+        ) {
+            return source.Union(others.AsEnumerable());
+        }
+
         /// <summary>
         /// Both <see cref="Enumerable.Append{TSource}"/>s and <see cref="Enumerable.Prepend{TSource}"/>s <paramref name="bookend"/> to <paramref name="source"/>.
         /// </summary>
@@ -880,7 +846,8 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T">the type of the items in <paramref name="source"/></typeparam>
         /// <returns>a new sequence containing only the non-<c>null</c> entries from <paramref name="source"/></returns>
         [NotNull]
-        public static IEnumerable<T> NonNull<T>([CanBeNull] [ItemCanBeNull] this IEnumerable<T> source) {
+        [ItemNotNull]
+        public static IEnumerable<T> NonNull<T>([CanBeNull, ItemCanBeNull] this IEnumerable<T> source) {
             return source == null ? Enumerable.Empty<T>() : source.Where(it => it != null);
         }
 
@@ -942,6 +909,61 @@ namespace BrandonUtils.Standalone.Collections {
             }
 
             return null;
+        }
+
+        #endregion
+
+        public static IEnumerable<T> EmptyIfNull<T>([CanBeNull, ItemCanBeNull] this IEnumerable<T> source) {
+            return source ?? Enumerable.Empty<T>();
+        }
+
+        public static IEnumerable<T> EmptyIfNull<T>([CanBeNull, ItemCanBeNull] this T[] source) {
+            return source ?? Array.Empty<T>();
+        }
+
+        #region Intersection
+
+        public static IEnumerable<T> Intersection<T>(
+            [NotNull, ItemCanBeNull]
+            this IEnumerable<T> source,
+            [NotNull, ItemCanBeNull]
+            IEnumerable<T> second,
+            [NotNull, ItemNotNull]
+            params IEnumerable<T>[] additional
+        ) {
+            if (source == null) {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (second == null) {
+                throw new ArgumentNullException(nameof(second));
+            }
+
+            if (additional == null) {
+                throw new ArgumentNullException(nameof(additional));
+            }
+
+            return additional.Prepend(source).Prepend(second).Intersection();
+        }
+
+        public static IEnumerable<T> Intersection<T>([NotNull] this IEnumerable<T> source, [NotNull, ItemNotNull] IEnumerable<IEnumerable<T>> others) {
+            if (source == null) {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (others == null) {
+                throw new ArgumentNullException(nameof(others));
+            }
+
+            return others.Prepend(source).Intersection();
+        }
+
+        public static IEnumerable<T> Intersection<T>([NotNull, ItemNotNull] this IEnumerable<IEnumerable<T>> sources) {
+            if (sources == null) {
+                throw new ArgumentNullException(nameof(sources));
+            }
+
+            return sources.Aggregate((soFar, next) => soFar.Intersect(next)).Distinct();
         }
 
         #endregion

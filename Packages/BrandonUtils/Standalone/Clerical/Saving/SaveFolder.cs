@@ -7,13 +7,15 @@ using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone.Clerical.Saving {
     [PublicAPI]
-    public class SaveFolder : CustomDirectoryInfo {
+    public readonly struct SaveFolder : ISaveFolder {
         public const string SaveFolderName = "SaveData";
 
-        [NotNull] public string PersistentDataPath { get; set; }
-        [NotNull] public string GameName           { get; set; }
+        public           string PersistentDataPath             { get; }
+        public           string RelativePathFromPersistentData => GameName;
+        [NotNull] public string GameName                       { get; }
 
-        [NotNull] public override DirectoryInfo Directory => new DirectoryInfo(FolderPath);
+        public DirectoryInfo  Directory      => new DirectoryInfo(FolderPath);
+        public FileSystemInfo FileSystemInfo => Directory;
 
 
         public SaveFolder(
@@ -39,12 +41,13 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
             GameName
         );
 
-        [NotNull]
-        public IEnumerable<SaveFile<T>> EnumerateSaveFiles<T>(string searchPattern) where T : ISaveData {
-            if (Exists) {
-                return EnumerateFiles(searchPattern, SearchOption.TopDirectoryOnly)
-                       .Select(it => new SaveFile<T>(this, it))
-                       .OrderByDescending(it => it.TimeStamp);
+
+        public IEnumerable<ISaveFile<T>> EnumerateSaveFiles<T>(string searchPattern) where T : ISaveData {
+            var self = this;
+            if (Directory.Exists) {
+                return Directory.EnumerateFiles(searchPattern, SearchOption.TopDirectoryOnly)
+                                .Select(it => new SaveFile<T>(self, it))
+                                .OrderByDescending(it => it.TimeStamp);
             }
             else {
                 return Enumerable.Empty<SaveFile<T>>();

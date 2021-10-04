@@ -14,15 +14,18 @@ namespace BrandonUtils.Standalone.Strings {
     public static class TypeLabelStyleExtensions {
         [NotNull]
         public static string GetTypeLabel([CanBeNull] this Type type, [CanBeNull] PrettificationSettings settings) {
-            if (type == null || settings?.TypeLabelStyle == TypeNameStyle.None) {
+            settings ??= new PrettificationSettings();
+
+            if (type == null || settings.TypeLabelStyle == TypeNameStyle.None) {
                 return "";
             }
 
             return $"[{type.PrettifyType(settings)}]";
         }
 
-        public static string WithTypeLabel(string thing, Type type, [CanBeNull] PrettificationSettings settings) {
-            return $"{GetTypeLabel(type, settings)}{thing}";
+        [NotNull]
+        public static string WithTypeLabel([CanBeNull] string thing, [CanBeNull] Type type, [CanBeNull] PrettificationSettings settings) {
+            return $"{GetTypeLabel(type, settings)}{thing.OrNullPlaceholder(settings)}";
         }
     }
 }

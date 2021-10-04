@@ -23,16 +23,12 @@ namespace BrandonUtils.Standalone.Strings {
         }
 
         public string Prettify([CanBeNull] T cinderella, PrettificationSettings settings = default) {
-            return cinderella == null ? "" : PrettificationFunction.Invoke(cinderella, settings);
+            settings ??= new PrettificationSettings();
+            return cinderella == null ? settings.NullPlaceholder : PrettificationFunction.Invoke(cinderella, settings);
         }
 
         public string PrettifySafely(T cinderella, PrettificationSettings settings = default) {
-            try {
-                return Prettify(cinderella, settings);
-            }
-            catch {
-                return Convert.ToString(cinderella);
-            }
+            return PrettifySafely((object)cinderella, settings);
         }
 
         private T TrySlipper([NotNull] object cinderella) {
@@ -44,14 +40,18 @@ namespace BrandonUtils.Standalone.Strings {
         }
 
         public string Prettify(object cinderella, PrettificationSettings settings = default) {
+            settings ??= new PrettificationSettings();
+
             if (PrettifierType.IsGenericTypeOrDefinition()) {
                 return PrettifyGeneric(cinderella, settings);
             }
 
-            return cinderella == null ? "" : Prettify(TrySlipper(cinderella), settings);
+            return cinderella == null ? settings.NullPlaceholder : Prettify(TrySlipper(cinderella), settings);
         }
 
         private string PrettifyGeneric(object cinderella, PrettificationSettings settings = default) {
+            settings ??= new PrettificationSettings();
+
             if (!(cinderella.GetType().IsGenericType || cinderella.GetType().IsGenericTypeDefinition)) {
                 throw new ArgumentException($"Can't use generic prettification for {cinderella.GetType()} because it isn't a generic type!");
             }
