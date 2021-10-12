@@ -22,7 +22,7 @@ namespace BrandonUtils.Standalone.Strings {
             PrettificationFunction = prettifierFunc;
         }
 
-        public string Prettify([CanBeNull] T cinderella, PrettificationSettings settings = default) {
+        public string Prettify(T cinderella, PrettificationSettings settings = default) {
             settings ??= new PrettificationSettings();
             return cinderella == null ? settings.NullPlaceholder : PrettificationFunction.Invoke(cinderella, settings);
         }

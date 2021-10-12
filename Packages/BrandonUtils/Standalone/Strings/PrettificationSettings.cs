@@ -17,14 +17,17 @@ namespace BrandonUtils.Standalone.Strings {
         /// </summary>
         [NotNull]
         public Fallback<LineStyle> PreferredLineStyle { get; } = new Fallback<LineStyle>(LineStyle.Dynamic);
+
         [NotNull] public Fallback<TypeNameStyle> TypeLabelStyle { get; } = new Fallback<TypeNameStyle>(TypeNameStyle.Full);
 
+        [NotNull]
         public static implicit operator PrettificationSettings(LineStyle lineStyle) {
             return new PrettificationSettings() {
                 PreferredLineStyle = { Value = lineStyle }
             };
         }
 
+        [NotNull]
         public static implicit operator PrettificationSettings(TypeNameStyle typeLabelStyle) {
             return new PrettificationSettings() {
                 TypeLabelStyle = { Value = typeLabelStyle }

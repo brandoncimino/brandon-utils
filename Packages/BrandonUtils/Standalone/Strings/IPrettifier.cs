@@ -18,14 +18,14 @@ namespace BrandonUtils.Standalone.Strings {
         /// <exception cref="InvalidCastException">if <paramref name="cinderella"/> is not of the <see cref="PrettifierType"/></exception>
         /// <seealso cref="PrettifySafely"/>
         [NotNull]
-        string Prettify([CanBeNull] object cinderella, PrettificationSettings settings = default);
+        string Prettify([CanBeNull] object cinderella, [CanBeNull] PrettificationSettings settings = default);
 
         /**
          * <summary>Attempts to <see cref="Prettify"/> <paramref name="cinderella"/>, falling back to <see cref="Convert.ToString(object)"/> if an <see cref="Exception"/> occurs.</summary>
          * <inheritdoc cref="Prettify"/>
          */
         [NotNull]
-        string PrettifySafely([CanBeNull] object cinderella, PrettificationSettings settings = default);
+        string PrettifySafely([CanBeNull] object cinderella, [CanBeNull] PrettificationSettings settings = default);
     }
 
     /**
@@ -35,11 +35,13 @@ namespace BrandonUtils.Standalone.Strings {
         /**
          * <inheritdoc cref="IPrettifier.Prettify"/>
          */
-        string Prettify(T cinderella, PrettificationSettings settings = default);
+        [NotNull]
+        string Prettify([CanBeNull] T cinderella, [CanBeNull] PrettificationSettings settings = default);
 
         /**
          * <inheritdoc cref="IPrettifier.PrettifySafely"/>
          */
-        string PrettifySafely(T cinderella, PrettificationSettings settings = default);
+        [NotNull]
+        string PrettifySafely([CanBeNull] T cinderella, [CanBeNull] PrettificationSettings settings = default);
     }
 }

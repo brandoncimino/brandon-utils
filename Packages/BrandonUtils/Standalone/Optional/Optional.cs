@@ -94,28 +94,28 @@ namespace BrandonUtils.Standalone.Optional {
         /// <param name="optional">this <see cref="IOptional{T}"/></param>
         /// <param name="fallback">the return value if this <see cref="CollectionUtils.IsEmpty{T}"/></param>
         /// <returns><see cref="IOptional{T}.Value"/> if it this <see cref="IOptional{T}.HasValue"/>; otherwise, returns <see cref="fallback"/>.</returns>
-        public static T GetValueOrDefault<T>([CanBeNull] [ItemCanBeNull] this IOptional<T> optional, [CanBeNull] T fallback) {
-            return optional is { HasValue: true } ? optional.Value : fallback;
+        [CanBeNull]
+        public static T GetValueOrDefault<T>([CanBeNull, ItemCanBeNull] this IOptional<T> optional, [CanBeNull] T fallback) {
+            return optional?.HasValue == true ? optional.Value : fallback;
         }
 
         /// <summary>
         /// Returns <see cref="IOptional{T}.Value"/> if it is present; otherwise, <see cref="Func{TResult}.Invoke"/>s <see cref="fallbackSupplier"/>.
         /// </summary>
         /// <remarks>
-        /// Corresponds to Java's <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html#orElseGet-java.util.function.Supplier-">Optional.orElseGet()</a>,
-        /// but with C#-style naming that matches <see cref="Nullable{T}"/>.<see cref="Nullable{T}.GetValueOrDefault()"/>.
+        /// Corresponds to:
+        /// Corresponds to Java's <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html#orElseGet-java.util.function.Supplier-">Optional.orElseGet()</a>.
         /// </remarks>
         /// <param name="optional">this <see cref="IOptional{T}"/></param>
         /// <param name="fallbackSupplier">a <see cref="Func{TResult}"/> that produces a <see cref="T"/> if <see cref="IOptional{T}.Value"/> isn't present</param>
         /// <returns><see cref="IOptional{T}.Value"/> if this <see cref="IOptional{T}.HasValue"/>; otherwise, <see cref="Func{TResult}.Invoke"/>s <see cref="fallbackSupplier"/></returns>
-        public static T GetValueOrDefault<T>([CanBeNull] this IOptional<T> optional, [NotNull] Func<T> fallbackSupplier) {
+        [CanBeNull]
+        public static T GetValueOrDefault<T>([CanBeNull, ItemCanBeNull] this IOptional<T> optional, [NotNull] Func<T> fallbackSupplier) {
             if (fallbackSupplier == null) {
                 throw new ArgumentNullException(nameof(fallbackSupplier));
             }
 
-            // woah...this some new-fangled way to say:
-            // return optional != null && optional.HasValue ? optional.Value : fallbackSupplier.Invoke();
-            return optional is { HasValue: true } ? optional.Value : fallbackSupplier.Invoke();
+            return optional?.HasValue == true ? optional.Value : fallbackSupplier.Invoke();
         }
 
         #endregion
@@ -215,7 +215,8 @@ namespace BrandonUtils.Standalone.Optional {
         /// <param name="optional">an <see cref="IOptional{T}"/></param>
         /// <typeparam name="T">the underlying type of the <see cref="IOptional{T}"/></typeparam>
         /// <returns>a <see cref="object.ToString"/> representation of the given <see cref="IOptional{T}"/></returns>
-        public static string ToString<T>([CanBeNull] IOptional<T> optional) {
+        [NotNull]
+        public static string ToString<T>([CanBeNull, ItemCanBeNull] IOptional<T> optional) {
             var realType   = optional?.GetType() ?? typeof(T);
             var prettyType = realType.Prettify();
             if (optional == null) {
