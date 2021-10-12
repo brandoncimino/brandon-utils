@@ -18,7 +18,7 @@ namespace BrandonUtils.Standalone {
         /// <param name="boolean">a <see cref="bool"/></param>
         /// <returns><c>0</c> if the <see cref="bool"/> is <c>false</c>; <c>1</c> if the <see cref="bool"/> is <c>true</c></returns>
         [Pure]
-        public static int Int(this bool boolean) {
+        public static int ToInt(this bool boolean) {
             return Convert.ToInt32(boolean);
         }
 
@@ -80,24 +80,49 @@ namespace BrandonUtils.Standalone {
         /// See <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/integral-numeric-types">Integral Numeric Types</a>
         /// </summary>
         private static readonly ReadOnlyCollection<Type> IntegralTypes = Array.AsReadOnly(
-            new[] { typeof(byte), typeof(sbyte), typeof(ushort), typeof(short), typeof(int), typeof(uint), typeof(long), typeof(ulong), }
+            new[] {
+                typeof(byte),
+                typeof(sbyte),
+                typeof(ushort),
+                typeof(short),
+                typeof(int),
+                typeof(uint),
+                typeof(long),
+                typeof(ulong),
+            }
         );
 
         /// <summary>
         /// See <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/floating-point-numeric-types">Floating-Point Numeric Types</a>
         /// </summary>
         private static readonly ReadOnlyCollection<Type> FloatingPointTypes = Array.AsReadOnly(
-            new[] { typeof(float), typeof(double), typeof(decimal) }
+            new[] {
+                typeof(float),
+                typeof(double),
+                typeof(decimal)
+            }
         );
 
         /// <summary>
         /// Both <see cref="IntegralTypes"/> and <see cref="FloatingPointTypes"/>.
         /// </summary>
-        public static readonly ReadOnlyCollection<Type> NumericTypes = FloatingPointTypes.Union(IntegralTypes).ToList().AsReadOnly();
+        public static readonly ReadOnlyCollection<Type> NumericTypes = FloatingPointTypes.Union(
+                                                                                             IntegralTypes
+                                                                                         )
+                                                                                         .ToList()
+                                                                                         .AsReadOnly();
+
         /// <summary>
         /// Special <see cref="NumericTypes"/> that are automatically cast to <see cref="Int32"/> when used in <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/arithmetic-operators">arithmetic</a>.
         /// </summary>
-        public static readonly ReadOnlyCollection<Type> PseudoIntTypes = Array.AsReadOnly(new[] { typeof(byte), typeof(sbyte), typeof(short), typeof(ushort) });
+        public static readonly ReadOnlyCollection<Type> PseudoIntTypes = Array.AsReadOnly(
+            new[] {
+                typeof(byte),
+                typeof(sbyte),
+                typeof(short),
+                typeof(ushort)
+            }
+        );
 
         /// <summary>
         /// Returns whether or not the given <see cref="value"/> is one of the <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/integral-numeric-types">integral numeric types</a> or <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/floating-point-numeric-types">floating-point numeric types</a>.
