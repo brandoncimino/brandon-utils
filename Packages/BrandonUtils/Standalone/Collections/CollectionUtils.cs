@@ -192,8 +192,9 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="separator"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        [ContractAnnotation("enumerable:null => null")]
         [CanBeNull]
+        [ContractAnnotation("enumerable:null => null")]
+        [ContractAnnotation("enumerable:notnull => notnull")]
         public static string JoinString<T>([CanBeNull] [ItemCanBeNull] this IEnumerable<T> enumerable, [CanBeNull] string separator = "") {
             return enumerable == null ? null : string.Join(separator, enumerable);
         }
@@ -206,7 +207,8 @@ namespace BrandonUtils.Standalone.Collections {
         /// <returns>the result of <see cref="string.Join(string,System.Collections.Generic.IEnumerable{string})"/></returns>
         [CanBeNull]
         [ContractAnnotation("enumerable:null => null")]
-        public static string JoinLines<T>([CanBeNull] [ItemCanBeNull] this IEnumerable<T> enumerable) {
+        [ContractAnnotation("enumerable:notnull => notnull")]
+        public static string JoinLines<T>([CanBeNull, ItemCanBeNull] this IEnumerable<T> enumerable) {
             return enumerable == null ? null : string.Join("\n", enumerable);
         }
 
@@ -504,7 +506,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// TODO: Experiment on whether it makes sense to have a special version of <see cref="IsEmpty{T}"/> as an <see cref="IOptional{T}"/> extension method, which would return the inverse of <see cref="IOptional{T}.HasValue"/>. The problem is that this method causes ambiguity with the <see cref="IEnumerable{T}"/> version of <see cref="IOptional{T}"/>
         [Pure]
         [ContractAnnotation("null => true")]
-        public static bool IsEmpty<T>([CanBeNull] [ItemCanBeNull] this IEnumerable<T> enumerable) {
+        public static bool IsEmpty<T>([CanBeNull, ItemCanBeNull, InstantHandle] this IEnumerable<T> enumerable) {
             return enumerable == null || !enumerable.Any();
         }
 
@@ -870,11 +872,10 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="predicate"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns>an <see cref="Optional{T}"/> containing the <typeparamref name="T"/> value that matched the <paramref name="predicate"/></returns>
-        public static Optional<T> FindFirst<T>(this IEnumerable<T> source, Func<T, bool> predicate) {
-            return source.Where(predicate)
-                         .Select(Optional.Optional.Of)
-                         .DefaultIfEmpty(new Optional<T>())
-                         .First();
+        [ItemCanBeNull]
+        public static Optional<T> FindFirst<T>([CanBeNull, ItemCanBeNull, InstantHandle] this IEnumerable<T> source, [CanBeNull, InstantHandle] Func<T, bool> predicate = default) {
+            source = predicate == null ? source.EmptyIfNull() : source.EmptyIfNull().Where(predicate);
+            return source.Take(1).ToOptional();
         }
 
         /// <param name="source"></param>
@@ -913,13 +914,21 @@ namespace BrandonUtils.Standalone.Collections {
 
         #endregion
 
+        #region EmptyIfNull
+
+        [Pure]
+        [NotNull]
+        [LinqTunnel]
         public static IEnumerable<T> EmptyIfNull<T>([CanBeNull, ItemCanBeNull] this IEnumerable<T> source) {
             return source ?? Enumerable.Empty<T>();
         }
 
-        public static IEnumerable<T> EmptyIfNull<T>([CanBeNull, ItemCanBeNull] this T[] source) {
+        [NotNull]
+        public static T[] EmptyIfNull<T>([CanBeNull, ItemCanBeNull] this T[] source) {
             return source ?? Array.Empty<T>();
         }
+
+        #endregion
 
         #region Intersection
 

@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
+using BrandonUtils.Standalone;
 using BrandonUtils.Standalone.Collections;
+using BrandonUtils.Standalone.Optional;
 using BrandonUtils.Testing;
 
 using Newtonsoft.Json;
@@ -249,6 +252,30 @@ namespace BrandonUtils.Tests.Standalone.Collections {
                     .And(Is.Not.EqualTo(original))
                     .And(Is.Not.SameAs(original))
                     .Invoke();
+        }
+
+        #endregion
+
+        #region Finding
+
+        [Test]
+        public void FindFirst() {
+            Asserter.WithHeading("Find First")
+                    .And(() => _findFirst(new[] { 1, 2, 3 },            1))
+                    .And(() => _findFirst(Array.Empty<int>(),           default))
+                    .And(() => _findFirst(new int?[] { null, 1, 2 },    null))
+                    .And(() => _findFirst(Enumerable.Empty<string>(),   default))
+                    .And(() => _findFirst(new int?[] { 1, 2, null, 3 }, it => it <= 0,     default))
+                    .And(() => _findFirst(new[] { 1, 2, 3 },            it => it.IsEven(), 2))
+                    .Invoke();
+        }
+
+        private static void _findFirst<T>(IEnumerable<T> actual, Optional<T> expected) {
+            Assert.That(actual.FindFirst(), Is.EqualTo(expected));
+        }
+
+        private static void _findFirst<T>(IEnumerable<T> actual, Func<T, bool> predicate, Optional<T> expected) {
+            Assert.That(actual.FindFirst(predicate), Is.EqualTo(expected));
         }
 
         #endregion
