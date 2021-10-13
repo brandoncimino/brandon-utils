@@ -8,6 +8,7 @@ using BrandonUtils.Standalone;
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Reflection;
 using BrandonUtils.Standalone.Strings;
+using BrandonUtils.Standalone.Strings.Prettifiers;
 using BrandonUtils.Testing;
 
 using NUnit.Framework;
@@ -331,14 +332,14 @@ namespace BrandonUtils.Tests.Standalone.Reflection {
                 typeof(int),
                 typeof(string)
             },
-            typeof(object)
+            typeof(IComparable)
         )]
         [TestCase(
             new[] {
                 typeof(List<object>),
                 typeof(Collection<object>)
             },
-            typeof(IEnumerable<object>)
+            typeof(IList<object>)
         )]
         public void MostCommonType(Type[] types, Type expectedType) {
             var ass = Asserter.WithHeading($"{nameof(MostCommonType)} for: {types.Prettify()}");
@@ -367,7 +368,7 @@ namespace BrandonUtils.Tests.Standalone.Reflection {
         }
 
         [Test]
-        [TestCase(typeof(Duckmobile), typeof(TrainCar), new[] { typeof(ILand), typeof(ICar) })]
+        [TestCase(typeof(Duckmobile), typeof(TrainCar), new[] { typeof(ILand), typeof(ICar), typeof(IVehicle) })]
         public void CommonInterface(Type a, Type b, Type[] expectedOptions) {
             var actual = ReflectionUtils.CommonInterfaces(a, b);
 
@@ -375,5 +376,37 @@ namespace BrandonUtils.Tests.Standalone.Reflection {
         }
 
         #endregion
+
+        #region Assignability (inheritance)
+
+        public class SuperList<T> : List<T> { }
+
+        public class IntList : List<int> { }
+
+        public class SuperIntList : SuperList<int> { }
+
+        #endregion
+
+        [Test]
+        [TestCase(typeof(int[]),                     Should.Pass)]
+        [TestCase(typeof(string),                    Should.Pass)]
+        [TestCase(typeof(KeyedList<int, DayOfWeek>), Should.Pass)]
+        [TestCase(typeof(int),                       Should.Fail)]
+        [TestCase(typeof(int[][][]),                 Should.Pass)]
+        [TestCase(typeof(IEnumerable<object>),       Should.Pass)]
+        [TestCase(typeof(IEnumerable<>),             Should.Pass)]
+        [TestCase(typeof(List<List<int[]>>),         Should.Pass)]
+        [TestCase(typeof(IList<List<object>>),       Should.Pass)]
+        [TestCase(typeof(IDictionary<,>),            Should.Pass)]
+        [TestCase(typeof(SuperList<>),               Should.Pass)]
+        [TestCase(typeof(SuperList<int>),            Should.Pass)]
+        [TestCase(typeof(IntList),                   Should.Pass)]
+        [TestCase(typeof(SuperIntList),              Should.Pass)]
+        [TestCase(typeof(SuperList<object>),         Should.Pass)]
+        public static void IsEnumerable(Type type, Should should) {
+            Console.WriteLine("FindInterfaces");
+            Console.WriteLine(type.FindInterfaces((type1, criteria) => true, default).Prettify());
+            Assert.That(type.IsEnumerable, should.Constrain(), $"{type.PrettifyType()}");
+        }
     }
 }

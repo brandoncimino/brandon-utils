@@ -16,6 +16,8 @@ using JetBrains.Annotations;
 namespace BrandonUtils.Standalone.Reflection {
     /// <summary>
     /// Contains utilities for <see cref="System.Reflection"/>.
+    ///
+    /// TODO: Split this class up. For example, the <see cref="Type"/> extensions should be in their own class
     /// </summary>
     public static class ReflectionUtils {
         /// <summary>
@@ -484,8 +486,23 @@ namespace BrandonUtils.Standalone.Reflection {
 
         /// <param name="type">a <see cref="Type"/> that might be generic</param>
         /// <returns><see cref="Type.IsGenericType"/> || <see cref="Type.IsGenericTypeDefinition"/></returns>
-        public static bool IsGenericTypeOrDefinition([NotNull] this Type type) {
-            return type.IsGenericType || type.IsGenericTypeDefinition;
+        [ContractAnnotation("null => false")]
+        public static bool IsGenericTypeOrDefinition([CanBeNull] this Type type) {
+            return type != null && (type.IsGenericType || type.IsGenericTypeDefinition);
+        }
+
+        [ContractAnnotation("null => false")]
+        public static bool IsEnumerable([CanBeNull] this Type type) {
+            if (type == null) {
+                return false;
+            }
+
+            return type.IsGenericTypeOrDefinition() && type.GetGenericTypeDefinition() == typeof(IEnumerable<>)
+                   || type.IsArray
+                   || type.FindInterfaces()
+                          .Where(it => it.IsGenericTypeOrDefinition())
+                          .Select(it => it.GetGenericTypeDefinition())
+                          .Contains(typeof(IEnumerable<>));
         }
 
         private static readonly Type[] TupleTypes = {
@@ -592,16 +609,24 @@ namespace BrandonUtils.Standalone.Reflection {
             return aInts.Intersect(bInts);
         }
 
-        [NotNull]
+        [Pure, NotNull]
         internal static IEnumerable<Type> CommonInterfaces([NotNull, ItemCanBeNull] IEnumerable<Type> types) {
             return types.Select(it => it.GetAllInterfaces()).Intersection();
         }
 
-        #endregion
-
 
         public static IEnumerable<Type> GetAllInterfaces([CanBeNull] this Type type) {
             return _GetAllInterfaces(type);
+        }
+
+        [Pure]
+        [NotNull, ItemNotNull]
+        public static Type[] FindInterfaces([NotNull] this Type type) {
+            if (type == null) {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            return type.FindInterfaces((type1, criteria) => true, default);
         }
 
         private static IEnumerable<Type> _GetAllInterfaces([CanBeNull] this Type type, [CanBeNull] IEnumerable<Type> soFar = default) {
@@ -627,5 +652,86 @@ namespace BrandonUtils.Standalone.Reflection {
 
             return ancestors;
         }
+
+        /// <summary>
+        /// An idiomatic inverse of <see cref="Type.IsAssignableFrom"/> because I always get confused by that.
+        /// </summary>
+        /// <param name="valueType"></param>
+        /// <param name="variableType"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        [PublicAPI]
+        [Pure]
+        [ContractAnnotation("valueType:null => stop")]
+        [ContractAnnotation("variableType:null => stop")]
+        public static bool CanBeAssignedTo([NotNull] this Type valueType, [NotNull] Type variableType) {
+            if (valueType == null) {
+                throw new ArgumentNullException(nameof(valueType));
+            }
+
+            if (variableType == null) {
+                throw new ArgumentNullException(nameof(variableType));
+            }
+
+            return variableType.IsAssignableFrom(valueType);
+        }
+
+        /// <summary>
+        /// An idiomatic alias for <see cref="Type.IsAssignableFrom"/> because I always get confused by that.
+        /// </summary>
+        /// <param name="variableType"></param>
+        /// <param name="valueType"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        [PublicAPI]
+        [Pure]
+        [ContractAnnotation("variableType:null => stop")]
+        [ContractAnnotation("valueType:null => stop")]
+        public static bool CanHoldValueOf([NotNull] this Type variableType, [NotNull] Type valueType) {
+            if (variableType == null) {
+                throw new ArgumentNullException(nameof(variableType));
+            }
+
+            if (valueType == null) {
+                throw new ArgumentNullException(nameof(valueType));
+            }
+
+            return variableType.IsAssignableFrom(valueType);
+        }
+
+        #endregion
+
+        #region Type Keywords
+
+        private static readonly Dictionary<Type, string> TypeKeywords = new Dictionary<Type, string>() {
+            [typeof(int)]     = "int",
+            [typeof(uint)]    = "uint",
+            [typeof(short)]   = "short",
+            [typeof(ushort)]  = "ushort",
+            [typeof(long)]    = "long",
+            [typeof(ulong)]   = "ulong",
+            [typeof(double)]  = "double",
+            [typeof(float)]   = "float",
+            [typeof(bool)]    = "bool",
+            [typeof(byte)]    = "byte",
+            [typeof(decimal)] = "decimal",
+            [typeof(sbyte)]   = "sbyte",
+            [typeof(char)]    = "char",
+            [typeof(object)]  = "object",
+            [typeof(string)]  = "string"
+        };
+
+        [Pure]
+        [NotNull]
+        [ContractAnnotation("null => stop")]
+        public static string NameOrKeyword([NotNull] this Type type) {
+            if (type == null) {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            return TypeKeywords.GetOrDefault(type, () => type.Name) ?? throw new InvalidOperationException();
+        }
+
+        #endregion
     }
 }
