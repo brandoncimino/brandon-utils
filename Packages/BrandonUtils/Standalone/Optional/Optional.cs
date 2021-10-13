@@ -99,6 +99,14 @@ namespace BrandonUtils.Standalone.Optional {
             return optional?.HasValue == true ? optional.Value : fallback;
         }
 
+        /**
+         * <inheritdoc cref="GetValueOrDefault{T}(BrandonUtils.Standalone.Optional.IOptional{T},T)"/>
+         */
+        [CanBeNull]
+        public static T OrElse<T>([CanBeNull, ItemCanBeNull] this IOptional<T> optional, [CanBeNull] T fallback) {
+            return optional.GetValueOrDefault(fallback);
+        }
+
         /// <summary>
         /// Returns <see cref="IOptional{T}.Value"/> if it is present; otherwise, <see cref="Func{TResult}.Invoke"/>s <see cref="fallbackSupplier"/>.
         /// </summary>
@@ -116,6 +124,14 @@ namespace BrandonUtils.Standalone.Optional {
             }
 
             return optional?.HasValue == true ? optional.Value : fallbackSupplier.Invoke();
+        }
+
+        /**
+         * <inheritdoc cref="GetValueOrDefault{T}(BrandonUtils.Standalone.Optional.IOptional{T},Func{T})"/>
+         */
+        [CanBeNull]
+        public static T OrElseGet<T>([CanBeNull, ItemCanBeNull] this IOptional<T> optional, [NotNull] Func<T> fallbackSupplier) {
+            return optional.GetValueOrDefault(fallbackSupplier);
         }
 
         #endregion
