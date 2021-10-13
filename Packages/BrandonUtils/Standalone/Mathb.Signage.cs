@@ -54,33 +54,66 @@ namespace BrandonUtils.Standalone {
 
         #region IsPositive
 
-        public static bool IsPositive(this short   value) => value >= 0;
-        public static bool IsPositive(this int     value) => value >= 0;
-        public static bool IsPositive(this long    value) => value >= 0;
-        public static bool IsPositive(this float   value) => value >= 0;
-        public static bool IsPositive(this double  value) => value >= 0;
+        [Pure]
+        public static bool IsPositive(this short value) => value >= 0;
+
+        [Pure]
+        public static bool IsPositive(this int value) => value >= 0;
+
+        [Pure]
+        public static bool IsPositive(this long value) => value >= 0;
+
+        [Pure]
+        public static bool IsPositive(this float value) => value >= 0;
+
+        [Pure]
+        public static bool IsPositive(this double value) => value >= 0;
+
+        [Pure]
         public static bool IsPositive(this decimal value) => value >= 0;
 
         #endregion
 
         #region IsStrictlyPositive
 
-        public static bool IsStrictlyPositive(this int     value) => value > 0;
-        public static bool IsStrictlyPositive(this short   value) => value > 0;
-        public static bool IsStrictlyPositive(this long    value) => value > 0;
-        public static bool IsStrictlyPositive(this float   value) => value > 0;
-        public static bool IsStrictlyPositive(this double  value) => value > 0;
+        [Pure]
+        public static bool IsStrictlyPositive(this int value) => value > 0;
+
+        [Pure]
+        public static bool IsStrictlyPositive(this short value) => value > 0;
+
+        [Pure]
+        public static bool IsStrictlyPositive(this long value) => value > 0;
+
+        [Pure]
+        public static bool IsStrictlyPositive(this float value) => value > 0;
+
+        [Pure]
+        public static bool IsStrictlyPositive(this double value) => value > 0;
+
+        [Pure]
         public static bool IsStrictlyPositive(this decimal value) => value > 0;
 
         #endregion
 
         #region IsNegative
 
-        public static bool IsNegative(this int     value) => value < 0;
-        public static bool IsNegative(this long    value) => value < 0;
-        public static bool IsNegative(this float   value) => value < 0;
-        public static bool IsNegative(this double  value) => value < 0;
-        public static bool IsNegative(this short   value) => value < 0;
+        [Pure]
+        public static bool IsNegative(this short value) => value < 0;
+
+        [Pure]
+        public static bool IsNegative(this int value) => value < 0;
+
+        [Pure]
+        public static bool IsNegative(this long value) => value < 0;
+
+        [Pure]
+        public static bool IsNegative(this float value) => value < 0;
+
+        [Pure]
+        public static bool IsNegative(this double value) => value < 0;
+
+        [Pure]
         public static bool IsNegative(this decimal value) => value < 0;
 
         #endregion
