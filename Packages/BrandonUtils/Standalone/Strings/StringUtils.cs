@@ -551,36 +551,54 @@ namespace BrandonUtils.Standalone.Strings {
         #region Line Management
 
         /// <summary>
-        /// Splits <paramref name="contentWithLines"/> via <c>"\r\n", "\r", or "\n"</c>.
+        /// Splits <paramref name="multilineContent"/> via <c>"\r\n", "\r", or "\n"</c>.
         /// </summary>
         /// <example>
         /// This will match any
         /// </example>
-        /// <param name="contentWithLines">the <see cref="string"/> being <see cref="string.Split(char[])"/></param>
+        /// <param name="multilineContent">the <see cref="string"/> being <see cref="string.Split(char[])"/></param>
         /// <param name="options"><see cref="StringSplitOptions"/></param>
-        /// <returns>an <see cref="Array"/> containing each individual line from <paramref name="contentWithLines"/></returns>
-        public static string[] SplitLines(this string contentWithLines, StringSplitOptions options = default) {
-            return contentWithLines.Split(LineBreakSplitters, options);
+        /// <returns>an <see cref="Array"/> containing each individual line from <paramref name="multilineContent"/></returns>
+        [Pure]
+        [NotNull, ItemNotNull]
+        public static string[] SplitLines([CanBeNull] this string multilineContent, StringSplitOptions options = default) {
+            return multilineContent?.Split(LineBreakSplitters, options) ?? Array.Empty<string>();
         }
 
         /// <summary>
-        /// Runs <see cref="SplitLines(string,System.StringSplitOptions)"/> against each <see cref="string"/> in <paramref name="contentsWithLines"/>,
+        /// Runs <see cref="SplitLines(string,System.StringSplitOptions)"/> against each <see cref="string"/> in <paramref name="multilineContents"/>,
         /// flattening the results.
         /// </summary>
-        /// <param name="contentsWithLines">a collection of <see cref="string"/>s that will each be passed to <see cref="SplitLines(string,System.StringSplitOptions)"/></param>
+        /// <param name="multilineContents">a collection of <see cref="string"/>s that will each be passed to <see cref="SplitLines(string,System.StringSplitOptions)"/></param>
         /// <param name="options"><see cref="StringSplitOptions"/></param>
         /// <returns>all of the individual <see cref="string"/>s, split line-by-line, and flattened</returns>
         /// <seealso cref="SplitLines(string,System.StringSplitOptions)"/>
         /// <seealso cref="ToStringLines"/>
-        public static string[] SplitLines(this IEnumerable<string> contentsWithLines, StringSplitOptions options = default) {
-            return contentsWithLines.SelectMany(content => content.SplitLines(options)).ToArray();
+        [Pure]
+        [NotNull, ItemNotNull]
+        public static string[] SplitLines([CanBeNull, ItemCanBeNull, InstantHandle] this IEnumerable<string> multilineContents, StringSplitOptions options = default) {
+            return multilineContents?.SelectMany(content => content.SplitLines(options)).ToArray() ?? Array.Empty<string>();
         }
 
-        public static int LongestLine(this IEnumerable<string> strings) {
-            return strings.SelectMany(it => it.SplitLines()).Max(it => it.Length);
+        /// <summary>
+        /// Shorthand to <see cref="string.Trim()"/> a collection of <see cref="string"/>s.
+        /// </summary>
+        /// <param name="strings">a collection of <see cref="string"/>s</param>
+        /// <returns>a collection of <see cref="string.Trim()"/>med <see cref="string"/>s</returns>
+        [Pure]
+        [LinqTunnel]
+        [NotNull, ItemCanBeNull]
+        public static IEnumerable<string> TrimLines([NotNull, ItemCanBeNull] this IEnumerable<string> strings) {
+            return strings.Select(it => it?.Trim());
         }
 
-        public static int LongestLine(this string str) {
+        [Pure]
+        public static int LongestLine([CanBeNull, ItemCanBeNull, InstantHandle] this IEnumerable<string> strings) {
+            return strings?.SelectMany(it => it.SplitLines()).Max(it => it.Length) ?? 0;
+        }
+
+        [Pure]
+        public static int LongestLine([CanBeNull] this string str) {
             return str.SplitLines().Max(it => it.Length);
         }
 
@@ -733,8 +751,12 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="nullPlaceholder">the <see cref="string"/> returned when <paramref name="obj"/> is <c>null</c></param>
         /// <returns>the <see cref="object.ToString"/> representation of <paramref name="obj"/>, or <c>null</c></returns>
         [NotNull]
-        public static string ToString([CanBeNull] this object obj, [CanBeNull] string nullPlaceholder) {
-            nullPlaceholder ??= Prettification.DefaultNullPlaceholder;
+        [ContractAnnotation("nullPlaceholder:null => stop")]
+        public static string ToString([CanBeNull] this object obj, [NotNull] string nullPlaceholder) {
+            if (nullPlaceholder == null) {
+                throw new ArgumentNullException(nameof(nullPlaceholder), $"Providing a null value as a {nameof(nullPlaceholder)} is redundant!");
+            }
+
             return obj == null ? nullPlaceholder : obj.ToString();
         }
 
@@ -744,13 +766,14 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="str">this <see cref="string"/></param>
         /// <param name="emptyPlaceholder">the fallback string if <paramref name="str"/> <see cref="IsNullOrEmpty"/>. Defaults to <c>""</c></param>
         /// <returns>this <see cref="string"/> or <paramref name="emptyPlaceholder"/></returns>
-        [NotNull]
+        [CanBeNull]
+        [ContractAnnotation("emptyPlaceholder:notnull => notnull")]
+        [ContractAnnotation("emptyPlaceholder:null => canbenull")]
         public static string IfEmpty([CanBeNull] this string str, [NotNull] string emptyPlaceholder) {
             if (emptyPlaceholder == null) {
                 throw new ArgumentNullException(nameof(emptyPlaceholder));
             }
 
-            emptyPlaceholder ??= "";
             return str.IsNullOrEmpty() ? emptyPlaceholder : str;
         }
 
@@ -762,7 +785,7 @@ namespace BrandonUtils.Standalone.Strings {
 
         [NotNull]
         public static string OrNullPlaceholder([CanBeNull] this object obj, [CanBeNull] PrettificationSettings settings) {
-            settings ??= new PrettificationSettings();
+            settings ??= Prettification.DefaultPrettificationSettings;
             return OrNullPlaceholder(obj, settings.NullPlaceholder);
         }
 
@@ -772,8 +795,10 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="str">this <see cref="string"/></param>
         /// <param name="blankPlaceholder">the fallback string if <paramref name="str"/> <see cref="IsBlank"/>. Defaults to <c>""</c></param>
         /// <returns>this <see cref="string"/> or <paramref name="blankPlaceholder"/></returns>
-        [NotNull]
-        public static string IfBlank([CanBeNull] this string str, [NotNull] string blankPlaceholder) {
+        [CanBeNull]
+        [ContractAnnotation("blankPlaceholder:notnull => notnull")]
+        [ContractAnnotation("blankPlaceholder:null => canbenull")]
+        public static string IfBlank([CanBeNull] this string str, [CanBeNull] string blankPlaceholder) {
             blankPlaceholder ??= "";
             return str.IsBlank() ? blankPlaceholder : str;
         }
