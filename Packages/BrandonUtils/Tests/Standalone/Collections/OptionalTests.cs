@@ -205,8 +205,36 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
         [Test]
         public void ToOptional_MultipleItems() {
-            var ls       = new[] { 1, 2, 3 };
-            var optional = ls.ToOptional();
+            var ls = new[] { 1, 2, 3 };
+
+            Assert.Throws<InvalidOperationException>(() => ls.ToOptional());
+        }
+
+        [Test]
+        public void ToOptional_Empty() {
+            var ls = Array.Empty<int>();
+            Asserter.Against(ls.ToOptional)
+                    .And(Has.Property(nameof(IOptional<object>.Count)).EqualTo(0))
+                    .And(Has.Property(nameof(IOptional<object>.HasValue)).False)
+                    .And(it => it.Value, Throws.InvalidOperationException)
+                    .And(Is.Empty)
+                    .Invoke();
+        }
+
+        [Test]
+        [TestCase(double.PositiveInfinity)]
+        [TestCase("#yolo")]
+        [TestCase(new[] { 1, 2, 3 })]
+        [TestCase(default(object))]
+        public void ToOptional_Single(object value) {
+            // var value = double.NegativeInfinity;
+            var ls = new object[] { value };
+            Asserter.Against(ls.ToOptional)
+                    .And(Has.Property(nameof(IOptional<object>.Count)).EqualTo(1))
+                    .And(Has.Property(nameof(IOptional<object>.HasValue)).True)
+                    .And(Has.Property(nameof(IOptional<object>.Value)).EqualTo(value))
+                    .And(Is.Not.Empty)
+                    .Invoke();
         }
 
         #endregion
