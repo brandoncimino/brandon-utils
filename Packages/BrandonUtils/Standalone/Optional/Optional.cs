@@ -172,7 +172,8 @@ namespace BrandonUtils.Standalone.Optional {
         /// <ul>
         /// <li>If <b>both</b> <see cref="a"/> and <see cref="b"/> are <b>empty</b>, then they are considered <b>equal</b>.</li>
         /// <li>If <b>both</b> <see cref="a"/> and <see cref="b"/> are <c>null</c>, then they are considered <b>equal</b>.</li>
-        /// <li>A <c>null</c> <see cref="IOptional{T}"/> is <b><i>NOT</i></b></li> considered equal to an <see cref="IOptional{T}"/> with a <c>null</c> <see cref="IOptional{T}.Value"/>!
+        /// <li>If <b>both</b> <see cref="a"/> and <see cref="b"/> <i><b>contain</b></i> <c>null</c>, then they are considered <b>equal</b>.</li>
+        /// <li>A <c>null</c> <see cref="IOptional{T}"/> is <b><i>NOT</i></b> considered equal to an <see cref="IOptional{T}"/> with a <c>null</c> <see cref="IOptional{T}.Value"/>!</li>
         /// </ul>
         /// </summary>
         /// <remarks>

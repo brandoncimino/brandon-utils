@@ -121,17 +121,15 @@ namespace BrandonUtils.Tests.Standalone.Collections {
             IOptional<string> def_b       = default;
             Optional<string>  def_c       = default;
             const string      null_string = default;
-            Console.WriteLine(def_c);
-            Console.WriteLine(optional_c);
             AssertAll.Of(
                 () => Assert.False(Optional.AreEqual(optional_a,  null_string), "Optional.AreEqual(optional_a, null_string)"),
                 () => Assert.False(Optional.AreEqual(null_string, optional_a),  "Optional.AreEqual(null_string, optional_a)"),
-                () => Assert.False(Optional.AreEqual(optional_a,  optional_b),  "Optional.AreEqual(optional_a, optional_b)"),
-                () => Assert.False(Optional.AreEqual(optional_b,  optional_a),  "Optional.AreEqual(optional_b,optional_a)"),
-                () => Assert.False(Optional.AreEqual(def_a,       def_b),       "Optional.AreEqual(def_a, def_b)"),
-                () => Assert.False(Optional.AreEqual(def_a,       def_a),       "Optional.AreEqual(def_a, def_a)"),
-                () => Assert.False(Optional.AreEqual(optional_a,  optional_c),  "Optional.AreEqual(optional_a, optional_c)"),
-                () => Assert.False(Optional.AreEqual(optional_c,  def_c),       "Optional.AreEqual(optional_c, def_c)")
+                () => Assert.True(Optional.AreEqual(optional_a,   optional_b), "Optional.AreEqual(optional_a, optional_b)"),
+                () => Assert.True(Optional.AreEqual(optional_b,   optional_a), "Optional.AreEqual(optional_b,optional_a)"),
+                () => Assert.True(Optional.AreEqual(def_a,        def_b),      "Optional.AreEqual(def_a, def_b)"),
+                () => Assert.True(Optional.AreEqual(def_a,        def_a),      "Optional.AreEqual(def_a, def_a)"),
+                () => Assert.False(Optional.AreEqual(optional_a,  optional_c), "Optional.AreEqual(optional_a, optional_c)"),
+                () => Assert.False(Optional.AreEqual(optional_c,  def_c),      "Optional.AreEqual(optional_c, def_c)")
             );
         }
 
@@ -217,10 +215,10 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
         public static (Optional<object>, string)[] GetOptionalToStringExpectations() {
             return new[] {
-                (new Optional<object>(5), "Optional<Object>[5]"),
-                (new Optional<object>(), $"Optional<Object>[{Optional.EmptyPlaceholder}]"),
-                (new Optional<object>(null), $"Optional<Object>[{new PrettificationSettings().NullPlaceholder.Value}]"),
-                (new Optional<object>(new Optional<object>(new Optional<object>("yolo"))), "Optional<Object>[Optional<Object>[Optional<Object>[yolo]]]")
+                (new Optional<object>(5), "Optional<object>[5]"),
+                (new Optional<object>(), $"Optional<object>[{Optional.EmptyPlaceholder}]"),
+                (new Optional<object>(null), $"Optional<object>[{new PrettificationSettings().NullPlaceholder.Value}]"),
+                (new Optional<object>(new Optional<object>(new Optional<object>("yolo"))), "Optional<object>[Optional<object>[Optional<object>[yolo]]]")
             };
         }
 
