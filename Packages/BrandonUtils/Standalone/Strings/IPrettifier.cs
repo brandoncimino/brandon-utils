@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 namespace BrandonUtils.Standalone.Strings {
     public interface IPrettifier {
         /// <value>the <see cref="Type"/> that this <see cref="IPrettifier{T}"/> can <see cref="Prettify"/>.</value>
+        [NotNull]
         Type PrettifierType { get; }
 
         /// <summary>

@@ -21,6 +21,7 @@ namespace BrandonUtils.Standalone.Optional {
         /// <summary>
         /// The <see cref="Optional{T}"/> value that might have been <see cref="Set"/>.
         /// </summary>
+        [ItemCanBeNull]
         public Optional<T> ExplicitValue { get; private set; }
         /// <summary>
         /// Whether or not <see cref="ExplicitValue"/> has been <see cref="Set"/>.
