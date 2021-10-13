@@ -17,25 +17,81 @@ namespace BrandonUtils.Standalone.Strings {
         internal const          string                       DefaultNullPlaceholder = "⛔";
         private static readonly KeyedList<Type, IPrettifier> Prettifiers            = PrettifierDatabase.GetDefaultPrettifiers();
 
-        public static void RegisterPrettifier(IPrettifier prettifier) {
+        [NotNull] private static PrettificationSettings _defaultSettings = new PrettificationSettings();
+        [NotNull]
+        public static PrettificationSettings DefaultPrettificationSettings {
+            [NotNull] get => _defaultSettings;
+            [CanBeNull] set => _defaultSettings = value ?? new PrettificationSettings();
+        }
+
+        public static void RegisterPrettifier([NotNull] IPrettifier prettifier) {
+            if (prettifier == null) {
+                throw new ArgumentNullException(nameof(prettifier));
+            }
+
             Prettifiers.Add(prettifier);
         }
 
-        public static IPrettifier UnregisterPrettifier(Type prettifierType) {
+        [NotNull]
+        public static IPrettifier UnregisterPrettifier([NotNull] Type prettifierType) {
+            if (prettifierType == null) {
+                throw new ArgumentNullException(nameof(prettifierType));
+            }
+
             return Prettifiers.Grab(prettifierType);
         }
 
-        internal static Optional<IPrettifier> FindGenericallyTypedPrettifier(Type type) {
+        #region Finding Prettifiers
+
+        [Pure]
+        [ItemNotNull]
+        internal static Optional<IPrettifier> FindPrettifier(Type type) {
+            if (DefaultPrettificationSettings.VerboseLogging) {
+                Console.WriteLine($"🔎 Attempting to find an {nameof(IPrettifier)} for the type {type}");
+            }
+
+            var prettifier = Optional.Optional.FirstWithValue(
+                type,
+                FindExactPrettifier,
+                FindExactGenericPrettifier,
+                FindGenericallyTypedPrettifier,
+                FindInheritedPrettifier
+            );
+
+            if (DefaultPrettificationSettings.VerboseLogging) {
+                prettifier.IfPresentOrElse(
+                    it => Console.WriteLine($"\t\t⛳ Found: {it}"),
+                    () => Console.WriteLine("\t\t🐸 No prettifier found!")
+                );
+            }
+
+            return prettifier;
+        }
+
+        #region Generics
+
+        [ItemNotNull]
+        internal static Optional<IPrettifier> FindGenericallyTypedPrettifier([NotNull] Type type) {
+            if (DefaultPrettificationSettings.VerboseLogging) {
+                Console.WriteLine($"\t→ {nameof(FindGenericallyTypedPrettifier)}({type.Name})");
+            }
+
+            return Optional.Optional.FirstWithValue(
+                type,
+                FindExactGenericPrettifier,
+                FindMatchingGenericPrettifier
+            );
+        }
+
+        private static Optional<IPrettifier> FindExactGenericPrettifier([NotNull] Type type) {
+            return type.IsGenericTypeOrDefinition() == false ? default : FindExactPrettifier(type.GetGenericTypeDefinition());
+        }
+
+        internal static Optional<IPrettifier> FindMatchingGenericPrettifier([NotNull] Type type) {
             return type.IsGenericTypeOrDefinition() ? Prettifiers.FindFirst(it => GenericTypesMatch(it.PrettifierType, type)) : default;
         }
 
-        private static Optional<IPrettifier> FindTuplePrettifier(Type type) {
-            return Prettifiers.Where(it => it.PrettifierType.IsTupleType())
-                              .Where(it => it.PrettifierType.GetGenericArguments().Length == type.GetGenericArguments().Length)
-                              .FindFirst();
-        }
-
-        internal static bool GenericTypesMatch(Type t1, Type t2) {
+        internal static bool GenericTypesMatch([NotNull] Type t1, [NotNull] Type t2) {
             if (!t1.IsGenericTypeOrDefinition() || !t2.IsGenericTypeOrDefinition()) {
                 return false;
             }
@@ -66,26 +122,25 @@ namespace BrandonUtils.Standalone.Strings {
             return type.GetGenericTypeDefinition().MakeGenericType(genArgCount.Repeat(typeof(object)).ToArray());
         }
 
+        #endregion
+
         [Pure]
         [ItemNotNull]
-        internal static Optional<IPrettifier> FindExactPrettifier(Type type) {
+        private static Optional<IPrettifier> FindExactPrettifier([NotNull] Type type) {
+            if (DefaultPrettificationSettings.VerboseLogging) {
+                Console.WriteLine($"\t→ {nameof(FindExactPrettifier)}({type.Name})");
+            }
+
             return Prettifiers.Find(type);
         }
 
         [Pure]
         [ItemNotNull]
-        internal static Optional<IPrettifier> FindPrettifier(Type type) {
-            return Optional.Optional.FirstWithValue(
-                type,
-                FindExactPrettifier,
-                FindGenericallyTypedPrettifier,
-                FindInheritedPrettifier
-            );
-        }
-
-        [Pure]
-        [ItemNotNull]
         private static Optional<IPrettifier> FindInheritedPrettifier(Type type) {
+            if (DefaultPrettificationSettings.VerboseLogging) {
+                Console.WriteLine($"\t→ {nameof(FindInheritedPrettifier)}({type.Name})");
+            }
+
             try {
                 return new Optional<IPrettifier>(Prettifiers.First(it => it.PrettifierType.IsAssignableFrom(type)));
             }
@@ -94,18 +149,39 @@ namespace BrandonUtils.Standalone.Strings {
             }
         }
 
+        #endregion
+
         [Pure]
         [NotNull]
         public static string Prettify([CanBeNull] this object cinderella, [CanBeNull] PrettificationSettings settings = default) {
+            settings ??= DefaultPrettificationSettings;
+
+            if (settings.VerboseLogging) {
+                Console.WriteLine($"👸 Prettifying [{cinderella?.GetType()}]{cinderella}");
+            }
+
             if (cinderella == null) {
                 return settings?.NullPlaceholder.Value.IsNotBlank() == true ? settings.NullPlaceholder.Value : DefaultNullPlaceholder;
             }
 
-            return FindPrettifier(cinderella.GetType())
+            var prettifier = FindPrettifier(cinderella.GetType());
+
+            return prettifier
                 .IfPresentOrElse(
                     it => it.PrettifySafely(cinderella, settings),
-                    () => Convert.ToString(cinderella)
+                    () => LastResortPrettifier(cinderella, settings)
                 );
+        }
+
+        [NotNull]
+        internal static string LastResortPrettifier([CanBeNull] object cinderella, [CanBeNull] PrettificationSettings settings) {
+            settings ??= new PrettificationSettings();
+
+            if (settings.VerboseLogging) {
+                Console.WriteLine($"⛑ Using the LAST RESORT prettifier for [{cinderella?.GetType()}] {cinderella}: {nameof(Convert.ToString)}!");
+            }
+
+            return Convert.ToString(cinderella);
         }
     }
 }

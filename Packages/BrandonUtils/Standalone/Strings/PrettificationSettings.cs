@@ -20,6 +20,8 @@ namespace BrandonUtils.Standalone.Strings {
 
         [NotNull] public Fallback<TypeNameStyle> TypeLabelStyle { get; } = new Fallback<TypeNameStyle>(TypeNameStyle.Full);
 
+        internal bool VerboseLogging = false;
+
         [NotNull]
         public static implicit operator PrettificationSettings(LineStyle lineStyle) {
             return new PrettificationSettings() {

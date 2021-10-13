@@ -2,18 +2,27 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
+using BrandonUtils.Standalone;
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Enums;
+using BrandonUtils.Standalone.Reflection;
 using BrandonUtils.Standalone.Strings;
 using BrandonUtils.Standalone.Strings.Prettifiers;
 using BrandonUtils.Testing;
+using BrandonUtils.Tests.Standalone.Reflection;
 
 using NUnit.Framework;
 
 using Is = NUnit.Framework.Is;
+using List = BrandonUtils.Standalone.Collections.List;
 
 namespace BrandonUtils.Tests.Standalone.Strings {
     public class PrettificationTests {
+        [SetUp]
+        public void SetDefaultPrettificationSettings() {
+            Prettification.DefaultPrettificationSettings.VerboseLogging = true;
+        }
+
         public class Expectation {
             public object                 Original;
             public string                 Expected;
@@ -29,19 +38,23 @@ namespace BrandonUtils.Tests.Standalone.Strings {
         }
 
         [Test]
-        [TestCase(typeof(int), nameof(Int32), nameof(Int32), nameof(Int32))]
+        [TestCase(typeof(int),    "int",    "int",    "int")]
+        [TestCase(typeof(object), "object", "object", "object")]
+        [TestCase(typeof(float),  "float",  "float",  "float")]
+        [TestCase(typeof(string), "string", "string", "string")]
         [TestCase(
             typeof(KeyValuePair<DayOfWeek, string>),
-            "KeyValuePair<DayOfWeek, String>",
+            "KeyValuePair<DayOfWeek, string>",
             "KeyValuePair<,>",
             "KeyValuePair<>"
         )]
         [TestCase(
             typeof(List<KeyValuePair<Collection<short>, uint>>),
-            "List<KeyValuePair<Collection<Int16>, UInt32>>",
+            "List<KeyValuePair<Collection<short>, uint>>",
             "List<>",
             "List<>"
         )]
+        [TestCase(typeof(DayOfWeek), "DayOfWeek", "DayOfWeek", "DayOfWeek")]
         public void PrettifyType(Type actualType, string expected_full, string expected_short, string expected_none) {
             var settings_full = new PrettificationSettings() {
                 TypeLabelStyle = { Value = TypeNameStyle.Full }
@@ -63,6 +76,7 @@ namespace BrandonUtils.Tests.Standalone.Strings {
                     $"Short:    {actualType.PrettifyType(settings_short)}",
                     $"None:     {actualType.PrettifyType(settings_none)}",
                     $"DeclaringType:    {actualType.DeclaringType}",
+                    $"NameOrKeyword:    {actualType.NameOrKeyword()}"
                 }.JoinLines()
             );
             Asserter.Against(actualType)
@@ -91,21 +105,70 @@ namespace BrandonUtils.Tests.Standalone.Strings {
             var dic = new Dictionary<string, DayOfWeek> { { "one", DayOfWeek.Monday }, { "two", DayOfWeek.Tuesday }, { "three", DayOfWeek.Wednesday } };
 
             var expectedString = @"
-String DayOfWeek
+string DayOfWeek
 ------ ---------
 one    Monday   
 two    Tuesday  
 three  Wednesday";
 
-            Assert.That(dic.Prettify(), Is.EqualTo(expectedString.TrimStart()));
+            Assert.That(dic.Prettify().Trim(), Is.EqualTo(expectedString.Trim()));
         }
 
-        private static Expectation[] Tuple2Expectations = new[] { new Expectation() { Original = ("one", 1), Expected = "(one, 1)" }, new Expectation() { Original = (new List<double>() { 1, 99, double.PositiveInfinity }, ("yolo", 80085)), Expected = $"([1, 99, {double.PositiveInfinity}], (yolo, 80085))" }, new Expectation() { Original = (double.PositiveInfinity, "beyond"), Expected = $"({double.PositiveInfinity}, beyond)" } };
+        [Test]
+        public void PrettifyDictionaryInferredType() {
+            var dic = new Dictionary<object, object>() {
+                [1]     = new TrainCar(),
+                ["two"] = new Duckmobile()
+            };
+
+            var actual = dic.Prettify();
+            var expected = @"
+IComparable IVehicle                                           
+----------- ---------------------------------------------------
+1           BrandonUtils.Tests.Standalone.Reflection.TrainCar  
+two         BrandonUtils.Tests.Standalone.Reflection.Duckmobile";
+            Console.WriteLine(actual);
+
+            Assert.That(actual.Trim(), Is.EqualTo(expected.Trim()));
+        }
+
+        private static Expectation[] Tuple2Expectations = new[] {
+            new Expectation() {
+                Original = ("one", 1),
+                Expected = "(one, 1)"
+            },
+            new Expectation() {
+                Original = (new List<double>() {
+                                1,
+                                99,
+                                double.PositiveInfinity
+                            }, ("yolo", 80085)),
+                Expected = $"(List<double>[1, 99, {double.PositiveInfinity}], (yolo, 80085))"
+            },
+            new Expectation() {
+                Original = (double.PositiveInfinity, "beyond"),
+                Expected = $"({double.PositiveInfinity}, beyond)"
+            }
+        };
+
+        [Test]
+        public void PrettifyTuple2_One() {
+            var tuple2 = (List.Of(1, double.PositiveInfinity, double.NegativeInfinity), "yolo");
+
+            Console.WriteLine(tuple2);
+            Console.WriteLine(tuple2.Prettify());
+
+            PrettifyTuple2(Tuple2Expectations[1]);
+        }
 
         [Test]
         public void PrettifyTuple2([ValueSource(nameof(Tuple2Expectations))] Expectation expectation) {
+            Console.WriteLine($"tuple: {expectation.Original}");
+            Console.WriteLine($"tuptype: {expectation.Original.GetType()}");
             var actualString = expectation.Original.Prettify();
-            Console.WriteLine(actualString);
+            Console.WriteLine($"actual:\n{actualString}");
+            Console.WriteLine($"expected:\n{expectation.Expected}");
+            5.IsPositive();
             Assert.That(actualString, Is.EqualTo(expectation.Expected.Trim()));
         }
 
@@ -116,14 +179,15 @@ three  Wednesday";
             var keyedList = new KeyedList<int, (int, string)>(it => it.Item1) { (1, "one"), (2, "two"), (99, "ninety-nine") };
 
             var expectedString = $@"
-Int32 (Int32, String)  
------ -----------------
-1     (1, one)         
-2     (2, two)         
-99    (99, ninety-nine)";
+int (int, string)    
+--- -----------------
+1   (1, one)           
+2   (2, two)         
+99  (99, ninety-nine)";
             var actualPrettifiedString = prettifier.Prettify(keyedList);
-            Console.WriteLine(actualPrettifiedString);
-            Assert.That(actualPrettifiedString.Trim(), Is.EqualTo(expectedString.Trim()));
+            Console.WriteLine($"{nameof(actualPrettifiedString)}:\n{actualPrettifiedString}");
+            Console.WriteLine($"{nameof(expectedString)}:\n{expectedString}");
+            Assert.That(actualPrettifiedString.SplitLines(StringSplitOptions.RemoveEmptyEntries).TrimLines(), Is.EqualTo(expectedString.SplitLines(StringSplitOptions.RemoveEmptyEntries).TrimLines()));
         }
 
         [Test]
@@ -241,13 +305,30 @@ Int32 (Int32, String)
         private static Expectation[] EnumerableExpectations() {
             var ls = new List<int>() { 1, 2, 3 };
             return new[] {
-                new Expectation() { Original = ls, Expected = "[1, 2, 3]" },
+                new Expectation() {
+                    Original = ls,
+                    Expected = "[1, 2, 3]",
+                    Settings = new PrettificationSettings() {
+                        TypeLabelStyle = { Value = TypeNameStyle.None }
+                    }
+                },
+                new Expectation() {
+                    Original = ls,
+                    Expected = "List<int>[1, 2, 3]",
+                },
+                new Expectation() {
+                    Original = ls,
+                    Expected = "List<>[1, 2, 3]",
+                    Settings = new PrettificationSettings() {
+                        TypeLabelStyle = { Value = TypeNameStyle.Short }
+                    }
+                },
                 new Expectation() {
                     Original = ls,
                     Settings = new PrettificationSettings() {
                         TypeLabelStyle = { Value = TypeNameStyle.Full }
                     },
-                    Expected = "List<Int32>[1, 2, 3]"
+                    Expected = "List<int>[1, 2, 3]"
                 },
                 new Expectation() {
                     Original = ls,
@@ -256,11 +337,19 @@ Int32 (Int32, String)
                         TypeLabelStyle     = { Value = TypeNameStyle.Full }
                     },
                     Expected = @"
-List<Int32>[
+List<int>[
   1
   2
   3
 ]"
+                },
+                new Expectation() {
+                    Original = new List<double>() {
+                        1,
+                        99,
+                        double.PositiveInfinity
+                    },
+                    Expected = "List<double>[1, 99, ∞]"
                 }
             };
         }
@@ -281,7 +370,7 @@ List<Int32>[
         }
 
         [Test]
-        [TestCase(new[] { DayOfWeek.Monday, DayOfWeek.Friday }, "[Monday, Friday]")]
+        [TestCase(new[] { DayOfWeek.Monday, DayOfWeek.Friday }, "EnumSet<DayOfWeek>[Monday, Friday]")]
         public void PrettifyEnumSet(DayOfWeek[] set, string expectedString) {
             var enumSet = new EnumSet<DayOfWeek>(set);
             var pretty  = enumSet.Prettify();

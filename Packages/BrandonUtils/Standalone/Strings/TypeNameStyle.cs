@@ -1,5 +1,6 @@
 ﻿using System;
 
+using BrandonUtils.Standalone.Reflection;
 using BrandonUtils.Standalone.Strings.Prettifiers;
 
 using JetBrains.Annotations;
@@ -11,16 +12,22 @@ namespace BrandonUtils.Standalone.Strings {
         Short
     }
 
-    public static class TypeLabelStyleExtensions {
+    public static class TypeNameStyleExtensions {
         [NotNull]
         public static string GetTypeLabel([CanBeNull] this Type type, [CanBeNull] PrettificationSettings settings) {
-            settings ??= new PrettificationSettings();
+            settings ??= Prettification.DefaultPrettificationSettings;
 
             if (type == null || settings.TypeLabelStyle == TypeNameStyle.None) {
                 return "";
             }
 
-            return $"[{type.PrettifyType(settings)}]";
+            var str = type.PrettifyType(settings);
+
+            if (type.IsArray || type.IsEnumerable()) {
+                return str;
+            }
+
+            return $"[{str}]";
         }
 
         [NotNull]

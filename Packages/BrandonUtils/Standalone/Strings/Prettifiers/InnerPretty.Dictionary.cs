@@ -6,11 +6,21 @@ using System.Linq;
 
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Exceptions;
+using BrandonUtils.Standalone.Reflection;
 
 using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone.Strings.Prettifiers {
     internal static partial class InnerPretty {
+        private static Type InferType(IEnumerable<object> stuff) {
+            try {
+                return ReflectionUtils.CommonType(stuff.Select(it => it.GetType()));
+            }
+            catch {
+                return typeof(object);
+            }
+        }
+
         /// <summary>
         /// TODO: Update this to work with an arbitrary number of columns
         /// </summary>
@@ -26,11 +36,25 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
 
         private static string PrettifyDictionary(IList<object> keys, IList<object> vals, PrettificationSettings settings) {
             // get the types of the columns, to use as headers
-            var keyType = keys.First(it => it != null).GetType();
-            var valType = vals.First(it => it != null).GetType();
+            var keyType = InferType(keys);
+            var valType = InferType(vals);
             return PrettifyDictionary(keys, vals, keyType, valType, settings);
         }
 
+        /// <summary>
+        /// The basis of the <see cref="InnerPretty"/> methods for dictionaries.
+        /// </summary>
+        /// <remarks>
+        /// Rather than operating on an actual <see cref="IDictionary{TKey,TValue}"/>, this takes in two <see cref="List{T}"/>s and explicit column headers.
+        /// </remarks>
+        /// <param name="keys"></param>
+        /// <param name="vals"></param>
+        /// <param name="keyHeader"></param>
+        /// <param name="valHeader"></param>
+        /// <param name="settings"></param>
+        /// <returns></returns>
+        /// <exception cref="NullReferenceException"></exception>
+        /// <exception cref="BrandonException"></exception>
         private static string PrettifyDictionary(
             [NotNull, ItemCanBeNull]
             IList<object> keys,
@@ -40,7 +64,7 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
             [NotNull]   object                 valHeader,
             [CanBeNull] PrettificationSettings settings
         ) {
-            settings ??= new PrettificationSettings();
+            settings ??= Prettification.DefaultPrettificationSettings;
 
             // add the headers
             keys.Insert(0, keyHeader);
@@ -114,6 +138,24 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
          */
         internal static string PrettifyKeyedList<TKey, TValue>(KeyedList<TKey, TValue> keyedList, PrettificationSettings settings = default) {
             IDictionary dictionary = keyedList.ToDictionary();
+            return PrettifyDictionary(
+                dictionary.Keys.Cast<object>().ToList(),
+                dictionary.Values.Cast<object>().ToList(),
+                typeof(TKey),
+                typeof(TValue),
+                settings
+            );
+        }
+
+        /// <summary>
+        /// The generic version of <see cref="PrettifyDictionary"/>
+        /// </summary>
+        /// <param name="dictionary"></param>
+        /// <param name="settings"></param>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <returns></returns>
+        internal static string PrettifyDictionary<TKey, TValue>(IDictionary<TKey, TValue> dictionary, PrettificationSettings settings = default) {
             return PrettifyDictionary(
                 dictionary.Keys.Cast<object>().ToList(),
                 dictionary.Values.Cast<object>().ToList(),
