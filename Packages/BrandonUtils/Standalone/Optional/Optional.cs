@@ -46,7 +46,8 @@ namespace BrandonUtils.Standalone.Optional {
         /// <remarks>
         /// Corresponds to Guava's <a href="https://guava.dev/releases/21.0/api/docs/com/google/common/collect/MoreCollectors.html#toOptional--">MoreCollectors.toOptional()</a>.
         /// </remarks>
-        public static Optional<T> ToOptional<T>(this IEnumerable<T> source) {
+        [ItemCanBeNull]
+        public static Optional<T> ToOptional<T>([CanBeNull] this IEnumerable<T> source) {
             if (source == null) {
                 return default;
             }
@@ -55,8 +56,10 @@ namespace BrandonUtils.Standalone.Optional {
             return ls.Any() ? Of(ls.Single()) : default;
         }
 
+        #region Failables
+
         /// <summary>
-        /// Attempts to <see cref="Func{TResult}.Invoke"/> <see cref="functionThatMightFail"/>, returning a <see cref="FailableFunc{TValue,TExcuse}"/>
+        /// Attempts to <see cref="Func{TResult}.Invoke"/> <see cref="functionThatMightFail"/>, returning a <see cref="FailableFunc{TValue}"/>
         /// that contains either the successful result or the <see cref="IFailableFunc{TValue,TExcuse}.Excuse"/> for failure.
         /// </summary>
         /// <param name="functionThatMightFail"></param>
@@ -69,6 +72,30 @@ namespace BrandonUtils.Standalone.Optional {
             return new FailableFunc<T>(functionThatMightFail);
         }
 
+        public static FailableFunc<TOut> Try<TIn, TOut>(
+            this Func<TIn, TOut> functionThatMightFail,
+            TIn                  input
+        ) {
+            return new FailableFunc<TOut>(() => functionThatMightFail.Invoke(input));
+        }
+
+        public static FailableFunc<TOut> Try<T1, T2, TOut>(
+            this Func<T1, T2, TOut> functionThatMightFail,
+            T1                      arg1,
+            T2                      arg2
+        ) {
+            return new FailableFunc<TOut>(() => functionThatMightFail.Invoke(arg1, arg2));
+        }
+
+        public static FailableFunc<TOut> Try<T1, T2, T3, TOut>(
+            this Func<T1, T2, T3, TOut> functionThatMightFail,
+            T1                          arg1,
+            T2                          arg2,
+            T3                          arg3
+        ) {
+            return new FailableFunc<TOut>(() => functionThatMightFail.Invoke(arg1, arg2, arg3));
+        }
+
         /// <summary>
         /// Attempts to <see cref="Action.Invoke"/> <see cref="actionThatMightFail"/>, returning a <see cref="Failable"/>
         /// that (might) contain the <see cref="IFailableFunc{TValue,TExcuse}.Excuse"/> for failure.
@@ -78,6 +105,8 @@ namespace BrandonUtils.Standalone.Optional {
         public static Failable Try(this Action actionThatMightFail) {
             return new Failable(actionThatMightFail);
         }
+
+        #endregion
 
         #region GetValueOrDefault
 
