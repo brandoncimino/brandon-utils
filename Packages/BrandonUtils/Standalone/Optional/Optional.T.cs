@@ -42,7 +42,7 @@ namespace BrandonUtils.Standalone.Optional {
         /// </remarks>
         public bool HasValue { get; }
 
-        [NotNull] public T Value => HasValue ? _value : throw OptionalException.IsEmptyException(this);
+        public T Value => HasValue ? _value : throw OptionalException.IsEmptyException(this);
 
         public Optional(T value) {
             _value   = value;

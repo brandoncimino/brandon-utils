@@ -187,6 +187,9 @@ namespace BrandonUtils.Standalone.Optional {
         /// <returns>the equality of the underlying <see cref="IOptional{T}.Value"/>s of <see cref="a"/> and <see cref="b"/></returns>
         /// <seealso cref="AreEqual{T}(BrandonUtils.Standalone.Optional.IOptional{T},T)"/>
         /// <seealso cref="AreEqual{T}(T,BrandonUtils.Standalone.Optional.IOptional{T})"/>
+        [ContractAnnotation("a:null, b:null => true")]
+        [ContractAnnotation("a:null, b:notnull => false")]
+        [ContractAnnotation("a:notnull, b:null => false")]
         public static bool AreEqual<T>([CanBeNull] IOptional<T> a, [CanBeNull] IOptional<T> b) {
             // return true if EITHER:
             // - a & b are the same object, OR
@@ -218,7 +221,6 @@ namespace BrandonUtils.Standalone.Optional {
         /// <remarks>
         /// <ul>
         /// <li>A null <see cref="IOptional{T}"/> should <b>not</b> be considered equal to a null <typeparamref name="T"/></li>
-        /// <li>Anm
         /// </ul>
         /// </remarks>
         /// <param name="a">an <see cref="IOptional{T}"/></param>
@@ -227,6 +229,7 @@ namespace BrandonUtils.Standalone.Optional {
         /// <returns>the equality of (<paramref name="a"/>.<see cref="IOptional{T}.Value"/>) and (<paramref name="b"/>)</returns>
         /// <seealso cref="AreEqual{T}(BrandonUtils.Standalone.Optional.IOptional{T},BrandonUtils.Standalone.Optional.IOptional{T})"/>
         /// <seealso cref="AreEqual{T}(T,BrandonUtils.Standalone.Optional.IOptional{T})"/>
+        [ContractAnnotation("a:null => false")]
         public static bool AreEqual<T>([CanBeNull] IOptional<T> a, [CanBeNull] T b) {
             // this method compares the _value_ of `a` to `b`, which means a value has to exist
             if (ReferenceEquals(a, null)) {
@@ -248,6 +251,7 @@ namespace BrandonUtils.Standalone.Optional {
         /// <returns>the equality of (<paramref name="a"/>) and (<paramref name="b"/>.<see cref="IOptional{T}.Value"/>)</returns>
         /// <seealso cref="AreEqual{T}(BrandonUtils.Standalone.Optional.IOptional{T},BrandonUtils.Standalone.Optional.IOptional{T})"/>
         /// <seealso cref="AreEqual{T}(BrandonUtils.Standalone.Optional.IOptional{T},T)"/>
+        [ContractAnnotation("b:null => false")]
         public static bool AreEqual<T>([CanBeNull] T a, [CanBeNull] IOptional<T> b) {
             return AreEqual(b, a);
         }
