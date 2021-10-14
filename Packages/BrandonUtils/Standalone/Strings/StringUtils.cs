@@ -65,6 +65,9 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="indentChar">The <see cref="char"/> that is <see cref="Repeat(char,int,string)"/>ed to build a single indentation. Defaults to <see cref="DefaultIndentChar"/>.</param>
         /// <returns>The indented <see cref="string"/>.</returns>
         /// <seealso cref="Indent(IEnumerable{string},int,int,char)"/>
+        [CanBeNull]
+        [ContractAnnotation("toIndent:null => null")]
+        [ContractAnnotation("toIndent:notnull => notnull")]
         public static string Indent(
             [CanBeNull] this string toIndent,
             [NonNegativeValue]
@@ -612,9 +615,12 @@ namespace BrandonUtils.Standalone.Strings {
         /// <returns>the indented <see cref="string"/>s</returns>
         /// <seealso cref="Indent(string,int,int,char)"/>
         [ContractAnnotation("lines:null => null")]
-        [CanBeNull]
+        [ContractAnnotation("lines:notnull => notnull")]
+        [Pure]
+        [CanBeNull, ItemNotNull]
+        [LinqTunnel]
         public static IEnumerable<string> Indent(
-            [CanBeNull] [ItemCanBeNull]
+            [CanBeNull, ItemCanBeNull]
             this IEnumerable<string> lines,
             [NonNegativeValue]
             int indentCount = 1,

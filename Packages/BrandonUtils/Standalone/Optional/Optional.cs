@@ -46,8 +46,9 @@ namespace BrandonUtils.Standalone.Optional {
         /// <remarks>
         /// Corresponds to Guava's <a href="https://guava.dev/releases/21.0/api/docs/com/google/common/collect/MoreCollectors.html#toOptional--">MoreCollectors.toOptional()</a>.
         /// </remarks>
+        /// <exception cref="InvalidOperationException">if <paramref name="source"/> contains <b>more than one element</b>.</exception>
         [ItemCanBeNull]
-        public static Optional<T> ToOptional<T>([CanBeNull] this IEnumerable<T> source) {
+        public static Optional<T> ToOptional<T>([CanBeNull, ItemCanBeNull, InstantHandle] this IEnumerable<T> source) {
             if (source == null) {
                 return default;
             }
