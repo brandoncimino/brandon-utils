@@ -734,11 +734,14 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T">the type of the elements of <paramref name="source"/></typeparam>
         /// <returns>a new sequence that begins <b>and</b> ends with <paramref name="bookend"/></returns>
         [Pure]
-        public static IEnumerable<T> Bookend<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> source, [CanBeNull] T bookend) {
+        [NotNull, ItemCanBeNull]
+        public static IEnumerable<T> Bookend<T>([NotNull, ItemCanBeNull, NoEnumeration] this IEnumerable<T> source, [CanBeNull] T bookend) {
             return source
                    .Prepend(bookend)
                    .Append(bookend);
         }
+
+        #region AppendNonNull
 
         /// <summary>
         /// <see cref="Enumerable.Append{TSource}"/>s a <typeparamref name="T"/> element to <paramref name="source"/> if it isn't <c>null</c>.
@@ -748,7 +751,14 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T">the type of the elements of <paramref name="source"/></typeparam>
         /// <returns>a new sequence that ends with <paramref name="valueThatMightBeNull"/> if it wasn't <c>null</c></returns>
         [Pure]
-        public static IEnumerable<T> AppendNonNull<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> source, [CanBeNull] T valueThatMightBeNull) {
+        [LinqTunnel]
+        [NotNull, ItemCanBeNull]
+        public static IEnumerable<T> AppendNonNull<T>(
+            [CanBeNull, ItemCanBeNull]
+            this IEnumerable<T> source,
+            [CanBeNull] T valueThatMightBeNull
+        ) {
+            source = source.EmptyIfNull();
             return valueThatMightBeNull == null ? source : source.Append(valueThatMightBeNull);
         }
 
@@ -760,7 +770,15 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         [Pure]
-        public static IEnumerable<T> AppendNonNull<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> source, [CanBeNull] [ItemCanBeNull] IEnumerable<T> additionalValuesThatMightBeNull) {
+        [LinqTunnel]
+        [NotNull, ItemCanBeNull]
+        public static IEnumerable<T> AppendNonNull<T>(
+            [CanBeNull, ItemCanBeNull]
+            this IEnumerable<T> source,
+            [CanBeNull, ItemCanBeNull]
+            IEnumerable<T> additionalValuesThatMightBeNull
+        ) {
+            source = source.EmptyIfNull();
             return additionalValuesThatMightBeNull == null ? source : source.Concat(additionalValuesThatMightBeNull.NonNull());
         }
 
@@ -768,7 +786,13 @@ namespace BrandonUtils.Standalone.Collections {
          * <inheritdoc cref="AppendNonNull{T}(System.Collections.Generic.IEnumerable{T},T)"/>
          */
         [Pure]
-        public static IEnumerable<T> AppendNonNull<T>([NotNull] this IEnumerable<T> source, [CanBeNull] T? valueThatMightBeNull) where T : struct {
+        [LinqTunnel]
+        [NotNull]
+        public static IEnumerable<T> AppendNonNull<T>(
+            [CanBeNull] this IEnumerable<T> source,
+            [CanBeNull]      T?             valueThatMightBeNull
+        ) where T : struct {
+            source = source.EmptyIfNull();
             return valueThatMightBeNull.IsEmpty() ? source : source.Append(valueThatMightBeNull.Value);
         }
 
@@ -776,9 +800,46 @@ namespace BrandonUtils.Standalone.Collections {
          * <inheritdoc cref="AppendNonNull{T}(System.Collections.Generic.IEnumerable{T},IEnumerable{T})"/>
          */
         [Pure]
-        public static IEnumerable<T> AppendNonNull<T>([NotNull] this IEnumerable<T> source, [CanBeNull] [ItemCanBeNull] IEnumerable<T?> additionalValuesThatMightBeNull) where T : struct {
-            return source.Concat(additionalValuesThatMightBeNull.NonNull());
+        [NotNull]
+        [LinqTunnel]
+        public static IEnumerable<T> AppendNonNull<T>(
+            [CanBeNull] this IEnumerable<T> source,
+            [CanBeNull, ItemCanBeNull]
+            IEnumerable<T?> additionalValuesThatMightBeNull
+        ) where T : struct {
+            return source.EmptyIfNull().Concat(additionalValuesThatMightBeNull.NonNull());
         }
+
+        #endregion
+
+        #region PrependNonNull
+
+        [NotNull]
+        [Pure]
+        [LinqTunnel]
+        public static IEnumerable<T> PrependNonNull<T>(
+            [NotNull, ItemCanBeNull]
+            this IEnumerable<T> source,
+            [CanBeNull] T valueThatMightBeNull
+        ) {
+            return valueThatMightBeNull == null ? source : source.Prepend(valueThatMightBeNull);
+        }
+
+        [NotNull]
+        [Pure]
+        [LinqTunnel]
+        public static IEnumerable<T> PrependNonNull<T>(
+            [NotNull, ItemCanBeNull]
+            this IEnumerable<T> source,
+            [CanBeNull, ItemCanBeNull]
+            IEnumerable<T> additionalValuesThatMightBeNull
+        ) {
+            return additionalValuesThatMightBeNull.NonNull().Concat(source);
+        }
+
+        #endregion
+
+        #region AddNonNull
 
         /// <summary>
         /// <see cref="ICollection{T}.Add"/>s <paramref name="valueThatMightBeNull"/> to <paramref name="source"/> if it isn't <c>null</c>.
@@ -841,6 +902,10 @@ namespace BrandonUtils.Standalone.Collections {
             return source;
         }
 
+        #endregion
+
+        #region NonNull
+
         /// <summary>
         /// Returns only the non-<c>null</c> entries from <paramref name="source"/>.
         /// </summary>
@@ -865,6 +930,8 @@ namespace BrandonUtils.Standalone.Collections {
         public static IEnumerable<T> NonNull<T>([CanBeNull] [ItemCanBeNull] this IEnumerable<T?> source) where T : struct {
             return source == null ? Enumerable.Empty<T>() : source.Where(it => it.HasValue).Select(it => it.Value);
         }
+
+        #endregion
 
         #region Finding
 
@@ -917,13 +984,15 @@ namespace BrandonUtils.Standalone.Collections {
         #region EmptyIfNull
 
         [Pure]
-        [NotNull]
+        [NotNull, ItemCanBeNull]
         [LinqTunnel]
-        public static IEnumerable<T> EmptyIfNull<T>([CanBeNull, ItemCanBeNull] this IEnumerable<T> source) {
+        public static IEnumerable<T> EmptyIfNull<T>([CanBeNull, ItemCanBeNull, NoEnumeration] this IEnumerable<T> source) {
             return source ?? Enumerable.Empty<T>();
         }
 
-        [NotNull]
+        [Pure]
+        [NotNull, ItemCanBeNull]
+        [LinqTunnel]
         public static T[] EmptyIfNull<T>([CanBeNull, ItemCanBeNull] this T[] source) {
             return source ?? Array.Empty<T>();
         }
