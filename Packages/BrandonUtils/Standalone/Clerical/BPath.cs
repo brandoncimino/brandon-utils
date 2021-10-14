@@ -21,6 +21,9 @@ namespace BrandonUtils.Standalone.Clerical {
         internal static readonly RegexGroup ExtensionGroup            = new RegexGroup(nameof(ExtensionGroup), @"(\.[^.]+?)+$");
         internal static readonly char[]     Separators                = Enum.GetValues(typeof(DirectorySeparator)).Cast<DirectorySeparator>().Select(DirectorySeparatorExtensions.ToChar).ToArray();
         internal static readonly Regex      DirectorySeparatorPattern = new Regex(@"[\\\/]");
+        internal static readonly string     OpenFolderIcon            = "📂";
+        internal static readonly string     ClosedFolderIcon          = "📁";
+        internal static readonly string     FileIcon                  = "📄";
 
         public static Failable ValidatePath([CanBeNull] string maybePath) {
             Action action = () => _ = Path.GetFullPath(maybePath!);
