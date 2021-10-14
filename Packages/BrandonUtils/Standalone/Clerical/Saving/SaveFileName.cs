@@ -53,7 +53,7 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
                 return new SaveFileName() {
                     Nickname      = match.Groups[NicknameGroup.GroupName].Value,
                     TimeStamp     = new DateTime(long.Parse(match.Groups[TimeStampGroup.GroupName].Value)),
-                    FullExtension = match.Groups[NicknameGroup.GroupName].Value,
+                    FullExtension = match.Groups[BPath.ExtensionGroup.GroupName].Value,
                 };
             }
             else {
