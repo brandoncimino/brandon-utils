@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.IO;
 
+using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Strings;
+using BrandonUtils.Standalone.Strings.Prettifiers;
 
 using JetBrains.Annotations;
 
@@ -181,10 +183,13 @@ namespace BrandonUtils.Standalone.Clerical {
             }
         }
 
+        [NotNull]
         private static string FamilyString(DirectoryInfo parent, FileSystemInfo child) {
+            Console.WriteLine(InnerPretty.PrettifyFileSystemInfo(parent).JoinLines());
+
             return new Dictionary<object, object>() {
-                [nameof(parent)] = parent,
-                [nameof(child)]  = child
+                [nameof(parent)] = InnerPretty.PrettifyFileSystemInfo(parent),
+                [nameof(child)]  = InnerPretty.PrettifyFileSystemInfo(child)
             }.Prettify();
         }
 
