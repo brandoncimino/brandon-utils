@@ -81,6 +81,7 @@ namespace BrandonUtils.Standalone.Optional {
         public static bool operator ==(Optional<T> a, T b) => Optional.AreEqual(a, b);
         public static bool operator !=(Optional<T> a, T b) => !Optional.AreEqual(a, b);
 
+        [NotNull]
         public override string ToString() {
             return Optional.ToString(this);
         }
