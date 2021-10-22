@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using JetBrains.Annotations;
@@ -144,6 +145,62 @@ namespace BrandonUtils.Standalone.Collections {
             ls.Sort();
             return (ls[0], ls[1], ls[2], ls[3], ls[4], ls[5], ls[6]);
         }
+
+        #endregion
+
+        #region "Spread Operators"
+
+        #region Item1
+
+        [NotNull]
+        [ItemCanBeNull]
+        [Pure]
+        [LinqTunnel]
+        public static IEnumerable<T> Item1<T, T2>([NotNull] this IEnumerable<(T, T2)> tuples) {
+            return tuples.Select(it => it.Item1);
+        }
+
+        [NotNull]
+        [ItemCanBeNull]
+        [Pure]
+        [LinqTunnel]
+        public static IEnumerable<T> Item1<T, T2, T3>([NotNull] this IEnumerable<(T, T2, T3)> tuples) {
+            return tuples.Select(it => it.Item1);
+        }
+
+        #endregion
+
+        #region Item2
+
+        [NotNull]
+        [ItemCanBeNull]
+        [Pure]
+        [LinqTunnel]
+        public static IEnumerable<T2> Item2<T, T2>([NotNull] this IEnumerable<(T, T2)> tuples) {
+            return tuples.Select(it => it.Item2);
+        }
+
+        [NotNull]
+        [ItemCanBeNull]
+        [Pure]
+        [LinqTunnel]
+        public static IEnumerable<T2> Item2<T, T2, T3>([NotNull] this IEnumerable<(T, T2, T3)> tuples) {
+            return tuples.Select(it => it.Item2);
+        }
+
+        #endregion
+
+        #region Item3
+
+        [NotNull]
+        [ItemCanBeNull]
+        [Pure]
+        [LinqTunnel]
+        public static IEnumerable<T3> Item3<T, T2, T3>([NotNull] this IEnumerable<(T, T2, T3)> tuples) {
+            return tuples.Select(it => it.Item3);
+        }
+
+        #endregion
 
         #endregion
     }
