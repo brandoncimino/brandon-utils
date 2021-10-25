@@ -983,6 +983,9 @@ namespace BrandonUtils.Standalone.Collections {
 
         #region EmptyIfNull
 
+        /// <param name="source">the <see cref="IEnumerable{T}"/> that might be null</param>
+        /// <typeparam name="T">the type of the elements in <paramref name="source"/></typeparam>
+        /// <returns><paramref name="source"/>, or an <see cref="Enumerable.Empty{TResult}"/> if <paramref name="source"/> was null</returns>
         [Pure]
         [NotNull, ItemCanBeNull]
         [LinqTunnel]
@@ -990,11 +993,54 @@ namespace BrandonUtils.Standalone.Collections {
             return source ?? Enumerable.Empty<T>();
         }
 
+        /**
+         * <inheritdoc cref="EmptyIfNull{T}(System.Collections.Generic.IEnumerable{T})"/>
+         */
+        [Pure]
+        [NotNull, ItemCanBeNull]
+        [LinqTunnel]
+        public static IEnumerable<T> OrEmpty<T>([CanBeNull, ItemCanBeNull] this IEnumerable<T> source) {
+            return source.EmptyIfNull();
+        }
+
+        /**
+         * <inheritdoc cref="EmptyIfNull{T}(System.Collections.Generic.IEnumerable{T})"/>
+         */
         [Pure]
         [NotNull, ItemCanBeNull]
         [LinqTunnel]
         public static T[] EmptyIfNull<T>([CanBeNull, ItemCanBeNull] this T[] source) {
             return source ?? Array.Empty<T>();
+        }
+
+        /**
+         * <inheritdoc cref="EmptyIfNull{T}(System.Collections.Generic.IEnumerable{T})"/>
+         */
+        [Pure]
+        [NotNull, ItemCanBeNull]
+        [LinqTunnel]
+        public static T[] OrEmpty<T>([CanBeNull, ItemCanBeNull] this T[] source) {
+            return source.EmptyIfNull();
+        }
+
+        /**
+         * <inheritdoc cref="EmptyIfNull{T}(System.Collections.Generic.IEnumerable{T})"/>
+         */
+        [Pure]
+        [NotNull]
+        [LinqTunnel]
+        public static IDictionary<TKey, TValue> EmptyIfNull<TKey, TValue>([CanBeNull] this IDictionary<TKey, TValue> source) {
+            return source ?? new Dictionary<TKey, TValue>();
+        }
+
+        /**
+         * <inheritdoc cref="EmptyIfNull{T}(System.Collections.Generic.IEnumerable{T})"/>
+         */
+        [Pure]
+        [NotNull]
+        [LinqTunnel]
+        public static IDictionary<TKey, TValue> OrEmpty<TKey, TValue>([CanBeNull] this IDictionary<TKey, TValue> source) {
+            return source.EmptyIfNull();
         }
 
         #endregion
