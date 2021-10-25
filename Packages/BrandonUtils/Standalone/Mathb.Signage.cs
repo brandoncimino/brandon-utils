@@ -50,6 +50,12 @@ namespace BrandonUtils.Standalone {
             return Math.Sign(value);
         }
 
+        /// <returns><paramref name="value"/>.<see cref="TimeSpan.CompareTo(object)"/>(<see cref="TimeSpan.Zero"/>)</returns>
+        [Pure]
+        public static int Sign(this TimeSpan value) {
+            return value.CompareTo(TimeSpan.Zero);
+        }
+
         #endregion
 
         #region IsPositive
