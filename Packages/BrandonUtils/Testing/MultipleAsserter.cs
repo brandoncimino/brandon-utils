@@ -314,14 +314,29 @@ namespace BrandonUtils.Testing {
 
         #region formatting
 
+        [NotNull, ItemNotNull]
         private IEnumerable<string> FormatFailures([InstantHandle] IEnumerable<IAssertable> testResults) {
             testResults = testResults.ToList();
             var failures = testResults.Where(it => it.Failed).ToList();
+
+            var prettySettings = new PrettificationSettings() {
+                PreferredLineStyle = { Value = LineStyle.Single },
+                LineLengthLimit    = { Value = 20 },
+                TypeLabelStyle     = { Value = TypeNameStyle.Full }
+            };
+
+            var countString = $"[{failures.Count}/{testResults.Count()}]";
+            var againstString = Actual.Select(it => it.Prettify(prettySettings))
+                                      .Select(it => it.Truncate(prettySettings.LineLengthLimit))
+                                      .Select(it => $" against {it}")
+                                      .OrElse("");
+
             return new List<string>()
-                   .Append($"[{failures.Count}/{testResults.Count()}] assertions failed:")
+                   .Append($"{countString} assertions failed{againstString}:")
                    .Concat(testResults.SelectMany(it => it.FormatAssertable(Indent + 1)));
         }
 
+        [NotNull]
         private string FormatMultipleAssertionMessage(IEnumerable<IAssertable> failures) {
             return new List<string>()
                    .Concat(FormatHeading())
@@ -336,6 +351,7 @@ namespace BrandonUtils.Testing {
         /// Returns either the result of <see cref="HeadingSupplier"/> or an empty <see cref="IEnumerable{T}"/> of strings.
         /// </summary>
         /// <returns></returns>
+        [NotNull]
         private IEnumerable<string> FormatHeading() {
             return HeadingSupplier != null ? new[] { HeadingSupplier.Invoke() } : new string[] { };
         }
