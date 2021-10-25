@@ -13,9 +13,6 @@ namespace BrandonUtils.Standalone.Randomization {
     public static class Brandom {
         public static readonly Random Gen = new Random();
 
-        /// <summary>
-        /// A variation of <see cref="Random.NextDouble"/> that returns
-        /// </summary>
         /// <returns>a random <see cref="double"/> in the range of <c>[0..1]</c>, i.e. <c><![CDATA[0 <= x <= 1]]></c></returns>
         [Pure]
         public static double NextDoubleInclusive([CanBeNull] this Random generator) {
@@ -199,6 +196,12 @@ namespace BrandonUtils.Standalone.Randomization {
         public static decimal  Decimal([CanBeNull] this  Random generator, decimal  max) => generator.Decimal(0, max);
         public static TimeSpan TimeSpan([CanBeNull] this Random generator, TimeSpan max) => generator.TimeSpan(default, max);
         public static DateTime DateTime([CanBeNull] this Random generator, DateTime max) => generator.DateTime(default, max);
+
+        /**
+         * <inheritdoc cref="NextDoubleInclusive"/>
+         * <remarks>Shorthand for <see cref="NextDoubleInclusive"/></remarks>
+         */
+        public static double Double([CanBeNull] this Random generator) => generator.NextDoubleInclusive();
 
         #endregion
     }
