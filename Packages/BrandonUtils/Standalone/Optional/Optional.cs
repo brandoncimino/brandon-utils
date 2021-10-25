@@ -177,6 +177,10 @@ namespace BrandonUtils.Standalone.Optional {
             return new Failable(actionThatMightFail);
         }
 
+        public static Timeable TryTimed([NotNull] this Action actionThatMightFail) {
+            return new Timeable(actionThatMightFail);
+        }
+
         #endregion
 
         #region GetValueOrDefault
