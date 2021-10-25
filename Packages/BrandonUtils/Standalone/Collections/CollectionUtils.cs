@@ -1170,5 +1170,14 @@ namespace BrandonUtils.Standalone.Collections {
         }
 
         #endregion
+
+        #region ToHashSet
+
+        [NotNull, ItemCanBeNull]
+        public static HashSet<T> ToHashSet<T>([NotNull, ItemCanBeNull] this IEnumerable<T> source, [CanBeNull] IEqualityComparer<T> comparer = default) {
+            return new HashSet<T>(source, comparer);
+        }
+
+        #endregion
     }
 }
