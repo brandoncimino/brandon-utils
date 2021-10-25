@@ -981,6 +981,30 @@ namespace BrandonUtils.Standalone.Collections {
 
         #endregion
 
+        #region TakeLast
+
+        /// <summary>
+        /// Combines <see cref="Enumerable.TakeWhile{TSource}(System.Collections.Generic.IEnumerable{TSource},System.Func{TSource,bool})"/> and <see cref="Enumerable.Last{TSource}(System.Collections.Generic.IEnumerable{TSource})"/>.
+        /// </summary>
+        /// <param name="source">the original <see cref="IEnumerable{T}"/></param>
+        /// <param name="takePredicate">the condition used to <see cref="Enumerable.TakeWhile{TSource}(System.Collections.Generic.IEnumerable{TSource},System.Func{TSource,bool})"/></param>
+        /// <typeparam name="T">the type of the items in <paramref name="source"/></typeparam>
+        /// <returns><see cref="Enumerable.TakeWhile{TSource}(System.Collections.Generic.IEnumerable{TSource},System.Func{TSource,bool})"/>.<see cref="Enumerable.Last{TSource}(System.Collections.Generic.IEnumerable{TSource})"/></returns>
+        [Pure, CanBeNull]
+        [ContractAnnotation("source:null => stop")]
+        [ContractAnnotation("takePredicate:null => stop")]
+        public static T TakeLast<T>(
+            [NotNull, ItemCanBeNull, InstantHandle]
+            this IEnumerable<T> source,
+            [NotNull] Func<T, bool> takePredicate
+        ) {
+            return source.TakeWhile(takePredicate).Last();
+        }
+
+        #endregion JustBefore
+
+        #endregion Finding
+
         #region EmptyIfNull
 
         /// <param name="source">the <see cref="IEnumerable{T}"/> that might be null</param>
