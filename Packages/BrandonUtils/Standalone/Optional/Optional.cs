@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 
 using BrandonUtils.Standalone.Collections;
@@ -7,6 +8,8 @@ using BrandonUtils.Standalone.Enums;
 using BrandonUtils.Standalone.Strings;
 
 using JetBrains.Annotations;
+
+using Pure = System.Diagnostics.Contracts.PureAttribute;
 
 namespace BrandonUtils.Standalone.Optional {
     /// <summary>
@@ -23,8 +26,45 @@ namespace BrandonUtils.Standalone.Optional {
         /// <param name="value"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static Optional<T> Of<T>(T value) {
+        [ItemCanBeNull]
+        public static Optional<T> Of<T>([CanBeNull] T value) {
             return new Optional<T>(value);
+        }
+
+        /// <summary>
+        /// Similar to <see cref="Of{T}"/>, but will treat a null <typeparamref name="T"/> <paramref name="value"/> as <see cref="Empty{T}"/>.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        [ItemNotNull]
+        public static Optional<T> OfNullable<T>([CanBeNull] T value) {
+            return value == null ? default : Of(value);
+        }
+
+        /// <summary>
+        /// A more verbose way to say <c>"default"</c>, if that's what you're into.
+        /// </summary>
+        /// <typeparam name="T">the underlying type of the <see cref="Optional{T}"/></typeparam>
+        /// <returns>an empty <see cref="Optional{T}"/></returns>
+        [ItemNotNull]
+        public static Optional<T> Empty<T>() {
+            return default;
+        }
+
+        public static Optional<T> ToOptional<T>([CanBeNull, ItemCanBeNull] this IOptional<T> optional) {
+            if (optional == null) {
+                return default;
+            }
+
+            return optional.Select(Of)
+                           .OrElse(default);
+
+            if (optional.HasValue) {
+                return new Optional<T>(optional.Value);
+            }
+
+            return default;
         }
 
         /// <summary>
@@ -55,6 +95,36 @@ namespace BrandonUtils.Standalone.Optional {
 
             var ls = source.ToList();
             return ls.Any() ? Of(ls.Single()) : default;
+        }
+
+        [Pure]
+        [CanBeNull, ItemCanBeNull]
+        [LinqTunnel]
+        public static IOptional<TOut> Select<TIn, TOut>(
+            [CanBeNull, ItemCanBeNull]
+            this IOptional<TIn> optional,
+            [NotNull] Func<TIn, TOut> selector
+        ) {
+            return optional?.AsEnumerable().Select(selector).ToOptional();
+        }
+
+        /// <summary>
+        /// Provides a "default" <see cref="object.ToString"/> method for <see cref="IOptional{T}"/> implementations to use.
+        /// </summary>
+        /// <param name="optional">an <see cref="IOptional{T}"/></param>
+        /// <typeparam name="T">the underlying type of the <see cref="IOptional{T}"/></typeparam>
+        /// <returns>a <see cref="object.ToString"/> representation of the given <see cref="IOptional{T}"/></returns>
+        [NotNull]
+        public static string ToString<T>([CanBeNull, ItemCanBeNull] IOptional<T> optional) {
+            var realType   = optional?.GetType() ?? typeof(T);
+            var prettyType = realType.Prettify();
+            if (optional == null) {
+                return $"({prettyType}){NullPlaceholder}";
+            }
+            else {
+                var valueString = optional.HasValue ? optional.Value.Prettify() : EmptyPlaceholder;
+                return $"{prettyType}[{valueString}]";
+            }
         }
 
         #region Failables
@@ -103,7 +173,7 @@ namespace BrandonUtils.Standalone.Optional {
         /// </summary>
         /// <param name="actionThatMightFail"></param>
         /// <returns></returns>
-        public static Failable Try(this Action actionThatMightFail) {
+        public static Failable Try([NotNull] this Action actionThatMightFail) {
             return new Failable(actionThatMightFail);
         }
 
@@ -135,6 +205,11 @@ namespace BrandonUtils.Standalone.Optional {
         [CanBeNull]
         public static T OrElse<T>([CanBeNull, ItemCanBeNull] this IOptional<T> optional, [CanBeNull] T fallback) {
             return optional.GetValueOrDefault(fallback);
+        }
+
+        [CanBeNull]
+        public static T OrDefault<T>([CanBeNull, ItemCanBeNull] this IOptional<T> optional) {
+            return optional.OrElse(default);
         }
 
         /// <summary>
@@ -259,25 +334,6 @@ namespace BrandonUtils.Standalone.Optional {
         }
 
         #endregion AreEqual
-
-        /// <summary>
-        /// Provides a "default" <see cref="object.ToString"/> method for <see cref="IOptional{T}"/> implementations to use.
-        /// </summary>
-        /// <param name="optional">an <see cref="IOptional{T}"/></param>
-        /// <typeparam name="T">the underlying type of the <see cref="IOptional{T}"/></typeparam>
-        /// <returns>a <see cref="object.ToString"/> representation of the given <see cref="IOptional{T}"/></returns>
-        [NotNull]
-        public static string ToString<T>([CanBeNull, ItemCanBeNull] IOptional<T> optional) {
-            var realType   = optional?.GetType() ?? typeof(T);
-            var prettyType = realType.Prettify();
-            if (optional == null) {
-                return $"({prettyType}){NullPlaceholder}";
-            }
-            else {
-                var valueString = optional.HasValue ? optional.Value.Prettify() : EmptyPlaceholder;
-                return $"{prettyType}[{valueString}]";
-            }
-        }
 
         #region IfPresentOrElse
 
@@ -408,7 +464,11 @@ namespace BrandonUtils.Standalone.Optional {
 
         #region Function Fallbacks
 
-        public static Optional<TOut> FirstWithValue<TOut>(IEnumerable<Func<Optional<TOut>>> functions) {
+        public static Optional<TOut> FirstWithValue<TOut>([NotNull, ItemNotNull] IEnumerable<Func<Optional<TOut>>> functions) {
+            if (functions == null) {
+                throw new ArgumentNullException(nameof(functions));
+            }
+
             return functions.Select(fn => fn.Invoke())
                             .FirstOrDefault(it => it.HasValue);
         }
@@ -417,13 +477,23 @@ namespace BrandonUtils.Standalone.Optional {
             return FirstWithValue(functions as IEnumerable<Func<Optional<TOut>>>);
         }
 
-        public static Optional<TOut> FirstWithValue<TIn, TOut>(TIn input, IEnumerable<Func<TIn, Optional<TOut>>> functions) {
+        public static Optional<TOut> FirstWithValue<TIn, TOut>(TIn input, [NotNull] IEnumerable<Func<TIn, Optional<TOut>>> functions) {
             return functions.Select(fn => fn.Invoke(input))
                             .FirstOrDefault(it => it.HasValue);
         }
 
         public static Optional<TOut> FirstWithValue<TIn, TOut>(TIn input, params Func<TIn, Optional<TOut>>[] functions) {
             return FirstWithValue(input, functions as IEnumerable<Func<TIn, Optional<TOut>>>);
+        }
+
+        [ItemCanBeNull]
+        public static IOptional<T> FirstWithValue<T>([NotNull] params IOptional<T>[] optionals) {
+            return optionals.FindFirst(it => it.HasValue).OrElse(default);
+        }
+
+        [ItemCanBeNull]
+        public static Optional<T> FirstWithValue<T>([NotNull] this IEnumerable<IOptional<T>> optionals) {
+            return optionals.FirstOrDefault(it => it.HasValue).ToOptional();
         }
 
         #endregion Function Fallbacks
