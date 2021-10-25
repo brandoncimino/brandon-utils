@@ -940,8 +940,13 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T"></typeparam>
         /// <returns>an <see cref="Optional{T}"/> containing the <typeparamref name="T"/> value that matched the <paramref name="predicate"/></returns>
         [ItemCanBeNull]
-        public static Optional<T> FindFirst<T>([CanBeNull, ItemCanBeNull, InstantHandle] this IEnumerable<T> source, [CanBeNull, InstantHandle] Func<T, bool> predicate = default) {
-            source = predicate == null ? source.EmptyIfNull() : source.EmptyIfNull().Where(predicate);
+        public static Optional<T> FindFirst<T>(
+            [CanBeNull, ItemCanBeNull, InstantHandle]
+            this IEnumerable<T> source,
+            [CanBeNull, InstantHandle]
+            Func<T, bool> predicate = default
+        ) {
+            source = predicate == default ? source.EmptyIfNull() : source.EmptyIfNull().Where(predicate);
             return source.Take(1).ToOptional();
         }
 
@@ -950,26 +955,41 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <returns>an <see cref="Optional{T}"/> containing the <typeparamref name="TValue"/> of <paramref name="key"/> if <paramref name="source"/> <see cref="IDictionary{TKey,TValue}.ContainsKey"/>; otherwise, an empty <see cref="Optional"/></returns>
-        public static Optional<TValue> Find<TKey, TValue>(this IDictionary<TKey, TValue> source, TKey key) {
+        [ItemCanBeNull]
+        [Pure]
+        public static Optional<TValue> Find<TKey, TValue>(
+            [CanBeNull] this IDictionary<TKey, TValue> source,
+            [NotNull]        TKey                      key
+        ) {
+            source = source.OrEmpty();
             return source.ContainsKey(key) ? source[key] : default(Optional<TValue>);
         }
 
         /// <inheritdoc cref="Find{TKey,TValue}(System.Collections.Generic.IDictionary{TKey,TValue},TKey)"/>
-        public static Optional<TValue> Find<TKey, TValue>(this KeyedCollection<TKey, TValue> source, TKey key) {
+        [ItemCanBeNull]
+        [Pure]
+        public static Optional<TValue> Find<TKey, TValue>(
+            [CanBeNull, ItemCanBeNull]
+            this KeyedCollection<TKey, TValue> source,
+            [NotNull] TKey key
+        ) {
+            if (source == null) {
+                return default;
+            }
+
             return source.Contains(key) ? source[key] : default(Optional<TValue>);
         }
-
-        #endregion
 
         #region Finding indexes
 
         /// TODO: alternate names could be: FirstIndexWhere, FirstIndexSatisfying
+        /// TODO: This can probably be made into some fancy thing that doesn't _necessarily_ enumerate <paramref name="source"/>, likely using <see cref="IEnumerable{T}.GetEnumerator"/> or something like that
         /// <param name="source"></param>
         /// <param name="predicate"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns>the index of the first entry in the <paramref name="source"/> that satisfies the <paramref name="predicate"/>; or null if none was found</returns>
-        public static int? FirstIndexOf<T>(this IEnumerable<T> source, Func<T, bool> predicate) {
-            var sourceArray = source.ToArray();
+        public static int? FirstIndexOf<T>([CanBeNull, ItemCanBeNull, InstantHandle] this IEnumerable<T> source, [InstantHandle] Func<T, bool> predicate) {
+            var sourceArray = source.EmptyIfNull().ToArray();
             for (int i = 0; i < sourceArray.Length; i++) {
                 if (predicate.Invoke(sourceArray[i])) {
                     return i;
@@ -1071,6 +1091,7 @@ namespace BrandonUtils.Standalone.Collections {
 
         #region Intersection
 
+        [NotNull, ItemNotNull]
         public static IEnumerable<T> Intersection<T>(
             [NotNull, ItemCanBeNull]
             this IEnumerable<T> source,
@@ -1094,7 +1115,13 @@ namespace BrandonUtils.Standalone.Collections {
             return additional.Prepend(source).Prepend(second).Intersection();
         }
 
-        public static IEnumerable<T> Intersection<T>([NotNull] this IEnumerable<T> source, [NotNull, ItemNotNull] IEnumerable<IEnumerable<T>> others) {
+        [NotNull, ItemNotNull]
+        public static IEnumerable<T> Intersection<T>(
+            [NotNull, InstantHandle]
+            this IEnumerable<T> source,
+            [NotNull, ItemNotNull, InstantHandle]
+            IEnumerable<IEnumerable<T>> others
+        ) {
             if (source == null) {
                 throw new ArgumentNullException(nameof(source));
             }
@@ -1106,7 +1133,8 @@ namespace BrandonUtils.Standalone.Collections {
             return others.Prepend(source).Intersection();
         }
 
-        public static IEnumerable<T> Intersection<T>([NotNull, ItemNotNull] this IEnumerable<IEnumerable<T>> sources) {
+        [NotNull, ItemNotNull]
+        public static IEnumerable<T> Intersection<T>([NotNull, ItemNotNull, InstantHandle] this IEnumerable<IEnumerable<T>> sources) {
             if (sources == null) {
                 throw new ArgumentNullException(nameof(sources));
             }
