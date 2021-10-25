@@ -83,7 +83,12 @@ namespace BrandonUtils.Standalone.Randomization {
         /// <exception cref="ArgumentNullException">if <paramref name="weightedChoices"/> is null or empty</exception>
         /// <exception cref="ArgumentOutOfRangeException">if any of the <paramref name="weightedChoices"/>' weights is negative</exception>
         /// <exception cref="BrandonException">if we fail to select any of the <paramref name="weightedChoices"/></exception>
-        public static T FromWeightedList<T>([CanBeNull] this Random generator, [NotNull, InstantHandle] IEnumerable<(T choice, double weight)> weightedChoices) {
+        [CanBeNull]
+        public static T FromWeightedList<T>(
+            [CanBeNull] this Random generator,
+            [NotNull, InstantHandle]
+            IEnumerable<(T choice, double weight)> weightedChoices
+        ) {
             if (weightedChoices == null) {
                 throw new ArgumentNullException(nameof(weightedChoices));
             }
@@ -108,6 +113,11 @@ namespace BrandonUtils.Standalone.Randomization {
             throw new BrandonException($"Unable to select an entry from the weighted list! ({nameof(targetWeight)} = {targetWeight}, from {weightedChoices.Prettify()}");
         }
 
+        [CanBeNull]
+        public static T FromWeightedList<T>([CanBeNull] this Random generator, [NotNull, InstantHandle] IEnumerable<(T choice, int weight)> weightedChoices) {
+            return generator.FromWeightedList(weightedChoices.Select(it => (it.choice, it.weight.ToDouble())));
+        }
+
         /// <summary>
         /// Returns a <see cref="KeyValuePair{TKey,TValue}.Key"/> from the <paramref name="weightedChoices"/>,
         /// where each choice is weighted by its <see cref="KeyValuePair{TKey,TValue}.Value"/>.
@@ -122,7 +132,12 @@ namespace BrandonUtils.Standalone.Randomization {
         /// <exception cref="BrandonException">if we fail to select an entry <i>(this should not occur under normal circumstances)</i></exception>
         [NotNull]
         public static T FromWeightedList<T>([CanBeNull] this Random generator, [NotNull] IDictionary<T, double> weightedChoices) {
-            return generator.FromWeightedList(weightedChoices.Select(it => (it.Key, it.Value)));
+            return generator.FromWeightedList(weightedChoices.Select(it => (it.Key, it.Value)))!;
+        }
+
+        [NotNull]
+        public static T FromWeightedList<T>([CanBeNull] this Random generator, [NotNull] IDictionary<T, int> weightedChoices) {
+            return generator.FromWeightedList(weightedChoices.Select(it => (it.Key, it.Value)))!;
         }
 
         /// <summary>
@@ -133,12 +148,23 @@ namespace BrandonUtils.Standalone.Randomization {
         /// <param name="weightSelector">a <see cref="Func{TResult}"/> to determine the relative weight of each of the <paramref name="choices"/>. <p><b>⚠ NOTE: ⚠</b></p>All of the weights must be >= 0!</param>
         /// <typeparam name="T">the type of <paramref name="choices"/></typeparam>
         /// <returns>a random <typeparamref name="T"/> entry from <paramref name="choices"/></returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="choices"/> is null</exception>
+        /// <exception cref="ArgumentNullException">if <paramref name="choices"/> is null or empty</exception>
         /// <exception cref="ArgumentNullException">if <paramref name="weightSelector"/> is null</exception>
         /// <exception cref="ArgumentOutOfRangeException">if any of the results of <paramref name="weightSelector"/> are <c><![CDATA[< 0]]></c></exception>
-        [NotNull]
-        public static T FromWeightedList<T>([CanBeNull] this Random generator, [NotNull] IEnumerable<T> choices, [NotNull] Func<T, double> weightSelector) {
+        [CanBeNull]
+        public static T FromWeightedList<T>(
+            [CanBeNull] this Random generator,
+            [NotNull, ItemCanBeNull, InstantHandle]
+            IEnumerable<T> choices,
+            [NotNull] Func<T, double> weightSelector
+        ) {
             if (weightSelector == null) {
+                throw new ArgumentNullException(nameof(weightSelector));
+            }
+
+            choices = choices.ToArray();
+
+            if (choices.IsEmpty()) {
                 throw new ArgumentNullException(nameof(weightSelector));
             }
 

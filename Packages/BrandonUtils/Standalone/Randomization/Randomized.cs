@@ -33,5 +33,13 @@ namespace BrandonUtils.Standalone.Randomization {
         public static FromWeightedList<T> FromWeightedList<T>(IDictionary<T, double> weightedChoices) {
             return new FromWeightedList<T>(weightedChoices);
         }
+
+        public static FromWeightedList<T> FromWeightedList<T>(IEnumerable<(T, double)> weightedChoices) {
+            return new FromWeightedList<T>(weightedChoices);
+        }
+
+        public static FromWeightedList<T> FromWeightedList<T>(IEnumerable<(T, int)> weightedChoices) {
+            return new FromWeightedList<T>(weightedChoices);
+        }
     }
 }
