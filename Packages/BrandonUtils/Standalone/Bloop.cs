@@ -137,7 +137,10 @@ namespace BrandonUtils.Standalone {
         /// <param name="loopFunction"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static IEnumerable<T> Repeat<T>(this int count, Func<int, T> loopFunction) {
+        [LinqTunnel]
+        [NotNull]
+        [Pure]
+        public static IEnumerable<T> Repeat<T>(this int count, [NotNull] Func<int, T> loopFunction) {
             return Enumerable.Range(0, count).Select(loopFunction.Invoke);
         }
 
