@@ -1143,5 +1143,32 @@ namespace BrandonUtils.Standalone.Collections {
         }
 
         #endregion
+
+        #region AsReadOnly
+
+        /// <summary>
+        /// Returns a <see cref="ReadOnlyCollection{T}"/> wrapper around this <see cref="IList{T}"/>.
+        /// </summary>
+        /// <param name="source">the original <see cref="IList{T}"/></param>
+        /// <typeparam name="T">the type of the elements of <paramref name="source"/></typeparam>
+        /// <returns>a <see cref="ReadOnlyCollection{T}"/> wrapper around this <see cref="IList{T}"/></returns>
+        [NotNull, ItemCanBeNull]
+        public static ReadOnlyCollection<T> AsReadOnly<T>([NotNull, ItemCanBeNull] this IList<T> source) {
+            return new ReadOnlyCollection<T>(source);
+        }
+
+        /// <summary>
+        /// Returns a <see cref="ReadOnlyDictionary{TKey,TValue}"/> wrapper around this <see cref="IDictionary{TKey,TValue}"/>.
+        /// </summary>
+        /// <param name="source">the original <see cref="IDictionary{TKey,TValue}"/></param>
+        /// <typeparam name="TKey">the type of <paramref name="source"/>'s <see cref="IDictionary{TKey,TValue}.Keys"/></typeparam>
+        /// <typeparam name="TValue">the type of <paramref name="source"/>'s <see cref="IDictionary{TKey,TValue}.Values"/></typeparam>
+        /// <returns>a <see cref="ReadOnlyDictionary{TKey,TValue}"/> wrapper around this <see cref="IDictionary{TKey,TValue}"/></returns>
+        [NotNull]
+        public static ReadOnlyDictionary<TKey, TValue> AsReadOnly<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> source) {
+            return new ReadOnlyDictionary<TKey, TValue>(source);
+        }
+
+        #endregion
     }
 }
