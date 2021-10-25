@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Enums;
+using BrandonUtils.Standalone.Optional;
 
 using FowlFever.Conjugal.Affixing;
 
@@ -753,7 +754,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// <summary>
         /// A variation on <see cref="object.ToString"/> that returns the specified <paramref name="nullPlaceholder"/> if the original <paramref name="obj"/> is <c>null</c>.
         /// </summary>
-        /// <param name="obj">the original object</param>
+        /// <param name="obj">the original <see cref="object"/></param>
         /// <param name="nullPlaceholder">the <see cref="string"/> returned when <paramref name="obj"/> is <c>null</c></param>
         /// <returns>the <see cref="object.ToString"/> representation of <paramref name="obj"/>, or <c>null</c></returns>
         [NotNull]
@@ -764,6 +765,34 @@ namespace BrandonUtils.Standalone.Strings {
             }
 
             return obj == null ? nullPlaceholder : obj.ToString();
+        }
+
+        /// <summary>
+        /// Applies <paramref name="formatter"/> to <paramref name="obj"/>, returning the result or, if the result is null, <paramref name="nullPlaceholder"/>.
+        /// </summary>
+        /// <param name="obj">the original <see cref="object"/></param>
+        /// <param name="formatter">the <see cref="Func{T,T2}"/> that will produce the formatted <paramref name="obj"/></param>
+        /// <param name="nullPlaceholder">the <see cref="string"/> returned when the result of <paramref name="formatter"/> is null</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        [NotNull]
+        [ContractAnnotation("formatter:null => stop")]
+        [ContractAnnotation("nullPlaceholder:null => stop")]
+        public static string ToString<T>(
+            [CanBeNull] this T               obj,
+            [NotNull]        Func<T, string> formatter,
+            [CanBeNull]      string          nullPlaceholder = Prettification.DefaultNullPlaceholder
+        ) {
+            if (nullPlaceholder == null) {
+                throw new ArgumentNullException(nameof(nullPlaceholder), $"Providing a null value as a {nameof(nullPlaceholder)} is redundant!");
+            }
+
+            if (formatter == null) {
+                throw new ArgumentNullException(nameof(formatter));
+            }
+
+            return formatter.MustNotBeNull().Try(obj).OrElse(default) ?? nullPlaceholder;
         }
 
         /// <summary>
