@@ -78,6 +78,9 @@ namespace BrandonUtils.Standalone {
         [Pure]
         public static bool IsPositive(this decimal value) => value >= 0;
 
+        [Pure]
+        public static bool IsPositive(this TimeSpan value) => value >= TimeSpan.Zero;
+
         #endregion
 
         #region IsStrictlyPositive
@@ -100,6 +103,9 @@ namespace BrandonUtils.Standalone {
         [Pure]
         public static bool IsStrictlyPositive(this decimal value) => value > 0;
 
+        [Pure]
+        public static bool IsStrictlyPositive(this TimeSpan value) => value > TimeSpan.Zero;
+
         #endregion
 
         #region IsNegative
@@ -121,6 +127,9 @@ namespace BrandonUtils.Standalone {
 
         [Pure]
         public static bool IsNegative(this decimal value) => value < 0;
+
+        [Pure]
+        public static bool IsNegative(this TimeSpan value) => value < TimeSpan.Zero;
 
         #endregion
 
