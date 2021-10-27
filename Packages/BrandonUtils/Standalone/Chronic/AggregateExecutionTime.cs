@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Strings;
 
 using JetBrains.Annotations;
@@ -113,9 +114,21 @@ namespace BrandonUtils.Standalone.Chronic {
                 First  = first;
                 Second = second;
             }
+
+            [NotNull]
+            public override string ToString() {
+                return new Dictionary<object, object>() {
+                        [nameof(First)]      = First,
+                        [nameof(Second)]     = Second,
+                        [nameof(Difference)] = Difference,
+                        [nameof(Ratio)]      = Ratio
+                    }.AsEnumerable()
+                     .JoinString(", ");
+                //.Prettify(LineStyle.Single);
+            }
         }
 
-        private TimeComparison Comparing(Func<AggregateExecutionTime, TimeSpan> extractor) {
+        private TimeComparison Comparing([NotNull] Func<AggregateExecutionTime, TimeSpan> extractor) {
             return new TimeComparison(extractor.Invoke(FirstTimes), extractor.Invoke(SecondTimes));
         }
 
