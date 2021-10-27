@@ -839,7 +839,7 @@ namespace BrandonUtils.Standalone.Strings {
         }
 
         [NotNull]
-        public static string UnlessBlank([CanBeNull] this string str) {
+        public static string MustNotBeBlank([CanBeNull] this string str) {
             return str.IsNotBlank() ? str : throw new ArgumentException($"The string must not be blank! (Actual: [{str ?? Prettification.DefaultNullPlaceholder}]");
         }
 

@@ -37,7 +37,7 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
             [CanBeNull] TData        data = default
         ) : base(
             folder,
-            saveFileName.Rendered.UnlessBlank(),
+            saveFileName.Rendered.MustNotBeBlank(),
             data
         ) {
             _saveFileName = saveFileName ?? throw new ArgumentNullException(nameof(saveFileName));

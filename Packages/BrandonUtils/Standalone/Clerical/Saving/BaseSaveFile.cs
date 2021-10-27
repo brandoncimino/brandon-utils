@@ -34,7 +34,7 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
         )
             : this(
                 folder ?? throw new ArgumentNullException(nameof(folder)),
-                new FileInfo(folder.Directory.GetChildPath(relativePathToFile.UnlessBlank())),
+                new FileInfo(folder.Directory.GetChildPath(relativePathToFile.MustNotBeBlank())),
                 data
             ) { }
 
