@@ -10,7 +10,7 @@ namespace BrandonUtils.Standalone.Strings {
     public class Prettifier<T> : IPrettifier<T>, IPrimaryKeyed<Type> {
         [NotNull] private Func<T, PrettificationSettings, string> PrettificationFunction { get; }
 
-        public Type PrettifierType { get; } = typeof(T).IsGenericTypeOrDefinition() ? typeof(T).GetGenericTypeDefinition() : typeof(T);
+        public Type PrettifierType { get; } = _getPrettifierType();
 
         [NotNull] public Type PrimaryKey => PrettifierType;
 
@@ -20,6 +20,15 @@ namespace BrandonUtils.Standalone.Strings {
 
         public Prettifier([NotNull] Func<T, PrettificationSettings, string> prettifierFunc) {
             PrettificationFunction = prettifierFunc;
+        }
+
+        private static Type _getPrettifierType() {
+            if (typeof(T) == typeof(Type)) {
+                // ReSharper disable once PossibleMistakenCallToGetType.2
+                return typeof(T).GetType();
+            }
+
+            return typeof(T).IsGenericTypeOrDefinition() ? typeof(T).GetGenericTypeDefinition() : typeof(T);
         }
 
         #endregion
@@ -56,14 +65,14 @@ namespace BrandonUtils.Standalone.Strings {
             settings ??= Prettification.DefaultPrettificationSettings;
 
             if (settings.VerboseLogging) {
-                Console.WriteLine($"🦺 SAFELY prettifying [{cinderella?.GetType()}]{cinderella}");
+                Console.WriteLine($"🦺 SAFELY prettifying [{cinderella?.GetType().Name}]{cinderella}");
             }
 
             try {
                 return Prettify(cinderella, settings);
             }
             catch (Exception e) {
-                var str = $"🧨 Error during prettification of [{cinderella?.GetType()}]{cinderella}:\n{e})";
+                var str = $"🧨 Error during prettification of [{cinderella?.GetType().Name}]{cinderella}:\n{e})";
                 Console.WriteLine(str);
                 return Prettification.LastResortPrettifier(cinderella, settings);
             }
