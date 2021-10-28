@@ -52,19 +52,24 @@ namespace BrandonUtils.Standalone.Optional {
             return default;
         }
 
+        /// <summary>
+        /// Converts an <see cref="IOptional{T}"/> to an <see cref="Optional{T}"/>.
+        /// </summary>
+        /// <remarks>
+        /// Technically, this creates a "new" <see cref="Optional{T}"/> even of the input <paramref name="optional"/> was already an <see cref="Optional{T}"/> -
+        /// this is to mimic the usage of <see cref="Enumerable.ToList{TSource}"/>, etc., which always return new objects.
+        ///
+        /// However, because <see cref="Optional{T}"/> is a <see cref="ValueType"/>, this isn't a particularly meaningful distinction.
+        /// </remarks>
+        /// <param name="optional">this <see cref="IOptional{T}"/></param>
+        /// <typeparam name="T">the type of the underlying value in <paramref name="optional"/></typeparam>
+        /// <returns>a new <see cref="Optional{T}"/> containing the same <see cref="IOptional{T}.Value"/> as <paramref name="optional"/>; or an empty <see cref="Optional{T}"/> if <paramref name="optional"/> was null</returns>
+        [ItemCanBeNull]
         public static Optional<T> ToOptional<T>([CanBeNull, ItemCanBeNull] this IOptional<T> optional) {
-            if (optional == null) {
-                return default;
-            }
-
-            return optional.Select(Of)
-                           .OrElse(default);
-
-            if (optional.HasValue) {
-                return new Optional<T>(optional.Value);
-            }
-
-            return default;
+            return optional switch {
+                null => default,
+                _    => optional.Select(Of).OrElse(default)
+            };
         }
 
         /// <summary>
@@ -452,11 +457,6 @@ namespace BrandonUtils.Standalone.Optional {
 
         #region IsEmpty
 
-        /// <returns>negation of <see cref="IOptional{T}.HasValue"/></returns>
-        // public static bool IsEmpty<T>(this IOptional<T> optional) {
-        //     return !optional.HasValue;
-        // }
-
         /// <returns>negation of <see cref="Nullable{T}.HasValue"/></returns>
         [ContractAnnotation("null => true")]
         [ContractAnnotation("notnull => false")]
@@ -466,39 +466,135 @@ namespace BrandonUtils.Standalone.Optional {
 
         #endregion IsEmpty
 
-        #region Function Fallbacks
+        #region FirstWithValue
 
-        public static Optional<TOut> FirstWithValue<TOut>([NotNull, ItemNotNull] IEnumerable<Func<Optional<TOut>>> functions) {
+        /// <summary>
+        /// Returns the <see cref="Enumerable.First{TSource}(System.Collections.Generic.IEnumerable{TSource})"/> entry from <paramref name="optionals"/>
+        /// that <see cref="IOptional{T}.HasValue"/>.
+        /// </summary>
+        /// <param name="optionals">a sequence of <see cref="Optional{T}"/>s</param>
+        /// <typeparam name="T">the underlying type of the <see cref="Optional{T}"/>s</typeparam>
+        /// <returns>the first <see cref="Optional{T}"/> that <see cref="Optional{T}.HasValue"/>; or an empty <see cref="Optional{T}"/> if no values were found</returns>
+        [ItemCanBeNull]
+        public static Optional<T> FirstWithValue<T>(
+            [NotNull] this IEnumerable<Optional<T>> optionals
+        ) {
+            return optionals.FirstOrDefault(it => it.HasValue);
+        }
+
+        #region 0 args (Func<TOut>)
+
+        public static Optional<TOut> FirstWithValue<TOut>(
+            [NotNull, ItemNotNull, InstantHandle]
+            IEnumerable<Func<Optional<TOut>>> functions
+        ) {
             if (functions == null) {
                 throw new ArgumentNullException(nameof(functions));
             }
 
-            return functions.Select(fn => fn.Invoke())
+            return functions.Select(fn => fn.MustNotBeNull().Invoke())
                             .FirstOrDefault(it => it.HasValue);
         }
 
-        public static Optional<TOut> FirstWithValue<TOut>(params Func<Optional<TOut>>[] functions) {
-            return FirstWithValue(functions as IEnumerable<Func<Optional<TOut>>>);
+        public static Optional<TOut> FirstWithValue<TOut>(
+            [NotNull, ItemNotNull]
+            params Func<Optional<TOut>>[] functions
+        ) {
+            if (functions == null) {
+                throw new ArgumentNullException(nameof(functions));
+            }
+
+            return FirstWithValue(functions.AsEnumerable());
         }
 
-        public static Optional<TOut> FirstWithValue<TIn, TOut>(TIn input, [NotNull] IEnumerable<Func<TIn, Optional<TOut>>> functions) {
-            return functions.Select(fn => fn.Invoke(input))
-                            .FirstOrDefault(it => it.HasValue);
+        #endregion
+
+        #region 1 arg (Func<TIn, TOut>)
+
+        public static Optional<TOut> FirstWithValue<TIn, TOut>(
+            [CanBeNull] TIn input,
+            [NotNull, ItemNotNull, InstantHandle]
+            IEnumerable<Func<TIn, Optional<TOut>>> functions
+        ) {
+            if (functions == null) {
+                throw new ArgumentNullException(nameof(functions));
+            }
+
+            return functions.Select(fn => fn.MustNotBeNull().Invoke(input))
+                            .FirstWithValue();
         }
 
-        public static Optional<TOut> FirstWithValue<TIn, TOut>(TIn input, params Func<TIn, Optional<TOut>>[] functions) {
-            return FirstWithValue(input, functions as IEnumerable<Func<TIn, Optional<TOut>>>);
+        public static Optional<TOut> FirstWithValue<TIn, TOut>(
+            [CanBeNull] TIn input,
+            [NotNull, ItemNotNull]
+            params Func<TIn, Optional<TOut>>[] functions
+        ) {
+            if (functions == null) {
+                throw new ArgumentNullException(nameof(functions));
+            }
+
+            return FirstWithValue(input, functions.AsEnumerable());
         }
 
-        [ItemCanBeNull]
-        public static IOptional<T> FirstWithValue<T>([NotNull] params IOptional<T>[] optionals) {
-            return optionals.FindFirst(it => it.HasValue).OrElse(default);
+        #endregion
+
+        #region 2 args (Func<T1, T2, TOut>)
+
+        public static Optional<TOut> FirstWithValue<T1, T2, TOut>(
+            (T1 arg1, T2 arg2) args,
+            [NotNull, ItemNotNull, InstantHandle]
+            IEnumerable<Func<T1, T2, Optional<TOut>>> functions
+        ) {
+            if (functions == null) {
+                throw new ArgumentNullException(nameof(functions));
+            }
+
+            return functions.Select(fn => fn.MustNotBeNull().Invoke(args))
+                            .FirstWithValue();
         }
 
-        [ItemCanBeNull]
-        public static Optional<T> FirstWithValue<T>([NotNull] this IEnumerable<IOptional<T>> optionals) {
-            return optionals.FirstOrDefault(it => it.HasValue).ToOptional();
+        public static Optional<TOut> FirstWithValue<T1, T2, TOut>(
+            (T1 arg1, T2 arg2) args,
+            [NotNull, ItemNotNull]
+            params Func<T1, T2, Optional<TOut>>[] functions
+        ) {
+            if (functions == null) {
+                throw new ArgumentNullException(nameof(functions));
+            }
+
+            return FirstWithValue(args, functions.AsEnumerable());
         }
+
+        #endregion
+
+        #region 3 args (Func<T1, T2, T3, TOut>)
+
+        public static Optional<TOut> FirstWithValue<T1, T2, T3, TOut>(
+            (T1 arg1, T2 arg2, T3 arg3) args,
+            [NotNull, ItemNotNull, InstantHandle]
+            IEnumerable<Func<T1, T2, T3, Optional<TOut>>> functions
+        ) {
+            if (functions == null) {
+                throw new ArgumentNullException(nameof(functions));
+            }
+
+            return functions.Select(it => it.Invoke(args))
+                            .FirstWithValue();
+        }
+
+        public static Optional<TOut> FirstWithValue<T1, T2, T3, TOut>(
+            (T1 arg1, T2 arg2, T3 arg3) args,
+            [NotNull, ItemNotNull]
+            params Func<T1, T2, T3, Optional<TOut>>[] functions
+        ) {
+            if (functions == null) {
+                throw new ArgumentNullException(nameof(functions));
+            }
+
+            return FirstWithValue(args, functions.AsEnumerable());
+        }
+
+        #endregion
 
         #endregion Function Fallbacks
     }
