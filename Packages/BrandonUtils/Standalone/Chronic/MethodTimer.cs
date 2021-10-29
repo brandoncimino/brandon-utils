@@ -87,11 +87,13 @@ namespace BrandonUtils.Standalone.Chronic {
 
         [NotNull]
         public static AggregateExecutionTime MeasureExecution<T>(
-            (string nickname, T input, Action<T> action) actionBeingTimed,
+            T                                   input,
+            (string nickname, Action<T> action) actionBeingTimed,
             [NonNegativeValue]
             int iterations
         ) {
-            return MeasureExecution((actionBeingTimed.nickname ?? actionBeingTimed.action.Method.Name, () => actionBeingTimed.action(actionBeingTimed.input)), iterations);
+            actionBeingTimed.nickname ??= actionBeingTimed.action.Method.Name;
+            return MeasureExecution((actionBeingTimed.nickname, () => actionBeingTimed.action(input)), iterations);
         }
 
         [NotNull]
@@ -101,7 +103,33 @@ namespace BrandonUtils.Standalone.Chronic {
             [NonNegativeValue]
             int iterations
         ) {
-            return MeasureExecution((default, input, actionBeingTimed), iterations);
+            return MeasureExecution(input, (default, actionBeingTimed), iterations);
+        }
+
+        #endregion
+
+        #region Action<T1,T2> (2 args)
+
+        [NotNull]
+        public static AggregateExecutionTime MeasureExecution<T1, T2>(
+            (T1 arg1, T2 arg2)                       input,
+            (string nickname, Action<T1, T2> action) actionBeingTimed,
+            [NonNegativeValue]
+            int iterations
+        ) {
+            actionBeingTimed.nickname ??= actionBeingTimed.action.Method.Name;
+            return MeasureExecution((actionBeingTimed.nickname, () => actionBeingTimed.action.Invoke(input)), iterations);
+        }
+
+        [NotNull]
+        public static AggregateExecutionTime MeasureExecution<T1, T2>(
+            (T1 arg1, T2 arg2) input,
+            [NotNull, InstantHandle]
+            Action<T1, T2> actionBeingTimed,
+            [NonNegativeValue]
+            int iterations
+        ) {
+            return MeasureExecution(input, (default, actionBeingTimed), iterations);
         }
 
         #endregion
