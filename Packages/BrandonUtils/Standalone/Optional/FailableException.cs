@@ -29,7 +29,7 @@ namespace BrandonUtils.Standalone.Optional {
 
         [NotNull]
         internal static InvalidOperationException FailedException<TValue, TExcuse>([NotNull] IFailableFunc<TValue, TExcuse> failableFunc, Optional<TExcuse> actualExcuse) where TExcuse : Exception {
-            return new InvalidOperationException($"Unable to retrieve the {typeof(TValue).PrettifyType()} {nameof(failableFunc.Value)} from the {failableFunc.GetType().Name} because it failed!", actualExcuse.OrElse(default));
+            return new InvalidOperationException($"Unable to retrieve the {typeof(TValue).PrettifyType(default)} {nameof(failableFunc.Value)} from the {failableFunc.GetType().Name} because it failed!", actualExcuse.OrElse(default));
         }
     }
 }

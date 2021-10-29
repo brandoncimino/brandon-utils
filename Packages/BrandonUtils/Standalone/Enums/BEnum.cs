@@ -18,16 +18,16 @@ namespace BrandonUtils.Standalone.Enums {
                 return enumType.GetEnumValues().Cast<T>().ToArray();
             }
 
-            throw new ArgumentException($"{enumType.PrettifyType()} is not an enum type!");
+            throw new ArgumentException($"{enumType.PrettifyType(default)} is not an enum type!");
         }
 
         public static T[] GetValues<T>(Type enumType) where T : struct, Enum {
             if (typeof(T) != enumType) {
-                throw new ArgumentException($"The {nameof(enumType)} {enumType.PrettifyType()} was not the same as the type argument {nameof(T)}!");
+                throw new ArgumentException($"The {nameof(enumType)} {enumType.PrettifyType(default)} was not the same as the type argument {nameof(T)}!");
             }
 
             if (!enumType.IsEnum) {
-                throw new ArgumentException($"{enumType.PrettifyType()} is not an enum type!");
+                throw new ArgumentException($"{enumType.PrettifyType(default)} is not an enum type!");
             }
 
             return enumType.GetEnumValues().Cast<T>().ToArray();

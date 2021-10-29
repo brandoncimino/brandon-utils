@@ -11,7 +11,7 @@ namespace BrandonUtils.Standalone.Strings {
         internal static KeyedList<Type, IPrettifier> GetDefaultPrettifiers() {
             return new KeyedList<Type, IPrettifier>(it => it.PrettifierType) {
                 new Prettifier<string>(Convert.ToString),
-                new Prettifier<Type>((type, settings) => InnerPretty.PrettifyType(type, settings)),
+                new Prettifier<Type>(InnerPretty.PrettifyType),
                 new Prettifier<IDictionary<object, object>>(InnerPretty.PrettifyDictionary),
                 new Prettifier<IDictionary>(InnerPretty.PrettifyDictionary),
                 new Prettifier<KeyedList<object, object>>(InnerPretty.PrettifyKeyedList),

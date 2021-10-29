@@ -54,7 +54,7 @@ namespace BrandonUtils.Standalone.Enums {
         public void MustContain(params T[] expectedValues) {
             if (!IsSupersetOf(expectedValues)) {
                 var mustContainMessage = BuildMustContainMessage(expectedValues);
-                throw new EnumNotInSetException<T>(this, expectedValues, $"The {GetType().PrettifyType()} didn't contain all of the {nameof(expectedValues)}!\n{mustContainMessage}");
+                throw new EnumNotInSetException<T>(this, expectedValues, $"The {GetType().PrettifyType(default)} didn't contain all of the {nameof(expectedValues)}!\n{mustContainMessage}");
             }
         }
 

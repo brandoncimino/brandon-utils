@@ -121,7 +121,7 @@ namespace BrandonUtils.Standalone.Optional {
 
         [NotNull]
         private InvalidOperationException NoExcuseExcuse() {
-            return new InvalidOperationException($"This {GetType().PrettifyType()} has no {nameof(_excuse)}! This probably means it is a default value, or was created using a no-argument constructor.");
+            return new InvalidOperationException($"This {GetType().PrettifyType(default)} has no {nameof(_excuse)}! This probably means it is a default value, or was created using a no-argument constructor.");
         }
     }
 }

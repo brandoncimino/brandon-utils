@@ -35,14 +35,6 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
             return type.IsGenericTypeOrDefinition() ? PrettifyGenericType(type, settings) : type.NameOrKeyword();
         }
 
-        /**
-         * <inheritdoc cref="PrettifyType(System.Type,BrandonUtils.Standalone.Strings.PrettificationSettings)"/>
-         */
-        [NotNull]
-        internal static string PrettifyType([CanBeNull] this Type type) {
-            return PrettifyType(type, default);
-        }
-
         [NotNull]
         private static string PrettifyGenericType([CanBeNull] Type genericType, [CanBeNull] PrettificationSettings settings) {
             if (genericType?.IsGenericType != true) {

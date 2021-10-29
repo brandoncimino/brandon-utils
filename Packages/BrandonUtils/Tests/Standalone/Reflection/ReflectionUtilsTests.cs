@@ -406,7 +406,7 @@ namespace BrandonUtils.Tests.Standalone.Reflection {
         public static void IsEnumerable(Type type, Should should) {
             Console.WriteLine("FindInterfaces");
             Console.WriteLine(type.FindInterfaces((type1, criteria) => true, default).Prettify());
-            Assert.That(type.IsEnumerable, should.Constrain(), $"{type.PrettifyType()}");
+            Assert.That(type.IsEnumerable, should.Constrain(), $"{type.PrettifyType(default)}");
         }
     }
 }

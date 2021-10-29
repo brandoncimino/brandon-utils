@@ -88,7 +88,7 @@ namespace BrandonUtils.Standalone.Strings {
                 return princess;
             }
 
-            throw new InvalidCastException($"Couldn't prettify [{cinderella.GetType().PrettifyType()}]{cinderella} because it wasn't the right type, {PrettifierType.PrettifyType()}!");
+            throw new InvalidCastException($"Couldn't prettify [{cinderella.GetType().PrettifyType(default)}]{cinderella} because it wasn't the right type, {PrettifierType.PrettifyType(default)}!");
         }
 
         [NotNull]
