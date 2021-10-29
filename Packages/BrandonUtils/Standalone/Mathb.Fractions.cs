@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.Contracts;
+﻿using System;
+using System.Diagnostics.Contracts;
 
 using BrandonUtils.Standalone.Chronic;
 
@@ -22,9 +23,7 @@ namespace BrandonUtils.Standalone {
             };
         }
 
-        [Pure]
-        public static double DeltaRatio(Rate initial, Rate final) {
-            return DeltaRatio(initial.Hertz, final.Hertz);
-        }
+        [Pure] public static double DeltaRatio(Rate     initial, Rate     final) => DeltaRatio(initial.Hertz, final.Hertz);
+        [Pure] public static double DeltaRatio(TimeSpan initial, TimeSpan final) => DeltaRatio(initial.Ticks, final.Ticks);
     }
 }
