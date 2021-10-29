@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics.Contracts;
 
+using BrandonUtils.Standalone.Chronic;
+
 namespace BrandonUtils.Standalone {
     public static partial class Mathb {
         [Pure] public static double Inverse(this    double value) => 1 / value;
@@ -18,6 +20,11 @@ namespace BrandonUtils.Standalone {
                 (double.NegativeInfinity, _)                       => double.NegativeInfinity,
                 _                                                  => (initial - final) / initial
             };
+        }
+
+        [Pure]
+        public static double DeltaRatio(Rate initial, Rate final) {
+            return DeltaRatio(initial.Hertz, final.Hertz);
         }
     }
 }
