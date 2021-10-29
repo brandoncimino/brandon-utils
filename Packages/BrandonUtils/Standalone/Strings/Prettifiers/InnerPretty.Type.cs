@@ -20,6 +20,7 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
         /// <param name="settings">optional <see cref="PrettificationSettings"/></param>
         /// <returns>a pretty <see cref="string"/></returns>
         [NotNull]
+        [Pure]
         public static string PrettifyType([CanBeNull] this Type type, [CanBeNull] PrettificationSettings settings) {
             settings ??= Prettification.DefaultPrettificationSettings;
 

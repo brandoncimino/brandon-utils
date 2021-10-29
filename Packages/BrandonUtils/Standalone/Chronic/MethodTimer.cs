@@ -57,6 +57,8 @@ namespace BrandonUtils.Standalone.Chronic {
 
         #region Multiple Executions
 
+        #region 0 args
+
         #region Action (0 args)
 
         [NotNull] public static AggregateExecutionTime MeasureExecution([NotNull] Action action, [NonNegativeValue] int iterations) => MeasureExecution((default, action), iterations);
@@ -83,6 +85,30 @@ namespace BrandonUtils.Standalone.Chronic {
 
         #endregion
 
+        #region Func<T> (0 args)
+
+        [NotNull]
+        public static AggregateExecutionTime MeasureExecution<T>(
+            (string nickname, Func<T> func) functionBeingTimed,
+            [NonNegativeValue]
+            int iterations
+        ) {
+            functionBeingTimed.nickname ??= functionBeingTimed.func.Method.Name;
+            return MeasureExecution(
+                (
+                    functionBeingTimed.nickname,
+                    new Action(() => functionBeingTimed.func.Invoke())
+                ),
+                iterations
+            );
+        }
+
+        #endregion
+
+        #endregion
+
+        #region 1 arg
+
         #region Action<T> (1 arg)
 
         [NotNull]
@@ -105,6 +131,35 @@ namespace BrandonUtils.Standalone.Chronic {
         ) {
             return MeasureExecution(input, (default, actionBeingTimed), iterations);
         }
+
+        #endregion
+
+        #region Func<TIn, TOut> (1 arg)
+
+        public static AggregateExecutionComparison MeasureExecution<TIn, TOut>(
+            TIn                                      input,
+            (string nickname, Func<TIn, TOut> func)  first,
+            (string nickname, Func<TIn, TOut> first) second,
+            [NonNegativeValue]
+            int iterations
+        ) {
+            throw new NotImplementedException();
+        }
+
+        [NotNull]
+        public static AggregateExecutionComparison MeasureExecution<TIn, TOut>(
+            TIn input,
+            [NotNull, InstantHandle]
+            Func<TIn, TOut> first,
+            [NotNull, InstantHandle]
+            Func<TIn, TOut> second,
+            [NonNegativeValue]
+            int iterations
+        ) {
+            throw new NotImplementedException();
+        }
+
+        #endregion
 
         #endregion
 
@@ -131,6 +186,12 @@ namespace BrandonUtils.Standalone.Chronic {
         ) {
             return MeasureExecution(input, (default, actionBeingTimed), iterations);
         }
+
+        #endregion
+
+        #region Func<T1, T2, TOut> (2 args)
+
+        //TODO
 
         #endregion
 
@@ -208,6 +269,12 @@ namespace BrandonUtils.Standalone.Chronic {
 
         #endregion
 
+        #region Func<TIn, TOut> (1 arg)
+
+        //TODO
+
+        #endregion"
+
         #region Action<T1,T2> (2 args)
 
         [NotNull]
@@ -230,6 +297,46 @@ namespace BrandonUtils.Standalone.Chronic {
             (T1 arg1, T2 arg2)       input,
             [NotNull] Action<T1, T2> first,
             [NotNull] Action<T1, T2> second,
+            [NonNegativeValue]
+            int iterations
+        ) {
+            return CompareExecutions(
+                input,
+                (default, first),
+                (default, second),
+                iterations
+            );
+        }
+
+        #endregion
+
+        #region Func<T1, T2, TOut> (2 args)
+
+        [NotNull]
+        public static AggregateExecutionComparison CompareExecutions<T1, T2, TOut>(
+            (T1 arg1, T2 arg2)                         input,
+            (string nickname, Func<T1, T2, TOut> func) first,
+            (string nickname, Func<T1, T2, TOut> func) second,
+            [NonNegativeValue]
+            int iterations
+        ) {
+            first.nickname  ??= first.func.Method.Name;
+            second.nickname ??= second.func.Method.Name;
+
+            return CompareExecutions(
+                (first.nickname, () => _ = first.func.Invoke(input)),
+                (second.nickname, () => _ = second.func.Invoke(input)),
+                iterations
+            );
+        }
+
+        [NotNull]
+        public static AggregateExecutionComparison CompareExecutions<T1, T2, TOut>(
+            (T1 arg1, T2 arg2) input,
+            [NotNull, InstantHandle]
+            Func<T1, T2, TOut> first,
+            [NotNull, InstantHandle]
+            Func<T1, T2, TOut> second,
             [NonNegativeValue]
             int iterations
         ) {

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 using BrandonUtils.Standalone;
+using BrandonUtils.Standalone.Chronic;
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Enums;
 using BrandonUtils.Standalone.Reflection;
@@ -71,7 +73,7 @@ namespace BrandonUtils.Tests.Standalone.Strings {
                     $"Name:     {actualType.Name}",
                     $"FullName: {actualType.FullName}",
                     $"Prettify: {actualType.Prettify()}",
-                    $"P. type:  {actualType.PrettifyType()}",
+                    $"P. type:  {InnerPretty.PrettifyType(actualType, default)}",
                     $"Full:     {actualType.PrettifyType(settings_full)}",
                     $"Short:    {actualType.PrettifyType(settings_short)}",
                     $"None:     {actualType.PrettifyType(settings_none)}",
@@ -202,7 +204,7 @@ int (int, string)
             Console.WriteLine($"kl def ass from ie def: {genTypeDef.IsAssignableFrom(enumerableTypeDef)}");
             Console.WriteLine($"ie def ass from kl def: {enumerableTypeDef.IsAssignableFrom(genTypeDef)}");
 
-            var prettifier = Prettification.FindPrettifier(keyedList.GetType());
+            var prettifier = Prettification.FindPrettifier(keyedList.GetType(), default);
 
             Console.WriteLine(prettifier);
             Console.WriteLine(prettifier.Select(it => it.Prettify(keyedList)));
@@ -246,7 +248,7 @@ int (int, string)
         [TestCase(typeof(C), "C:pretty")]
         [TestCase(typeof(D), "A:pretty")]
         public void PrettifierPrefersExactType(Type actualType, string expectedString) {
-            var prettifier = Prettification.FindPrettifier(actualType);
+            var prettifier = Prettification.FindPrettifier(actualType, default);
             Console.WriteLine(prettifier);
 
             var instance = Convert.ChangeType(actualType.GetConstructor(Array.Empty<Type>())?.Invoke(Array.Empty<object>()), actualType);
@@ -392,6 +394,98 @@ List<int>[
                     ["style"]           = style
                 }.Prettify(settings)
             );
+        }
+
+        [Test]
+        public void PerformanceTest_Dictionary() {
+            var settings = new PrettificationSettings();
+
+            var ob = new Dictionary<DayOfWeek, string>() {
+                [DayOfWeek.Monday]    = "Monntag",
+                [DayOfWeek.Tuesday]   = "Zwei...tag?",
+                [DayOfWeek.Wednesday] = "Mittwoch",
+                [DayOfWeek.Thursday]  = "Donnerstag",
+                [DayOfWeek.Friday]    = "Freitag",
+                [DayOfWeek.Saturday]  = "Samstag",
+                [DayOfWeek.Sunday]    = "Sonntag"
+            };
+
+            Assert.That(ob.GetType(), Is.EqualTo(typeof(Dictionary<DayOfWeek, string>)));
+
+            void ViaExtension(object obj) {
+                _ = obj.Prettify(settings);
+            }
+
+            // ReSharper disable once SuggestBaseTypeForParameter
+            void ViaSpecific(Dictionary<DayOfWeek, string> obj) {
+                _ = InnerPretty.PrettifyDictionary<DayOfWeek, string>(obj);
+            }
+
+            var comparison = MethodTimer.CompareExecutions(
+                ob,
+                ViaExtension,
+                ViaSpecific,
+                1000
+            );
+
+            Console.WriteLine(comparison);
+        }
+
+        [Test]
+        [TestCase(typeof(IDictionary<(int?, List<DayOfWeek>), Stopwatch>))]
+        public void PerformanceTest_Type(Type type) {
+            const int iterations = 2000;
+
+            var settings = new PrettificationSettings();
+
+            var comparison = MethodTimer.CompareExecutions(
+                (type, settings),
+                Prettification.Prettify,
+                InnerPretty.PrettifyType,
+                iterations
+            );
+
+            Console.WriteLine(comparison);
+            Assert.That(comparison.Faster, Is.EqualTo(AggregateExecutionComparison.Which.Second));
+        }
+
+        class Parent {
+            public string Nickname;
+        }
+
+        class Child : Parent {
+            public bool IsBehaved;
+        }
+
+        [Test]
+        public static void PerformanceTest_ExactVsDerivedType() {
+            var settings = new PrettificationSettings();
+
+            var exactPrettifier = new Prettifier<Parent>((parent, prettySettings) => $"Parent (actually {parent.GetType().Prettify(prettySettings)}): {parent.Nickname}");
+            Prettification.RegisterPrettifier(exactPrettifier);
+
+            var exactType   = new Parent() { Nickname = "Parent_1" };
+            var derivedType = new Child() { Nickname  = "Child_1", IsBehaved = false };
+
+            Console.WriteLine(
+                new Dictionary<object, object>() {
+                    [nameof(exactType)]   = exactType.GetType().Prettify(settings),
+                    [nameof(derivedType)] = derivedType.GetType().Prettify(settings)
+                }
+            );
+
+            Assert.That(derivedType.GetType(), Is.EqualTo(typeof(Child)));
+            Assert.That(exactType.GetType(),   Is.EqualTo(typeof(Parent)));
+
+            const int iterations = 2000;
+
+            var comparison = MethodTimer.CompareExecutions(
+                (nameof(exactType), () => _ = exactType.Prettify(settings)),
+                (nameof(derivedType), () => _ = derivedType.Prettify(settings)),
+                iterations
+            );
+
+            Assert.That(comparison.Faster, Is.EqualTo(AggregateExecutionComparison.Which.First));
         }
     }
 }

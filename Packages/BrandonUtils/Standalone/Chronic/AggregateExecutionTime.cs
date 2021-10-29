@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Strings;
+
+using FowlFever.Conjugal.Affixing;
 
 using JetBrains.Annotations;
 
@@ -18,6 +21,8 @@ namespace BrandonUtils.Standalone.Chronic {
     /// </remarks>
     [PublicAPI]
     public class AggregateExecutionTime : IComparable<AggregateExecutionTime> {
+        [NotNull] public string Nickname { get; }
+
         [NotNull, ItemNotNull]
         public ExecutionTime[] Executions { get; }
 
@@ -41,8 +46,9 @@ namespace BrandonUtils.Standalone.Chronic {
 
         public double SuccessRate => (double)Executions.Count(it => it.Execution.Failed == false) / Executions.Length;
 
-        internal AggregateExecutionTime([NotNull, ItemNotNull] IEnumerable<ExecutionTime> executions) {
+        internal AggregateExecutionTime([NotNull] string nickname, [NotNull, ItemNotNull] IEnumerable<ExecutionTime> executions) {
             Executions = executions.ToArray();
+            Nickname   = nickname.MustNotBeBlank();
         }
 
         /// <summary>
@@ -60,11 +66,20 @@ namespace BrandonUtils.Standalone.Chronic {
                 throw new ArgumentNullException(nameof(other));
             }
 
+            return Average.CompareTo(other.Average);
+
             var minCompare = Min.CompareTo(other.Min);
             var maxCompare = Max.CompareTo(other.Max);
             var avgCompare = Average.CompareTo(other.Average);
 
             var compares = new int[] { minCompare, maxCompare, avgCompare };
+            Console.WriteLine(
+                new Dictionary<object, object>() {
+                    [$"Min: {Min}, {other.Min}"]         = minCompare,
+                    [$"Max: {Max}, {other.Max}"]         = maxCompare,
+                    [$"Avg: {Average}, {other.Average}"] = avgCompare
+                }.Prettify()
+            );
             if (compares.Any(it => it > 0) && compares.All(it => it >= 0)) {
                 return 1;
             }
@@ -86,18 +101,38 @@ namespace BrandonUtils.Standalone.Chronic {
                 throw new ArgumentNullException($"{nameof(Executions)} contained null! {Executions.Prettify()}");
             }
 
-            return new Dictionary<object, object>() {
+            var table = new Dictionary<object, object>() {
                 [nameof(Total)]   = Total,
                 [nameof(Average)] = Average,
                 [nameof(Min)]     = Min,
                 [nameof(Max)]     = Max,
             }.Prettify();
+
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+            if (Nickname != null) {
+                table = table.PrefixIfMissing("\n").Prefix(Nickname);
+            }
+
+            return table;
         }
     }
 
     public class AggregateExecutionComparison {
-        public AggregateExecutionTime FirstTimes;
-        public AggregateExecutionTime SecondTimes;
+        public enum Which {
+            First,
+            Second,
+            Neither
+        }
+
+        public readonly AggregateExecutionTime FirstTimes;
+        public readonly AggregateExecutionTime SecondTimes;
+
+        public Which Faster => FirstTimes.CompareTo(SecondTimes) switch {
+            -1 => Which.First,
+            0  => Which.Neither,
+            1  => Which.Second,
+            _  => throw new ArgumentOutOfRangeException()
+        };
 
         public AggregateExecutionComparison(AggregateExecutionTime firstTimes, AggregateExecutionTime secondTimes) {
             FirstTimes  = firstTimes;
@@ -105,31 +140,49 @@ namespace BrandonUtils.Standalone.Chronic {
         }
 
         public readonly struct TimeComparison {
-            public readonly TimeSpan First;
-            public readonly TimeSpan Second;
-            public          TimeSpan Difference => First - Second;
-            public          double   Ratio      => First.Divide(Second);
+            public readonly (string nickname, TimeSpan duration) First;
+            public readonly (string nickname, TimeSpan duration) Second;
+            public          TimeSpan                             Difference => First.duration - Second.duration;
+            public          double                               Ratio      => First.duration.Divide(Second.duration);
+            public          double                               DeltaRatio => Mathb.DeltaRatio(First.duration, Second.duration);
 
-            public TimeComparison(TimeSpan first, TimeSpan second) {
-                First  = first;
-                Second = second;
+            [SuppressMessage("ReSharper", "UseDeconstructionOnParameter")]
+            public TimeComparison(
+                (string nickname, TimeSpan duration) first,
+                (string nickname, TimeSpan duration) second
+            ) {
+                First  = (first.nickname  ?? nameof(First), first.duration);
+                Second = (second.nickname ?? nameof(Second), second.duration);
             }
 
             [NotNull]
             public override string ToString() {
                 return new Dictionary<object, object>() {
-                        [nameof(First)]      = First,
-                        [nameof(Second)]     = Second,
+                        [First.nickname]     = First.duration,
+                        [Second.nickname]    = Second.duration,
                         [nameof(Difference)] = Difference,
-                        [nameof(Ratio)]      = Ratio
+                        [nameof(Ratio)]      = Ratio,
+                        [nameof(DeltaRatio)] = DeltaRatio
                     }.AsEnumerable()
                      .JoinString(", ");
-                //.Prettify(LineStyle.Single);
+            }
+
+            [NotNull]
+            public string GetSummary() {
+                return First.duration.CompareTo(Second.duration) switch {
+                    -1 => $"[{First.nickname}] is {Mathb.DeltaRatio(Second.duration, First.duration):P0} faster than [{Second.nickname}]",
+                    0  => $"[{First.nickname}] and [{Second.nickname}] are equally fast",
+                    1  => $"[{Second.nickname}] is {Mathb.DeltaRatio(First.duration, Second.duration):P0} faster than [{First.nickname}]",
+                    _  => throw new ArgumentOutOfRangeException()
+                } + " on average.";
             }
         }
 
         private TimeComparison Comparing([NotNull] Func<AggregateExecutionTime, TimeSpan> extractor) {
-            return new TimeComparison(extractor.Invoke(FirstTimes), extractor.Invoke(SecondTimes));
+            return new TimeComparison(
+                (FirstTimes.Nickname, extractor.Invoke(FirstTimes)),
+                (SecondTimes.Nickname, extractor.Invoke(SecondTimes))
+            );
         }
 
         public TimeComparison Total   => Comparing(it => it.Total);
@@ -138,9 +191,12 @@ namespace BrandonUtils.Standalone.Chronic {
         [NotNull]
         public override string ToString() {
             return new Dictionary<object, object>() {
-                [nameof(Total)]   = Total,
-                [nameof(Average)] = Average
-            }.Prettify();
+                    [nameof(Total)]   = Total,
+                    [nameof(Average)] = Average
+                }.Prettify()
+                 .SplitLines()
+                 .Append(Total.GetSummary())
+                 .JoinLines();
         }
     }
 }
