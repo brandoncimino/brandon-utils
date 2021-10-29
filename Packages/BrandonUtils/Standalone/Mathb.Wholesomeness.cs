@@ -58,5 +58,18 @@ namespace BrandonUtils.Standalone {
         [Pure] public static long MustBeLong(this ulong   value) => value.AsLong() ?? throw new ArgumentOutOfRangeException(nameof(value), value, $"Must be a whole number in the range of valid {nameof(Int64)} values!");
 
         #endregion
+
+        #region Finality
+
+        [Pure] public static bool IsInfinite(this double value) => double.IsInfinity(value);
+        [Pure] public static bool IsInfinite(this float  value) => float.IsInfinity(value);
+
+        [Pure] public static bool IsPositiveInfinity(this double value) => double.IsPositiveInfinity(value);
+        [Pure] public static bool IsPositiveInfinity(this float  value) => float.IsPositiveInfinity(value);
+
+        [Pure] public static bool IsNegativeInfinity(this double value) => double.IsNegativeInfinity(value);
+        [Pure] public static bool IsNegativeInfinity(this float  value) => float.IsNegativeInfinity(value);
+
+        #endregion
     }
 }
