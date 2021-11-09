@@ -18,7 +18,7 @@ namespace BrandonUtils.Standalone.Collections {
     ///     Contains utility and extension methods for collections, such as <see cref="IDictionary{TKey,TValue}" /> and <see cref="IList{T}" />.
     /// </summary>
     [PublicAPI]
-    public static class CollectionUtils {
+    public static partial class CollectionUtils {
         /// <summary>
         /// Retrieves and <see cref="ICollection{T}.Remove"/>s the <see cref="Enumerable.ElementAt{TSource}"/> <paramref name="index"/>
         /// </summary>
@@ -161,25 +161,43 @@ namespace BrandonUtils.Standalone.Collections {
         /// </example>
         /// <param name="dictionary">The <see cref="IDictionary{TKey,TValue}" /> you would like to iterate over.</param>
         /// <param name="action">The <see cref="Action" /> that will be performed against each <see cref="KeyValuePair{TKey,TValue}" /> in <paramref name="dictionary" />.</param>
-        /// <typeparam name="T">The type of <paramref name="dictionary" />'s <see cref="IDictionary{TKey,TValue}.Keys" /></typeparam>
-        /// <typeparam name="T2">The type of <paramref name="dictionary" />'s <see cref="IDictionary{TKey,TValue}.Values" /></typeparam>
+        /// <typeparam name="TKey">The type of <paramref name="dictionary" />'s <see cref="IDictionary{TKey,TValue}.Keys" /></typeparam>
+        /// <typeparam name="TVal">The type of <paramref name="dictionary" />'s <see cref="IDictionary{TKey,TValue}.Values" /></typeparam>
         /// <seealso cref="ForEach{T,T2}(System.Collections.Generic.IDictionary{T,T2},System.Action{T2})" />
         /// <seealso cref="List{T}.ForEach" />
-        public static void ForEach<T, T2>(this IDictionary<T, T2> dictionary, Action<KeyValuePair<T, T2>> action) {
+        [ContractAnnotation("dictionary:null => stop")]
+        [ContractAnnotation("action:null => stop")]
+        public static void ForEach<TKey, TVal>([NotNull] this IDictionary<TKey, TVal> dictionary, [NotNull, InstantHandle] Action<KeyValuePair<TKey, TVal>> action) {
             foreach (var pair in dictionary) {
                 action.Invoke(pair);
             }
         }
 
+        /// <summary>
+        /// Similarly to <see cref="List{T}.ForEach"/>, this performs <paramref name="action"/> against each <see cref="KeyValuePair{TKey,TValue}.Key"/> and <see cref="KeyValuePair{TKey,TValue}.Value"/> in this <paramref name="dictionary"/>.
+        /// </summary>
+        /// <remarks>
+        /// This operates the same as <see cref="ForEach{T,T2}(System.Collections.Generic.IDictionary{T,T2},System.Action{System.Collections.Generic.KeyValuePair{T,T2}})"/>, except that it "deconstructs" the <see cref="KeyValuePair{TKey,TValue}"/> into a separate <see cref="KeyValuePair{TKey,TValue}.Key"/> and <see cref="KeyValuePair{TKey,TValue}.Value"/>.
+        /// </remarks>
+        /// <param name="dictionary">the original <see cref="Dictionary{TKey,TValue}"/></param>
+        /// <param name="action">the <see cref="Action{T1,T2}"/> executed against each <see cref="KeyValuePair{TKey,TValue}.Key"/> and <see cref="KeyValuePair{TKey,TValue}.Value"/></param>
+        /// <typeparam name="TKey">the type of <see cref="Dictionary{TKey,TValue}.Keys"/></typeparam>
+        /// <typeparam name="TVal">the type of <see cref="Dictionary{TKey,TValue}.Values"/></typeparam>
+        [ContractAnnotation("dictionary:null => stop")]
+        [ContractAnnotation("action:null => stop")]
+        public static void ForEach<TKey, TVal>([NotNull] this IDictionary<TKey, TVal> dictionary, [NotNull, InstantHandle] Action<TKey, TVal> action) {
+            foreach (var pair in dictionary) {
+                action.Invoke(pair.Key, pair.Value);
+            }
+        }
+
         /// <inheritdoc cref="ForEach{T,T2}(System.Collections.Generic.IDictionary{T,T2},System.Action{System.Collections.Generic.KeyValuePair{T,T2}})"/>
         /// <summary>
-        ///     Similarly to <see cref="List{T}.ForEach" />, this performs <paramref name="action" /> against each
-        ///     <b>
-        ///         <see cref="KeyValuePair{TKey,TValue}.Value" />
-        ///     </b>
-        ///     in <paramref name="dictionary" />.
+        ///     Similarly to <see cref="List{T}.ForEach" />, this performs <paramref name="action" /> against each <b><see cref="KeyValuePair{TKey,TValue}.Value" /></b> in <paramref name="dictionary" />.
         /// </summary>
-        public static void ForEach<T, T2>(this IDictionary<T, T2> dictionary, Action<T2> action) {
+        [ContractAnnotation("dictionary:null => stop")]
+        [ContractAnnotation("action:null => stop")]
+        public static void ForEach<TKey, TVal>([NotNull] this IDictionary<TKey, TVal> dictionary, [NotNull, InstantHandle] Action<TVal> action) {
             dictionary.Values.ToList().ForEach(action);
         }
 
@@ -674,7 +692,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T">The type of the elements of <paramref name="source" />.</typeparam>
         /// <returns>the inverse of <see cref="Enumerable.Contains{TSource}(System.Collections.Generic.IEnumerable{TSource},TSource)"/></returns>
         [Pure]
-        public static bool DoesNotContain<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> source, [CanBeNull] T value) {
+        public static bool DoesNotContain<T>([NotNull, ItemCanBeNull, InstantHandle] this IEnumerable<T> source, [CanBeNull] T value) {
             return !source.Contains(value);
         }
 
