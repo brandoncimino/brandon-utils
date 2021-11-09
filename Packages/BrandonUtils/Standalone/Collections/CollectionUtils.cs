@@ -949,6 +949,20 @@ namespace BrandonUtils.Standalone.Collections {
             return source == null ? Enumerable.Empty<T>() : source.Where(it => it.HasValue).Select(it => it.Value);
         }
 
+        #region NonBlank
+
+        [NotNull]
+        public static IEnumerable<string> NonBlank([CanBeNull, ItemCanBeNull] this IEnumerable<string> lines) {
+            return lines == null ? Enumerable.Empty<string>() : lines.Where(it => it.IsNotBlank());
+        }
+
+        [NotNull]
+        public static IEnumerable<string> NonEmpty([CanBeNull, ItemCanBeNull] this IEnumerable<string> lines) {
+            return lines == null ? Enumerable.Empty<string>() : lines.Where(it => it.IsNotEmpty());
+        }
+
+        #endregion
+
         #endregion
 
         #region Finding
