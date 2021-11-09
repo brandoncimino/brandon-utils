@@ -851,6 +851,7 @@ namespace BrandonUtils.Standalone.Strings {
         }
 
         [NotNull]
+        [ContractAnnotation("null => stop")]
         public static string MustNotBeBlank([CanBeNull] this string str) {
             return str.IsNotBlank() ? str : throw new ArgumentException($"The string must not be blank! (Actual: [{str ?? Prettification.DefaultNullPlaceholder}]");
         }
