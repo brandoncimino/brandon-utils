@@ -608,15 +608,37 @@ namespace BrandonUtils.Standalone.Strings {
             return strings.Select(it => it?.Trim());
         }
 
+        #region LongestLine
+
         [Pure]
+        [NonNegativeValue]
         public static int LongestLine([CanBeNull, ItemCanBeNull, InstantHandle] this IEnumerable<string> strings) {
             return strings?.SelectMany(it => it.SplitLines()).Max(it => it.Length) ?? 0;
         }
 
         [Pure]
+        [NonNegativeValue]
         public static int LongestLine([CanBeNull] this string str) {
             return str.SplitLines().Max(it => it.Length);
         }
+
+        #endregion
+
+        #region LineCount
+
+        [Pure]
+        [NonNegativeValue]
+        public static int LineCount([CanBeNull] this string str) {
+            return str.SplitLines().Length;
+        }
+
+        [Pure]
+        [NonNegativeValue]
+        public static int LineCount([CanBeNull, ItemCanBeNull, InstantHandle] this IEnumerable<string> strings) {
+            return strings.SplitLines().Length;
+        }
+
+        #endregion
 
         /// <summary>
         /// <see cref="Indent(string,int,int,char)"/>s each <see cref="string"/> in <paramref name="lines"/>.
