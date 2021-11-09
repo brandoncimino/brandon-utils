@@ -360,8 +360,12 @@ namespace BrandonUtils.Standalone.Strings {
             };
         }
 
-        public static string FillRight(this string self, int totalLength, string filler) {
+        [NotNull]
+        [ContractAnnotation("filler:null => stop")]
+        public static string FillRight([CanBeNull] this string self, [NonNegativeValue] int totalLength, [NotNull] string filler) {
             ValidateFillParameters(filler, totalLength);
+
+            self ??= "";
 
             if (self.Length >= totalLength) {
                 return self;
@@ -371,8 +375,12 @@ namespace BrandonUtils.Standalone.Strings {
             return self + filler.Fill(additionalLengthNeeded);
         }
 
-        public static string FillLeft(this string self, int totalLength, string filler) {
+        [NotNull]
+        [ContractAnnotation("filler:null => stop")]
+        public static string FillLeft([CanBeNull] this string self, [NonNegativeValue] int totalLength, [NotNull] string filler) {
             ValidateFillParameters(filler, totalLength);
+
+            self ??= "";
 
             if (self.Length >= totalLength) {
                 return self;
@@ -382,7 +390,9 @@ namespace BrandonUtils.Standalone.Strings {
             return self + filler.Fill(additionalLengthNeeded).Reverse().JoinString();
         }
 
-        public static string Fill(this string filler, int totalLength) {
+        [NotNull]
+        [ContractAnnotation("filler:null => stop")]
+        public static string Fill([NotNull] this string filler, [NonNegativeValue] int totalLength) {
             ValidateFillParameters(filler, totalLength);
 
             var fullLength  = totalLength / filler.Length;
@@ -391,7 +401,8 @@ namespace BrandonUtils.Standalone.Strings {
             return filled;
         }
 
-        private static void ValidateFillParameters(string filler, int totalLength) {
+        [ContractAnnotation("filler:null => stop")]
+        private static void ValidateFillParameters([NotNull] string filler, [NonNegativeValue] int totalLength) {
             if (filler == null) {
                 throw new ArgumentNullException(nameof(filler));
             }
@@ -400,6 +411,7 @@ namespace BrandonUtils.Standalone.Strings {
                 throw new ArgumentException($"Cannot fill with an empty string!", nameof(filler));
             }
 
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if (totalLength < 0) {
                 throw new ArgumentOutOfRangeException(nameof(totalLength), "Must be positive");
             }
