@@ -1211,5 +1211,33 @@ namespace BrandonUtils.Standalone.Collections {
         }
 
         #endregion
+
+        #region Dictionaries After Dark
+
+        /// <summary>
+        /// Shorthand to go from an <see cref="IEnumerable{T}"/> of <see cref="KeyValuePair{TKey,TValue}"/>s back to an <see cref="IDictionary{TKey,TValue}"/> via <see cref="Enumerable.ToDictionary{TSource,TKey,TValue}(System.Collections.Generic.IEnumerable{TSource},System.Func{TSource,TKey},System.Func{TSource,TValue})"/>
+        /// </summary>
+        /// <param name="source">a collection of <see cref="KeyValuePair{TKey,TValue}"/>s</param>
+        /// <typeparam name="TKey">the type of <see cref="IDictionary{TKey,TValue}.Keys"/></typeparam>
+        /// <typeparam name="TVal">the type of <see cref="IDictionary{TKey,TValue}.Values"/></typeparam>
+        /// <returns>a new <see cref="IDictionary{TKey,TValue}"/></returns>
+        [NotNull]
+        public static IDictionary<TKey, TVal> ToDictionary<TKey, TVal>([NotNull, InstantHandle] this IEnumerable<KeyValuePair<TKey, TVal>> source) {
+            return source.ToDictionary(pair => pair.Key, pair => pair.Value);
+        }
+
+        /// <summary>
+        /// Similar to <see cref="NonNull{T}(System.Collections.Generic.IEnumerable{T})"/>, but checks for null <see cref="KeyValuePair{TKey,TValue}"/>.<see cref="KeyValuePair{TKey,TValue}.Value"/>s in a <see cref="IDictionary{TKey,TValue}"/>.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TVal"></typeparam>
+        /// <returns></returns>
+        [NotNull]
+        public static IDictionary<TKey, TVal> NonNull<TKey, TVal>([NotNull] this IDictionary<TKey, TVal> source) {
+            return source.Where(it => it.Value != null).ToDictionary();
+        }
+
+        #endregion
     }
 }
