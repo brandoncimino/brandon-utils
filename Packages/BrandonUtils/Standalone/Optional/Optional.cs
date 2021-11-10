@@ -344,6 +344,32 @@ namespace BrandonUtils.Standalone.Optional {
 
         #endregion AreEqual
 
+        #region IfPresent
+
+        /// <summary>
+        /// If this <see cref="IOptional{T}.HasValue"/>, <see cref="Action{T}.Invoke"/> <paramref name="actionIfPresent"/>.
+        /// Otherwise, do nothing.
+        /// </summary>
+        /// <param name="optional">this <see cref="IOptional{T}"/></param>
+        /// <param name="actionIfPresent">an action performed on <see cref="IOptional{T}.Value"/> if this <see cref="IOptional{T}.HasValue"/></param>
+        /// <typeparam name="T">the underlying type of this <see cref="IOptional{T}"/></typeparam>
+        public static void IfPresent<T>([CanBeNull, ItemCanBeNull] this IOptional<T> optional, [NotNull] Action<T> actionIfPresent) {
+            if (optional?.HasValue == true) {
+                actionIfPresent.Invoke(optional.Value);
+            }
+        }
+
+        /**
+         * <inheritdoc cref="IfPresent{T}(BrandonUtils.Standalone.Optional.IOptional{T},System.Action{T})"/>
+         */
+        public static void IfPresent<T>([CanBeNull] this T? nullable, Action<T> actionIfPresent) where T : struct {
+            if (nullable.HasValue) {
+                actionIfPresent.Invoke(nullable.Value);
+            }
+        }
+
+        #endregion
+
         #region IfPresentOrElse
 
         /**
@@ -382,12 +408,12 @@ namespace BrandonUtils.Standalone.Optional {
         /// </remarks>
         /// <param name="optional">this <see cref="IOptional{T}"/></param>
         /// <param name="ifPresent">the "mapping" <see cref="Func{TIn, TResult}"/> to run if this <see cref="IOptional{T}.HasValue"/></param>
-        /// <param name="orElse">the <see cref="Func{TResult}"/> that generates the "default" / "fallback" value when this <see cref="IsEmpty{T}(BrandonUtils.Standalone.Optional.IOptional{T})"/></param>
+        /// <param name="orElse">the <see cref="Func{TResult}"/> that generates the "default" / "fallback" value when this <see cref="IsEmpty{T}"/></param>
         /// <typeparam name="TIn">the underlying type of the original <see cref="IOptional{T}"/></typeparam>
         /// <typeparam name="TOut">the resulting type</typeparam>
         /// <returns></returns>
-        public static TOut IfPresentOrElse<TIn, TOut>(this IOptional<TIn> optional, Func<TIn, TOut> ifPresent, Func<TOut> orElse) {
-            return optional.HasValue ? ifPresent.Invoke(optional.Value) : orElse.Invoke();
+        public static TOut IfPresentOrElse<TIn, TOut>([CanBeNull] this IOptional<TIn> optional, Func<TIn, TOut> ifPresent, Func<TOut> orElse) {
+            return optional?.HasValue == true ? ifPresent.Invoke(optional.Value) : orElse.Invoke();
         }
 
         /// <summary>
@@ -399,10 +425,10 @@ namespace BrandonUtils.Standalone.Optional {
         /// </remarks>
         /// <param name="optional">this <see cref="IOptional{T}"/></param>
         /// <param name="ifPresent">the <see cref="Action{T}"/> to run if this <see cref="IOptional{T}.HasValue"/></param>
-        /// <param name="orElse">the parameterless <see cref="Action"/> to run if this <see cref="IsEmpty{T}(BrandonUtils.Standalone.Optional.IOptional{T})"/></param>
+        /// <param name="orElse">the parameterless <see cref="Action"/> to run if this <see cref="IsEmpty{T}"/></param>
         /// <typeparam name="TIn">the underlying type of this <see cref="Optional{T}"/></typeparam>
-        public static void IfPresentOrElse<TIn>(this IOptional<TIn> optional, Action<TIn> ifPresent, Action orElse) {
-            if (optional.HasValue) {
+        public static void IfPresentOrElse<TIn>([CanBeNull] this IOptional<TIn> optional, Action<TIn> ifPresent, Action orElse) {
+            if (optional?.HasValue == true) {
                 ifPresent.Invoke(optional.Value);
             }
             else {
