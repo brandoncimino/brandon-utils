@@ -1238,6 +1238,36 @@ namespace BrandonUtils.Standalone.Collections {
             return source.Where(it => it.Value != null).ToDictionary();
         }
 
+        /// <summary>
+        /// Performs a <see cref="Enumerable.Select{TSource,TResult}(System.Collections.Generic.IEnumerable{TSource},System.Func{TSource,TResult})"/> that only transforms the <see cref="IDictionary{TKey,TValue}.Values"/>.
+        /// </summary>
+        /// <param name="source">the original <see cref="IDictionary{TKey,TValue}"/></param>
+        /// <param name="selector">the <see cref="Func{TOld,TNew}"/> applied to each <see cref="KeyValuePair{TKey,TValue}.Value"/></param>
+        /// <typeparam name="TKey">the type of the <see cref="IDictionary{TKey,TValue}.Keys"/></typeparam>
+        /// <typeparam name="TOld">the type of the original <see cref="IDictionary{TKey,TValue}.Values"/></typeparam>
+        /// <typeparam name="TNew">the type of the new <see cref="IDictionary{TKey,TValue}.Values"/></typeparam>
+        /// <returns>a new <see cref="IDictionary{TKey,TValue}"/></returns>
+        [NotNull]
+        public static IDictionary<TKey, TNew> SelectValues<TKey, TOld, TNew>([NotNull] this IDictionary<TKey, TOld> source, Func<TOld, TNew> selector) {
+            return source.ToDictionary(
+                it => it.Key,
+                it => selector(it.Value)
+            );
+        }
+
+        /// <summary>
+        /// Returns a new <see cref="IDictionary{TKey,TValue}"/> containing only the elements of <paramref name="source"/> whose <see cref="KeyValuePair{TKey,TValue}.Value"/> satisfies the given <paramref name="predicate"/>.
+        /// </summary>
+        /// <param name="source">the original <see cref="IDictionary{TKey,TValue}"/></param>
+        /// <param name="predicate">the <see cref="Func{T,Boolean}"/> used to test each <see cref="KeyValuePair{TKey,TValue}.Value"/></param>
+        /// <typeparam name="TKey">the type of the <see cref="IDictionary{TKey,TValue}.Keys"/></typeparam>
+        /// <typeparam name="TVal">the type of the <see cref="IDictionary{TKey,TValue}.Values"/></typeparam>
+        /// <returns>a new <see cref="IDictionary{TKey,TValue}"/></returns>
+        [NotNull]
+        public static IDictionary<TKey, TVal> WhereValues<TKey, TVal>([NotNull] this IDictionary<TKey, TVal> source, Func<TVal, bool> predicate) {
+            return source.Where(it => predicate(it.Value)).ToDictionary();
+        }
+
         #endregion
     }
 }
