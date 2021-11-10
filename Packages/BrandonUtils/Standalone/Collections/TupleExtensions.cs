@@ -204,222 +204,224 @@ namespace BrandonUtils.Standalone.Collections {
 
         #endregion
 
-        #region Sum
+        #region Sum ⚠: These methods have been disabled because they slowed down IntelliJ's autocompletion a _lot_
 
-        #region Sum<int>
-
-        [Pure] public static int Sum(this (int, int)                                                                            tuple) => tuple.ToArray().Sum();
-        [Pure] public static int Sum(this (int, int, int)                                                                       tuple) => tuple.ToArray().Sum();
-        [Pure] public static int Sum(this (int, int, int, int)                                                                  tuple) => tuple.ToArray().Sum();
-        [Pure] public static int Sum(this (int, int, int, int, int)                                                             tuple) => tuple.ToArray().Sum();
-        [Pure] public static int Sum(this (int, int, int, int, int, int)                                                        tuple) => tuple.ToArray().Sum();
-        [Pure] public static int Sum(this (int, int, int, int, int, int, int)                                                   tuple) => tuple.ToArray().Sum();
-        [Pure] public static int Sum(this (int, int, int, int, int, int, int, int)                                              tuple) => tuple.ToArray().Sum();
-        [Pure] public static int Sum(this (int, int, int, int, int, int, int, int, int)                                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static int Sum(this (int, int, int, int, int, int, int, int, int, int)                                    tuple) => tuple.ToArray().Sum();
-        [Pure] public static int Sum(this (int, int, int, int, int, int, int, int, int, int, int)                               tuple) => tuple.ToArray().Sum();
-        [Pure] public static int Sum(this (int, int, int, int, int, int, int, int, int, int, int, int)                          tuple) => tuple.ToArray().Sum();
-        [Pure] public static int Sum(this (int, int, int, int, int, int, int, int, int, int, int, int, int)                     tuple) => tuple.ToArray().Sum();
-        [Pure] public static int Sum(this (int, int, int, int, int, int, int, int, int, int, int, int, int, int)                tuple) => tuple.ToArray().Sum();
-        [Pure] public static int Sum(this (int, int, int, int, int, int, int, int, int, int, int, int, int, int, int)           tuple) => tuple.ToArray().Sum();
-        [Pure] public static int Sum(this (int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int)      tuple) => tuple.ToArray().Sum();
-        [Pure] public static int Sum(this (int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int) tuple) => tuple.ToArray().Sum();
-
-        #endregion
-
-        #region Sum<int?>
-
-        [Pure] public static int? Sum(this (int?, int?)                                                                                     tuple) => tuple.ToArray().Sum();
-        [Pure] public static int? Sum(this (int?, int?, int?)                                                                               tuple) => tuple.ToArray().Sum();
-        [Pure] public static int? Sum(this (int?, int?, int?, int?)                                                                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static int? Sum(this (int?, int?, int?, int?, int?)                                                                   tuple) => tuple.ToArray().Sum();
-        [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?)                                                             tuple) => tuple.ToArray().Sum();
-        [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?)                                                       tuple) => tuple.ToArray().Sum();
-        [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?, int?)                                                 tuple) => tuple.ToArray().Sum();
-        [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?, int?, int?)                                           tuple) => tuple.ToArray().Sum();
-        [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?, int?, int?, int?)                                     tuple) => tuple.ToArray().Sum();
-        [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?)                               tuple) => tuple.ToArray().Sum();
-        [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?)                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?)                   tuple) => tuple.ToArray().Sum();
-        [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?)             tuple) => tuple.ToArray().Sum();
-        [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?)       tuple) => tuple.ToArray().Sum();
-        [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?) tuple) => tuple.ToArray().Sum();
-
-        [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?) tuple) => tuple.ToArray().Sum();
-
-        #endregion
-
-        #region Sum<long>
-
-        [Pure] public static long Sum(this (long, long)                                                                                           tuple) => tuple.ToArray().Sum();
-        [Pure] public static long Sum(this (long, long, long)                                                                                     tuple) => tuple.ToArray().Sum();
-        [Pure] public static long Sum(this (long, long, long, long)                                                                               tuple) => tuple.ToArray().Sum();
-        [Pure] public static long Sum(this (long, long, long, long, long)                                                                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static long Sum(this (long, long, long, long, long, long)                                                                   tuple) => tuple.ToArray().Sum();
-        [Pure] public static long Sum(this (long, long, long, long, long, long, long)                                                             tuple) => tuple.ToArray().Sum();
-        [Pure] public static long Sum(this (long, long, long, long, long, long, long, long)                                                       tuple) => tuple.ToArray().Sum();
-        [Pure] public static long Sum(this (long, long, long, long, long, long, long, long, long)                                                 tuple) => tuple.ToArray().Sum();
-        [Pure] public static long Sum(this (long, long, long, long, long, long, long, long, long, long)                                           tuple) => tuple.ToArray().Sum();
-        [Pure] public static long Sum(this (long, long, long, long, long, long, long, long, long, long, long)                                     tuple) => tuple.ToArray().Sum();
-        [Pure] public static long Sum(this (long, long, long, long, long, long, long, long, long, long, long, long)                               tuple) => tuple.ToArray().Sum();
-        [Pure] public static long Sum(this (long, long, long, long, long, long, long, long, long, long, long, long, long)                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static long Sum(this (long, long, long, long, long, long, long, long, long, long, long, long, long, long)                   tuple) => tuple.ToArray().Sum();
-        [Pure] public static long Sum(this (long, long, long, long, long, long, long, long, long, long, long, long, long, long, long)             tuple) => tuple.ToArray().Sum();
-        [Pure] public static long Sum(this (long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long)       tuple) => tuple.ToArray().Sum();
-        [Pure] public static long Sum(this (long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long) tuple) => tuple.ToArray().Sum();
-
-        #endregion
-
-        #region Sum<long?>
-
-        [Pure] public static long? Sum(this (long?, long?)                                                                                                   tuple) => tuple.ToArray().Sum();
-        [Pure] public static long? Sum(this (long?, long?, long?)                                                                                            tuple) => tuple.ToArray().Sum();
-        [Pure] public static long? Sum(this (long?, long?, long?, long?)                                                                                     tuple) => tuple.ToArray().Sum();
-        [Pure] public static long? Sum(this (long?, long?, long?, long?, long?)                                                                              tuple) => tuple.ToArray().Sum();
-        [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?)                                                                       tuple) => tuple.ToArray().Sum();
-        [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?)                                                                tuple) => tuple.ToArray().Sum();
-        [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?, long?)                                                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?, long?, long?)                                                  tuple) => tuple.ToArray().Sum();
-        [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?, long?, long?, long?)                                           tuple) => tuple.ToArray().Sum();
-        [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?)                                    tuple) => tuple.ToArray().Sum();
-        [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?)                             tuple) => tuple.ToArray().Sum();
-        [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?)                      tuple) => tuple.ToArray().Sum();
-        [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?)               tuple) => tuple.ToArray().Sum();
-        [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?)        tuple) => tuple.ToArray().Sum();
-        [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?) tuple) => tuple.ToArray().Sum();
-
-        [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?) tuple) => tuple.ToArray().Sum();
-
-        #endregion
-
-        #region Sum<float>
-
-        [Pure] public static float Sum(this (float, float)                                                                                                          tuple) => tuple.ToArray().Sum();
-        [Pure] public static float Sum(this (float, float, float)                                                                                                   tuple) => tuple.ToArray().Sum();
-        [Pure] public static float Sum(this (float, float, float, float)                                                                                            tuple) => tuple.ToArray().Sum();
-        [Pure] public static float Sum(this (float, float, float, float, float)                                                                                     tuple) => tuple.ToArray().Sum();
-        [Pure] public static float Sum(this (float, float, float, float, float, float)                                                                              tuple) => tuple.ToArray().Sum();
-        [Pure] public static float Sum(this (float, float, float, float, float, float, float)                                                                       tuple) => tuple.ToArray().Sum();
-        [Pure] public static float Sum(this (float, float, float, float, float, float, float, float)                                                                tuple) => tuple.ToArray().Sum();
-        [Pure] public static float Sum(this (float, float, float, float, float, float, float, float, float)                                                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static float Sum(this (float, float, float, float, float, float, float, float, float, float)                                                  tuple) => tuple.ToArray().Sum();
-        [Pure] public static float Sum(this (float, float, float, float, float, float, float, float, float, float, float)                                           tuple) => tuple.ToArray().Sum();
-        [Pure] public static float Sum(this (float, float, float, float, float, float, float, float, float, float, float, float)                                    tuple) => tuple.ToArray().Sum();
-        [Pure] public static float Sum(this (float, float, float, float, float, float, float, float, float, float, float, float, float)                             tuple) => tuple.ToArray().Sum();
-        [Pure] public static float Sum(this (float, float, float, float, float, float, float, float, float, float, float, float, float, float)                      tuple) => tuple.ToArray().Sum();
-        [Pure] public static float Sum(this (float, float, float, float, float, float, float, float, float, float, float, float, float, float, float)               tuple) => tuple.ToArray().Sum();
-        [Pure] public static float Sum(this (float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float)        tuple) => tuple.ToArray().Sum();
-        [Pure] public static float Sum(this (float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float) tuple) => tuple.ToArray().Sum();
-
-        #endregion
-
-        #region Sum<float?>
-
-        [Pure] public static float? Sum(this (float?, float?)                                                                                                                 tuple) => tuple.ToArray().Sum();
-        [Pure] public static float? Sum(this (float?, float?, float?)                                                                                                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static float? Sum(this (float?, float?, float?, float?)                                                                                                 tuple) => tuple.ToArray().Sum();
-        [Pure] public static float? Sum(this (float?, float?, float?, float?, float?)                                                                                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?)                                                                                 tuple) => tuple.ToArray().Sum();
-        [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?)                                                                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?, float?)                                                                 tuple) => tuple.ToArray().Sum();
-        [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?, float?, float?)                                                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?, float?, float?, float?)                                                 tuple) => tuple.ToArray().Sum();
-        [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?)                                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?)                                 tuple) => tuple.ToArray().Sum();
-        [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?)                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?)                 tuple) => tuple.ToArray().Sum();
-        [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?)         tuple) => tuple.ToArray().Sum();
-        [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?) tuple) => tuple.ToArray().Sum();
-
-        [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?) tuple) => tuple.ToArray().Sum();
-
-        #endregion
-
-        #region Sum<double>
-
-        [Pure] public static double Sum(this (double, double)                                                                                                                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static double Sum(this (double, double, double)                                                                                                                 tuple) => tuple.ToArray().Sum();
-        [Pure] public static double Sum(this (double, double, double, double)                                                                                                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static double Sum(this (double, double, double, double, double)                                                                                                 tuple) => tuple.ToArray().Sum();
-        [Pure] public static double Sum(this (double, double, double, double, double, double)                                                                                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static double Sum(this (double, double, double, double, double, double, double)                                                                                 tuple) => tuple.ToArray().Sum();
-        [Pure] public static double Sum(this (double, double, double, double, double, double, double, double)                                                                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static double Sum(this (double, double, double, double, double, double, double, double, double)                                                                 tuple) => tuple.ToArray().Sum();
-        [Pure] public static double Sum(this (double, double, double, double, double, double, double, double, double, double)                                                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static double Sum(this (double, double, double, double, double, double, double, double, double, double, double)                                                 tuple) => tuple.ToArray().Sum();
-        [Pure] public static double Sum(this (double, double, double, double, double, double, double, double, double, double, double, double)                                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static double Sum(this (double, double, double, double, double, double, double, double, double, double, double, double, double)                                 tuple) => tuple.ToArray().Sum();
-        [Pure] public static double Sum(this (double, double, double, double, double, double, double, double, double, double, double, double, double, double)                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static double Sum(this (double, double, double, double, double, double, double, double, double, double, double, double, double, double, double)                 tuple) => tuple.ToArray().Sum();
-        [Pure] public static double Sum(this (double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double)         tuple) => tuple.ToArray().Sum();
-        [Pure] public static double Sum(this (double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double) tuple) => tuple.ToArray().Sum();
-
-        #endregion
-
-        #region Sum<double?>
-
-        [Pure] public static double? Sum(this (double?, double?)                                                                                                                               tuple) => tuple.ToArray().Sum();
-        [Pure] public static double? Sum(this (double?, double?, double?)                                                                                                                      tuple) => tuple.ToArray().Sum();
-        [Pure] public static double? Sum(this (double?, double?, double?, double?)                                                                                                             tuple) => tuple.ToArray().Sum();
-        [Pure] public static double? Sum(this (double?, double?, double?, double?, double?)                                                                                                    tuple) => tuple.ToArray().Sum();
-        [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?)                                                                                           tuple) => tuple.ToArray().Sum();
-        [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?)                                                                                  tuple) => tuple.ToArray().Sum();
-        [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?, double?)                                                                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?, double?, double?)                                                                tuple) => tuple.ToArray().Sum();
-        [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?, double?, double?, double?)                                                       tuple) => tuple.ToArray().Sum();
-        [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?)                                              tuple) => tuple.ToArray().Sum();
-        [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?)                                     tuple) => tuple.ToArray().Sum();
-        [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?)                            tuple) => tuple.ToArray().Sum();
-        [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?)                   tuple) => tuple.ToArray().Sum();
-        [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?)          tuple) => tuple.ToArray().Sum();
-        [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?) tuple) => tuple.ToArray().Sum();
-
-        [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?) tuple) => tuple.ToArray().Sum();
-
-        #endregion
-
-        #region Sum<decimal>
-
-        [Pure] public static decimal Sum(this (decimal, decimal)                                                                                                                                        tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal Sum(this (decimal, decimal, decimal)                                                                                                                               tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal)                                                                                                                      tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal)                                                                                                             tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal)                                                                                                    tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal)                                                                                           tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal)                                                                                  tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal)                                                                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal)                                                                tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal)                                                       tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal)                                              tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal)                                     tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal)                            tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal)                   tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal)          tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal) tuple) => tuple.ToArray().Sum();
-
-        #endregion
-
-        #region Sum<decimal?>
-
-        [Pure] public static decimal? Sum(this (decimal?, decimal?)                                                                                                                                             tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?)                                                                                                                                   tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?)                                                                                                                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?)                                                                                                               tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?)                                                                                                     tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?)                                                                                           tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?)                                                                                 tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?)                                                                       tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?)                                                             tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?)                                                   tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?)                                         tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?)                               tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?)                     tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?)           tuple) => tuple.ToArray().Sum();
-        [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?) tuple) => tuple.ToArray().Sum();
-
-        [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?) tuple) => tuple.ToArray().Sum();
-
-        #endregion
+        //
+        // #region Sum<int>
+        //
+        // [Pure] public static int Sum(this (int, int)                                                                            tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int Sum(this (int, int, int)                                                                       tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int Sum(this (int, int, int, int)                                                                  tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int Sum(this (int, int, int, int, int)                                                             tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int Sum(this (int, int, int, int, int, int)                                                        tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int Sum(this (int, int, int, int, int, int, int)                                                   tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int Sum(this (int, int, int, int, int, int, int, int)                                              tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int Sum(this (int, int, int, int, int, int, int, int, int)                                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int Sum(this (int, int, int, int, int, int, int, int, int, int)                                    tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int Sum(this (int, int, int, int, int, int, int, int, int, int, int)                               tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int Sum(this (int, int, int, int, int, int, int, int, int, int, int, int)                          tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int Sum(this (int, int, int, int, int, int, int, int, int, int, int, int, int)                     tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int Sum(this (int, int, int, int, int, int, int, int, int, int, int, int, int, int)                tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int Sum(this (int, int, int, int, int, int, int, int, int, int, int, int, int, int, int)           tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int Sum(this (int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int)      tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int Sum(this (int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int) tuple) => tuple.ToArray().Sum();
+        //
+        // #endregion
+        //
+        // #region Sum<int?>
+        //
+        // [Pure] public static int? Sum(this (int?, int?)                                                                                     tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int? Sum(this (int?, int?, int?)                                                                               tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int? Sum(this (int?, int?, int?, int?)                                                                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int? Sum(this (int?, int?, int?, int?, int?)                                                                   tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?)                                                             tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?)                                                       tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?, int?)                                                 tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?, int?, int?)                                           tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?, int?, int?, int?)                                     tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?)                               tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?)                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?)                   tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?)             tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?)       tuple) => tuple.ToArray().Sum();
+        // [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?) tuple) => tuple.ToArray().Sum();
+        //
+        // [Pure] public static int? Sum(this (int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?, int?) tuple) => tuple.ToArray().Sum();
+        //
+        // #endregion
+        //
+        // #region Sum<long>
+        //
+        // [Pure] public static long Sum(this (long, long)                                                                                           tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long Sum(this (long, long, long)                                                                                     tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long Sum(this (long, long, long, long)                                                                               tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long Sum(this (long, long, long, long, long)                                                                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long Sum(this (long, long, long, long, long, long)                                                                   tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long Sum(this (long, long, long, long, long, long, long)                                                             tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long Sum(this (long, long, long, long, long, long, long, long)                                                       tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long Sum(this (long, long, long, long, long, long, long, long, long)                                                 tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long Sum(this (long, long, long, long, long, long, long, long, long, long)                                           tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long Sum(this (long, long, long, long, long, long, long, long, long, long, long)                                     tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long Sum(this (long, long, long, long, long, long, long, long, long, long, long, long)                               tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long Sum(this (long, long, long, long, long, long, long, long, long, long, long, long, long)                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long Sum(this (long, long, long, long, long, long, long, long, long, long, long, long, long, long)                   tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long Sum(this (long, long, long, long, long, long, long, long, long, long, long, long, long, long, long)             tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long Sum(this (long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long)       tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long Sum(this (long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long) tuple) => tuple.ToArray().Sum();
+        //
+        // #endregion
+        //
+        // #region Sum<long?>
+        //
+        // [Pure] public static long? Sum(this (long?, long?)                                                                                                   tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long? Sum(this (long?, long?, long?)                                                                                            tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long? Sum(this (long?, long?, long?, long?)                                                                                     tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long? Sum(this (long?, long?, long?, long?, long?)                                                                              tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?)                                                                       tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?)                                                                tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?, long?)                                                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?, long?, long?)                                                  tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?, long?, long?, long?)                                           tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?)                                    tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?)                             tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?)                      tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?)               tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?)        tuple) => tuple.ToArray().Sum();
+        // [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?) tuple) => tuple.ToArray().Sum();
+        //
+        // [Pure] public static long? Sum(this (long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?, long?) tuple) => tuple.ToArray().Sum();
+        //
+        // #endregion
+        //
+        // #region Sum<float>
+        //
+        // [Pure] public static float Sum(this (float, float)                                                                                                          tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float Sum(this (float, float, float)                                                                                                   tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float Sum(this (float, float, float, float)                                                                                            tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float Sum(this (float, float, float, float, float)                                                                                     tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float Sum(this (float, float, float, float, float, float)                                                                              tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float Sum(this (float, float, float, float, float, float, float)                                                                       tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float Sum(this (float, float, float, float, float, float, float, float)                                                                tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float Sum(this (float, float, float, float, float, float, float, float, float)                                                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float Sum(this (float, float, float, float, float, float, float, float, float, float)                                                  tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float Sum(this (float, float, float, float, float, float, float, float, float, float, float)                                           tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float Sum(this (float, float, float, float, float, float, float, float, float, float, float, float)                                    tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float Sum(this (float, float, float, float, float, float, float, float, float, float, float, float, float)                             tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float Sum(this (float, float, float, float, float, float, float, float, float, float, float, float, float, float)                      tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float Sum(this (float, float, float, float, float, float, float, float, float, float, float, float, float, float, float)               tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float Sum(this (float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float)        tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float Sum(this (float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float) tuple) => tuple.ToArray().Sum();
+        //
+        // #endregion
+        //
+        // #region Sum<float?>
+        //
+        // [Pure] public static float? Sum(this (float?, float?)                                                                                                                 tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float? Sum(this (float?, float?, float?)                                                                                                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float? Sum(this (float?, float?, float?, float?)                                                                                                 tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float? Sum(this (float?, float?, float?, float?, float?)                                                                                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?)                                                                                 tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?)                                                                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?, float?)                                                                 tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?, float?, float?)                                                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?, float?, float?, float?)                                                 tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?)                                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?)                                 tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?)                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?)                 tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?)         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?) tuple) => tuple.ToArray().Sum();
+        //
+        // [Pure] public static float? Sum(this (float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?, float?) tuple) => tuple.ToArray().Sum();
+        //
+        // #endregion
+        //
+        // #region Sum<double>
+        //
+        // [Pure] public static double Sum(this (double, double)                                                                                                                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double Sum(this (double, double, double)                                                                                                                 tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double Sum(this (double, double, double, double)                                                                                                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double Sum(this (double, double, double, double, double)                                                                                                 tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double Sum(this (double, double, double, double, double, double)                                                                                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double Sum(this (double, double, double, double, double, double, double)                                                                                 tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double Sum(this (double, double, double, double, double, double, double, double)                                                                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double Sum(this (double, double, double, double, double, double, double, double, double)                                                                 tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double Sum(this (double, double, double, double, double, double, double, double, double, double)                                                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double Sum(this (double, double, double, double, double, double, double, double, double, double, double)                                                 tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double Sum(this (double, double, double, double, double, double, double, double, double, double, double, double)                                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double Sum(this (double, double, double, double, double, double, double, double, double, double, double, double, double)                                 tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double Sum(this (double, double, double, double, double, double, double, double, double, double, double, double, double, double)                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double Sum(this (double, double, double, double, double, double, double, double, double, double, double, double, double, double, double)                 tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double Sum(this (double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double)         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double Sum(this (double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double) tuple) => tuple.ToArray().Sum();
+        //
+        // #endregion
+        //
+        // #region Sum<double?>
+        //
+        // [Pure] public static double? Sum(this (double?, double?)                                                                                                                               tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double? Sum(this (double?, double?, double?)                                                                                                                      tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double? Sum(this (double?, double?, double?, double?)                                                                                                             tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double? Sum(this (double?, double?, double?, double?, double?)                                                                                                    tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?)                                                                                           tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?)                                                                                  tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?, double?)                                                                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?, double?, double?)                                                                tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?, double?, double?, double?)                                                       tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?)                                              tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?)                                     tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?)                            tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?)                   tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?)          tuple) => tuple.ToArray().Sum();
+        // [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?) tuple) => tuple.ToArray().Sum();
+        //
+        // [Pure] public static double? Sum(this (double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?, double?) tuple) => tuple.ToArray().Sum();
+        //
+        // #endregion
+        //
+        // #region Sum<decimal>
+        //
+        // [Pure] public static decimal Sum(this (decimal, decimal)                                                                                                                                        tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal Sum(this (decimal, decimal, decimal)                                                                                                                               tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal)                                                                                                                      tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal)                                                                                                             tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal)                                                                                                    tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal)                                                                                           tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal)                                                                                  tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal)                                                                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal)                                                                tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal)                                                       tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal)                                              tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal)                                     tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal)                            tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal)                   tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal)          tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal Sum(this (decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal, decimal) tuple) => tuple.ToArray().Sum();
+        //
+        // #endregion
+        //
+        // #region Sum<decimal?>
+        //
+        // [Pure] public static decimal? Sum(this (decimal?, decimal?)                                                                                                                                             tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?)                                                                                                                                   tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?)                                                                                                                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?)                                                                                                               tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?)                                                                                                     tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?)                                                                                           tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?)                                                                                 tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?)                                                                       tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?)                                                             tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?)                                                   tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?)                                         tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?)                               tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?)                     tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?)           tuple) => tuple.ToArray().Sum();
+        // [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?) tuple) => tuple.ToArray().Sum();
+        //
+        // [Pure] public static decimal? Sum(this (decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?, decimal?) tuple) => tuple.ToArray().Sum();
+        //
+        // #endregion
+        //
 
         #endregion
     }
