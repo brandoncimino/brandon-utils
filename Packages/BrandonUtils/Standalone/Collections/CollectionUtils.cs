@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -1224,6 +1225,21 @@ namespace BrandonUtils.Standalone.Collections {
         [NotNull]
         public static IDictionary<TKey, TVal> ToDictionary<TKey, TVal>([NotNull, InstantHandle] this IEnumerable<KeyValuePair<TKey, TVal>> source) {
             return source.ToDictionary(pair => pair.Key, pair => pair.Value);
+        }
+
+        /// <summary>
+        /// Converts a non-generic <see cref="IDictionary"/> to an <see cref="IDictionary{TKey,TValue}"/> of <see cref="object"/>s.
+        /// </summary>
+        /// <remarks>
+        /// This essentially uses <see cref="Enumerable.Cast{TResult}"/> on both the <see cref="IDictionary.Keys"/> and <see cref="IDictionary.Values"/>.
+        /// </remarks>
+        /// <param name="dictionary">the original, non-generic <see cref="IDictionary"/></param>
+        /// <returns>a generic <see cref="IDictionary{TKey,TValue}"/></returns>
+        [NotNull]
+        public static IDictionary<object, object> ToGeneric([NotNull] this IDictionary dictionary) {
+            var keys = dictionary.Keys.Cast<object>().ToArray();
+            var vals = dictionary.Values.Cast<object>().ToArray();
+            return keys.Select((k, i) => new KeyValuePair<object, object>(k, vals[i])).ToDictionary();
         }
 
         /// <summary>
