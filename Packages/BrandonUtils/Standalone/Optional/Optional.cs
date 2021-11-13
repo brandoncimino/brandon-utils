@@ -53,6 +53,22 @@ namespace BrandonUtils.Standalone.Optional {
         }
 
         /// <summary>
+        /// Executes <paramref name="predicate"/>, and if it returns <c>true</c>, returns the result of <paramref name="supplier"/>.
+        /// </summary>
+        /// <remarks>
+        /// It is possible...sleepy
+        /// TODO: Should this be called `GetIf`...? That sounds more grammatically correct, but the parameters are ordered <paramref name="predicate"/> then <paramref name="supplier"/>...
+        /// </remarks>
+        /// <param name="predicate"></param>
+        /// <param name="supplier"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        [ItemNotNull]
+        public static Optional<T> IfGet<T>([NotNull, InstantHandle] Func<bool> predicate, [NotNull] Func<T> supplier) {
+            return predicate.Invoke() ? Of(supplier.Invoke()) : default;
+        }
+
+        /// <summary>
         /// Converts an <see cref="IOptional{T}"/> to an <see cref="Optional{T}"/>.
         /// </summary>
         /// <remarks>
