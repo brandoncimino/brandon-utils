@@ -13,6 +13,8 @@ using BrandonUtils.Standalone.Strings.Prettifiers;
 using BrandonUtils.Testing;
 using BrandonUtils.Tests.Standalone.Reflection;
 
+using Newtonsoft.Json;
+
 using NUnit.Framework;
 
 using Is = NUnit.Framework.Is;
@@ -486,6 +488,34 @@ List<int>[
             );
 
             Assert.That(comparison.Faster, Is.EqualTo(AggregateExecutionComparison.Which.First));
+        }
+
+        [Test]
+        public void CloneSettings() {
+            var original = new PrettificationSettings() {
+                HeaderStyle          = { Value = HeaderStyle.None },
+                TableHeaderSeparator = { Value = "💄" },
+                NullPlaceholder      = { Value = "⛑" }
+            };
+
+            Console.WriteLine($"ORIGINAL: {original}");
+
+            Console.WriteLine($"header style: {original.HeaderStyle}");
+            Console.WriteLine($"\t-> pretty: {original.HeaderStyle.Prettify(new PrettificationSettings())}");
+            Console.WriteLine($"separator: {original.TableHeaderSeparator}");
+
+            Console.WriteLine($"JSON: {JsonConvert.SerializeObject(original)}");
+
+            var copy = original.JsonClone();
+
+            Console.WriteLine($"COPY: {copy}");
+
+            Asserter.Against(copy)
+                    .And(Has.Property(nameof(copy.HeaderStyle)).EqualTo(original.HeaderStyle))
+                    .And(Has.Property(nameof(copy.TableHeaderSeparator)).EqualTo(original.TableHeaderSeparator))
+                    .And(Has.Property(nameof(copy.NullPlaceholder)).EqualTo(original.NullPlaceholder))
+                    .And(Is.Not.SameAs(original))
+                    .Invoke();
         }
     }
 }
