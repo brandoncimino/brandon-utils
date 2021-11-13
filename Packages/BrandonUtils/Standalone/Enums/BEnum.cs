@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
+using BrandonUtils.Standalone.Collections;
+using BrandonUtils.Standalone.Strings;
 using BrandonUtils.Standalone.Strings.Prettifiers;
 
 using JetBrains.Annotations;
@@ -38,15 +41,89 @@ namespace BrandonUtils.Standalone.Enums {
         /// </summary>
         /// <param name="argumentName"></param>
         /// <param name="enumValue"></param>
+        /// <param name="allowedValues"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(string argumentName, T enumValue) where T : struct, Enum {
+        [NotNull]
+        public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(
+            [CanBeNull] string argumentName,
+            T                  enumValue,
+            [CanBeNull, InstantHandle]
+            IEnumerable<T> allowedValues = default
+        ) where T : struct, Enum {
             return new InvalidEnumArgumentException(argumentName, (int)(object)enumValue, typeof(T));
         }
 
-        public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(string argumentName, T? enumValue) where T : struct, Enum {
-            //return enumValue == null ? new InvalidEnumArgumentException(argumentName, -1, typeof(T)) : InvalidEnumArgumentException(argumentName, enumValue.Value, typeof(T));
+        [NotNull]
+        public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(
+            [CanBeNull] string argumentName,
+            T?                 enumValue
+        ) where T : struct, Enum {
             return new InvalidEnumArgumentException(argumentName, -1, typeof(T));
         }
+
+        #region Enum not in set
+
+        [NotNull]
+        private static string BuildEnumNotInSetMessage(
+            [CanBeNull] string              paramName,
+            [NotNull]   Type                enumType,
+            [NotNull]   IEnumerable<object> checkedValues,
+            [NotNull]   IEnumerable<object> allowedValues
+        ) {
+            var badValues = checkedValues.Except(allowedValues);
+
+            var msg = $"{enumType.PrettifyType(default)} values {badValues.Prettify()} aren't among the allowed values!";
+
+            var dic = new Dictionary<object, object>() {
+                    ["Enum type"]      = enumType,
+                    ["Parameter name"] = paramName,
+                    ["Allowed values"] = allowedValues,
+                    ["Checked values"] = checkedValues,
+                    ["Bad values"]     = badValues
+                }.SelectValues(it => it.Prettify())
+                 .WhereValues(it => it.IsNotBlank());
+
+            var prettyDic = dic.Prettify(HeaderStyle.None);
+
+            return new object[] {
+                msg,
+                prettyDic.SplitLines().Indent(),
+            }.JoinLines();
+        }
+
+        [NotNull]
+        public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(
+            [CanBeNull] string         argumentName,
+            [NotNull]   IEnumerable<T> checkedValues,
+            [NotNull]   IEnumerable<T> allowedValues
+        ) where T : struct, Enum {
+            return new InvalidEnumArgumentException(
+                BuildEnumNotInSetMessage(
+                    argumentName,
+                    typeof(T),
+                    checkedValues.Cast<object>(),
+                    allowedValues.Cast<object>()
+                )
+            );
+        }
+
+        [NotNull]
+        public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(
+            [CanBeNull] string          argumentName,
+            [NotNull]   IEnumerable<T?> checkedValues,
+            [NotNull]   IEnumerable<T?> allowedValues
+        ) where T : struct, Enum {
+            return new InvalidEnumArgumentException(
+                BuildEnumNotInSetMessage(
+                    argumentName,
+                    typeof(T?),
+                    checkedValues.Cast<object>(),
+                    allowedValues.Cast<object>()
+                )
+            );
+        }
+
+        #endregion
     }
 }
