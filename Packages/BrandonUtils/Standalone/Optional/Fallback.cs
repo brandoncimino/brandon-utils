@@ -99,5 +99,10 @@ namespace BrandonUtils.Standalone.Optional {
         }
 
         #endregion
+
+        [NotNull]
+        public override string ToString() {
+            return Optional.ToString(this);
+        }
     }
 }
