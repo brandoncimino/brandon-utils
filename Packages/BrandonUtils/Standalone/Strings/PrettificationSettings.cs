@@ -1,14 +1,21 @@
-﻿using BrandonUtils.Standalone.Optional;
+﻿using System;
+
+using BrandonUtils.Standalone.Optional;
 
 using JetBrains.Annotations;
 
+using Newtonsoft.Json;
+
 namespace BrandonUtils.Standalone.Strings {
-    public class PrettificationSettings {
+    public class PrettificationSettings : IJsonCloneable {
         /// <summary>
         /// When the <see cref="PreferredLineStyle"/> is <see cref="LineStyle.Dynamic"/>, <see cref="LineLengthLimit"/> is used to decide between <see cref="LineStyle.Multi"/> and <see cref="LineStyle.Single"/>.
         /// </summary>
         [NotNull]
         public Fallback<int> LineLengthLimit { get; } = new Fallback<int>(50);
+
+        [NotNull] public Fallback<string> TableHeaderSeparator { get; } = new Fallback<string>("-");
+        [NotNull] public Fallback<string> TableColumnSeparator { get; } = new Fallback<string>(" ");
 
         [NotNull] public Fallback<string> NullPlaceholder { get; } = new Fallback<string>("⛔");
 
@@ -19,6 +26,8 @@ namespace BrandonUtils.Standalone.Strings {
         public Fallback<LineStyle> PreferredLineStyle { get; } = new Fallback<LineStyle>(LineStyle.Dynamic);
 
         [NotNull] public Fallback<TypeNameStyle> TypeLabelStyle { get; } = new Fallback<TypeNameStyle>(TypeNameStyle.Full);
+
+        [NotNull] public Fallback<HeaderStyle> HeaderStyle { get; } = new Fallback<HeaderStyle>(Strings.HeaderStyle.None);
 
         internal bool VerboseLogging = false;
 
@@ -34,6 +43,25 @@ namespace BrandonUtils.Standalone.Strings {
             return new PrettificationSettings() {
                 TypeLabelStyle = { Value = typeLabelStyle }
             };
+        }
+
+        [NotNull]
+        public static implicit operator PrettificationSettings(HeaderStyle headerStyle) {
+            return new PrettificationSettings() {
+                HeaderStyle = { Value = headerStyle }
+            };
+        }
+
+        [NotNull]
+        public PrettificationSettings Copy() {
+            throw new NotImplementedException("Need to play with this vs. IJsonCloneable");
+            var json = JsonConvert.SerializeObject(this);
+            return JsonConvert.DeserializeObject<PrettificationSettings>(json);
+        }
+
+        [NotNull]
+        public override string ToString() {
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
     }
 }
