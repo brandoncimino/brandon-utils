@@ -6,14 +6,17 @@ using System.Reflection;
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Strings.Prettifiers;
 
+using JetBrains.Annotations;
+
 namespace BrandonUtils.Standalone.Strings {
     internal static partial class PrettifierDatabase {
+        [NotNull]
         internal static KeyedList<Type, IPrettifier> GetDefaultPrettifiers() {
             return new KeyedList<Type, IPrettifier>(it => it.PrettifierType) {
                 new Prettifier<string>(Convert.ToString),
                 new Prettifier<Type>(InnerPretty.PrettifyType),
-                new Prettifier<IDictionary<object, object>>(InnerPretty.PrettifyDictionary),
-                new Prettifier<IDictionary>(InnerPretty.PrettifyDictionary),
+                new Prettifier<IDictionary<object, object>>(InnerPretty.PrettifyDictionary2),
+                new Prettifier<IDictionary>(InnerPretty.PrettifyDictionary2),
                 new Prettifier<KeyedList<object, object>>(InnerPretty.PrettifyKeyedList),
                 new Prettifier<(object, object)>(InnerPretty.Tuple2),
                 new Prettifier<(object, object, object)>(InnerPretty.Tuple3),
@@ -29,5 +32,7 @@ namespace BrandonUtils.Standalone.Strings {
                 new Prettifier<MemberInfo>(InnerPretty.PrettifyMemberInfo),
             };
         }
+
+        internal static readonly IPrettifier EnumPrettifier = new Prettifier<Enum>(InnerPretty.PrettifyEnum);
     }
 }
