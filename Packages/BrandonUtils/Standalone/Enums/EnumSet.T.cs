@@ -15,7 +15,7 @@ namespace BrandonUtils.Standalone.Enums {
     /// </summary>
     /// <typeparam name="T">an <see cref="Enum"/> type</typeparam>
     [PublicAPI]
-    public class EnumSet<T> : HashSet<T> where T : struct, Enum {
+    public class EnumSet<T> : HashSet<T>, ICollection<T> where T : struct, Enum {
         #region Constructors
 
         public EnumSet([NotNull] params T[] enumValues) : base(enumValues) { }
@@ -31,16 +31,6 @@ namespace BrandonUtils.Standalone.Enums {
         #endregion Inherited Constructors
 
         #endregion Constructors
-
-        #region Factory Methods
-
-        /// <returns>an <see cref="EnumSet{T}"/> containing all of the <b>unique</b> values of <typeparamref name="T"/></returns>
-        /// <seealso cref="EnumSet.OfAllValues{T}"/>
-        public static EnumSet<T> OfAllValues() {
-            return new EnumSet<T>(BEnum.GetValues<T>());
-        }
-
-        #endregion
 
         #region MustContain
 
@@ -86,14 +76,17 @@ namespace BrandonUtils.Standalone.Enums {
             }
         }
 
-        /**
-         * <inheritdoc cref="MustContain(T[])"/>
-         */
-        public void MustContain(T expectedValue) {
-            if (!Contains(expectedValue)) {
-                throw new EnumNotInSetException<T>(this, expectedValue);
-            }
-        }
+        // /**
+        //  * <inheritdoc cref="MustContain(T[])"/>
+        //  */
+        // [NotNull]
+        // public EnumSet<T> MustContain(T expectedValue) {
+        //     if (!Contains(expectedValue)) {
+        //         throw new EnumNotInSetException<T>(this, expectedValue);
+        //     }
+        //
+        //     return this;
+        // }
 
         /**
          * <inheritdoc cref="MustContain(T[])"/>
@@ -116,7 +109,6 @@ namespace BrandonUtils.Standalone.Enums {
             }
         }
 
-
         private string BuildMustContainMessage(T[] valuesThatShouldBeThere) {
             PrettificationSettings prettySettings = TypeNameStyle.Full;
 
@@ -137,6 +129,23 @@ namespace BrandonUtils.Standalone.Enums {
         /// <returns></returns>
         public EnumSet<T> Copy() {
             return new EnumSet<T>(this);
+        }
+
+        public ReadOnlyEnumSet<T> AsReadOnly() {
+            throw new NotImplementedException();
+        }
+
+        public bool ShouldBeReadOnly;
+
+        bool ICollection<T>.IsReadOnly => ShouldBeReadOnly;
+
+        [NotNull]
+        public override string ToString() {
+            return this.Prettify();
+        }
+
+        void ICollection<T>.Add(T item) {
+            throw new NotImplementedException("can't add, ok?");
         }
     }
 }
