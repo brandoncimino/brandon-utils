@@ -10,14 +10,48 @@ using BrandonUtils.Standalone.Strings.Prettifiers;
 using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone.Exceptions {
-    [Obsolete("Please use " + nameof(EnumNotInSetException<DayOfWeek>) + " instead")]
+    [Obsolete("Please use " + nameof(EnumNotInSetException) + " instead")]
     public class EnumNotInSubsetException<T> : EnumNotInSetException<T> where T : Enum {
         public EnumNotInSubsetException(ICollection<T> superset, IEnumerable<T> expectedValues = null, string messagePrefix = null, Exception innerException = null) : base(superset, expectedValues, messagePrefix, innerException) { }
         public EnumNotInSubsetException(ICollection<T> superset, T              invalidValue,          string messagePrefix = null, Exception innerException = null) : base(superset, invalidValue, messagePrefix, innerException) { }
     }
 
+    public class EnumNotInSetException : InvalidEnumArgumentException {
+        public EnumNotInSetException(
+            [NotNull, ItemNotNull]
+            IEnumerable<object> superset,
+            [NotNull, ItemNotNull]
+            IEnumerable<object> expectedValues,
+            [CanBeNull] string    messagePrefix  = default,
+            [CanBeNull] Exception innerException = default
+        )
+            : base(BuildMessage(superset, expectedValues, messagePrefix), innerException) { }
+
+        [NotNull]
+        private static string BuildMessage(
+            [NotNull]   IEnumerable<object> superset,
+            [CanBeNull] IEnumerable<object> valuesThatShouldBeThere,
+            [CanBeNull] string              messagePrefix
+        ) {
+            PrettificationSettings prettySettings = new PrettificationSettings() {
+                TypeLabelStyle = { Value = TypeNameStyle.Full }
+            };
+
+            var badValues = valuesThatShouldBeThere?.Except(superset);
+
+            return new Dictionary<object, object>() {
+                    [superset.GetType().PrettifyType(prettySettings)] = superset,
+                    [nameof(valuesThatShouldBeThere)]                 = valuesThatShouldBeThere,
+                    ["Disallowed values"]                             = badValues
+                }.Prettify(prettySettings)
+                 .SplitLines()
+                 .PrependNonNull(messagePrefix)
+                 .JoinLines();
+        }
+    }
+
     [PublicAPI]
-    public class EnumNotInSetException<T> : InvalidEnumArgumentException where T : Enum {
+    public class EnumNotInSetException<T> : InvalidEnumArgumentException {
         private         string _baseMessage;
         public override string Message       => List.Of(MessagePrefix, "", _baseMessage).NonNull().JoinLines();
         public virtual  string MessagePrefix { get; }
