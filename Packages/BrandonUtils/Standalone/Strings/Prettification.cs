@@ -45,9 +45,7 @@ namespace BrandonUtils.Standalone.Strings {
 
         [Pure]
         [ItemNotNull]
-        internal static Optional<IPrettifier> FindPrettifier(Type type, [CanBeNull] PrettificationSettings settings) {
-            settings ??= DefaultPrettificationSettings;
-
+        internal static Optional<IPrettifier> FindPrettifier([NotNull] Type type, [NotNull] PrettificationSettings settings) {
             if (settings.VerboseLogging) {
                 Console.WriteLine($"🔎 Attempting to find an {nameof(IPrettifier)} for the type {type}");
             }
@@ -73,9 +71,7 @@ namespace BrandonUtils.Standalone.Strings {
         #region Generics
 
         [ItemNotNull]
-        internal static Optional<IPrettifier> FindGenericallyTypedPrettifier([NotNull] Type type, [CanBeNull] PrettificationSettings settings) {
-            settings ??= DefaultPrettificationSettings;
-
+        internal static Optional<IPrettifier> FindGenericallyTypedPrettifier([NotNull] Type type, [NotNull] PrettificationSettings settings) {
             if (settings.VerboseLogging) {
                 Console.WriteLine($"\t→ {nameof(FindGenericallyTypedPrettifier)}({type.Name})");
             }
@@ -87,15 +83,11 @@ namespace BrandonUtils.Standalone.Strings {
             );
         }
 
-        private static Optional<IPrettifier> FindExactGenericPrettifier([NotNull] Type type, [CanBeNull] PrettificationSettings settings) {
-            settings ??= DefaultPrettificationSettings;
-
+        private static Optional<IPrettifier> FindExactGenericPrettifier([NotNull] Type type, [NotNull] PrettificationSettings settings) {
             return type.IsGenericTypeOrDefinition() == false ? default : FindExactPrettifier(type.GetGenericTypeDefinition(), settings);
         }
 
-        internal static Optional<IPrettifier> FindMatchingGenericPrettifier([NotNull] Type type, [CanBeNull] PrettificationSettings settings) {
-            settings ??= DefaultPrettificationSettings;
-
+        internal static Optional<IPrettifier> FindMatchingGenericPrettifier([NotNull] Type type, [NotNull] PrettificationSettings settings) {
             return type.IsGenericTypeOrDefinition() ? Prettifiers.FindFirst(it => GenericTypesMatch(it.PrettifierType, type)) : default;
         }
 
@@ -134,8 +126,7 @@ namespace BrandonUtils.Standalone.Strings {
 
         [Pure]
         [ItemNotNull]
-        private static Optional<IPrettifier> FindExactPrettifier([NotNull] Type type, [CanBeNull] PrettificationSettings settings) {
-            settings ??= DefaultPrettificationSettings;
+        private static Optional<IPrettifier> FindExactPrettifier([NotNull] Type type, [NotNull] PrettificationSettings settings) {
             if (settings.VerboseLogging) {
                 Console.WriteLine($"\t→ {nameof(FindExactPrettifier)}({type.Name})");
             }
@@ -145,9 +136,7 @@ namespace BrandonUtils.Standalone.Strings {
 
         [Pure]
         [ItemNotNull]
-        private static Optional<IPrettifier> FindInheritedPrettifier(Type type, [CanBeNull] PrettificationSettings settings) {
-            settings ??= DefaultPrettificationSettings;
-
+        private static Optional<IPrettifier> FindInheritedPrettifier([NotNull] Type type, [NotNull] PrettificationSettings settings) {
             if (settings.VerboseLogging) {
                 Console.WriteLine($"\t→ {nameof(FindInheritedPrettifier)}({type.Name})");
             }
@@ -158,6 +147,20 @@ namespace BrandonUtils.Standalone.Strings {
             catch (InvalidOperationException) {
                 return default;
             }
+        }
+
+        [Pure]
+        [ItemNotNull]
+        private static Optional<IPrettifier> FindEnumPrettifier([NotNull] Type type, [NotNull] PrettificationSettings settings) {
+            if (settings.VerboseLogging) {
+                Console.WriteLine($"\t→ {nameof(FindEnumPrettifier)}({type.Name})");
+            }
+
+            if (type.IsEnum) {
+                return new Optional<IPrettifier>(PrettifierDatabase.EnumPrettifier);
+            }
+
+            throw new NotImplementedException("TODO over the weekend at nicole's place maybe");
         }
 
         #endregion
@@ -189,7 +192,7 @@ namespace BrandonUtils.Standalone.Strings {
             settings ??= new PrettificationSettings();
 
             if (settings.VerboseLogging) {
-                Console.WriteLine($"⛑ Using the LAST RESORT prettifier for [{cinderella?.GetType()}] {cinderella}: {nameof(Convert.ToString)}!");
+                Console.WriteLine($"⛑ Using the LAST RESORT prettifier for [{cinderella?.GetType()}]{cinderella}: {nameof(Convert.ToString)}!");
             }
 
             return Convert.ToString(cinderella);
