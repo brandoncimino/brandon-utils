@@ -5,6 +5,8 @@ using System.Linq;
 
 using JetBrains.Annotations;
 
+using Newtonsoft.Json;
+
 namespace BrandonUtils.Standalone.Optional {
     /// <inheritdoc cref="IOptional{T}"/>
     /// <remarks>
@@ -12,6 +14,7 @@ namespace BrandonUtils.Standalone.Optional {
     /// This gives access to the full suite of <see cref="System.Linq"/> extension methods.
     /// </remarks>
     [PublicAPI]
+    [JsonConverter(typeof(OptionalJsonConverter))]
     public readonly struct Optional<T> : IEquatable<T>, IEquatable<IOptional<T>>, IOptional<T> {
         public override int GetHashCode() {
             unchecked {

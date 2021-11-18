@@ -7,6 +7,8 @@ using BrandonUtils.Standalone.Optional;
 using BrandonUtils.Standalone.Strings;
 using BrandonUtils.Testing;
 
+using Newtonsoft.Json;
+
 using NUnit.Framework;
 
 using Is = BrandonUtils.Testing.Is;
@@ -254,6 +256,46 @@ namespace BrandonUtils.Tests.Standalone.Collections {
         public void OptionalToString([ValueSource(nameof(GetOptionalToStringExpectations))] (Optional<object>, string) expectation) {
             var (optional, expectedString) = expectation;
             Assert.That(optional.ToString(), Is.EqualTo(expectedString));
+        }
+
+        #endregion
+
+        #region Serialization
+
+        [Test]
+        public void SerializeOptional() {
+            var optional = Optional.Of(5);
+            var json     = JsonConvert.SerializeObject(optional);
+            Console.WriteLine($"json: {json}");
+            Assert.That(json, Is.EqualTo("[5]"));
+        }
+
+        [Test]
+        public void SerializeEmptyOptional() {
+            var optional = Optional.Empty<string>();
+            var json     = JsonConvert.SerializeObject(optional);
+            Console.WriteLine($"json: {json}");
+            Assert.That(json, Is.EqualTo("[]"));
+        }
+
+        [Test]
+        public void SerializeOptionalOfNull() {
+            var optional = Optional.Of<string>(null);
+            var json     = JsonConvert.SerializeObject(optional);
+            Console.WriteLine($"json: {json}");
+            Assert.That(json, Is.EqualTo("[null]"));
+        }
+
+        [Test]
+        public void DeserializeOptional() {
+            const int val      = 5;
+            var       json     = $"[{val}]";
+            var       fromJson = JsonConvert.DeserializeObject<Optional<int>>(json);
+            Console.WriteLine($"fromJson: {fromJson}");
+            Asserter.Against(fromJson)
+                    .And(it => it.Value, Is.EqualTo(val))
+                    .And(Is.EqualTo(new Optional<int>(val)))
+                    .Invoke();
         }
 
         #endregion
