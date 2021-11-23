@@ -118,6 +118,44 @@ namespace BrandonUtils.Standalone.Optional {
             return ls.Any() ? Of(ls.Single()) : default;
         }
 
+        #region Flatten
+
+        /// <summary>
+        /// Reduces a nested <see cref="Optional{T}"/> of <see cref="Optional{T}"/>s into a simple <see cref="Optional{T}"/>.
+        /// </summary>
+        /// <example>
+        /// <code><![CDATA[Optional.Of(Optional.Of(Optional.Of(5))).Flatten() == Optional.Of(5)]]></code>
+        /// </example>
+        /// <param name="optional">a <a href="https://en.wikipedia.org/w/index.php?title=%D0%9C%D0%B0%D1%82%D1%80%D1%91%D1%88%D0%BA%D0%B0">матрёшка</a> <see cref="Optional{T}"/></param>
+        /// <typeparam name="T">the "most reduced" type of the <see cref="Optional{T}"/></typeparam>
+        /// <returns>a single-tier <see cref="Optional{T}"/></returns>
+        [Pure]
+        [ItemCanBeNull]
+        public static Optional<T> Flatten<T>(this Optional<Optional<T>> optional) => optional.OrDefault();
+
+        /**
+         * <inheritdoc cref="Flatten{T}(BrandonUtils.Standalone.Optional.Optional{BrandonUtils.Standalone.Optional.Optional{T}})"/>
+         */
+        [Pure]
+        [ItemCanBeNull]
+        public static Optional<T> Flatten<T>(this Optional<Optional<Optional<T>>> optional) => optional.OrDefault().Flatten();
+
+        /**
+         * <inheritdoc cref="Flatten{T}(BrandonUtils.Standalone.Optional.Optional{BrandonUtils.Standalone.Optional.Optional{T}})"/>
+         */
+        [Pure]
+        [ItemCanBeNull]
+        public static Optional<T> Flatten<T>(this Optional<Optional<Optional<Optional<T>>>> optional) => optional.OrDefault().Flatten();
+
+        /**
+         * <inheritdoc cref="Flatten{T}(BrandonUtils.Standalone.Optional.Optional{BrandonUtils.Standalone.Optional.Optional{T}})"/>
+         */
+        [Pure]
+        [ItemCanBeNull]
+        public static Optional<T> Flatten<T>(this Optional<Optional<Optional<Optional<Optional<T>>>>> optional) => optional.OrDefault().Flatten();
+
+        #endregion
+
         [Pure]
         [CanBeNull, ItemCanBeNull]
         [LinqTunnel]

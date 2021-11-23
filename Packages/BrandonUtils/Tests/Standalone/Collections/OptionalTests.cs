@@ -299,5 +299,107 @@ namespace BrandonUtils.Tests.Standalone.Collections {
         }
 
         #endregion
+
+        #region Flatten
+
+        [Test]
+        public void Flatten_2() {
+            var inner = Optional.Of(5);
+            var outer = Optional.Of(inner);
+            var flat  = outer.Flatten();
+
+            Asserter.Against(flat)
+                    .And(Is.TypeOf<Optional<int>>())
+                    .And(it => it.HasValue, Is.EqualTo(true))
+                    .And(it => it.Value,    Is.EqualTo(inner.Value))
+                    .Invoke();
+        }
+
+        [Test]
+        public void Flatten_2_Empty() {
+            var inner = Optional.Empty<int>();
+            var outer = Optional.Of(inner);
+            var flat  = outer.Flatten();
+
+            Asserter.Against(flat)
+                    .And(Is.TypeOf<Optional<int>>())
+                    .And(it => it.HasValue, Is.EqualTo(false))
+                    .And(it => it.Value,    Throws.InvalidOperationException)
+                    .Invoke();
+        }
+
+        [Test]
+        public void Flatten_3() {
+            var inner  = Optional.Of(5);
+            var middle = Optional.Of(inner);
+            var outer  = Optional.Of(middle);
+            var flat   = outer.Flatten();
+
+            Asserter.Against(flat)
+                    .And(Is.TypeOf<Optional<int>>())
+                    .And(it => it.HasValue, Is.EqualTo(true))
+                    .And(it => it.Value,    Is.EqualTo(5))
+                    .Invoke();
+        }
+
+        [Test]
+        public void Flatten_3_Empty() {
+            var inner  = Optional.Empty<int>();
+            var middle = Optional.Of(inner);
+            var outer  = Optional.Of(middle);
+            var flat   = outer.Flatten();
+
+            Asserter.Against(flat)
+                    .And(Is.TypeOf<Optional<int>>())
+                    .And(it => it.HasValue, Is.EqualTo(false))
+                    .And(it => it.Value,    Throws.InvalidOperationException)
+                    .Invoke();
+        }
+
+        [Test]
+        public void Flatten_4() {
+            var t1   = Optional.Of(5);
+            var t2   = Optional.Of(t1);
+            var t3   = Optional.Of(t2);
+            var t4   = Optional.Of(t3);
+            var flat = t4.Flatten();
+
+            Asserter.Against(flat)
+                    .And(Is.TypeOf<Optional<int>>())
+                    .And(it => it.HasValue, Is.EqualTo(true))
+                    .And(it => it.Value,    Is.EqualTo(5))
+                    .Invoke();
+        }
+
+        [Test]
+        public void Flatten_4_Empty() {
+            var t1   = Optional.Empty<int>();
+            var t2   = Optional.Of(t1);
+            var t3   = Optional.Of(t2);
+            var t4   = Optional.Of(t3);
+            var flat = t4.Flatten();
+
+            Asserter.Against(flat)
+                    .And(Is.TypeOf<Optional<int>>())
+                    .And(it => it.HasValue, Is.EqualTo(false))
+                    .And(it => it.Value,    Throws.InvalidOperationException)
+                    .Invoke();
+        }
+
+        [Test]
+        public void Flatten_Mixed() {
+            var inner = Optional.Empty<Optional<int>>();
+            var outer = Optional.Of(inner);
+            var flat  = outer.Flatten();
+
+            Asserter.Against(flat)
+                    .And(Is.TypeOf<Optional<int>>())
+                    .And(it => it.HasValue,    Is.False)
+                    .And(it => it.Value,       Throws.InvalidOperationException)
+                    .And(() => outer.HasValue, Is.True)
+                    .Invoke();
+        }
+
+        #endregion
     }
 }
