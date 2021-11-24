@@ -952,12 +952,12 @@ namespace BrandonUtils.Standalone.Collections {
 
         #region NonBlank
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public static IEnumerable<string> NonBlank([CanBeNull, ItemCanBeNull] this IEnumerable<string> lines) {
             return lines == null ? Enumerable.Empty<string>() : lines.Where(it => it.IsNotBlank());
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public static IEnumerable<string> NonEmpty([CanBeNull, ItemCanBeNull] this IEnumerable<string> lines) {
             return lines == null ? Enumerable.Empty<string>() : lines.Where(it => it.IsNotEmpty());
         }
