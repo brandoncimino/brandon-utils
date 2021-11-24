@@ -41,6 +41,7 @@ namespace BrandonUtils.Testing {
         internal IList<(Func<TActual, object>, IResolveConstraint)> Constraints_AgainstTransformation { get; } = new List<(Func<TActual, object>, IResolveConstraint)>();
 
         protected abstract Action<string>                                          ActionOnFailure            { get; }
+        protected virtual  Action<string>                                          ActionOnSuccess            { get; } = Console.WriteLine;
         protected abstract Action<TActual, IResolveConstraint>                     ConstraintResolver         { get; }
         protected abstract Action<ActualValueDelegate<object>, IResolveConstraint> DelegateConstraintResolver { get; }
         protected abstract Action<object, IResolveConstraint>                      ObjectConstraintResolver   { get; }
@@ -363,10 +364,9 @@ namespace BrandonUtils.Testing {
         #endregion
 
         public void Invoke() {
-            var failures = TestEverything().ToList();
-            if (failures.Any(it => it.Failed)) {
-                ActionOnFailure.Invoke(FormatMultipleAssertionMessage(failures));
-            }
+            var assertables = TestEverything().ToList();
+            var valediction = assertables.Any(it => it.Failed) ? ActionOnFailure : ActionOnSuccess;
+            valediction.Invoke(FormatMultipleAssertionMessage(assertables));
         }
     }
 }
