@@ -160,5 +160,19 @@ namespace BrandonUtils.Standalone {
         public static bool    ToBool([CanBeNull] this    object obj) => Convert.ToBoolean(obj);
 
         #endregion
+
+        #region Icons
+
+        private const string TrueIcon  = "✅";
+        private const string FalseIcon = "❌";
+
+        /// <param name="value">a <see cref="bool"/></param>
+        /// <returns>either <see cref="TrueIcon"/> or <see cref="FalseIcon"/></returns>
+        [NotNull]
+        public static string Icon(this bool value) {
+            return value ? TrueIcon : FalseIcon;
+        }
+
+        #endregion
     }
 }
