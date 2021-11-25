@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -13,12 +14,15 @@ using BrandonUtils.Standalone.Strings.Prettifiers;
 
 using JetBrains.Annotations;
 
+using Pure = System.Diagnostics.Contracts.PureAttribute;
+
 namespace BrandonUtils.Standalone.Reflection {
     /// <summary>
     /// Contains utilities for <see cref="System.Reflection"/>.
     ///
     /// TODO: Split this class up. For example, the <see cref="Type"/> extensions should be in their own class
     /// </summary>
+    [PublicAPI]
     public static class ReflectionUtils {
         /// <summary>
         /// Returns the <see cref="MethodInfo"/> for this method that <b><i>called <see cref="ThisMethod"/></i></b>.
@@ -677,11 +681,44 @@ namespace BrandonUtils.Standalone.Reflection {
         }
 
         /// <summary>
-        /// An idiomatic alias for <see cref="Type.IsAssignableFrom"/> because I always get confused by that.
+        /// Determines whether this <see cref="Type"/> is an inheritor of any of the <paramref name="possibleParents"/> via <see cref="Type.IsAssignableFrom"/>
         /// </summary>
+        /// <param name="child">this <see cref="Type"/></param>
+        /// <param name="possibleParents">the <see cref="Type"/>s that might be <see cref="Type.IsAssignableFrom"/> <paramref name="child"/></param>
+        /// <returns>true if any of the <paramref name="possibleParents"/> <see cref="Type.IsAssignableFrom"/> <paramref name="child"/></returns>
+        /// <exception cref="ArgumentNullException">if <paramref name="child"/> or <paramref name="possibleParents"/> is null</exception>
+        [Pure]
+        [ContractAnnotation("child:null => stop")]
+        [ContractAnnotation("possibleParents:null => stop")]
+        public static bool IsKindOf([NotNull] this Type child, [NotNull, ItemNotNull, InstantHandle] IEnumerable<Type> possibleParents) {
+            if (child == null) {
+                throw new ArgumentNullException(nameof(child));
+            }
+
+            if (possibleParents == null) {
+                throw new ArgumentNullException(nameof(possibleParents));
+            }
+
+            return possibleParents.Any(it => it.IsAssignableFrom(child));
+        }
+
+        /**
+         * <inheritdoc cref="IsKindOf(System.Type,System.Collections.Generic.IEnumerable{System.Type})"/>
+         */
+        [Pure]
+        [ContractAnnotation("child:null => stop")]
+        [ContractAnnotation("possibleParents:null => stop")]
+        public static bool IsKindOf([NotNull] this Type child, [NotNull, ItemNotNull] params Type[] possibleParents) => IsKindOf(child, possibleParents.AsEnumerable());
+
+        /// <summary>
+        /// Determines whether a <b>variable</b> of this <see cref="Type"/> is capable of holding a <b>value</b> of <paramref name="valueType"/>.
+        /// </summary>
+        /// <remarks>
+        /// An idiomatic alias for <see cref="Type.IsAssignableFrom"/> because I always get confused by that.
+        /// </remarks>
         /// <param name="variableType"></param>
         /// <param name="valueType"></param>
-        /// <returns></returns>
+        /// <returns>true if <paramref name="variableType"/> <see cref="Type.IsAssignableFrom"/> <paramref name="valueType"/></returns>
         /// <exception cref="ArgumentNullException"></exception>
         [PublicAPI]
         [Pure]
@@ -697,6 +734,56 @@ namespace BrandonUtils.Standalone.Reflection {
             }
 
             return variableType.IsAssignableFrom(valueType);
+        }
+
+        /// <summary>
+        /// Determines whether a variable of this <see cref="Type"/> is capable of being assigned the given value.
+        /// </summary>
+        /// <remarks>
+        /// This is similar to <see cref="Type.IsInstanceOfType"/>, except that it handles null <paramref name="obj"/> differently by checking
+        /// <paramref name="variableType"/> <see cref="Type.IsValueType"/>:
+        /// <code><![CDATA[
+        /// typeof(int).IsInstanceOfType(null);     // false
+        /// typeof(int).CanHold(null);              // false (because int is a value type)
+        /// ]]></code>
+        ///
+        /// <code><![CDATA[
+        /// typeof(string).IsInstanceOfType(null);  // false
+        /// typeof(string).CanHold(null);           // true  (because string is a reference type)
+        /// ]]></code>
+        /// </remarks>
+        /// <param name="variableType">this <see cref="Type"/></param>
+        /// <param name="obj">the <see cref="object"/> that this <see cref="Type"/> might hold</param>
+        /// <returns>true if a variable of <paramref name="variableType"/> could hold <paramref name="obj"/></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        [Pure]
+        public static bool CanHold([NotNull] this Type variableType, [CanBeNull] object obj) {
+            if (variableType == null) {
+                throw new ArgumentNullException(nameof(variableType));
+            }
+
+            if (obj == null) {
+                return variableType.IsValueType == false;
+            }
+
+            return variableType.IsInstanceOfType(obj);
+        }
+
+        [Pure]
+        public static bool IsInstanceOf(
+            [NotNull] this object obj,
+            [NotNull, ItemNotNull, InstantHandle]
+            IEnumerable<Type> possibleTypes
+        ) {
+            if (obj == null) {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
+            if (possibleTypes == null) {
+                throw new ArgumentNullException(nameof(possibleTypes));
+            }
+
+            return possibleTypes.Any(it => it.IsInstanceOfType(obj));
         }
 
         #endregion
