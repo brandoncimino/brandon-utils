@@ -167,7 +167,13 @@ namespace BrandonUtils.Standalone.Strings {
 
         [Pure]
         [NotNull]
-        public static string Prettify([CanBeNull] this object cinderella, [CanBeNull] PrettificationSettings settings = default) {
+        public static string Prettify([CanBeNull] this object cinderella) {
+            return cinderella.Prettify(default);
+        }
+
+        [Pure]
+        [NotNull]
+        public static string Prettify([CanBeNull] this object cinderella, [CanBeNull] PrettificationSettings settings) {
             settings ??= DefaultPrettificationSettings;
 
             if (settings.VerboseLogging) {
