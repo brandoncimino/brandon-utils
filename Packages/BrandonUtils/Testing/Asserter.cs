@@ -10,10 +10,10 @@ using Pure = System.Diagnostics.Contracts.PureAttribute;
 
 namespace BrandonUtils.Testing {
     public class Asserter<T> : MultipleAsserter<Asserter<T>, T> {
-        protected override Action<string>                                          ActionOnFailure            => Assert.Fail;
-        protected override Action<T, IResolveConstraint>                           ConstraintResolver         => Assert.That;
-        protected override Action<ActualValueDelegate<object>, IResolveConstraint> DelegateConstraintResolver => Assert.That;
-        protected override Action<object, IResolveConstraint>                      ObjectConstraintResolver   => Assert.That;
+        protected override Action<string>                                                        ActionOnFailure          => Assert.Fail;
+        protected override Action<ActualValueDelegate<object>, IResolveConstraint, Func<string>> TrueResolver             => Assert.That;
+        protected override Action<ActualValueDelegate<T>, IResolveConstraint, Func<string>>      TrueTypeResolver         => Assert.That;
+        protected override Action<TestDelegate, IResolveConstraint, Func<string>>                ActionConstraintResolver => Assert.That;
 
         public Asserter() { }
         public Asserter(T                      actual) : base(actual) { }
@@ -32,7 +32,6 @@ namespace BrandonUtils.Testing {
             return new Asserter<T>(actualValueDelegate);
         }
 
-        [Pure]
-        public static Asserter<object> WithHeading(string heading) => new Asserter<object>().WithHeading(heading);
+        [Pure] public static Asserter<object> WithHeading(string heading) => new Asserter<object>().WithHeading(heading);
     }
 }

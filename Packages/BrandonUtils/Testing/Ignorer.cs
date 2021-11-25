@@ -5,10 +5,10 @@ using NUnit.Framework.Constraints;
 
 namespace BrandonUtils.Testing {
     public class Ignorer<T> : MultipleAsserter<Ignorer<T>, T> {
-        protected override Action<string>                                          ActionOnFailure            => Assert.Ignore;
-        protected override Action<T, IResolveConstraint>                           ConstraintResolver         => Ignore.Unless;
-        protected override Action<ActualValueDelegate<object>, IResolveConstraint> DelegateConstraintResolver => Ignore.Unless;
-        protected override Action<object, IResolveConstraint>                      ObjectConstraintResolver   => Ignore.Unless;
+        protected override Action<string>                                                        ActionOnFailure          => Assert.Ignore;
+        protected override Action<ActualValueDelegate<object>, IResolveConstraint, Func<string>> TrueResolver             => Ignore.Unless;
+        protected override Action<ActualValueDelegate<T>, IResolveConstraint, Func<string>>      TrueTypeResolver         => Ignore.Unless;
+        protected override Action<TestDelegate, IResolveConstraint, Func<string>>                ActionConstraintResolver => Ignore.Unless;
 
         public Ignorer() { }
 

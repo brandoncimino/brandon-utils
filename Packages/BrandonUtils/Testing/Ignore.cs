@@ -1,5 +1,8 @@
 ﻿using System;
 
+using BrandonUtils.Standalone.Collections;
+using BrandonUtils.Standalone.Optional;
+
 using JetBrains.Annotations;
 
 using NUnit.Framework;
@@ -40,6 +43,35 @@ namespace BrandonUtils.Testing {
 
         public static void If<T>(ActualValueDelegate<T> actual, IResolveConstraint constraint) {
             constraint.Resolve().ApplyTo(actual);
+        }
+
+        public static void Unless<T>(
+            [NotNull]   ActualValueDelegate<T> actualValueDelegate,
+            [NotNull]   IResolveConstraint     constraint,
+            [CanBeNull] Func<string>           messageProvider
+        ) {
+            var appliedConstraint = constraint.Resolve().ApplyTo(actualValueDelegate);
+            HandleConstraintResult(appliedConstraint, messageProvider);
+        }
+
+        public static void Unless(
+            [NotNull]   TestDelegate       action,
+            [NotNull]   IResolveConstraint constraint,
+            [CanBeNull] Func<string>       messageProvider
+        ) {
+            var appliedConstraint = constraint.Resolve().ApplyTo(action);
+            HandleConstraintResult(appliedConstraint, messageProvider);
+        }
+
+        private static void HandleConstraintResult(ConstraintResult result, Func<string> messageProvider) {
+            if (result.IsSuccess == false) {
+                var mParts = new[] {
+                    messageProvider.Try().OrDefault(),
+                    result.Description
+                };
+
+                Assert.Ignore(mParts.NonNull().JoinLines());
+            }
         }
 
         /// <summary>

@@ -18,16 +18,21 @@ namespace BrandonUtils.Testing {
         public           Exception Excuse => _excuse ?? throw new InvalidOperationException($"Could not retrieve the {nameof(Excuse)} from the {this.GetType().Name} because {nameof(Failed)} = {Failed}!");
         public           bool      Failed => _excuse != null;
 
-        public string Nickname { get; }
+        public string       Nickname { get; }
+        public Func<string> Message  { get; }
 
         public Assertable(
-            [CanBeNull] TActual                             actual,
-            [NotNull]   IResolveConstraint                  constraint,
-            [NotNull]   Action<TActual, IResolveConstraint> constraintResolutionAction
+            [CanBeNull] string                                                                 nickname,
+            [NotNull]   ActualValueDelegate<TActual>                                           actual,
+            [NotNull]   IResolveConstraint                                                     constraint,
+            [CanBeNull] Func<string>                                                           message,
+            [NotNull]   Action<ActualValueDelegate<TActual>, IResolveConstraint, Func<string>> trueResolver
         ) {
-            Nickname = constraint.GetType().Prettify(AssertableExtensions.AssertablePrettificationSettings);
+            Nickname = nickname ?? constraint.GetType().Prettify(AssertableExtensions.AssertablePrettificationSettings);
+            Message  = message;
+
             try {
-                constraintResolutionAction.Invoke(actual, constraint);
+                trueResolver.Invoke(actual, constraint, message);
                 _excuse = default;
             }
             catch (SuccessException) {
@@ -39,13 +44,17 @@ namespace BrandonUtils.Testing {
         }
 
         public Assertable(
-            [NotNull] ActualValueDelegate<TActual>                             actualValueDelegate,
-            [NotNull] IResolveConstraint                                       constraint,
-            [NotNull] Action<ActualValueDelegate<TActual>, IResolveConstraint> delegateConstraintResolutionAction
+            [CanBeNull] string                                                 nickname,
+            [NotNull]   TestDelegate                                           action,
+            [NotNull]   IResolveConstraint                                     constraint,
+            [CanBeNull] Func<string>                                           message,
+            [NotNull]   Action<TestDelegate, IResolveConstraint, Func<string>> actionResolver
         ) {
-            Nickname = constraint.GetType().Prettify();
+            Nickname = nickname ?? action.Method.Name;
+            Message  = message;
+
             try {
-                delegateConstraintResolutionAction.Invoke(actualValueDelegate, constraint);
+                actionResolver.Invoke(action, constraint, message);
                 _excuse = default;
             }
             catch (SuccessException) {
@@ -53,52 +62,6 @@ namespace BrandonUtils.Testing {
             }
             catch (Exception e) {
                 _excuse = e;
-            }
-        }
-
-        public Assertable(
-            [CanBeNull] TActual         actual,
-            [NotNull]   Action<TActual> assertion
-        ) {
-            Nickname = assertion.Method.Name;
-
-            try {
-                assertion.Invoke(actual);
-                _excuse = default;
-            }
-            catch (SuccessException) {
-                _excuse = default;
-            }
-            catch (Exception e) {
-                _excuse = e;
-            }
-        }
-
-        public Assertable(
-            [NotNull] ActualValueDelegate<TActual> actualValueDelegate,
-            [NotNull] Action<TActual>              assertion
-        ) {
-            Nickname = assertion.Method.Name;
-
-            try {
-                assertion.Invoke(GetActualValue(actualValueDelegate));
-                _excuse = default;
-            }
-            catch (SuccessException) {
-                _excuse = default;
-            }
-            catch (Exception e) {
-                _excuse = e;
-            }
-        }
-
-        private static TActual GetActualValue(ActualValueDelegate<TActual> actualValueDelegate) {
-            try {
-                return actualValueDelegate.Invoke();
-            }
-            catch (Exception e) {
-                Assert.Fail($"Error when getting the result of the {nameof(actualValueDelegate)}!", e);
-                throw;
             }
         }
 
