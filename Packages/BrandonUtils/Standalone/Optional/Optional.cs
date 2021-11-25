@@ -5,6 +5,7 @@ using System.Linq;
 
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Enums;
+using BrandonUtils.Standalone.Reflection;
 using BrandonUtils.Standalone.Strings;
 
 using JetBrains.Annotations;
@@ -188,6 +189,8 @@ namespace BrandonUtils.Standalone.Optional {
 
         #region Failables
 
+        #region FailableFunc
+
         /// <summary>
         /// Attempts to <see cref="Func{TResult}.Invoke"/> <see cref="functionThatMightFail"/>, returning a <see cref="FailableFunc{TValue}"/>
         /// that contains either the successful result or the <see cref="IFailableFunc{TValue,TExcuse}.Excuse"/> for failure.
@@ -226,19 +229,35 @@ namespace BrandonUtils.Standalone.Optional {
             return new FailableFunc<TOut>(() => functionThatMightFail.Invoke(arg1, arg2, arg3));
         }
 
+        #endregion
+
+        #region Failable Action
+
         /// <summary>
         /// Attempts to <see cref="Action.Invoke"/> <see cref="actionThatMightFail"/>, returning a <see cref="Failable"/>
         /// that (might) contain the <see cref="IFailableFunc{TValue,TExcuse}.Excuse"/> for failure.
         /// </summary>
+        /// <param name="actionThatMightFail">the <see cref="Action"/> being executed</param>
+        /// <returns>a <see cref="Failable"/> containing information about execution of the <paramref name="actionThatMightFail"/></returns>
+        public static Failable Try([NotNull, InstantHandle] this Action actionThatMightFail) => new Failable(actionThatMightFail);
+
+        public static Failable Try<T>([NotNull, InstantHandle] this                  Action<T>                  actionThatMightFail, T  argument)                                 => new Failable(() => actionThatMightFail.Invoke(argument));
+        public static Failable Try<T1, T2>([NotNull, InstantHandle] this             Action<T1, T2>             actionThatMightFail, T1 arg1, T2 arg2)                            => new Failable(() => actionThatMightFail.Invoke(arg1, arg2));
+        public static Failable Try<T1, T2, T3>([NotNull, InstantHandle] this         Action<T1, T2, T3>         actionThatMightFail, T1 arg1, T2 arg2, T3 arg3)                   => new Failable(() => actionThatMightFail.Invoke(arg1, arg2, arg3));
+        public static Failable Try<T1, T2, T3, T4>([NotNull, InstantHandle] this     Action<T1, T2, T3, T4>     actionThatMightFail, T1 arg1, T2 arg2, T3 arg3, T4 arg4)          => new Failable(() => actionThatMightFail.Invoke(arg1, arg2, arg3, arg4));
+        public static Failable Try<T1, T2, T3, T4, T5>([NotNull, InstantHandle] this Action<T1, T2, T3, T4, T5> actionThatMightFail, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5) => new Failable(() => actionThatMightFail.Invoke(arg1, arg2, arg3, arg4, arg5));
+
+        /// <summary>
+        /// Attempts to execute this <see cref="Action"/>, capturing <see cref="Exception"/>s and returning a <see cref="Timeable"/>
+        /// that describes what happened.
+        /// </summary>
         /// <param name="actionThatMightFail"></param>
         /// <returns></returns>
-        public static Failable Try([NotNull] this Action actionThatMightFail) {
-            return new Failable(actionThatMightFail);
-        }
-
-        public static Timeable TryTimed([NotNull] this Action actionThatMightFail) {
+        public static Timeable TryTimed([NotNull, InstantHandle] this Action actionThatMightFail) {
             return new Timeable(actionThatMightFail);
         }
+
+        #endregion
 
         #endregion
 
@@ -372,7 +391,7 @@ namespace BrandonUtils.Standalone.Optional {
         [ContractAnnotation("a:null => false")]
         public static bool AreEqual<T>([CanBeNull] IOptional<T> a, [CanBeNull] T b) {
             // this method compares the _value_ of `a` to `b`, which means a value has to exist
-            if (ReferenceEquals(a, null)) {
+            if (!(a is { HasValue: true })) {
                 return false;
             }
 
