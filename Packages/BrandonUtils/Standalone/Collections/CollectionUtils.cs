@@ -1285,5 +1285,46 @@ namespace BrandonUtils.Standalone.Collections {
         }
 
         #endregion
+
+        /// <summary>
+        /// Lazily performs an <see cref="Action"/> on each item on <paramref name="source"/> <b>when it is actually enumerated</b>
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="action"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        [Pure]
+        [LinqTunnel]
+        [NotNull]
+        public static IEnumerable<T> Peek<T>([NotNull, ItemCanBeNull] this IEnumerable<T> source, [NotNull] Action<T> action) {
+            return source.Select(
+                it => {
+                    action.Invoke(it);
+                    return it;
+                }
+            );
+        }
+
+        /// <summary>
+        /// Lazy tests a <paramref name="predicate"/> against each item in <paramref name="source"/> <b>when it is actually enumerated</b>, and throws an exception if the <paramref name="predicate"/> returns false.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="predicate"></param>
+        /// <param name="exceptionSupplier"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        [Pure]
+        [NotNull]
+        [LinqTunnel]
+        public static IEnumerable<T> Must<T>([NotNull, ItemNotNull] this IEnumerable<T> source, [NotNull] Func<T, bool> predicate, [CanBeNull] Func<T, Exception> exceptionSupplier = default) {
+            return source.Peek(
+                it => {
+                    if (predicate.Invoke(it) == false) {
+                        throw exceptionSupplier?.Invoke(it) ?? new ArgumentException($"{source.GetType().Prettify()} entry {it.Prettify()} did not satisfy the predicate {predicate.Prettify()}!");
+                    }
+                }
+            );
+        }
     }
 }
