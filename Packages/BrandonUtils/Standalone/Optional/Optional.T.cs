@@ -18,11 +18,7 @@ namespace BrandonUtils.Standalone.Optional {
     /// </remarks>
     [PublicAPI]
     [JsonConverter(typeof(OptionalJsonConverter))]
-    // [JsonObject(MemberSerialization.OptIn)]
-    public readonly struct Optional<T> : IEquatable<T>, IEquatable<Optional<T>>, IOptional<T>, IOptional {
-        public Type      InnerType => typeof(T);
-        object IOptional.Value     => Value;
-
+    public readonly struct Optional<T> : IEquatable<T>, IEquatable<Optional<T>>, IOptional<T> {
         public override int GetHashCode() {
             unchecked {
                 return (EqualityComparer<T>.Default.GetHashCode(_value) * 397) ^ HasValue.GetHashCode();
@@ -30,11 +26,6 @@ namespace BrandonUtils.Standalone.Optional {
         }
 
         public override bool Equals(object obj) {
-            // Things get real weird if we compare matryoshka optionals, so this always returns `false` in that case.
-            if (typeof(T).IsOptionalType()) {
-                return false;
-            }
-
             // this syntax...is scary
             return obj switch {
                 Optional<T> optional when Equals(optional) => true,

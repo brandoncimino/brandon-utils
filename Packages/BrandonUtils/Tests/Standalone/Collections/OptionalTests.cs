@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Optional;
 using BrandonUtils.Standalone.Strings;
+using BrandonUtils.Standalone.Strings.Json;
 using BrandonUtils.Testing;
 
 using Newtonsoft.Json;
@@ -12,6 +13,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 
 using Is = BrandonUtils.Testing.Is;
+using List = BrandonUtils.Standalone.Collections.List;
 
 namespace BrandonUtils.Tests.Standalone.Collections {
     [SuppressMessage("ReSharper", "AccessToStaticMemberViaDerivedType")]
@@ -21,14 +23,13 @@ namespace BrandonUtils.Tests.Standalone.Collections {
             var a = new Optional<int>();
             var b = new Optional<int>();
 
-            AssertAll.Of(
-                () => Assert.That(a,                          Is.EqualTo(b), "a equals b"),
-                () => Assert.That(a,                          Is.EqualTo(new Optional<int>())),
-                () => Assert.That(a.Equals(new string[] { }), Is.False, "a should not equal a different empty collection of the same item type"),
-                // ReSharper disable once SuspiciousTypeConversion.Global
-                () => Assert.That(a.Equals(new Optional<string>()), Is.False, $"a (with item type {a.ItemType()}) should not equal an {a.GetType().Name} with item type {typeof(string)}"),
-                () => Assert.That(a == b,                           "a == b")
-            );
+            Asserter.Against(a)
+                    .And(Is.EqualTo(b), "a IsEqualTo b")
+                    .And(Is.EqualTo(new Optional<int>()))
+                    .And(Is.EqualTo(default(Optional<int>)))
+                    .And(it => it == b,      Is.True, "a == b")
+                    .And(it => it.Equals(b), Is.True, "a.Equals(b)")
+                    .Invoke();
         }
 
         [Test]
@@ -177,8 +178,9 @@ namespace BrandonUtils.Tests.Standalone.Collections {
                 () => Assert.That((ofNull == nullOptional) == (nullOptional == ofNull), "(ofNull == nullOptional) == (nullOptional == ofNull)"),
                 () => Assert.That((ofNull != nullOptional) == (nullOptional != ofNull), "(ofNull != nullOptional) == (nullOptional != ofNull)"),
                 // vs. nullInterface
-                () => Assert.That(ofNull == nullInterface, Is.False, "ofNull == nullInterface"),
-                () => Assert.That(ofNull != nullInterface, "ofNull != nullInterface"),
+                // 📝 No longer supported as of 11/23/2021
+                // () => Assert.That(ofNull == nullInterface, Is.False, "ofNull == nullInterface"),
+                // () => Assert.That(ofNull != nullInterface, "ofNull != nullInterface"),
                 // operators with a left-hand IOptional aren't supported as it would cause lots of ambiguity with the other operators
                 // () => Assert.That((ofNull == nullInterface) == (nullInterface == ofNull), "(ofNull == nullInterface) == (nullInterface == ofNull)"),
                 // vs. ofNull2
@@ -190,15 +192,44 @@ namespace BrandonUtils.Tests.Standalone.Collections {
                 () => Assert.That(ofNull,                                                     Is.Not.EqualTo(defaultOptional), "ofNull, Is.Not.EqualTo(defaultOptional)"),
                 () => Assert.That((ofNull == defaultOptional) == (defaultOptional == ofNull), "(ofNull == defaultOptional) == (defaultOptional == ofNull)"),
                 // vs. defaultInterface
-                () => Assert.That(ofNull == defaultInterface, Is.False, "ofNull == defaultInterface"),
-                () => Assert.That(ofNull != defaultInterface, "ofNull != defaultInterface"),
-                () => Assert.That(ofNull,                     Is.Not.EqualTo(defaultInterface), "ofNull, Is.Not.EqualTo(defaultInterface)"),
+                // 📝 No longer supported as of 11/23/2021
+                // () => Assert.That(ofNull == defaultInterface, Is.False, "ofNull == defaultInterface"),
+                // () => Assert.That(ofNull != defaultInterface, "ofNull != defaultInterface"),
+                () => Assert.That(ofNull, Is.Not.EqualTo(defaultInterface), "ofNull, Is.Not.EqualTo(defaultInterface)"),
                 // vs. empty
                 () => Assert.That(ofNull == empty,                        Is.False, "ofNull == empty"),
                 () => Assert.That(ofNull != empty,                        "ofNull != empty"),
                 () => Assert.That(ofNull,                                 Is.Not.EqualTo(empty), "ofNull, Is.Not.EqualTo(empty)"),
                 () => Assert.That((ofNull == empty) == (empty == ofNull), "(ofNull == empty) == (empty == ofNull)")
             );
+        }
+
+        [Test]
+        public void Serialize_NestedOptionalOfArray() {
+            var inner = Optional.Of(new[] { 1, 2, 3 });
+            var outer = Optional.Of(inner);
+            // Console.WriteLine(inner == outer);
+            var json = JsonConvert.SerializeObject(outer);
+            Console.WriteLine(json);
+        }
+
+        [Test]
+        public void NestedOptionalEquality() {
+            var innerValue = Optional.Of(5);
+            var inner      = Optional.Of(innerValue);
+            var outer      = Optional.Of(inner);
+
+            Console.WriteLine($"\n⛑inner == outer -> {inner     == outer}");
+            Console.WriteLine($"\n⏱{inner} == {outer} -> {inner == outer}");
+
+            Asserter.WithHeading(nameof(NestedOptionalEquality))
+                    .And(() => Assert.That(inner      == innerValue, "inner == innerValue"))
+                    .And(() => Assert.That(innerValue == inner,      "innerValue == inner"))
+                    .And(() => Assert.That(inner      != outer,      "inner != outer"))
+                    .And(() => Assert.That(outer      != inner,      "outer != inner"))
+                    .And(() => Assert.That(outer      != innerValue, "outer != innerValue"))
+                    .And(() => Assert.That(innerValue != outer,      "innerValue != outer"))
+                    .Invoke();
         }
 
         #endregion
@@ -271,7 +302,15 @@ namespace BrandonUtils.Tests.Standalone.Collections {
         }
 
         [Test]
-        public void SerializeEmptyOptional() {
+        public void SerializeOptional2() {
+            var ls   = List.Of(List.Of(5, 4, 3));
+            var json = JsonConvert.SerializeObject(ls);
+            Console.WriteLine($"json: {json}");
+            Assert.That(json, Is.EqualTo("[[5,4,3]]"));
+        }
+
+        [Test]
+        public void Serialize_EmptyOptional() {
             var optional = Optional.Empty<string>();
             var json     = JsonConvert.SerializeObject(optional);
             Console.WriteLine($"json: {json}");
@@ -279,7 +318,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
         }
 
         [Test]
-        public void SerializeOptionalOfNull() {
+        public void Serialize_OptionalOfNull() {
             var optional = Optional.Of<string>(null);
             var json     = JsonConvert.SerializeObject(optional);
             Console.WriteLine($"json: {json}");
@@ -287,14 +326,112 @@ namespace BrandonUtils.Tests.Standalone.Collections {
         }
 
         [Test]
-        public void DeserializeOptional() {
+        public void Serialize_NestedOptional() {
+            var inner = Optional.Of(5);
+            var outer = Optional.Of(inner);
+            Console.WriteLine($"inner: {inner}");
+            Console.WriteLine($"outer: {outer}");
+            var json = JsonConvert.SerializeObject(outer);
+            Console.WriteLine($"json: {json}");
+            Assert.That(json, Is.EqualTo("[[5]]"));
+        }
+
+        [Test]
+        public void Serialize_NestedOptional_WithSettings() {
+            const int value       = 5;
+            var       valueString = value.ToString();
+            var       inner       = Optional.Of(value);
+            var       outer       = Optional.Of(inner);
+            var settings = new JsonSerializerSettings() {
+                Formatting = Formatting.Indented,
+            };
+
+            var innerAsserter = Asserter.Against(() => JsonConvert.SerializeObject(inner, settings))
+                                        .WithHeading($"Inner Json -> {inner}")
+                                        .And(it => it.LineCount(),              Is.EqualTo(3), "Line Count")
+                                        .And(it => it.SplitLines().TrimLines(), Is.EqualTo(new[] { "[", valueString, "]" }));
+
+            var outerAsserter = Asserter.Against(() => JsonConvert.SerializeObject(outer, settings))
+                                        .WithHeading($"Outer Json -> {outer}")
+                                        .And(it => it.LineCount(),              Is.EqualTo(5),                                         "Line Count")
+                                        .And(it => it.SplitLines().TrimLines(), Is.EqualTo(new[] { "[", "[", valueString, "]", "]" }), "Trimmed Lines");
+
+            Asserter.WithHeading("Nested Optional Jsons Respect Json Serialization Settings")
+                    .And(innerAsserter)
+                    .And(outerAsserter)
+                    .Invoke();
+        }
+
+        [SetUp]
+        public void SetDefaultJsonSettings() {
+            JsonConvert.DefaultSettings = GetMySettings;
+        }
+
+        private static JsonSerializerSettings GetMySettings() {
+            return new JsonSerializerSettings() {
+                TraceWriter = new ConsoleTraceWriter(typeof(OptionalTests)) {
+                    LevelFilter = TraceLevel.Verbose
+                }
+            };
+        }
+
+        [Test]
+        public void SerializeNestedEmptyOptional() {
+            IOptional<object> inner = Optional.Empty<object>();
+            var               outer = Optional.Of(inner);
+
+            Asserter.Against(() => JsonConvert.SerializeObject(outer))
+                    .And(Is.EqualTo("[[]]"))
+                    .Invoke();
+        }
+
+        [Test]
+        public void SerializeNestEmptyOptionalForReal() {
+            var inner = Optional.Empty<int>();
+            var outer = Optional.Of(inner);
+            Console.WriteLine($"inner: {inner}");
+            Console.WriteLine($"outer: {outer}");
+            var json = JsonConvert.SerializeObject(outer, new OptionalJsonConverter());
+            Console.WriteLine($"json: {json}");
+        }
+
+        #endregion
+
+        #region Deserialization
+
+        [Test]
+        public void Deserialize_Optional() {
             const int val      = 5;
             var       json     = $"[{val}]";
             var       fromJson = JsonConvert.DeserializeObject<Optional<int>>(json);
             Console.WriteLine($"fromJson: {fromJson}");
             Asserter.Against(fromJson)
-                    .And(it => it.Value, Is.EqualTo(val))
+                    .And(it => it.HasValue, Is.True)
+                    .And(it => it.Value,    Is.EqualTo(val))
                     .And(Is.EqualTo(new Optional<int>(val)))
+                    .Invoke();
+        }
+
+        [Test]
+        public void Deserialize_EmptyOptional() {
+            const string json     = "[]";
+            var          fromJson = JsonConvert.DeserializeObject<Optional<int>>(json);
+            Console.WriteLine($"fromJson: {fromJson}");
+            Asserter.Against(fromJson)
+                    .And(it => it.HasValue, Is.False)
+                    .And(it => it.Value,    Throws.InvalidOperationException)
+                    .Invoke();
+        }
+
+        [Test]
+        public void Deserialize_NestedOptional() {
+            const string json     = "[[5]]";
+            var          fromJson = JsonConvert.DeserializeObject<Optional<Optional<int>>>(json);
+            Console.WriteLine($"fromJson: {fromJson}");
+            Asserter.Against(fromJson)
+                    .And(it => Console.WriteLine($"inside assert: {it}"))
+                    .And(it => it.HasValue, Is.True)
+                    .And(it => it.Value,    Is.EqualTo(Optional.Of(5)))
                     .Invoke();
         }
 

@@ -5,7 +5,6 @@ using System.Linq;
 
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Enums;
-using BrandonUtils.Standalone.Reflection;
 using BrandonUtils.Standalone.Strings;
 
 using JetBrains.Annotations;
@@ -20,17 +19,6 @@ namespace BrandonUtils.Standalone.Optional {
     public static class Optional {
         internal const string NullPlaceholder  = "⛔";
         internal const string EmptyPlaceholder = "🈳";
-
-        public static bool IsOptionalType(this Type type) {
-            //TODO:this logic is definitely incorrect
-            var interfaces = type.GetInterfaces();
-            return interfaces.Any(
-                it => typeof(IOptional).IsAssignableFrom(it) ||
-                      (it.IsGenericTypeOrDefinition() && it.GetGenericTypeDefinition() == typeof(IOptional<>))
-            );
-            //TODO: a Type.HasInterface() extension
-            return type.GetInterfaces().Any(it => it.IsGenericTypeOrDefinition() && it.GetGenericTypeDefinition() == typeof(IOptional<>));
-        }
 
         /// <summary>
         /// Creates an <see cref="Optional{T}"/> without ugly type parameters.
@@ -204,7 +192,7 @@ namespace BrandonUtils.Standalone.Optional {
 
         /// <summary>
         /// Attempts to <see cref="Func{TResult}.Invoke"/> <see cref="functionThatMightFail"/>, returning a <see cref="FailableFunc{TValue}"/>
-        /// that contains either the successful result or the <see cref="IFailableFunc{TValue,TExcuse}.Excuse"/> for failure.
+        /// that contains either the successful result or the <see cref="IFailableFunc{TValue}.Excuse"/> for failure.
         /// </summary>
         /// <param name="functionThatMightFail"></param>
         /// <typeparam name="T"></typeparam>
@@ -212,7 +200,11 @@ namespace BrandonUtils.Standalone.Optional {
         /// <example>
         /// TODO: Add an example, but I'm tired right now and when I started writing one instead made <see cref="DayOfWeekExtensions.IsSchoolNight"/>
         /// </example>
-        public static FailableFunc<T> Try<T>(this Func<T> functionThatMightFail) {
+        public static FailableFunc<T> Try<T>([NotNull, InstantHandle] this Func<T> functionThatMightFail) {
+            if (functionThatMightFail == null) {
+                throw new ArgumentNullException(nameof(functionThatMightFail));
+            }
+
             return new FailableFunc<T>(functionThatMightFail);
         }
 
