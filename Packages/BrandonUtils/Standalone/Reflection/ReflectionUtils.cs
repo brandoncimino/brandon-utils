@@ -543,6 +543,10 @@ namespace BrandonUtils.Standalone.Reflection {
 
         #region Type Ancestry
 
+        public static bool IsExceptionType([NotNull] this Type self) {
+            return typeof(Exception).IsAssignableFrom(self);
+        }
+
         [NotNull]
         internal static Type CommonType([CanBeNull, ItemCanBeNull, InstantHandle] IEnumerable<Type> types) {
             if (types == null) {
@@ -785,6 +789,13 @@ namespace BrandonUtils.Standalone.Reflection {
 
             return possibleTypes.Any(it => it.IsInstanceOfType(obj));
         }
+
+        [Pure]
+        public static bool IsInstanceOf(
+            [NotNull] this object obj,
+            [NotNull, ItemNotNull]
+            params Type[] possibleTypes
+        ) => IsInstanceOf(obj, possibleTypes.AsEnumerable());
 
         #endregion
 
