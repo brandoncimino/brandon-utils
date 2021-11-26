@@ -63,10 +63,10 @@ namespace BrandonUtils.Testing {
             HandleConstraintResult(appliedConstraint, messageProvider);
         }
 
-        private static void HandleConstraintResult(ConstraintResult result, Func<string> messageProvider) {
+        private static void HandleConstraintResult([NotNull] ConstraintResult result, [CanBeNull] Func<string> messageProvider) {
             if (result.IsSuccess == false) {
                 var mParts = new[] {
-                    messageProvider.Try().OrDefault(),
+                    messageProvider?.Try().OrDefault(),
                     result.Description
                 };
 

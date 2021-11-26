@@ -1326,5 +1326,24 @@ namespace BrandonUtils.Standalone.Collections {
                 }
             );
         }
+
+        /// <summary>
+        /// Returns an <see cref="IEnumerable{T}"/> containing <paramref name="self"/>.
+        ///
+        /// 📝 NOTE: If <paramref name="self"/> is null, <see cref="Enumerable.Empty{TResult}"/> is returned instead.
+        /// </summary>
+        /// <remarks>
+        /// This is essentially an extension method version of <see cref="Enumerable.Repeat{TResult}"/>.
+        /// </remarks>
+        /// <param name="self">the original item</param>
+        /// <param name="repetitions">the number of times to <see cref="Enumerable.Repeat{TResult}"/> <paramref name="self"/></param>
+        /// <typeparam name="T">the type of <paramref name="self"/></typeparam>
+        /// <returns>an <see cref="IEnumerable{T}"/> containing <paramref name="self"/>, if <paramref name="self"/> is not null; otherwise, <see cref="Enumerable.Empty{TResult}"/></returns>
+        [Pure]
+        [NotNull]
+        [ItemNotNull]
+        public static IEnumerable<T> WrapInEnumerable<T>([CanBeNull] this T self, [NonNegativeValue] int repetitions = 1) {
+            return Enumerable.Repeat(self, (self != null).ToInt());
+        }
     }
 }

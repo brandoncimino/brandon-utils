@@ -1,17 +1,44 @@
 ﻿using System;
 
+using BrandonUtils.Standalone.Strings;
+
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
 
 namespace BrandonUtils.Testing {
     public class Assumer<T> : MultipleAsserter<Assumer<T>, T> {
-        protected override Action<string>                                                        ActionOnFailure          => Assert.Inconclusive;
-        protected override Action<ActualValueDelegate<object>, IResolveConstraint, Func<string>> TrueResolver             => Assume.That;
-        protected override Action<ActualValueDelegate<T>, IResolveConstraint, Func<string>>      TrueTypeResolver         => Assume.That;
-        protected override Action<TestDelegate, IResolveConstraint, Func<string>>                ActionConstraintResolver => Assume.That;
-
         public Assumer() { }
         public Assumer(T actual) : base(actual) { }
+
+        protected override void OnFailure(string results) => Assert.Inconclusive(results);
+
+        public override void ResolveFunc<T1>(
+            ActualValueDelegate<T1> actual,
+            IResolveConstraint      constraint,
+            Func<string>            message
+        ) {
+            var msg = message?.Invoke();
+            if (msg.IsBlank()) {
+                // 📝 NOTE: NUnit can't handle null message providers...
+                Assume.That(actual, constraint);
+            }
+            else {
+                Assume.That(actual, constraint, msg);
+            }
+        }
+
+        public override void ResolveAction(
+            TestDelegate       action,
+            IResolveConstraint constraint,
+            Func<string>       message
+        ) {
+            if (message == null) {
+                Assume.That(action, constraint);
+            }
+            else {
+                Assume.That(action, constraint, message);
+            }
+        }
     }
 
     public static class Assumer {

@@ -31,19 +31,16 @@ namespace BrandonUtils.Standalone.Optional {
 
             try {
                 failableAction.Invoke();
-                Console.WriteLine("Failable -> ✅");
                 _excuse          = default;
                 IgnoredException = default;
             }
             catch (Exception e) when (e.IsInstanceOf(IgnoredExceptionTypes)) {
                 // Handling an ignored exception
-                Console.WriteLine("Failable -> 🔇");
                 _excuse          = default;
                 IgnoredException = e;
             }
             catch (Exception e) {
                 // Handling a non-ignored exception
-                Console.WriteLine("Failable -> 🧨");
                 _excuse          = e;
                 IgnoredException = default;
             }

@@ -17,34 +17,70 @@ namespace BrandonUtils.Testing {
     public abstract class MultipleAsserter<TSelf, TActual> : IMultipleAsserter where TSelf : MultipleAsserter<TSelf, TActual>, new() {
         private const string HeadingIcon = "🧪";
 
+        private Optional<ActualValueDelegate<TActual>> _actual;
         /// <summary>
         /// The actual value being asserted against (if there is one)
         /// </summary>
-        private Optional<ActualValueDelegate<TActual>> Actual;
+        private Optional<ActualValueDelegate<TActual>> Actual {
+            get => _actual;
+            set {
+                if (_actual.HasValue) {
+                    throw new InvalidOperationException($"The {nameof(Actual)} value has already been set!");
+                }
 
-        [CanBeNull] public Func<string> HeadingSupplier { get; set; }
+                _actual = value.Select(AndAlsoCache);
+            }
+        }
+
+        /// <summary>
+        /// Contains the result of the latest time <see cref="Actual"/> was <see cref="ActualValueDelegate{TActual}.Invoke"/>d.
+        /// </summary>
+        private Optional<TActual> CachedActual;
+
+
+        /// <param name="originalActualValueDelegate">the original <see cref="ActualValueDelegate{TActual}"/></param>
+        /// <returns>a new <see cref="ActualValueDelegate{TActual}"/> that executes the <paramref name="originalActualValueDelegate"/> while <b>also</b> storing the result in <see cref="CachedActual"/></returns>
+        [NotNull]
+        private ActualValueDelegate<TActual> AndAlsoCache([NotNull] ActualValueDelegate<TActual> originalActualValueDelegate) {
+            return () => {
+                var v = originalActualValueDelegate.Invoke();
+                CachedActual = v;
+                return v;
+            };
+        }
+
+        public Func<string> Heading { get; set; }
 
         public int Indent { get; set; }
 
-        internal IList<(Action, Func<string>)>                                          Actions_AgainstAnything     { get; } = new List<(Action, Func<string>)>();
-        internal IList<(Action<TActual>, Func<string>)>                                 Actions_AgainstActual       { get; } = new List<(Action<TActual>, Func<string>)>();
-        internal IList<(IResolveConstraint, Func<string>)>                              Constraints_AgainstActual   { get; } = new List<(IResolveConstraint, Func<string>)>();
-        internal IList<(object, IResolveConstraint, Func<string>)>                      Constraints_AgainstAnything { get; } = new List<(object, IResolveConstraint, Func<string>)>();
-        internal IList<(ActualValueDelegate<object>, IResolveConstraint, Func<string>)> Constraints_AgainstDelegate { get; } = new List<(ActualValueDelegate<object>, IResolveConstraint, Func<string>)>();
+        internal IList<(Action action, Func<string> nickname)>                                                     Actions_AgainstAnything     { get; } = new List<(Action, Func<string>)>();
+        internal IList<(Action<TActual> action, Func<string> nickname)>                                            Actions_AgainstActual       { get; } = new List<(Action<TActual>, Func<string>)>();
+        internal IList<(IResolveConstraint constraint, Func<string> nickname)>                                     Constraints_AgainstActual   { get; } = new List<(IResolveConstraint, Func<string>)>();
+        internal IList<(object target, IResolveConstraint constraint, Func<string> nickname)>                      Constraints_AgainstAnything { get; } = new List<(object, IResolveConstraint, Func<string>)>();
+        internal IList<(ActualValueDelegate<object> target, IResolveConstraint constraint, Func<string> nickname)> Constraints_AgainstDelegate { get; } = new List<(ActualValueDelegate<object>, IResolveConstraint, Func<string>)>();
 
         internal IList<IMultipleAsserter> Asserters { get; } = new List<IMultipleAsserter>();
 
-        internal IList<(Func<TActual, object>, IResolveConstraint, Func<string>)> Constraints_AgainstTransformation { get; } = new List<(Func<TActual, object>, IResolveConstraint, Func<string>)>();
+        internal IList<(Func<TActual, object> transformation, IResolveConstraint constraint, Func<string> nickname)> Constraints_AgainstTransformation { get; } = new List<(Func<TActual, object>, IResolveConstraint, Func<string>)>();
 
-        protected abstract Action<string>                                                         ActionOnFailure          { get; }
-        protected virtual  Action<string>                                                         ActionOnSuccess          { get; } = Console.WriteLine;
-        protected abstract Action<ActualValueDelegate<object>, IResolveConstraint, Func<string>>  TrueResolver             { get; }
-        protected abstract Action<ActualValueDelegate<TActual>, IResolveConstraint, Func<string>> TrueTypeResolver         { get; }
-        protected abstract Action<TestDelegate, IResolveConstraint, Func<string>>                 ActionConstraintResolver { get; }
-        // protected abstract Action<TActual, IResolveConstraint>                                    ConstraintResolver         { get; }
-        // protected abstract Action<ActualValueDelegate<TActual>, IResolveConstraint>               ActualConstraintResolver   { get; }
-        // protected abstract Action<ActualValueDelegate<object>, IResolveConstraint>                AnythingConstraintResolver { get; }
-        // protected abstract Action<object, IResolveConstraint>                                     ObjectConstraintResolver   { get; }
+        protected abstract void OnFailure(string results);
+
+
+        protected virtual void OnSuccess(string results) {
+            Console.WriteLine(results);
+        }
+
+        public abstract void ResolveFunc<T>(
+            [NotNull]   ActualValueDelegate<T> actual,
+            [NotNull]   IResolveConstraint     constraint,
+            [CanBeNull] Func<string>           message
+        );
+
+        public abstract void ResolveAction(
+            [NotNull]   TestDelegate       action,
+            [NotNull]   IResolveConstraint constraint,
+            [CanBeNull] Func<string>       message
+        );
 
         private Optional<Exception> ShortCircuitException;
 
@@ -57,6 +93,18 @@ namespace BrandonUtils.Testing {
         }
 
         private TSelf Self => this as TSelf;
+
+        //TODO: Make an extension method of this called "AsFunc" or something
+        [CanBeNull]
+        [ContractAnnotation("null => null")]
+        [ContractAnnotation("notnull => notnull")]
+        private Func<T> AsFunc<T>([CanBeNull] T obj) {
+            return obj switch {
+                null       => null,
+                string str => str.IsBlank() ? default(Func<T>) : () => obj,
+                _          => () => obj
+            };
+        }
 
         #region Builder
 
@@ -76,18 +124,20 @@ namespace BrandonUtils.Testing {
 
         #region Actions_AgainstAnything
 
-        [MustUseReturnValue]
-        public TSelf And([CanBeNull] Action action, [CanBeNull] Func<string> message = default) {
-            Actions_AgainstAnything.AddNonNull((action, message));
+        private TSelf _Add_Action_AgainstAnything([NotNull] Action action, [CanBeNull] Func<string> nickname) {
+            Actions_AgainstAnything.Add((action, nickname));
             return Self;
         }
 
         [MustUseReturnValue]
-        public TSelf And([CanBeNull] Action action, string message) => And(action, () => message);
+        public TSelf And([NotNull] Action action, [CanBeNull] Func<string> nickname = default) => _Add_Action_AgainstAnything(action, nickname);
 
         [MustUseReturnValue]
-        public TSelf And([CanBeNull, ItemCanBeNull] IEnumerable<Action> actions) {
-            actions?.ForEach(it => _ = And((it, default)));
+        public TSelf And([NotNull] Action action, string nickname) => _Add_Action_AgainstAnything(action, AsFunc(nickname));
+
+        [MustUseReturnValue]
+        public TSelf And([NotNull, ItemNotNull] IEnumerable<Action> actions) {
+            actions?.ForEach(it => _ = _Add_Action_AgainstAnything(it, default));
             return Self;
         }
 
@@ -95,39 +145,40 @@ namespace BrandonUtils.Testing {
 
         #region Actions_AgainstActual
 
-        private void Add_Action_AgainstActual([CanBeNull] Action<TActual> action, Func<string> message) {
-            Actions_AgainstActual.Add((action, message));
-        }
-
-        private void Add_Action_AgainstActual([CanBeNull] Action<TActual> action) => Add_Action_AgainstActual(action, default);
-
-        [MustUseReturnValue]
-        public TSelf And([CanBeNull] Action<TActual> action, Func<string> message = default) {
-            Add_Action_AgainstActual(action, message);
+        private TSelf _Add_Action_AgainstActual([NotNull] Action<TActual> action, [CanBeNull] Func<string> nickname) {
+            Actions_AgainstActual.Add((action, nickname));
             return Self;
         }
 
         [MustUseReturnValue]
-        public TSelf And([CanBeNull] Action<TActual> action, string message) => And(action, () => message);
+        public TSelf And(
+            [NotNull]   Action<TActual> action,
+            [CanBeNull] Func<string>    nickname = default
+        ) =>
+            _Add_Action_AgainstActual(
+                action,
+                nickname
+            );
 
         [MustUseReturnValue]
-        public TSelf And([CanBeNull] [ItemCanBeNull] IEnumerable<Action<TActual>> actions) {
-            actions?.ForEach(Add_Action_AgainstActual);
-            return Self;
-        }
+        public TSelf And(
+            [NotNull]   Action<TActual> action,
+            [CanBeNull] string          nickname
+        ) =>
+            _Add_Action_AgainstActual(action, AsFunc(nickname));
 
         #endregion
 
         #region Constraints_AgainstActual
 
         [MustUseReturnValue]
-        public TSelf And([CanBeNull] IResolveConstraint constraint, Func<string> message = default) {
-            Constraints_AgainstActual.AddNonNull((constraint, message));
+        public TSelf And([CanBeNull] IResolveConstraint constraint, [CanBeNull] Func<string> nickname = default) {
+            Constraints_AgainstActual.AddNonNull((constraint, message: nickname));
             return Self;
         }
 
         [MustUseReturnValue]
-        public TSelf And([CanBeNull] IResolveConstraint constraint, string message) => And(constraint, () => message);
+        public TSelf And([CanBeNull] IResolveConstraint constraint, string nickname) => And(constraint, () => nickname);
 
         [MustUseReturnValue]
         public TSelf And([CanBeNull, ItemCanBeNull] IEnumerable<IResolveConstraint> constraints) {
@@ -139,56 +190,66 @@ namespace BrandonUtils.Testing {
 
         #region Constraints_AgainstAnything
 
-        [MustUseReturnValue]
-        public TSelf And((object, IResolveConstraint, Func<string>) constraint) {
-            Constraints_AgainstAnything.Add(constraint);
+        private TSelf _Add_Constraint_AgainstAnything([CanBeNull] object target, [NotNull] IResolveConstraint constraint, [CanBeNull] Func<string> nickname) {
+            Constraints_AgainstAnything.Add((target, constraint, nickname));
             return Self;
         }
 
         [MustUseReturnValue]
-        public TSelf And((object, IResolveConstraint) constraint) => And((constraint.Item1, constraint.Item2, default));
+        public TSelf And(
+            [CanBeNull] object             target,
+            [NotNull]   IResolveConstraint constraint,
+            [CanBeNull] Func<string>       nickname = default
+        ) =>
+            _Add_Constraint_AgainstAnything(target, constraint, nickname);
 
         [MustUseReturnValue]
-        public TSelf And([CanBeNull] IEnumerable<(object, IResolveConstraint)> constraints) {
-            constraints?.ForEach(it => _ = And((it.Item1, it.Item2, default)));
+        public TSelf And([CanBeNull] IEnumerable<(object target, IResolveConstraint constraint)> constraints) {
+            constraints?.ForEach(it => _ = _Add_Constraint_AgainstAnything(it.target, it.constraint, default));
             return Self;
         }
 
         [MustUseReturnValue]
-        public TSelf And([CanBeNull] object actual, [CanBeNull] IResolveConstraint constraint, Func<string> message = default) => And((actual, constraint, message));
-
-        [MustUseReturnValue]
-        public TSelf And([CanBeNull] object actual, [CanBeNull] IResolveConstraint constraint, string message) => And(actual, constraint, () => message);
+        public TSelf And(
+            [CanBeNull] object             target,
+            [NotNull]   IResolveConstraint constraint,
+            [CanBeNull] string             nickname
+        ) =>
+            _Add_Constraint_AgainstAnything(target, constraint, AsFunc(nickname));
 
         #endregion
 
         #region Constraints_AgainstDelegate
 
-        [MustUseReturnValue]
-        public TSelf And(ActualValueDelegate<object> testDelegate, IResolveConstraint constraint, Func<string> message = default) {
-            Constraints_AgainstDelegate.AddNonNull((testDelegate, constraint, message));
+        private TSelf _Add_Constraint_AgainstDelegate([NotNull] ActualValueDelegate<object> testDelegate, [NotNull] IResolveConstraint constraint, [CanBeNull] Func<string> nickname) {
+            Constraints_AgainstDelegate.AddNonNull((testDelegate, constraint, nickname));
             return Self;
         }
 
         [MustUseReturnValue]
-        public TSelf And(ActualValueDelegate<object> testDelegate, IResolveConstraint constraint, string message) => And(testDelegate, constraint, () => message);
+        public TSelf And([NotNull] ActualValueDelegate<object> testDelegate, [NotNull] IResolveConstraint constraint, [CanBeNull] Func<string> nickname = default) => _Add_Constraint_AgainstDelegate(testDelegate, constraint, nickname);
+
+        [MustUseReturnValue]
+        public TSelf And([NotNull] ActualValueDelegate<object> testDelegate, [NotNull] IResolveConstraint constraint, [CanBeNull] string nickname) => _Add_Constraint_AgainstDelegate(testDelegate, constraint, AsFunc(nickname));
 
         #endregion
 
         #region Constraints_AgainstTransformation
 
-        [MustUseReturnValue]
-        public TSelf And(Func<TActual, object> actualTransformation, IResolveConstraint constraint, Func<string> message = default) {
-            Constraints_AgainstTransformation.Add((actualTransformation, constraint, message));
+        private TSelf _Add_Constraint_AgainstTransformation([NotNull] Func<TActual, object> actualTransformation, [NotNull] IResolveConstraint constraint, [CanBeNull] Func<string> nickname) {
+            Constraints_AgainstTransformation.Add((actualTransformation, constraint, nickname));
             return Self;
         }
 
         [MustUseReturnValue]
-        public TSelf And(Func<TActual, object> actualTransformation, IResolveConstraint constraint, string message) => And(actualTransformation, constraint, () => message);
+        public TSelf And([NotNull] Func<TActual, object> tf, [NotNull] IResolveConstraint constraint, [CanBeNull] Func<string> nickname = default) => _Add_Constraint_AgainstTransformation(tf, constraint, nickname);
+
+        [MustUseReturnValue]
+        public TSelf And([NotNull] Func<TActual, object> tf, [NotNull] IResolveConstraint constraint, [CanBeNull] string nickname) => _Add_Constraint_AgainstTransformation(tf, constraint, AsFunc(nickname));
 
         [MustUseReturnValue]
         public TSelf And([CanBeNull] IEnumerable<(Func<TActual, object>, IResolveConstraint)> constraints) {
-            constraints?.ForEach(it => _ = And(it.Item1, it.Item2));
+            constraints?.ForEach(it => _ = _Add_Constraint_AgainstTransformation(it.Item1, it.Item2, default));
             return Self;
         }
 
@@ -196,17 +257,13 @@ namespace BrandonUtils.Testing {
 
         #region Asserters
 
-        [MustUseReturnValue]
-        public TSelf And([CanBeNull] IMultipleAsserter asserter) {
-            Asserters.AddNonNull(asserter);
+        private TSelf _Add_Asserter([NotNull] IMultipleAsserter asserter) {
+            Asserters.Add(asserter);
             return Self;
         }
 
         [MustUseReturnValue]
-        public TSelf And([CanBeNull] [ItemCanBeNull] IEnumerable<IMultipleAsserter> asserters) {
-            Asserters.AddNonNull(asserters);
-            return Self;
-        }
+        public TSelf And([NotNull] IMultipleAsserter asserter) => _Add_Asserter(asserter);
 
         #endregion
 
@@ -216,13 +273,13 @@ namespace BrandonUtils.Testing {
 
         [MustUseReturnValue]
         public TSelf WithHeading([NotNull] Func<string> headingSupplier) {
-            HeadingSupplier = headingSupplier;
+            Heading = headingSupplier;
             return Self;
         }
 
         [MustUseReturnValue]
         public TSelf WithHeading([CanBeNull] string heading) {
-            HeadingSupplier = () => heading;
+            Heading = heading.IsNotBlank() ? () => heading : (Func<string>)default;
             return Self;
         }
 
@@ -247,7 +304,7 @@ namespace BrandonUtils.Testing {
             new TestDelegate(ass.action),
             Throws.Nothing,
             default,
-            ActionConstraintResolver
+            ResolveAction
         );
 
         private IAssertable Test_Action_AgainstActual((Action<TActual> action, Func<string> nickname) ass) {
@@ -257,7 +314,7 @@ namespace BrandonUtils.Testing {
                 () => ass.action.Invoke(actual.Invoke()),
                 Throws.Nothing,
                 default,
-                ActionConstraintResolver
+                ResolveAction
             );
         }
 
@@ -268,33 +325,38 @@ namespace BrandonUtils.Testing {
                 actualValueDelegate,
                 againstActual.constraint,
                 againstActual.message,
-                TrueTypeResolver
+                ResolveFunc
             );
         }
 
         private IAssertable Test_Constraint_AgainstAnything((object, IResolveConstraint, Func<string>) constraint_againstAnything) {
             var (target, resolveConstraint, message) = constraint_againstAnything;
-            return new Assertable(default, () => target, resolveConstraint, message, TrueResolver);
+            return new Assertable(default, () => target, resolveConstraint, message, ResolveFunc);
         }
 
-        private IAssertable Test_Constraint_AgainstDelegate((ActualValueDelegate<object> tDelegate, IResolveConstraint constraint, Func<string>) constraint_againstDelegate) {
-            var (tDelegate, constraint, message) = constraint_againstDelegate;
-            return new Assertable(default, tDelegate, constraint, message, TrueResolver);
+        private IAssertable Test_Constraint_AgainstDelegate((ActualValueDelegate<object> tDelegate, IResolveConstraint constraint, Func<string> nickname) constraint_againstDelegate) {
+            var (tDelegate, constraint, nickname) = constraint_againstDelegate;
+            return new Assertable(nickname, tDelegate, constraint, default, ResolveFunc);
         }
 
-        private IAssertable Test_Constraint_AgainstTransformation((Func<TActual, object> transformation, IResolveConstraint constraint, Func<string>) constraint_againstTransformation) {
-            var (transformation, constraint, message) = constraint_againstTransformation;
+        private IAssertable Test_Constraint_AgainstTransformation((Func<TActual, object> transformation, IResolveConstraint constraint, Func<string> nickname) constraint_againstTransformation) {
             return new Assertable(
+                constraint_againstTransformation.nickname,
+                () => constraint_againstTransformation.transformation.Invoke(Actual.OrElseThrow(ActualIsEmptyException(constraint_againstTransformation.constraint)).Invoke()),
+                constraint_againstTransformation.constraint,
                 default,
-                () => transformation.Invoke(Actual.OrElseThrow(ActualIsEmptyException(constraint)).Invoke()),
-                constraint,
-                message,
-                TrueResolver
+                ResolveFunc
             );
         }
 
         private IAssertable Test_Asserter(IMultipleAsserter asserter) {
-            return Test_Action_AgainstAnything((asserter.Invoke, default));
+            return new Assertable(
+                asserter.Heading,
+                asserter.Invoke,
+                Throws.Nothing,
+                default,
+                ResolveAction
+            );
         }
 
         #endregion
@@ -341,15 +403,15 @@ namespace BrandonUtils.Testing {
 
             var prettySettings = new PrettificationSettings() {
                 PreferredLineStyle = { Value = LineStyle.Single },
-                LineLengthLimit    = { Value = 20 },
-                TypeLabelStyle     = { Value = TypeNameStyle.Full }
+                LineLengthLimit    = { Value = 30 },
+                TypeLabelStyle     = { Value = TypeNameStyle.Short }
             };
 
             var countString = failures.IsNotEmpty() ? $"[{failures.Count}/{testResults.Count()}]" : $"All {testResults.Count()}";
-            Console.WriteLine($"ACTUAL:{Actual.Prettify()}");
-            var againstString = Actual.Select(it => it.Prettify(prettySettings))
+
+            var againstString = Actual.Select(it => CachedActual.Prettify(prettySettings))
                                       .Select(it => it.Truncate(prettySettings.LineLengthLimit))
-                                      .Select(it => $" against {it}")
+                                      .Select(it => $" against [{it}]")
                                       .OrElse("");
 
             var summary = failures.IsNotEmpty()
@@ -373,12 +435,12 @@ namespace BrandonUtils.Testing {
         }
 
         /// <summary>
-        /// Returns either the result of <see cref="HeadingSupplier"/> or an empty <see cref="IEnumerable{T}"/> of strings.
+        /// Returns either the result of <see cref="Heading"/> or an empty <see cref="IEnumerable{T}"/> of strings.
         /// </summary>
         /// <returns></returns>
         [NotNull]
         private IEnumerable<string> FormatHeading() {
-            return HeadingSupplier != null ? new[] { HeadingSupplier.Invoke() } : new string[] { };
+            return (Heading?.Invoke()).WrapInEnumerable();
         }
 
         private Optional<string> FormatShortCircuitException() {
@@ -388,13 +450,13 @@ namespace BrandonUtils.Testing {
         #endregion
 
         public void Invoke() {
-            var assertables = TestEverything().ToList();
-            var valediction = assertables.Any(it => it.Failed) ? ActionOnFailure : ActionOnSuccess;
-            if (valediction == null) {
-                throw new ArgumentNullException(nameof(valediction));
+            var results = TestEverything().ToList();
+            if (results.Any(it => it.Failed)) {
+                OnFailure(FormatMultipleAssertionMessage(results));
             }
-
-            valediction.Invoke(FormatMultipleAssertionMessage(assertables));
+            else {
+                OnSuccess(FormatMultipleAssertionMessage(results));
+            }
         }
     }
 }
