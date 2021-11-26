@@ -15,8 +15,8 @@ namespace BrandonUtils.Standalone.Strings {
             return new KeyedList<Type, IPrettifier>(it => it.PrettifierType) {
                 new Prettifier<string>(Convert.ToString),
                 new Prettifier<Type>(InnerPretty.PrettifyType),
-                new Prettifier<IDictionary<object, object>>(InnerPretty.PrettifyDictionary2),
-                new Prettifier<IDictionary>(InnerPretty.PrettifyDictionary2),
+                new Prettifier<IDictionary<object, object>>(InnerPretty.PrettifyDictionary),
+                new Prettifier<IDictionary>(InnerPretty.PrettifyDictionary),
                 new Prettifier<KeyedList<object, object>>(InnerPretty.PrettifyKeyedList),
                 new Prettifier<(object, object)>(InnerPretty.Tuple2),
                 new Prettifier<(object, object, object)>(InnerPretty.Tuple3),
@@ -30,6 +30,7 @@ namespace BrandonUtils.Standalone.Strings {
                 new Prettifier<MethodInfo>(InnerPretty.PrettifyMethodInfo),
                 new Prettifier<ParameterInfo>(InnerPretty.PrettifyParameterInfo),
                 new Prettifier<MemberInfo>(InnerPretty.PrettifyMemberInfo),
+                new Prettifier<Delegate>(InnerPretty.PrettifyDelegate),
             };
         }
 
