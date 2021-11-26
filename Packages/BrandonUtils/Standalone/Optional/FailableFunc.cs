@@ -9,19 +9,16 @@ using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone.Optional {
     /**
-     * <summary>A simplified <see cref="IFailableFunc{TValue,TExcuse}"/> that uses the base <see cref="Exception"/> type for its <see cref="Excuse"/>.</summary>
-     * <inheritdoc cref="IFailableFunc{TValue,TExcuse}"/>
+     * <inheritdoc cref="IFailableFunc{TValue}"/>
      */
     [PublicAPI]
-    public readonly struct FailableFunc<TValue> : IFailableFunc<TValue, Exception>, IEquatable<IOptional<TValue>>, IEquatable<TValue> {
+    public readonly struct FailableFunc<TValue> : IFailableFunc<TValue>, IEquatable<IOptional<TValue>>, IEquatable<TValue> {
         public bool HasValue { get; }
 
         [ItemCanBeNull]
         private readonly Optional<TValue> _value;
-
         internal Optional<TValue> SafeValue => HasValue ? _value : default;
-
-        public TValue Value => HasValue ? _value.Value : throw FailableException.FailedException(this, _excuse);
+        public   TValue           Value     => HasValue ? _value.Value : throw FailableException.FailedException(this, _excuse);
 
         [ItemCanBeNull]
         private readonly Optional<Exception> _excuse;

@@ -1,4 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using BrandonUtils.Standalone.Collections;
+using BrandonUtils.Standalone.Reflection;
 
 using JetBrains.Annotations;
 
@@ -7,22 +12,40 @@ namespace BrandonUtils.Standalone.Optional {
      * <inheritdoc cref="IFailable"/>
      */
     public readonly struct Failable : IFailable {
-        private const string SuccessIcon = "✅";
-        private const string FailIcon    = "❌";
+        private const    string              SuccessIcon = "✅";
+        private const    string              FailIcon    = "❌";
+        private readonly Exception           _excuse;
+        public           Exception           Excuse                => _excuse ?? throw FailableException.DidNotFailException(this);
+        public           bool                Failed                => _excuse != null;
+        public           Type[]              IgnoredExceptionTypes { get; }
+        public           Optional<Exception> IgnoredException      { get; }
 
-        private readonly Exception _excuse;
+        public Failable([NotNull, InstantHandle] Action failableAction, [NotNull, ItemNotNull] params Type[] ignoredExceptionTypes) : this(failableAction, ignoredExceptionTypes.AsEnumerable()) { }
 
-        public Exception Excuse => _excuse ?? throw FailableException.DidNotFailException(this);
+        public Failable([NotNull, InstantHandle] Action failableAction, [NotNull, ItemNotNull] IEnumerable<Type> ignoredExceptionTypes) {
+            IgnoredExceptionTypes = ignoredExceptionTypes.Must(ReflectionUtils.IsExceptionType).ToArray();
 
-        public bool Failed => _excuse != null;
+            if (failableAction == null) {
+                throw new ArgumentNullException(nameof(failableAction), $"Unable to attempt a {nameof(Failable)} because the {nameof(failableAction)} was null!");
+            }
 
-        public Failable(Action failableAction) {
             try {
                 failableAction.Invoke();
-                _excuse = default;
+                Console.WriteLine("Failable -> ✅");
+                _excuse          = default;
+                IgnoredException = default;
+            }
+            catch (Exception e) when (e.IsInstanceOf(IgnoredExceptionTypes)) {
+                // Handling an ignored exception
+                Console.WriteLine("Failable -> 🔇");
+                _excuse          = default;
+                IgnoredException = e;
             }
             catch (Exception e) {
-                _excuse = e;
+                // Handling a non-ignored exception
+                Console.WriteLine("Failable -> 🧨");
+                _excuse          = e;
+                IgnoredException = default;
             }
         }
 
