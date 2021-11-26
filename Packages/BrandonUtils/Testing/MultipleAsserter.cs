@@ -242,51 +242,49 @@ namespace BrandonUtils.Testing {
 
         #region Executing Test Assertions
 
-        /// <summary>
-        /// </summary>
-        /// <remarks>
-        /// This method returns <see cref="IAssertable"/> instead of <see cref="Assertable"/> to make it play nice with the typed <see cref="Assertable{TActual}"/>,
-        /// which would be returned by <see cref="Test_Constraint_AgainstActual"/>.
-        /// </remarks>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        private static IAssertable Test_Action_AgainstAnything((Action, Func<string>) action) => new Assertable(action.Item1, action.Item2);
+        private IAssertable Test_Action_AgainstAnything((Action action, Func<string> nickname) ass) => new Assertable(
+            ass.nickname,
+            new TestDelegate(ass.action),
+            Throws.Nothing,
+            default,
+            ActionConstraintResolver
+        );
 
-        private IAssertable Test_Action_AgainstActual((Action<TActual>, Func<string>) action) {
-            var actual = Actual.OrElseThrow(ActualIsEmptyException($"Could not execute the {action.GetType().Prettify()} {action.Item1.Method.Name}"));
-            return new Assertable<TActual>(
-                default,
-                () => action.Item1.Invoke(actual.Invoke()),
+        private IAssertable Test_Action_AgainstActual((Action<TActual> action, Func<string> nickname) ass) {
+            var actual = Actual.OrElseThrow(ActualIsEmptyException($"Could not execute the {ass.GetType().Prettify()} {ass.action.Method.Name}"));
+            return new Assertable(
+                ass.nickname,
+                () => ass.action.Invoke(actual.Invoke()),
                 Throws.Nothing,
                 default,
                 ActionConstraintResolver
             );
         }
 
-        private IAssertable Test_Constraint_AgainstActual((IResolveConstraint, Func<string>) constraint) {
-            var actualValueDelegate = Actual.OrElseThrow(ActualIsEmptyException(constraint.Item1));
-            return new Assertable<TActual>(
+        private IAssertable Test_Constraint_AgainstActual((IResolveConstraint constraint, Func<string> message) againstActual) {
+            var actualValueDelegate = Actual.OrElseThrow(ActualIsEmptyException(againstActual.Item1));
+            return Assertable.Assert(
                 default,
                 actualValueDelegate,
-                constraint.Item1,
-                default,
+                againstActual.constraint,
+                againstActual.message,
                 TrueTypeResolver
             );
         }
 
         private IAssertable Test_Constraint_AgainstAnything((object, IResolveConstraint, Func<string>) constraint_againstAnything) {
-            var (actual, resolveConstraint, message) = constraint_againstAnything;
-            return new Assertable<object>(default, () => actual, resolveConstraint, message, TrueResolver);
+            var (target, resolveConstraint, message) = constraint_againstAnything;
+            return new Assertable(default, () => target, resolveConstraint, message, TrueResolver);
         }
 
         private IAssertable Test_Constraint_AgainstDelegate((ActualValueDelegate<object> tDelegate, IResolveConstraint constraint, Func<string>) constraint_againstDelegate) {
             var (tDelegate, constraint, message) = constraint_againstDelegate;
-            return new Assertable<object>(default, tDelegate, constraint, message, TrueResolver);
+            return new Assertable(default, tDelegate, constraint, message, TrueResolver);
         }
 
         private IAssertable Test_Constraint_AgainstTransformation((Func<TActual, object> transformation, IResolveConstraint constraint, Func<string>) constraint_againstTransformation) {
             var (transformation, constraint, message) = constraint_againstTransformation;
-            return new Assertable<object>(
+            return new Assertable(
                 default,
                 () => transformation.Invoke(Actual.OrElseThrow(ActualIsEmptyException(constraint)).Invoke()),
                 constraint,
@@ -392,6 +390,10 @@ namespace BrandonUtils.Testing {
         public void Invoke() {
             var assertables = TestEverything().ToList();
             var valediction = assertables.Any(it => it.Failed) ? ActionOnFailure : ActionOnSuccess;
+            if (valediction == null) {
+                throw new ArgumentNullException(nameof(valediction));
+            }
+
             valediction.Invoke(FormatMultipleAssertionMessage(assertables));
         }
     }

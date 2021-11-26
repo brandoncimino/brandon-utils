@@ -11,14 +11,14 @@ namespace BrandonUtils.Standalone.Optional {
     /**
      * <inheritdoc cref="IFailable"/>
      */
-    public readonly struct Failable : IFailable {
-        private const    string              SuccessIcon = "✅";
-        private const    string              FailIcon    = "❌";
-        private readonly Exception           _excuse;
-        public           Exception           Excuse                => _excuse ?? throw FailableException.DidNotFailException(this);
-        public           bool                Failed                => _excuse != null;
-        public           Type[]              IgnoredExceptionTypes { get; }
-        public           Optional<Exception> IgnoredException      { get; }
+    public class Failable : IFailable {
+        private const    string                    SuccessIcon = "✅";
+        private const    string                    FailIcon    = "❌";
+        private readonly Exception                 _excuse;
+        public           Exception                 Excuse                => _excuse ?? throw FailableException.DidNotFailException(this);
+        public           bool                      Failed                => _excuse != null;
+        public           IReadOnlyCollection<Type> IgnoredExceptionTypes { get; }
+        public           Optional<Exception>       IgnoredException      { get; }
 
         public Failable([NotNull, InstantHandle] Action failableAction, [NotNull, ItemNotNull] params Type[] ignoredExceptionTypes) : this(failableAction, ignoredExceptionTypes.AsEnumerable()) { }
 

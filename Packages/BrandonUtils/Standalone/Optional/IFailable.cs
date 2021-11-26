@@ -4,13 +4,12 @@ using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone.Optional {
     /// <summary>
-    /// A simplified <see cref="IFailable{TExcuse}"/> that uses the base <see cref="Exception"/> type.
+    /// Represents something that <b><i>might</i></b> have failed.
     /// </summary>
-    /// <inheritdoc cref="IFailable{TExcuse}"/>
     [PublicAPI]
     public interface IFailable {
         /// <summary>
-        /// The <see cref="TExcuse"/> <see cref="Exception"/> that caused this <see cref="IFailable{TExcuse}"/> to fail (if it did).
+        /// The <see cref="Exception"/> that caused this <see cref="IFailable"/> to fail (if it did).
         /// </summary>
         /// <remarks>
         /// <ul>
@@ -22,7 +21,7 @@ namespace BrandonUtils.Standalone.Optional {
         public Exception Excuse { get; }
 
         /// <summary>
-        /// Whether or not this <see cref="IFailable{TExcuse}"/> was a failure.
+        /// Whether or not this <see cref="IFailable"/> was a failure.
         /// </summary>
         /// <remarks>
         /// <ul>
@@ -31,11 +30,5 @@ namespace BrandonUtils.Standalone.Optional {
         /// </ul>
         /// </remarks>
         public bool Failed { get; }
-
-        // [NotNull, ItemNotNull]
-        // public Type[] IgnoredExceptionTypes { get; }
-        //
-        // [ItemNotNull]
-        // public Optional<Exception> IgnoredException { get; }
     }
 }

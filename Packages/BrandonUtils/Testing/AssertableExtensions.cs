@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using BrandonUtils.Standalone.Exceptions;
 using BrandonUtils.Standalone.Strings;
 
 using FowlFever.Conjugal.Affixing;
@@ -54,25 +53,7 @@ namespace BrandonUtils.Testing {
 
         private static Affixation GetHeader(IAssertable assertable, string passIcon = PassIcon, string failIcon = FailIcon) {
             var icon = assertable.Failed ? failIcon : passIcon;
-            return Affixation.Prefixation(assertable.Nickname, icon, " ");
+            return Affixation.Prefixation(assertable.Nickname.Invoke(), icon, " ");
         }
-
-        private static IEnumerable<string> FormatHeader(IAssertable failure, string passIcon = PassIcon, string failIcon = FailIcon) {
-            var icon   = failure.Failed ? failIcon : passIcon;
-            var result = failure.Failed ? "failed!" : "passed!";
-            var name   = failure.Nickname;
-            return new[] {
-                $"{icon} {name} {result}"
-            };
-        }
-
-        private static IEnumerable<string> FilterStackTrace(Exception exception) => exception.FilteredStackTrace(
-                                                                                                 new StringFilter()
-                                                                                                     .Matching(@"^\s*(in|at) NUnit")
-                                                                                                     .Matching($@"^\s*(in|at) {typeof(AssertAll)}")
-                                                                                                     .Matching(@"^\s*(in|at) System\.Reflection")
-                                                                                                     .Matching(@"^\s*(in|at) System\.RuntimeMethodHandle")
-                                                                                             )
-                                                                                             .TruncateLines(10);
     }
 }

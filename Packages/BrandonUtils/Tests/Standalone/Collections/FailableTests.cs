@@ -51,8 +51,9 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
             public static void Equality<T>(FailableFunc<T> failableFunc, Optional<T> optional, bool expectedEquality) {
                 AssertAll.Of(
-                    () => Assert.That(failableFunc == optional,                      Is.EqualTo(expectedEquality), "failable == optional"),
-                    () => Assert.That(optional     == failableFunc,                  Is.EqualTo(expectedEquality), "optional == failable"),
+                    () => Assert.That(failableFunc == optional, Is.EqualTo(expectedEquality), "failable == optional"),
+                    // no longer supported through ==
+                    // () => Assert.That(optional     == failableFunc,                  Is.EqualTo(expectedEquality), "optional == failable"),
                     () => Assert.That(failableFunc.Equals(optional),                 Is.EqualTo(expectedEquality), "failable.Equals(optional)"),
                     () => Assert.That(optional.Equals(failableFunc),                 Is.EqualTo(expectedEquality), "optional.Equals(failable)"),
                     () => Assert.That(Optional.AreEqual(optional,     failableFunc), Is.EqualTo(expectedEquality), "Optional.AreEqual(optional, failable)"),
