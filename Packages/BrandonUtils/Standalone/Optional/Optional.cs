@@ -21,6 +21,17 @@ namespace BrandonUtils.Standalone.Optional {
         internal const string NullPlaceholder  = "⛔";
         internal const string EmptyPlaceholder = "🈳";
 
+        public static bool IsOptionalType(this Type type) {
+            //TODO:this logic is definitely incorrect
+            var interfaces = type.GetInterfaces();
+            return interfaces.Any(
+                it => typeof(IOptional).IsAssignableFrom(it) ||
+                      (it.IsGenericTypeOrDefinition() && it.GetGenericTypeDefinition() == typeof(IOptional<>))
+            );
+            //TODO: a Type.HasInterface() extension
+            return type.GetInterfaces().Any(it => it.IsGenericTypeOrDefinition() && it.GetGenericTypeDefinition() == typeof(IOptional<>));
+        }
+
         /// <summary>
         /// Creates an <see cref="Optional{T}"/> without ugly type parameters.
         /// </summary>
@@ -235,7 +246,7 @@ namespace BrandonUtils.Standalone.Optional {
 
         /// <summary>
         /// Attempts to <see cref="Action.Invoke"/> <see cref="actionThatMightFail"/>, returning a <see cref="Failable"/>
-        /// that (might) contain the <see cref="IFailableFunc{TValue,TExcuse}.Excuse"/> for failure.
+        /// that (might) contain the <see cref="IFailableFunc{TValue}.Excuse"/> for failure.
         /// </summary>
         /// <param name="actionThatMightFail">the <see cref="Action"/> being executed</param>
         /// <returns>a <see cref="Failable"/> containing information about execution of the <paramref name="actionThatMightFail"/></returns>
