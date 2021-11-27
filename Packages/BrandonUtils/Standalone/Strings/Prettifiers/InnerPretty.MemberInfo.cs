@@ -13,8 +13,8 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
             return $"{typeName}{memberName}".WithTypeLabel(memberInfo.GetType(), settings);
         }
 
-        public static string PrettifyMethodInfo(MethodInfo methodInfo, PrettificationSettings settings = default) {
-            return $"{PrettifyMemberInfo(methodInfo)}({PrettifyParameters(methodInfo)})";
+        public static string PrettifyMethodInfo(MethodInfo methodInfo, PrettificationSettings settings) {
+            return $"{PrettifyMemberInfo(methodInfo, settings)}({PrettifyParameters(methodInfo, settings)})";
         }
 
         private static string PrettifyParameters(MethodBase methodInfo, PrettificationSettings settings = default) {
