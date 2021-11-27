@@ -491,23 +491,68 @@ namespace BrandonUtils.Standalone.Reflection {
 
         /// <param name="type">a <see cref="Type"/> that might be generic</param>
         /// <returns><see cref="Type.IsGenericType"/> || <see cref="Type.IsGenericTypeDefinition"/></returns>
+        [Obsolete("This is redundant, because if IsGenericTypeDefinition is true, then IsGenericType must also be true")]
         [ContractAnnotation("null => false")]
         public static bool IsGenericTypeOrDefinition([CanBeNull] this Type type) {
-            return type != null && (type.IsGenericType || type.IsGenericTypeDefinition);
+            return type?.IsGenericType == true;
         }
 
-        [ContractAnnotation("null => false")]
-        public static bool IsEnumerable([CanBeNull] this Type type) {
-            if (type == null) {
+        /// <summary>
+        /// Determines whether this <see cref="Type"/> implements the given interface <see cref="Type"/>.
+        /// </summary>
+        /// <param name="self">this <see cref="Type"/></param>
+        /// <param name="interfaceType">the <see cref="Type.IsInterface"/> that this <see cref="Type"/> might implement</param>
+        /// <returns>true if this <see cref="Type"/>, or one of its ancestors, implements <paramref name="interfaceType"/></returns>
+        public static bool Implements([CanBeNull] this Type self, [NotNull] Type interfaceType) {
+            if (interfaceType?.IsInterface != true) {
+                throw new ArgumentException(nameof(interfaceType), $"The type {interfaceType.Prettify()} was not an interface!");
+            }
+
+            // null can't implement anything
+            if (self == null) {
                 return false;
             }
 
-            return type.IsGenericTypeOrDefinition() && type.GetGenericTypeDefinition() == typeof(IEnumerable<>)
-                   || type.IsArray
-                   || type.FindInterfaces()
-                          .Where(it => it.IsGenericTypeOrDefinition())
-                          .Select(it => it.GetGenericTypeDefinition())
-                          .Contains(typeof(IEnumerable<>));
+            // when self is an interface, we have to do some extra checks, because GetInterface() won't return itself
+            if (self.IsInterface && SelfImplements(self, interfaceType)) {
+                return true;
+            }
+
+            // if the interface is a constructed generic, we need to be more specific with the check, because GetInterface() doesn't take generic type parameters into account
+            if (interfaceType.IsConstructedGenericType) {
+                return interfaceType.IsAssignableFrom(self);
+            }
+
+            // finally, if we didn't trigger any special cases, we use GetInterface()
+            return self.GetInterface(interfaceType.Name) != null;
+        }
+
+        /// <summary>
+        /// Used when both <paramref name="self"/> and <paramref name="other"/> <see cref="Type.IsInterface"/>s to see if <paramref name="self"/> implements <paramref name="other"/>.
+        /// </summary>
+        /// <param name="self"></param>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        private static bool SelfImplements(Type self, Type other) {
+            if (self == other) {
+                return true;
+            }
+
+            if (self.IsGenericType != other.IsGenericType) {
+                return false;
+            }
+
+            if (self.IsConstructedGenericType && other.IsGenericTypeDefinition) {
+                self = self.GetGenericTypeDefinition();
+            }
+
+            return other.IsAssignableFrom(self);
+        }
+
+
+        [ContractAnnotation("null => false")]
+        public static bool IsEnumerable([CanBeNull] this Type type) {
+            return type.Implements(typeof(IEnumerable<>));
         }
 
         private static readonly Type[] TupleTypes = {

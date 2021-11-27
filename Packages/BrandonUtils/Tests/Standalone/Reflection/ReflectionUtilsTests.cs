@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -254,6 +255,10 @@ namespace BrandonUtils.Tests.Standalone.Reflection {
             Assert.That(backingField, Has.Property(nameof(MemberInfo.Name)).EqualTo(propertyWithBackingField.BackingFieldName), $"Found a backing field for {propertyWithBackingField}, but it wasn't named {propertyWithBackingField.BackingFieldName}");
         }
 
+        /// <summary>
+        /// TODO: Revisit this test, taking advantage of the <see cref="System.Runtime.CompilerServices.CompilerGeneratedAttribute"/>
+        /// </summary>
+        /// <param name="propertyWithBackingField"></param>
         [Test]
         public void IsBackingField(
             [ValueSource(nameof(AllProperties))]
@@ -385,8 +390,6 @@ namespace BrandonUtils.Tests.Standalone.Reflection {
 
         public class SuperIntList : SuperList<int> { }
 
-        #endregion
-
         [Test]
         [TestCase(typeof(int[]),                     Should.Pass)]
         [TestCase(typeof(string),                    Should.Pass)]
@@ -403,25 +406,21 @@ namespace BrandonUtils.Tests.Standalone.Reflection {
         [TestCase(typeof(IntList),                   Should.Pass)]
         [TestCase(typeof(SuperIntList),              Should.Pass)]
         [TestCase(typeof(SuperList<object>),         Should.Pass)]
+        [TestCase(typeof(IEnumerable),               Should.Fail)]
+        [TestCase(typeof(IList),                     Should.Fail)]
         public static void IsEnumerable(Type type, Should should) {
-            Console.WriteLine("");
-            Console.WriteLine("FindInterfaces");
-            Console.WriteLine(type.FindInterfaces((type1, criteria) => true, default).Prettify());
-            var iEble = type.GetInterface(typeof(IEnumerable<>).Name);
-            Console.WriteLine($"IEnumerable interface: {iEble} -> {iEble?.Name} -> {iEble.Prettify()}");
             Asserter.Against(type)
                     .WithHeading($"{type.Prettify()} is IEnumerable<>")
-                    .And(ReflectionUtils.IsEnumerable,                        should.Constrain())
-                    .And(it => type.GetInterface(typeof(IEnumerable<>).Name), should == Should.Pass ? Is.Not.Null : Is.Null, $"")
+                    .And(ReflectionUtils.IsEnumerable,               should.Constrain())
+                    .And(it => it.Implements(typeof(IEnumerable<>)), should.Constrain())
                     .Invoke();
-            Assert.That(type.IsEnumerable, should.Constrain(), $"{type.PrettifyType(default)}");
         }
 
-        public static void yolo() {
+        private static void yolo() {
             Console.WriteLine("#🐣");
         }
 
-        public static (Delegate dgate, bool compGen, string nickname)[] Gates = {
+        private static (Delegate dgate, bool compGen, string nickname)[] Gates = {
             (new Action(yolo), false, "new Action(yolo)"),
             (new Func<string>(() => "swag?"), true, "new Func<string>(() => \"swag?\")"),
             (new Func<Delegate, PrettificationSettings, string>(InnerPretty.PrettifyDelegate), false, "new Func<Delegate, PrettificationSettings, string>(InnerPretty.PrettifyDelegate)"),
@@ -430,13 +429,13 @@ namespace BrandonUtils.Tests.Standalone.Reflection {
             (new Func<bool, string>(PrimitiveUtils.Icon), false, "PrimitiveUtils.Icon"),
         };
 
-        public void yolocal() {
+        private void yolocal() {
             Console.WriteLine("♿💔");
         }
 
-        public static Action YoAct = yolo;
+        private static readonly Action YoAct = yolo;
 
-        public static (Action action, bool compGen, string nickname)[] Actions = {
+        private static readonly (Action action, bool compGen, string nickname)[] Actions = {
             (yolo, false, "yolo"),
             (() => yolo(), true, "() => yolo()"),
             (() => _ = 5, true, "() => _ = 5"),
@@ -448,6 +447,10 @@ namespace BrandonUtils.Tests.Standalone.Reflection {
             (new Action(YoAct), false, "new Action(YoAct)")
         };
 
+        #endregion
+
+        #region Compiler-Generated Stuff
+
         [Test]
         public void DelegateIsCompilerGenerated() {
             var ass    = Asserter.WithHeading("Actions");
@@ -456,5 +459,63 @@ namespace BrandonUtils.Tests.Standalone.Reflection {
                  .ForEach((dg, cg, nn) => ass.And(() => dg.IsCompilerGenerated(), Is.EqualTo(cg), nn));
             ass.Invoke();
         }
+
+        #endregion
+
+        #region Implements
+
+        public interface ISuperList<T> : IList<T> { }
+
+        [Test]
+        [TestCase(typeof(List<>),                            typeof(IEnumerable<>))]
+        [TestCase(typeof(IList<>),                           typeof(ICollection<>))]
+        [TestCase(typeof(SuperList<>),                       typeof(IEnumerable))]
+        [TestCase(typeof(ISuperList<int>),                   typeof(IList<int>))]
+        [TestCase(typeof(ISuperList<int>),                   typeof(IEnumerable))]
+        [TestCase(typeof(IReadOnlyCollection<int>),          typeof(IReadOnlyCollection<>))]
+        [TestCase(typeof(ReadOnlyCollection<int>),           typeof(IReadOnlyCollection<>))]
+        [TestCase(typeof(List<string>),                      typeof(IReadOnlyCollection<string>))]
+        [TestCase(typeof(IList<IList<object>>),              typeof(IEnumerable<IEnumerable<object>>))]
+        [TestCase(typeof(IList<ISuperList<SuperList<int>>>), typeof(IEnumerable<IEnumerable<IEnumerable>>))]
+        public void ImplementsOther(Type self, Type other) {
+            Assume.That(other.IsInterface);
+            Asserter.Against(self)
+                    .And(it => it.Implements(other), Is.True, $"{self.Prettify()} implements {other.Prettify()}")
+                    .Invoke();
+        }
+
+        [Test]
+        [TestCase(typeof(List<>),                   typeof(IList<int>))]
+        [TestCase(typeof(IReadOnlyCollection<int>), typeof(IReadOnlyCollection<string>))]
+        [TestCase(typeof(IList<int>),               typeof(IEnumerable<string>))]
+        [TestCase(typeof(IEnumerable),              typeof(IEnumerable<>))]
+        [TestCase(typeof(IEnumerable<int>),         typeof(IList<int>))]
+        public void Implements_NOT(Type self, Type other) {
+            Assume.That(other.IsInterface, () => $"{nameof(other)} {other.Prettify()} must be an interface!");
+            Asserter.Against(self)
+                    .And(it => it.Implements(other), Is.False, $"{self.Prettify()} does NOT implement {other.Prettify()}")
+                    .Invoke();
+        }
+
+        [Test]
+        [TestCase(typeof(IEnumerable))]
+        [TestCase(typeof(IEnumerable<>))]
+        [TestCase(typeof(IEnumerable<int>))]
+        [TestCase(typeof(IList))]
+        [TestCase(typeof(IList<>))]
+        [TestCase(typeof(IDictionary<,>))]
+        [TestCase(typeof(IList<IDictionary<IList, int>>))]
+        [TestCase(typeof(IList<IList<object>>))]
+        [TestCase(typeof(IEnumerable<IEnumerable<object>>))]
+        [TestCase(typeof(IList<ISuperList<SuperList<int>>>))]
+        public void ImplementsSelf(Type self) {
+            Console.WriteLine($"Type: {self.Prettify()}");
+            Assume.That(self.IsInterface);
+            Asserter.Against(self)
+                    .And(it => it.Implements(it), Is.True, $"{self.Prettify()} implements itself")
+                    .Invoke();
+        }
+
+        #endregion
     }
 }
