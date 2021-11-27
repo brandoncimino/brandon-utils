@@ -221,34 +221,34 @@ namespace BrandonUtils.Testing {
 
         #region Constraints_AgainstDelegate
 
-        private TSelf _Add_Constraint_AgainstDelegate([NotNull] ActualValueDelegate<object> testDelegate, [NotNull] IResolveConstraint constraint, [CanBeNull] Func<string> nickname) {
-            Constraints_AgainstDelegate.AddNonNull((testDelegate, constraint, nickname));
+        private TSelf _Add_Constraint_AgainstDelegate([NotNull] ActualValueDelegate<object> supplier, [NotNull] IResolveConstraint constraint, [CanBeNull] Func<string> nickname) {
+            Constraints_AgainstDelegate.AddNonNull((supplier, constraint, nickname));
             return Self;
         }
 
         [MustUseReturnValue]
-        public TSelf And([NotNull] ActualValueDelegate<object> testDelegate, [NotNull] IResolveConstraint constraint, [CanBeNull] Func<string> nickname = default) => _Add_Constraint_AgainstDelegate(testDelegate, constraint, nickname);
+        public TSelf And([NotNull] ActualValueDelegate<object> supplier, [NotNull] IResolveConstraint constraint, [CanBeNull] Func<string> nickname = default) => _Add_Constraint_AgainstDelegate(supplier, constraint, nickname);
 
         [MustUseReturnValue]
-        public TSelf And([NotNull] ActualValueDelegate<object> testDelegate, [NotNull] IResolveConstraint constraint, [CanBeNull] string nickname) => _Add_Constraint_AgainstDelegate(testDelegate, constraint, AsFunc(nickname));
+        public TSelf And([NotNull] ActualValueDelegate<object> supplier, [NotNull] IResolveConstraint constraint, [CanBeNull] string nickname) => _Add_Constraint_AgainstDelegate(supplier, constraint, AsFunc(nickname));
 
         #endregion
 
         #region Constraints_AgainstTransformation
 
-        private TSelf _Add_Constraint_AgainstTransformation([NotNull] Func<TActual, object> actualTransformation, [NotNull] IResolveConstraint constraint, [CanBeNull] Func<string> nickname) {
-            Constraints_AgainstTransformation.Add((actualTransformation, constraint, nickname));
+        private TSelf _Add_Constraint_AgainstTransformation<T>([NotNull] Func<TActual, T> actualTransformation, [NotNull] IResolveConstraint constraint, [CanBeNull] Func<string> nickname) {
+            Constraints_AgainstTransformation.Add((act => actualTransformation(act), constraint, nickname));
             return Self;
         }
 
         [MustUseReturnValue]
-        public TSelf And([NotNull] Func<TActual, object> tf, [NotNull] IResolveConstraint constraint, [CanBeNull] Func<string> nickname = default) => _Add_Constraint_AgainstTransformation(tf, constraint, nickname);
+        public TSelf And<TNew>([NotNull] Func<TActual, TNew> tf, [NotNull] IResolveConstraint constraint, [CanBeNull] Func<string> nickname = default) => _Add_Constraint_AgainstTransformation(tf, constraint, nickname);
 
         [MustUseReturnValue]
-        public TSelf And([NotNull] Func<TActual, object> tf, [NotNull] IResolveConstraint constraint, [CanBeNull] string nickname) => _Add_Constraint_AgainstTransformation(tf, constraint, AsFunc(nickname));
+        public TSelf And<TNew>([NotNull] Func<TActual, TNew> tf, [NotNull] IResolveConstraint constraint, [CanBeNull] string nickname) => _Add_Constraint_AgainstTransformation(tf, constraint, AsFunc(nickname));
 
         [MustUseReturnValue]
-        public TSelf And([CanBeNull] IEnumerable<(Func<TActual, object>, IResolveConstraint)> constraints) {
+        public TSelf And<TNew>([CanBeNull] IEnumerable<(Func<TActual, TNew>, IResolveConstraint)> constraints) {
             constraints?.ForEach(it => _ = _Add_Constraint_AgainstTransformation(it.Item1, it.Item2, default));
             return Self;
         }
