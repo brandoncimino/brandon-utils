@@ -7,6 +7,8 @@ using JetBrains.Annotations;
 namespace BrandonUtils.Standalone {
     [PublicAPI]
     public static class Bloop {
+        #region ForEach
+
         /// <summary>
         /// Provides extension-method-style <c>foreach</c> loop functionality to <see cref="IEnumerable{T}"/>.
         /// </summary>
@@ -36,6 +38,15 @@ namespace BrandonUtils.Standalone {
                 actionWithIndex(list[i], i);
             }
         }
+
+        public static void ForEach<T1, T2>([NotNull, InstantHandle] this                     IEnumerable<(T1, T2)>                     enumerable, [NotNull, InstantHandle] Action<T1, T2>                     action) => enumerable.ForEach(it => action.Invoke(it));
+        public static void ForEach<T1, T2, T3>([NotNull, InstantHandle] this                 IEnumerable<(T1, T2, T3)>                 enumerable, [NotNull, InstantHandle] Action<T1, T2, T3>                 action) => enumerable.ForEach(it => action.Invoke(it));
+        public static void ForEach<T1, T2, T3, T4>([NotNull, InstantHandle] this             IEnumerable<(T1, T2, T3, T4)>             enumerable, [NotNull, InstantHandle] Action<T1, T2, T3, T4>             action) => enumerable.ForEach(it => action.Invoke(it));
+        public static void ForEach<T1, T2, T3, T4, T5>([NotNull, InstantHandle] this         IEnumerable<(T1, T2, T3, T4, T5)>         enumerable, [NotNull, InstantHandle] Action<T1, T2, T3, T4, T5>         action) => enumerable.ForEach(it => action.Invoke(it));
+        public static void ForEach<T1, T2, T3, T4, T5, T6>([NotNull, InstantHandle] this     IEnumerable<(T1, T2, T3, T4, T5, T6)>     enumerable, [NotNull, InstantHandle] Action<T1, T2, T3, T4, T5, T6>     action) => enumerable.ForEach(it => action.Invoke(it));
+        public static void ForEach<T1, T2, T3, T4, T5, T6, T7>([NotNull, InstantHandle] this IEnumerable<(T1, T2, T3, T4, T5, T6, T7)> enumerable, [NotNull, InstantHandle] Action<T1, T2, T3, T4, T5, T6, T7> action) => enumerable.ForEach(it => action.Invoke(it));
+
+        #endregion
 
         #region "Repeat" Extensions
 
