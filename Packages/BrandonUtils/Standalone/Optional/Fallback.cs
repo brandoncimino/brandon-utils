@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 using JetBrains.Annotations;
 
+using Newtonsoft.Json;
+
 namespace BrandonUtils.Standalone.Optional {
     /// <summary>
     /// A "box" for a value that that <i>might</i> have an <see cref="ExplicitValue"/>, but otherwise, has a <see cref="FallbackValue"/>.
@@ -17,11 +19,13 @@ namespace BrandonUtils.Standalone.Optional {
     /// </remarks>
     /// <typeparam name="T">the underlying value's type</typeparam>
     [PublicAPI]
+    [JsonObject(MemberSerialization.OptIn)]
     public class Fallback<T> : IOptional<T> {
         /// <summary>
         /// The <see cref="Optional{T}"/> value that might have been <see cref="Set"/>.
         /// </summary>
         [ItemCanBeNull]
+        [JsonProperty(Order = int.MaxValue)]
         public Optional<T> ExplicitValue { get; private set; }
         /// <summary>
         /// Whether or not <see cref="ExplicitValue"/> has been <see cref="Set"/>.
@@ -40,13 +44,32 @@ namespace BrandonUtils.Standalone.Optional {
         /// The value returned when <see cref="ExplicitValue"/> isn't present.
         /// </summary>
         [CanBeNull]
+        [JsonProperty(Order = int.MinValue)]
         public T FallbackValue { get; }
 
         public int Count => ExplicitValue.Count;
 
+        #region Constructors
+
         public Fallback([CanBeNull] T fallbackValue = default) {
             FallbackValue = fallbackValue;
         }
+
+        #endregion
+
+        #region Factories
+
+        [NotNull]
+        public static Fallback<T> Of([CanBeNull] T fallbackValue) {
+            return new Fallback<T>(fallbackValue);
+        }
+
+        [NotNull]
+        public static Fallback<T> Of([CanBeNull] T fallbackValue, [CanBeNull] T explicitValue) {
+            return new Fallback<T>(fallbackValue).Set(explicitValue);
+        }
+
+        #endregion
 
         /// <summary>
         /// Sets the <see cref="ExplicitValue"/>'s <see cref="Optional{T}.Value"/>.
@@ -80,6 +103,7 @@ namespace BrandonUtils.Standalone.Optional {
         /// <param name="self">this <see cref="Fallback{T}"/></param>
         /// <returns><see cref="Value"/></returns>
         /// <exception cref="ArgumentNullException">if <paramref name="self"/> is null</exception>
+        [CanBeNull]
         public static implicit operator T([NotNull] Fallback<T> self) {
             if (self == null) {
                 throw new ArgumentNullException(nameof(self));
