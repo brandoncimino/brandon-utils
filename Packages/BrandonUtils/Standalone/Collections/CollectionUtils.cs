@@ -1277,6 +1277,24 @@ namespace BrandonUtils.Standalone.Collections {
         }
 
         /// <summary>
+        /// A variation of the built-in <see cref="Enumerable.Select{TSource,TResult}(System.Collections.Generic.IEnumerable{TSource},System.Func{TSource,TResult})"/>
+        /// that separates the <see cref="KeyValuePair{TKey,TValue}.Key"/> and <see cref="KeyValuePair{TKey,TValue}.Value"/> before sending them to the <paramref name="selector"/> <see cref="Func{T1,T2,TResult}"/>.
+        /// </summary>
+        /// <param name="source">the original <see cref="IDictionary{TKey,TValue}"/></param>
+        /// <param name="selector">the <see cref="Func{T1,T2,TResult}"/> that performs a transformation against each <see cref="KeyValuePair{TKey,TValue}.Key"/> and <see cref="KeyValuePair{TKey,TValue}.Value"/></param>
+        /// <typeparam name="TKey">the type of <paramref name="source"/>'s <see cref="IDictionary{TKey,TValue}.Keys"/></typeparam>
+        /// <typeparam name="TVal">the type of <paramref name="source"/>'s <see cref="IDictionary{TKey,TValue}.Values"/></typeparam>
+        /// <typeparam name="TNew">the type of the new <see cref="IEnumerable{T}"/></typeparam>
+        /// <returns>a new <see cref="IEnumerable{T}"/> containing the results of the <paramref name="selector"/></returns>
+        /// <seealso cref="ForEach{TKey,TVal}(System.Collections.Generic.IDictionary{TKey,TVal},System.Action{TKey,TVal})"/>
+        [NotNull]
+        [ItemCanBeNull]
+        [Pure]
+        public static IEnumerable<TNew> Select<TKey, TVal, TNew>([NotNull] this IDictionary<TKey, TVal> source, [NotNull] Func<TKey, TVal, TNew> selector) {
+            return source.Select(kvp => selector.Invoke(kvp.Key, kvp.Value));
+        }
+
+        /// <summary>
         /// Returns a new <see cref="IDictionary{TKey,TValue}"/> containing only the elements of <paramref name="source"/> whose <see cref="KeyValuePair{TKey,TValue}.Value"/> satisfies the given <paramref name="predicate"/>.
         /// </summary>
         /// <param name="source">the original <see cref="IDictionary{TKey,TValue}"/></param>
