@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 using BrandonUtils.Standalone.Attributes;
@@ -828,6 +829,22 @@ namespace BrandonUtils.Standalone.Reflection {
             }
 
             return TypeKeywords.GetOrDefault(type, () => type.Name) ?? throw new InvalidOperationException();
+        }
+
+        #endregion
+
+        #region Compiler Generation
+
+        public static bool IsCompilerGenerated(this MethodInfo methodInfo) {
+            return methodInfo.GetCustomAttribute<CompilerGeneratedAttribute>() != null;
+        }
+
+        public static bool IsCompilerGenerated(this Type type) {
+            return type.GetCustomAttribute<CompilerGeneratedAttribute>() != null;
+        }
+
+        public static bool IsCompilerGenerated(this Delegate dgate) {
+            return dgate.Method.DeclaringType.IsCompilerGenerated();
         }
 
         #endregion

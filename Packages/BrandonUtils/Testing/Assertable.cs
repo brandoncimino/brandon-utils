@@ -22,7 +22,7 @@ namespace BrandonUtils.Testing {
     public class Assertable : Failable, IAssertable {
         public Func<string> Nickname { get; }
 
-        protected Assertable(
+        private Assertable(
             [NotNull] Action       action,
             [NotNull] Func<string> nickname
         ) : base(
@@ -40,7 +40,7 @@ namespace BrandonUtils.Testing {
             [NotNull]   Action<TestDelegate, IResolveConstraint, Func<string>> actionResolver
         ) : this(
             () => actionResolver.Invoke(assertion, constraint, message),
-            nickname ?? assertion.Prettify
+            nickname ?? GetNicknameSupplier(assertion, constraint)
         ) { }
 
         public Assertable(
@@ -52,7 +52,7 @@ namespace BrandonUtils.Testing {
         ) : base(
             () => resolver.Invoke(actual, constraint, message)
         ) {
-            Nickname = nickname ?? constraint.Prettify;
+            Nickname = nickname ?? GetNicknameSupplier(actual, constraint);
         }
 
 
@@ -69,8 +69,21 @@ namespace BrandonUtils.Testing {
         ) {
             return new Assertable(
                 () => resolver.Invoke(actual, constraint, message),
-                nickname ?? constraint.Prettify
+                nickname ?? GetNicknameSupplier(actual, constraint)
             );
+        }
+
+        [NotNull]
+        private static Func<string> GetNicknameSupplier([CanBeNull] Delegate dgate, [CanBeNull] IResolveConstraint constraint) {
+            return () => GetNickname(dgate, constraint);
+        }
+
+        [NotNull]
+        private static string GetNickname([CanBeNull] Delegate dgate, [CanBeNull] IResolveConstraint constraint) {
+            var dName = dgate?.Prettify();
+            var cName = constraint?.Prettify();
+            var parts = new[] { dName, cName };
+            return parts.NonBlank().JoinString(" ");
         }
     }
 }

@@ -404,9 +404,57 @@ namespace BrandonUtils.Tests.Standalone.Reflection {
         [TestCase(typeof(SuperIntList),              Should.Pass)]
         [TestCase(typeof(SuperList<object>),         Should.Pass)]
         public static void IsEnumerable(Type type, Should should) {
+            Console.WriteLine("");
             Console.WriteLine("FindInterfaces");
             Console.WriteLine(type.FindInterfaces((type1, criteria) => true, default).Prettify());
+            var iEble = type.GetInterface(typeof(IEnumerable<>).Name);
+            Console.WriteLine($"IEnumerable interface: {iEble} -> {iEble?.Name} -> {iEble.Prettify()}");
+            Asserter.Against(type)
+                    .WithHeading($"{type.Prettify()} is IEnumerable<>")
+                    .And(ReflectionUtils.IsEnumerable,                        should.Constrain())
+                    .And(it => type.GetInterface(typeof(IEnumerable<>).Name), should == Should.Pass ? Is.Not.Null : Is.Null, $"")
+                    .Invoke();
             Assert.That(type.IsEnumerable, should.Constrain(), $"{type.PrettifyType(default)}");
+        }
+
+        public static void yolo() {
+            Console.WriteLine("#🐣");
+        }
+
+        public static (Delegate dgate, bool compGen, string nickname)[] Gates = {
+            (new Action(yolo), false, "new Action(yolo)"),
+            (new Func<string>(() => "swag?"), true, "new Func<string>(() => \"swag?\")"),
+            (new Func<Delegate, PrettificationSettings, string>(InnerPretty.PrettifyDelegate), false, "new Func<Delegate, PrettificationSettings, string>(InnerPretty.PrettifyDelegate)"),
+            (new Func<Delegate, PrettificationSettings, string>((del, set) => InnerPretty.PrettifyDelegate(del, set)), true, "new Func<Delegate, PrettificationSettings, string>((del, set) => InnerPretty.PrettifyDelegate(del, set))"),
+            (new Func<bool, string>(it => it.Icon()), true, "it => it.Icon()"),
+            (new Func<bool, string>(PrimitiveUtils.Icon), false, "PrimitiveUtils.Icon"),
+        };
+
+        public void yolocal() {
+            Console.WriteLine("♿💔");
+        }
+
+        public static Action YoAct = yolo;
+
+        public static (Action action, bool compGen, string nickname)[] Actions = {
+            (yolo, false, "yolo"),
+            (() => yolo(), true, "() => yolo()"),
+            (() => _ = 5, true, "() => _ = 5"),
+            (() => { }, true, "() => { }"),
+            (new ReflectionUtilsTests().yolocal, false, "new ReflectionUtilsTests().yolocal"),
+            (() => YoAct.Invoke(), true, "() => YoAct.Invoke()"),
+            (YoAct.Invoke, false, "YoAct.Invoke"),
+            (YoAct, false, "YoAct"),
+            (new Action(YoAct), false, "new Action(YoAct)")
+        };
+
+        [Test]
+        public void DelegateIsCompilerGenerated() {
+            var ass    = Asserter.WithHeading("Actions");
+            var aGates = Actions.Select(it => ((Delegate)it.action, it.compGen, it.nickname));
+            Gates.Concat(aGates)
+                 .ForEach((dg, cg, nn) => ass.And(() => dg.IsCompilerGenerated(), Is.EqualTo(cg), nn));
+            ass.Invoke();
         }
     }
 }
