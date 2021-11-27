@@ -61,7 +61,7 @@ namespace BrandonUtils.Testing {
 
         internal IList<IMultipleAsserter> Asserters { get; } = new List<IMultipleAsserter>();
 
-        internal IList<(Func<TActual, object> transformation, IResolveConstraint constraint, Func<string> nickname)> Constraints_AgainstTransformation { get; } = new List<(Func<TActual, object>, IResolveConstraint, Func<string>)>();
+        internal IList<(Delegate transformation, IResolveConstraint constraint, Func<string> nickname)> Constraints_AgainstTransformation { get; } = new List<(Delegate, IResolveConstraint, Func<string>)>();
 
         protected abstract void OnFailure(string results);
 
@@ -236,8 +236,9 @@ namespace BrandonUtils.Testing {
 
         #region Constraints_AgainstTransformation
 
-        private TSelf _Add_Constraint_AgainstTransformation<T>([NotNull] Func<TActual, T> actualTransformation, [NotNull] IResolveConstraint constraint, [CanBeNull] Func<string> nickname) {
-            Constraints_AgainstTransformation.Add((act => actualTransformation(act), constraint, nickname));
+        private TSelf _Add_Constraint_AgainstTransformation<TNew>([NotNull] Func<TActual, TNew> actualTransformation, [NotNull] IResolveConstraint constraint, [CanBeNull] Func<string> nickname) {
+            nickname ??= Assertable.GetNicknameSupplier(actualTransformation, constraint);
+            Constraints_AgainstTransformation.Add((actualTransformation, constraint, nickname));
             return Self;
         }
 
@@ -300,7 +301,7 @@ namespace BrandonUtils.Testing {
         #region Executing Test Assertions
 
         private IAssertable Test_Action_AgainstAnything((Action action, Func<string> nickname) ass) => new Assertable(
-            ass.nickname,
+            ass.nickname ?? Assertable.GetNicknameSupplier(ass.action, default),
             new TestDelegate(ass.action),
             Throws.Nothing,
             default,
@@ -310,7 +311,7 @@ namespace BrandonUtils.Testing {
         private IAssertable Test_Action_AgainstActual((Action<TActual> action, Func<string> nickname) ass) {
             var actual = Actual.OrElseThrow(ActualIsEmptyException($"Could not execute the {ass.GetType().Prettify()} {ass.action.Method.Name}"));
             return new Assertable(
-                ass.nickname,
+                ass.nickname ?? Assertable.GetNicknameSupplier(ass.action, default),
                 () => ass.action.Invoke(actual.Invoke()),
                 Throws.Nothing,
                 default,
@@ -339,11 +340,12 @@ namespace BrandonUtils.Testing {
             return new Assertable(nickname, tDelegate, constraint, default, ResolveFunc);
         }
 
-        private IAssertable Test_Constraint_AgainstTransformation((Func<TActual, object> transformation, IResolveConstraint constraint, Func<string> nickname) constraint_againstTransformation) {
+        private IAssertable Test_Constraint_AgainstTransformation((Delegate transformation, IResolveConstraint constraint, Func<string> nickname) constraint_againstTransformation) {
+            var (transformation, constraint, nickname) = constraint_againstTransformation;
             return new Assertable(
-                constraint_againstTransformation.nickname,
-                () => constraint_againstTransformation.transformation.Invoke(Actual.OrElseThrow(ActualIsEmptyException(constraint_againstTransformation.constraint)).Invoke()),
-                constraint_againstTransformation.constraint,
+                nickname ?? Assertable.GetNicknameSupplier(transformation, constraint),
+                () => transformation.DynamicInvoke(Actual.OrElseThrow(ActualIsEmptyException(constraint)).Invoke()),
+                constraint,
                 default,
                 ResolveFunc
             );
