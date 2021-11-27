@@ -17,7 +17,18 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
 
         [NotNull]
         private static string _Prettify_MethodReference([NotNull] Delegate methodReference, [NotNull] PrettificationSettings settings) {
+            //TODO: Remove this roundabout logic once we have a proper way to copy settings, such as using a fancy-schmancy new record
+            var labelStyleModified = settings.TypeLabelStyle.HasValue == false;
+            if (labelStyleModified) {
+                settings.TypeLabelStyle.Set(TypeNameStyle.None);
+            }
+
             var methodInfo = PrettifyMethodInfo(methodReference.Method, settings);
+
+            if (labelStyleModified) {
+                settings.TypeLabelStyle.Unset();
+            }
+
             return $"{MethodIcon} {methodInfo}";
         }
 

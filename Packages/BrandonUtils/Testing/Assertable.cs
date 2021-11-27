@@ -74,7 +74,7 @@ namespace BrandonUtils.Testing {
         }
 
         [NotNull]
-        private static Func<string> GetNicknameSupplier([CanBeNull] Delegate dgate, [CanBeNull] IResolveConstraint constraint) {
+        internal static Func<string> GetNicknameSupplier([CanBeNull] Delegate dgate, [CanBeNull] IResolveConstraint constraint) {
             return () => GetNickname(dgate, constraint);
         }
 
@@ -83,7 +83,7 @@ namespace BrandonUtils.Testing {
             var dName = dgate?.Prettify();
             var cName = constraint?.Prettify();
             var parts = new[] { dName, cName };
-            return parts.NonBlank().JoinString(" ");
+            return parts.NonBlank().JoinString(" 🗜 ");
         }
     }
 }
