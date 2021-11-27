@@ -968,8 +968,13 @@ namespace BrandonUtils.Standalone.Collections {
 
         #region Finding
 
-        /// <param name="source"></param>
-        /// <param name="predicate"></param>
+        /// <remarks>
+        /// This is similar to the built-in <see cref="Enumerable.First{TSource}(System.Collections.Generic.IEnumerable{TSource})"/>, however,
+        /// this method will return <see cref="Optional.Empty{T}"/> when <paramref name="source"/> is null or empty instead of
+        /// throwing an exception.
+        /// </remarks>
+        /// <param name="source">the original <see cref="IEnumerable{T}"/></param>
+        /// <param name="predicate">a function used to filter the entries in <paramref name="source"/></param>
         /// <typeparam name="T"></typeparam>
         /// <returns>an <see cref="Optional{T}"/> containing the <typeparamref name="T"/> value that matched the <paramref name="predicate"/></returns>
         [ItemCanBeNull]
