@@ -517,5 +517,81 @@ namespace BrandonUtils.Tests.Standalone.Reflection {
         }
 
         #endregion
+
+        #region ToString
+
+        class NoToString { }
+
+        class HasToString {
+            public override string ToString() {
+                return $"I am an explicitly overridden ToString method. I was declared in {nameof(HasToString)}, but exist in {GetType().Prettify()}";
+            }
+        }
+
+        class ChildOfString : HasToString { }
+
+        class ToDoppelganger {
+            public string ToString(int i) {
+                return $"🦹 I tricked you! I am a {GetType().Prettify()}!";
+            }
+        }
+
+        class Doppelface : IDoppelface {
+            string IDoppelface.ToString() {
+                return $"😈 I've fooled you once again! I am {GetType().Prettify()}!";
+            }
+        }
+
+        class Newface {
+            public new string ToString() {
+                return $"🤖";
+            }
+        }
+
+        interface IDoppelface {
+            string ToString();
+        }
+
+        abstract class AbstractSelf {
+            public abstract override string ToString();
+        }
+
+        abstract class IncorporealSelf : AbstractSelf {
+            public override string ToString() => "👻";
+        }
+
+        class SpiritualSelf : IncorporealSelf { }
+
+        class CorporealSelf : IncorporealSelf {
+            public override string ToString() => "💪";
+        }
+
+        class ReifiedSelf : AbstractSelf {
+            public override string ToString() {
+                return "🧠 -> 🙋‍";
+            }
+        }
+
+        [Test]
+        [TestCase(typeof(object),          Should.BeNull)]
+        [TestCase(typeof(NoToString),      Should.BeNull)]
+        [TestCase(typeof(HasToString),     Should.BeNotNull)]
+        [TestCase(typeof(ChildOfString),   Should.BeNotNull)]
+        [TestCase(typeof(List<int>),       Should.BeNull)]
+        [TestCase(typeof(IList<int>),      Should.BeNull)]
+        [TestCase(typeof(ToDoppelganger),  Should.BeNull)]
+        [TestCase(typeof(Doppelface),      Should.BeNull)]
+        [TestCase(typeof(IDoppelface),     Should.BeNull)]
+        [TestCase(typeof(Newface),         Should.BeNotNull)]
+        [TestCase(typeof(AbstractSelf),    Should.BeNull)]
+        [TestCase(typeof(ReifiedSelf),     Should.BeNotNull)]
+        [TestCase(typeof(IncorporealSelf), Should.BeNotNull)]
+        [TestCase(typeof(CorporealSelf),   Should.BeNotNull)]
+        [TestCase(typeof(IncorporealSelf), Should.BeNotNull)]
+        public void PersonalToStringMethod(Type type, Should should) {
+            Assert.That(type.GetToStringOverride, should.Constrain());
+        }
+
+        #endregion
     }
 }

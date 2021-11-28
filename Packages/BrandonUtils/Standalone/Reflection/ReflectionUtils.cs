@@ -893,5 +893,73 @@ namespace BrandonUtils.Standalone.Reflection {
         }
 
         #endregion
+
+        #region ToString
+
+        public enum Inheritance {
+            Inherited,
+            DeclaredOnly
+        }
+
+        /// <summary>
+        /// Returns this <see cref="Type"/>'s override of <see cref="object.ToString"/>, if present.
+        /// </summary>
+        /// <remarks>
+        /// By default, this will return any <see cref="object.ToString"/> method with a <see cref="MemberInfo.DeclaringType"/> other than <see cref="object"/>.
+        /// This means that a <see cref="object.ToString"/> method declared in a <b>parent class</b> will be returned.
+        /// This behavior can be controlled by specifying <see cref="Inheritance.Inherited"/> or <see cref="Inheritance.DeclaredOnly"/>.
+        ///
+        /// <p/><b>📝 Note:</b><br/> This will not return <see cref="MethodBase.IsAbstract"/> methods, which includes:
+        /// <ul>
+        /// <li>Methods declared <c>abstract</c> inside of <c>abstract</c> classes</li>
+        /// <li>Methods declared inside of interfaces</li>
+        /// </ul>
+        /// </remarks>
+        /// <example>
+        /// Say we have the following classes, where <c>Parent</c> declares an override of <see cref="object.ToString"/>:
+        /// <code><![CDATA[
+        /// class Parent {
+        ///     public override ToString() => "Parent.ToString";
+        /// }
+        ///
+        /// class Child : Parent { }
+        /// ]]></code>
+        ///
+        /// The <see cref="Inheritance"/> parameter determines whether <c>Child.GetToStringOverride()</c> will return <c>Parent</c>'s <see cref="object.ToString"/> method:
+        /// <code><![CDATA[
+        /// public static void Example(){
+        ///     typeof(Parent).GetToStringOverride();               // -> Parent.ToString
+        ///     typeof(Parent).GetToStringOverride(Inherited);      // -> Parent.ToString
+        ///     typeof(Parent).GetToStringOverride(DeclaredOnly);   // -> Parent.ToString
+        ///
+        ///     typeof(Child).GetToStringOverride();                // -> Parent.ToString
+        ///     typeof(Child).GetToStringOverride(Inherited);       // -> Parent.ToString
+        ///     typeof(Child).GetToStringOverride(DeclaredOnly);    // -> null
+        /// }
+        /// ]]>
+        /// </code>
+        /// </example>
+        /// <param name="type">this <see cref="Type"/></param>
+        /// <param name="inheritance">whether to include <see cref="Inheritance.Inherited"/> or <see cref="Inheritance.DeclaredOnly"/> methods</param>
+        /// <returns>a non-default override of <see cref="object.ToString"/></returns>
+        [CanBeNull]
+        public static MethodInfo GetToStringOverride([CanBeNull] this Type type, Inheritance inheritance) {
+            if (type == null || type == typeof(object)) {
+                return null;
+            }
+
+            var toString = type.GetMethod(nameof(ToString), new Type[] { });
+            Console.WriteLine($"-> Found [{toString.Prettify()}], IsAbstract = {toString?.IsAbstract}");
+
+            return toString?.IsAbstract == true || toString?.DeclaringType == typeof(object) ? null : toString;
+        }
+
+        /// <inheritdoc cref="GetToStringOverride(System.Type,BrandonUtils.Standalone.Reflection.ReflectionUtils.Inheritance)"/>
+        [CanBeNull]
+        public static MethodInfo GetToStringOverride([CanBeNull] this Type type) {
+            return GetToStringOverride(type, Inheritance.Inherited);
+        }
+
+        #endregion
     }
 }
