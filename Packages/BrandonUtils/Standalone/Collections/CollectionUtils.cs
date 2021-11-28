@@ -23,6 +23,9 @@ namespace BrandonUtils.Standalone.Collections {
         /// <summary>
         /// Retrieves and <see cref="ICollection{T}.Remove"/>s the <see cref="Enumerable.ElementAt{TSource}"/> <paramref name="index"/>
         /// </summary>
+        /// <remarks>
+        /// TODO: Revisit this method - it needs better null handling, for instance
+        /// </remarks>
         /// <param name="collection"></param>
         /// <param name="index"></param>
         /// <typeparam name="T"></typeparam>
@@ -31,6 +34,26 @@ namespace BrandonUtils.Standalone.Collections {
             var item = collection.ElementAt(index);
             collection.Remove(item);
             return item;
+        }
+
+        /// <summary>
+        /// <see cref="IDictionary{TKey,TValue}.Remove(TKey)"/>s an entry from this <see cref="IDictionary{TKey,TValue}"/>, returning the removed <see cref="TValue"/>.
+        /// </summary>
+        /// <remarks>
+        /// This works identically to <see cref="IDictionary{TKey,TValue}.Remove(TKey)"/>, except that it returns the actual removed value instead of a <see cref="bool"/>.
+        /// </remarks>
+        /// <param name="dictionary">this <see cref="IDictionary{TKey,TValue}"/></param>
+        /// <param name="key">the <see cref="KeyValuePair{TKey,TValue}.Key"/> that you'd like to remove</param>
+        /// <typeparam name="TKey">the type of the <see cref="IDictionary{TKey,TValue}.Keys"/></typeparam>
+        /// <typeparam name="TValue">the type of the <see cref="IDictionary{TKey,TValue}.Values"/></typeparam>
+        /// <returns>the removed <typeparamref name="TValue"/>, if any; otherwise, <c>null</c></returns>
+        [CanBeNull]
+        public static TValue Grab<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> dictionary, [NotNull] TKey key) {
+            if (dictionary.TryGetValue(key, out var val) && dictionary.Remove(key)) {
+                return val;
+            }
+
+            return default;
         }
 
         [Pure]
