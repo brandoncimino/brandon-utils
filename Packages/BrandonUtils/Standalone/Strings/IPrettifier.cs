@@ -1,9 +1,11 @@
 ﻿using System;
 
+using BrandonUtils.Standalone.Collections;
+
 using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone.Strings {
-    public interface IPrettifier {
+    public interface IPrettifier : IPrimaryKeyed<Type> {
         /// <value>the <see cref="Type"/> that this <see cref="IPrettifier{T}"/> can <see cref="Prettify"/>.</value>
         [NotNull]
         Type PrettifierType { get; }
