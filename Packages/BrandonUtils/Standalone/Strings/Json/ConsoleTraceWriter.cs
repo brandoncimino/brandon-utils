@@ -16,17 +16,20 @@ namespace BrandonUtils.Standalone.Strings.Json {
     /// </summary>
     [PublicAPI]
     public class ConsoleTraceWriter : ITraceWriter {
-        public string Nickname { get; }
+        [CanBeNull] public string Nickname { get; }
 
         [NotNull]
         [ItemNotNull]
         private IEnumerable<string> GetNameParts() => new[] {
-            Nickname ?? GetType().Prettify(),
+            Nickname,
             $"#{GetHashCode()}",
             Thread.CurrentThread.Name
         }.NonBlank();
 
-        [NotNull] private string FullName => $"{GetNameParts().JoinString("-")}";
+        [NotNull]
+        private string GetFullName() {
+            return Nickname.IsBlank() ? "|" : $"{GetNameParts().JoinString("-")}";
+        }
 
         public TraceLevel LevelFilter { get; set; }
 
@@ -41,7 +44,7 @@ namespace BrandonUtils.Standalone.Strings.Json {
         public void Trace(TraceLevel level, [CanBeNull] string message, [CanBeNull] Exception ex) {
             var msg = new[] {
                     GetTraceLevelIcon(level),
-                    $"[{FullName}]",
+                    GetFullName(),
                     message,
                     ex != null ? $"-> {ex}" : default
                 }.NonBlank()

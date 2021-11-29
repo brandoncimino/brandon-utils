@@ -171,17 +171,18 @@ namespace BrandonUtils.Standalone.Optional {
         /// Provides a "default" <see cref="object.ToString"/> method for <see cref="IOptional{T}"/> implementations to use.
         /// </summary>
         /// <param name="optional">an <see cref="IOptional{T}"/></param>
+        /// <param name="settings">optional <see cref="PrettificationSettings"/></param>
         /// <typeparam name="T">the underlying type of the <see cref="IOptional{T}"/></typeparam>
         /// <returns>a <see cref="object.ToString"/> representation of the given <see cref="IOptional{T}"/></returns>
         [NotNull]
-        public static string ToString<T>([CanBeNull, ItemCanBeNull] IOptional<T> optional) {
+        public static string ToString<T>([CanBeNull, ItemCanBeNull] IOptional<T> optional, [CanBeNull] PrettificationSettings settings) {
             var realType   = optional?.GetType() ?? typeof(T);
-            var prettyType = realType.Prettify();
+            var prettyType = realType.Prettify(settings);
             if (optional == null) {
                 return $"({prettyType}){NullPlaceholder}";
             }
             else {
-                var valueString = optional.HasValue ? optional.Value.Prettify() : EmptyPlaceholder;
+                var valueString = optional.HasValue ? optional.Value.Prettify(settings) : EmptyPlaceholder;
                 return $"{prettyType}[{valueString}]";
             }
         }
@@ -694,6 +695,26 @@ namespace BrandonUtils.Standalone.Optional {
             }
 
             return FirstWithValue(args, functions.AsEnumerable());
+        }
+
+        #endregion
+
+        #region 😱 DYNAMIC
+
+        public static Optional<TResult> FirstWithValue<TDelegate, TResult>(
+            [NotNull, ItemNotNull]
+            IEnumerable<TDelegate> delegates,
+            params object[] inputs
+        ) where TDelegate : Delegate {
+            foreach (var dg in delegates) {
+                var result = dg.DynamicInvoke(inputs);
+
+                if (result is Optional<TResult> { HasValue: true } or) {
+                    return or;
+                }
+            }
+
+            return default;
         }
 
         #endregion

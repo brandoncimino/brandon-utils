@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
+using BrandonUtils.Standalone.Strings;
+
 using JetBrains.Annotations;
 
 using Newtonsoft.Json;
@@ -89,7 +91,7 @@ namespace BrandonUtils.Standalone.Optional {
 
         [NotNull]
         public override string ToString() {
-            return Optional.ToString(this);
+            return Optional.ToString(this, new PrettificationSettings());
         }
 
         #endregion

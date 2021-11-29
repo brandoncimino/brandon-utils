@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
+using BrandonUtils.Standalone.Strings;
 using BrandonUtils.Standalone.Strings.Prettifiers;
 
 using JetBrains.Annotations;
@@ -113,7 +114,7 @@ namespace BrandonUtils.Standalone.Optional {
 
         [NotNull]
         public override string ToString() {
-            return Optional.ToString(this);
+            return Optional.ToString(this, new PrettificationSettings());
         }
 
         [NotNull]

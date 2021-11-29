@@ -193,7 +193,7 @@ namespace BrandonUtils.Standalone.Chronic {
             return new Dictionary<object, object>() {
                     [nameof(Total)]   = Total,
                     [nameof(Average)] = Average
-                }.Prettify()
+                }.Prettify(new PrettificationSettings())
                  .SplitLines()
                  .Append(Total.GetSummary())
                  .JoinLines();

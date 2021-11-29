@@ -497,6 +497,8 @@ namespace BrandonUtils.Standalone.Reflection {
             return type?.IsGenericType == true;
         }
 
+        #region Type.Implements(Type)
+
         /// <summary>
         /// Determines whether this <see cref="Type"/> implements the given interface <see cref="Type"/>.
         /// </summary>
@@ -549,6 +551,7 @@ namespace BrandonUtils.Standalone.Reflection {
             return other.IsAssignableFrom(self);
         }
 
+        #endregion
 
         [ContractAnnotation("null => false")]
         public static bool IsEnumerable([CanBeNull] this Type type) {
@@ -949,8 +952,6 @@ namespace BrandonUtils.Standalone.Reflection {
             }
 
             var toString = type.GetMethod(nameof(ToString), new Type[] { });
-            Console.WriteLine($"-> Found [{toString.Prettify()}], IsAbstract = {toString?.IsAbstract}");
-
             return toString?.IsAbstract == true || toString?.DeclaringType == typeof(object) ? null : toString;
         }
 

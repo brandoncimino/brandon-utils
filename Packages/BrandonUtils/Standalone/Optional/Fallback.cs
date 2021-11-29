@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
+using BrandonUtils.Standalone.Strings;
+
 using JetBrains.Annotations;
 
 using Newtonsoft.Json;
@@ -126,7 +128,7 @@ namespace BrandonUtils.Standalone.Optional {
 
         [NotNull]
         public override string ToString() {
-            return Optional.ToString(this);
+            return Optional.ToString(this, new PrettificationSettings());
         }
     }
 }
