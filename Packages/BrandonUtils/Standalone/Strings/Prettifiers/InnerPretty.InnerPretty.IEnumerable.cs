@@ -10,16 +10,6 @@ using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone.Strings.Prettifiers {
     internal static partial class InnerPretty {
-        public static string PrettifyEnumerableT<T>([NotNull] [ItemCanBeNull] IEnumerable<T> enumerable, [CanBeNull] PrettificationSettings settings) {
-            var lineStyle = settings?.PreferredLineStyle.Value ?? default;
-            return lineStyle switch {
-                LineStyle.Multi   => PrettifyEnumerable_MultiLine(enumerable, enumerable.GetType(), settings),
-                LineStyle.Single  => PrettifyEnumerable_SingleLine(enumerable, enumerable.GetType(), settings),
-                LineStyle.Dynamic => PrettifyEnumerable_DynamicLine(enumerable, enumerable.GetType(), settings),
-                _                 => throw BEnum.InvalidEnumArgumentException(nameof(PrettificationSettings.PreferredLineStyle), lineStyle)
-            };
-        }
-
         private static string PrettifyEnumerable_DynamicLine<T>(
             [NotNull] [ItemCanBeNull]
             IEnumerable<T> enumerable,

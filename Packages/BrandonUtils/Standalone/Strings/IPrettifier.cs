@@ -10,6 +10,8 @@ namespace BrandonUtils.Standalone.Strings {
         [NotNull]
         Type PrettifierType { get; }
 
+        bool CanPrettify(Type type);
+
         /// <summary>
         /// Returns a pretty <see cref="string"/> representation of <paramref name="cinderella"/> <b>IF</b> <paramref name="cinderella"/> is of the <see cref="PrettifierType"/>.
         ///

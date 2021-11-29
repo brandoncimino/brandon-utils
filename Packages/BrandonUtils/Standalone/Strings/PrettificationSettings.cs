@@ -1,11 +1,10 @@
-﻿using System;
-
-using BrandonUtils.Standalone.Optional;
+﻿using BrandonUtils.Standalone.Optional;
 using BrandonUtils.Standalone.Strings.Json;
 
 using JetBrains.Annotations;
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace BrandonUtils.Standalone.Strings {
     public class PrettificationSettings : IJsonCloneable {
@@ -30,8 +29,6 @@ namespace BrandonUtils.Standalone.Strings {
 
         [NotNull] public Fallback<HeaderStyle> HeaderStyle { get; } = new Fallback<HeaderStyle>(Strings.HeaderStyle.None);
 
-        internal bool VerboseLogging = false;
-
         [NotNull]
         public static implicit operator PrettificationSettings(LineStyle lineStyle) {
             return new PrettificationSettings() {
@@ -53,12 +50,7 @@ namespace BrandonUtils.Standalone.Strings {
             };
         }
 
-        [NotNull]
-        public PrettificationSettings Copy() {
-            throw new NotImplementedException("Need to play with this vs. IJsonCloneable");
-            var json = JsonConvert.SerializeObject(this);
-            return JsonConvert.DeserializeObject<PrettificationSettings>(json);
-        }
+        [CanBeNull] public ITraceWriter TraceWriter { get; set; } = null;
 
         [NotNull]
         public override string ToString() {

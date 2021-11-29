@@ -1,16 +1,17 @@
 ﻿using System;
+using System.Linq;
 
-using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Reflection;
+using BrandonUtils.Standalone.Strings.Json;
 using BrandonUtils.Standalone.Strings.Prettifiers;
 
 using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone.Strings {
-    public class Prettifier<T> : IPrettifier<T>, IPrimaryKeyed<Type> {
+    public class Prettifier<T> : IPrettifier<T> {
         [NotNull] private Func<T, PrettificationSettings, string> PrettificationFunction { get; }
 
-        public Type PrettifierType { get; } = _getPrettifierType();
+        public Type PrettifierType { get; }
 
         [NotNull] public Type PrimaryKey => PrettifierType;
 
@@ -20,15 +21,7 @@ namespace BrandonUtils.Standalone.Strings {
 
         public Prettifier([NotNull] Func<T, PrettificationSettings, string> prettifierFunc) {
             PrettificationFunction = prettifierFunc;
-        }
-
-        private static Type _getPrettifierType() {
-            if (typeof(T) == typeof(Type)) {
-                // ReSharper disable once PossibleMistakenCallToGetType.2
-                return typeof(T).GetType();
-            }
-
-            return typeof(T).IsGenericTypeOrDefinition() ? typeof(T).GetGenericTypeDefinition() : typeof(T);
+            PrettifierType         = PrettificationTypeSimplifier.SimplifyType(typeof(T), new PrettificationSettings());
         }
 
         #endregion
@@ -46,9 +39,7 @@ namespace BrandonUtils.Standalone.Strings {
         public string Prettify(object cinderella, PrettificationSettings settings = default) {
             settings ??= Prettification.DefaultPrettificationSettings;
 
-            if (settings.VerboseLogging) {
-                Console.WriteLine($"⚠ DANGEROUSLY prettifying [{cinderella?.GetType()}]{cinderella}");
-            }
+            settings.TraceWriter.Verbose(() => $"⚠ DANGEROUSLY prettifying [{cinderella?.GetType()}]{cinderella}");
 
             if (cinderella == null) {
                 return settings.NullPlaceholder;
@@ -64,9 +55,7 @@ namespace BrandonUtils.Standalone.Strings {
         public string PrettifySafely(object cinderella, PrettificationSettings settings = default) {
             settings ??= Prettification.DefaultPrettificationSettings;
 
-            if (settings.VerboseLogging) {
-                Console.WriteLine($"🦺 SAFELY prettifying [{cinderella?.GetType().Name}]{cinderella}");
-            }
+            settings.TraceWriter.Verbose(() => $"🦺 SAFELY prettifying [{cinderella?.GetType().Name}]{cinderella}");
 
             try {
                 return Prettify(cinderella, settings);
@@ -76,6 +65,27 @@ namespace BrandonUtils.Standalone.Strings {
                 Console.WriteLine(str);
                 return Prettification.LastResortPrettifier(cinderella, settings);
             }
+        }
+
+        public bool CanPrettify([NotNull] Type cinderellaType) {
+            throw new NotImplementedException("NOT YET FINISHED");
+            if (PrettifierType.IsGenericType == false) {
+                return PrettifierType.IsAssignableFrom(cinderellaType);
+            }
+
+            if (cinderellaType.IsConstructedGenericType) {
+                cinderellaType = cinderellaType.GetGenericTypeDefinition();
+            }
+
+            var checks = new Func<bool>[] {
+                () => PrettifierType == cinderellaType,
+                () => PrettifierType.IsInterface && cinderellaType.Implements(PrettifierType),
+                () => PrettifierType.IsClass     && cinderellaType.IsSubclassOf(PrettifierType),
+                () => PrettifierType.IsAssignableFrom(cinderellaType),
+                () => PrettifierType.IsAssignableFrom(cinderellaType.MakeGenericType())
+            };
+
+            return checks.Any(it => it.Invoke());
         }
 
         #endregion
@@ -95,9 +105,7 @@ namespace BrandonUtils.Standalone.Strings {
         private string PrettifyGeneric([CanBeNull] object cinderella, [CanBeNull] PrettificationSettings settings) {
             settings ??= Prettification.DefaultPrettificationSettings;
 
-            if (settings.VerboseLogging) {
-                Console.WriteLine($"🕵️ Using generic prettification for [{cinderella?.GetType()}");
-            }
+            settings.TraceWriter.Verbose(() => $"🕵️ Using generic prettification for [{cinderella?.GetType()}");
 
             if (cinderella?.GetType().IsGenericTypeOrDefinition() != true) {
                 throw new ArgumentException($"Can't use generic prettification for type [{cinderella?.GetType()}] because it isn't a generic type!");

@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 
 using BrandonUtils.Standalone;
 using BrandonUtils.Standalone.Chronic;
@@ -25,7 +28,7 @@ namespace BrandonUtils.Tests.Standalone.Strings {
     public class PrettificationTests {
         [SetUp]
         public void SetDefaultPrettificationSettings() {
-            Prettification.DefaultPrettificationSettings.VerboseLogging = true;
+            Prettification.DefaultPrettificationSettings.TraceWriter = new ConsoleTraceWriter() { LevelFilter = TraceLevel.Verbose };
         }
 
         public class Expectation {
@@ -196,7 +199,46 @@ int (int, string)
         }
 
         [Test]
-        public void FindGenericallyTypedPrettifier() {
+        [TestCase(typeof(IDictionary<object, (int, Dictionary<string, DayOfWeek>)>), typeof(IDictionary))]
+        [TestCase(typeof(DayOfWeek),                                                 typeof(Enum))]
+        [TestCase(typeof(Nerd),                                                      typeof(IPrettifiable))]
+        [TestCase(typeof(Lazy<Lazy<Lazy<List<int>>>>),                               typeof(Lazy<>))]
+        [TestCase(typeof(ReadOnlyDictionary<,>),                                     typeof(ReadOnlyDictionary<,>))]
+        [TestCase(typeof(int),                                                       typeof(int))]
+        [TestCase(typeof(Professor<IPrettifiable>),                                  typeof(IPrettifiable))]
+        public void SimplifiedTypes(Type original, Type simplified) {
+            var actual = PrettificationTypeSimplifier.SimplifyType(original, Prettification.DefaultPrettificationSettings, 0);
+            Asserter.Against(actual)
+                    .And(Is.EqualTo(simplified))
+                    .Invoke();
+        }
+
+        [Test]
+        [TestCase(typeof(DayOfWeek),                                           typeof(Enum))]
+        [TestCase(typeof(List<Dictionary<int, int>>),                          typeof(IEnumerable))]
+        [TestCase(typeof(Nerd),                                                typeof(IPrettifiable))]
+        [TestCase(typeof(IReadOnlyDictionary<(int, string), List<DayOfWeek>>), typeof(IDictionary))]
+        [TestCase(typeof(Dictionary<int, object>),                             typeof(IDictionary))]
+        [TestCase(typeof(string),                                              typeof(string))]
+        [TestCase(typeof(Professor<List<Nerd>>),                               typeof(IPrettifiable))]
+        [TestCase(typeof(List<>),                                              typeof(IEnumerable))]
+        [TestCase(typeof(List<int>),                                           typeof(IEnumerable))]
+        public void FindPrettifier(Type cinderellaType, Type prettifierType) {
+            var prettifier = PrettifierFinders.FindPrettifier(
+                Prettification.Prettifiers,
+                cinderellaType,
+                default,
+                PrettifierFinders.GetDefaultFinders()
+            );
+            Asserter.Against(prettifier)
+                    .WithHeading($"Prettifier for 🧇 {cinderellaType.Prettify()} 🧇 {cinderellaType}")
+                    .And(Has.Property(nameof(prettifier.HasValue)).EqualTo(true),                                                          $"Prettifier found for {cinderellaType.Prettify()}")
+                    .And(Has.Property(nameof(prettifier.Value)).With.Property(nameof(IPrettifier.PrettifierType)).EqualTo(prettifierType), $"Prettifier type should be {prettifierType.Prettify()}")
+                    .Invoke();
+        }
+
+        [Test]
+        public void FindGenericallyTypedPrettifier_old() {
             var keyedList = new KeyedList<int, (int, string)>(it => it.Item1) { (1, "one"), (2, "two"), (99, "ninety-nine") };
 
             var genTypeDef = keyedList.GetType().GetGenericTypeDefinition();
@@ -207,7 +249,12 @@ int (int, string)
             Console.WriteLine($"kl def ass from ie def: {genTypeDef.IsAssignableFrom(enumerableTypeDef)}");
             Console.WriteLine($"ie def ass from kl def: {enumerableTypeDef.IsAssignableFrom(genTypeDef)}");
 
-            var prettifier = Prettification.FindPrettifier(keyedList.GetType(), default);
+            var prettifier = PrettifierFinders.FindPrettifier(
+                Prettification.Prettifiers,
+                keyedList.GetType(),
+                default,
+                PrettifierFinders.GetDefaultFinders()
+            );
 
             Console.WriteLine(prettifier);
             Console.WriteLine(prettifier.Select(it => it.Prettify(keyedList)));
@@ -249,9 +296,14 @@ int (int, string)
         [TestCase(typeof(A), "A:pretty")]
         [TestCase(typeof(B), "B:pretty")]
         [TestCase(typeof(C), "C:pretty")]
-        [TestCase(typeof(D), "A:pretty")]
+        [TestCase(typeof(D), "D.ToString")]
         public void PrettifierPrefersExactType(Type actualType, string expectedString) {
-            var prettifier = Prettification.FindPrettifier(actualType, default);
+            var prettifier = PrettifierFinders.FindPrettifier(
+                Prettification.Prettifiers,
+                actualType,
+                default,
+                PrettifierFinders.GetDefaultFinders()
+            );
             Console.WriteLine(prettifier);
 
             var instance = Convert.ChangeType(actualType.GetConstructor(Array.Empty<Type>())?.Invoke(Array.Empty<object>()), actualType);
@@ -303,6 +355,69 @@ int (int, string)
             var expected = "A:pretty";
             Console.WriteLine(d.Prettify());
             Assert.That(d.Prettify(), Is.EqualTo(expected));
+        }
+
+        #endregion
+
+        #region Prettifier Prefers IPrettifiable
+
+        class Nerd : IPrettifiable {
+            public string Prettify(PrettificationSettings settings = default) => $"{GetType().Prettify()}::{nameof(Prettify)}";
+
+            public override string ToString() => $"{GetType().Prettify()}::{nameof(ToString)}";
+        }
+
+        class LoveInterest<T> : IPrettifiable {
+            public          string Prettify(PrettificationSettings settings = default) => $"{GetType().Prettify()}::{nameof(Prettify)}";
+            public override string ToString()                                          => $"{GetType().Prettify()}::{nameof(ToString)}";
+        }
+
+        class Professor<T> : Nerd { }
+
+        class DebugPrettifier : IPrettifier {
+            public Type PrettifierType { get; }
+            public Type PrimaryKey     => PrettifierType;
+
+            public bool CanPrettify(Type type) => true;
+
+            public DebugPrettifier(Type type) {
+                PrettifierType = type;
+            }
+
+            public string Prettify(object cinderella, PrettificationSettings settings = default) {
+                return PrettifyString();
+            }
+
+            public string PrettifyString() {
+                return $"{PrettifierType.Prettify()}::{nameof(DebugPrettifier)}";
+            }
+
+            public string PrettifySafely(object cinderella, PrettificationSettings settings = default) {
+                return PrettifyString();
+            }
+        }
+
+        [Test]
+        [TestCase(typeof(Nerd))]
+        [TestCase(typeof(LoveInterest<Nerd>))]
+        [TestCase(typeof(LoveInterest<>))]
+        [TestCase(typeof(LoveInterest<int>))]
+        [TestCase(typeof(Professor<int>))]
+        public static void PrettifierPrefersIPrettifiable(Type prettifiableType) {
+            var prettifier = new DebugPrettifier(prettifiableType);
+            Prettification.RegisterPrettifier(prettifier);
+
+            if (prettifiableType.IsGenericTypeDefinition) {
+                prettifiableType = prettifiableType.MakeGenericType(typeof(int));
+            }
+
+            var inst = Activator.CreateInstance(prettifiableType);
+
+            Asserter.Against(inst)
+                    .And(it => it.ToString(), Is.EqualTo($"{inst.GetType().Prettify()}::{nameof(ToString)}"))
+                    .And(it => it.Prettify(), Is.EqualTo($"{inst.GetType().Prettify()}::{nameof(IPrettifiable.Prettify)}"))
+                    .And(it => it.Prettify(), Is.Not.EqualTo(prettifier.PrettifyString()))
+                    .Invoke();
         }
 
         #endregion
@@ -370,7 +485,7 @@ List<int>[
         public void GenTypesMatch() {
             var ls         = new List<int> { 1, 2, 3 };
             var lst        = ls.GetType();
-            var typesMatch = Prettification.GenericTypesMatch(lst, typeof(IEnumerable<object>));
+            var typesMatch = PrettifierFinders.GenericTypesMatch(lst, typeof(IEnumerable<object>));
             Console.WriteLine(typesMatch);
         }
 
@@ -381,6 +496,27 @@ List<int>[
             var pretty  = enumSet.Prettify();
             Console.WriteLine(pretty);
             Assert.That(pretty, Is.EqualTo(expectedString));
+        }
+
+        [Test]
+        public void DoesRuntimeTypeHaveToString() {
+            var type = typeof(Type).GetType();
+            Console.WriteLine(type);
+            var toString = type.GetToStringOverride();
+            Console.WriteLine(toString);
+            Console.WriteLine("dec: " + toString?.DeclaringType);
+            Console.WriteLine("ref: " + toString?.ReflectedType);
+
+            var prettifier = PrettifierFinders.FindPrettifier(
+                Prettification.Prettifiers,
+                type,
+                default,
+                PrettifierFinders.GetDefaultFinders()
+            );
+            Asserter.Against(prettifier)
+                    .And(Has.Property(nameof(prettifier.HasValue)).EqualTo(true))
+                    .And(Has.Property(nameof(prettifier.Value)).With.Property(nameof(IPrettifier.PrettifierType)).EqualTo(typeof(Type)))
+                    .Invoke();
         }
 
         [Test]
@@ -401,7 +537,12 @@ List<int>[
 
         [Test]
         public void PerformanceTest_Dictionary() {
-            var settings = new PrettificationSettings();
+            var settings    = new PrettificationSettings();
+            var oldSettings = Prettification.DefaultPrettificationSettings;
+            Prettification.DefaultPrettificationSettings = settings;
+
+            Console.WriteLine($"Settings: {settings}");
+            Console.WriteLine($"Trace Writer: {settings.TraceWriter}");
 
             var ob = new Dictionary<DayOfWeek, string>() {
                 [DayOfWeek.Monday]    = "Monntag",
@@ -421,7 +562,7 @@ List<int>[
 
             // ReSharper disable once SuggestBaseTypeForParameter
             void ViaSpecific(Dictionary<DayOfWeek, string> obj) {
-                _ = InnerPretty.PrettifyDictionary<DayOfWeek, string>(obj);
+                _ = InnerPretty.PrettifyDictionary<DayOfWeek, string>(obj, settings);
             }
 
             var comparison = MethodTimer.CompareExecutions(
@@ -432,6 +573,7 @@ List<int>[
             );
 
             Console.WriteLine(comparison);
+            Prettification.DefaultPrettificationSettings = oldSettings;
         }
 
         [Test]
@@ -439,7 +581,9 @@ List<int>[
         public void PerformanceTest_Type(Type type) {
             const int iterations = 2000;
 
-            var settings = new PrettificationSettings();
+            var settings    = new PrettificationSettings();
+            var oldSettings = Prettification.DefaultPrettificationSettings;
+            Prettification.DefaultPrettificationSettings = settings;
 
             var comparison = MethodTimer.CompareExecutions(
                 (type, settings),
@@ -449,6 +593,7 @@ List<int>[
             );
 
             Console.WriteLine(comparison);
+            Prettification.DefaultPrettificationSettings = oldSettings;
             Assert.That(comparison.Faster, Is.EqualTo(AggregateExecutionComparison.Which.Second));
         }
 
@@ -516,6 +661,56 @@ List<int>[
                     .And(Has.Property(nameof(copy.TableHeaderSeparator)).EqualTo(original.TableHeaderSeparator))
                     .And(Has.Property(nameof(copy.NullPlaceholder)).EqualTo(original.NullPlaceholder))
                     .And(Is.Not.SameAs(original))
+                    .Invoke();
+        }
+
+        private static Type[] PrettyTypesWithInterfaces = {
+            typeof(IList<>),
+            typeof(KeyedCollection<,>),
+            typeof(IDictionary),
+            typeof(IEnumerable)
+        };
+
+        [Test]
+        public void DoInterfaceAndInheritFindDifferentPrettifiers([ValueSource(nameof(PrettyTypesWithInterfaces))] Type t) {
+            Prettification.DefaultPrettificationSettings = LineStyle.Single;
+            var settings    = Prettification.DefaultPrettificationSettings;
+            var iPrettifier = PrettifierFinders.FindInterfacePrettifier(Prettification.Prettifiers, t, settings);
+            var cPrettifier = PrettifierFinders.FindInheritedPrettifier(Prettification.Prettifiers, t, settings);
+            var gPrettifier = PrettifierFinders.FindGenericallyTypedPrettifier(Prettification.Prettifiers, t, settings);
+
+            var toStringMethod  = t.GetMethod(nameof(ToString));
+            var toStringClass   = toStringMethod?.DeclaringType;
+            var toStringReflect = toStringMethod?.ReflectedType;
+
+            var stuff = new Dictionary<object, object>() {
+                ["cinderella"]                                             = t.Prettify(settings),
+                [nameof(PrettifierFinders.FindInterfacePrettifier)]        = iPrettifier,
+                [nameof(PrettifierFinders.FindInheritedPrettifier)]        = cPrettifier,
+                [nameof(PrettifierFinders.FindGenericallyTypedPrettifier)] = gPrettifier,
+                [nameof(toStringMethod)]                                   = toStringMethod,
+                [$"-> {nameof(toStringMethod.DeclaringType)}"]             = toStringClass,
+                [$"-> {nameof(toStringMethod.ReflectedType)}"]             = toStringReflect,
+            };
+
+            stuff.Select((k, v) => $"{k.Prettify(settings).ForceToLength(35)}{v.Prettify(settings)}").ToList().ForEach(Console.WriteLine);
+        }
+
+        class ExtendsDBType : ParameterInfo {
+            public override string ToString() {
+                return PrettyString();
+            }
+
+            public static string PrettyString() {
+                var prettyString = $"{nameof(ExtendsDBType)} > {nameof(ParameterInfo)}";
+                return prettyString;
+            }
+        }
+
+        [Test]
+        public void PrettifyPrefersToStringOverrideOverInheritedClass() {
+            Asserter.Against(new ExtendsDBType())
+                    .And(it => it.Prettify(), Is.EqualTo(ExtendsDBType.PrettyString()))
                     .Invoke();
         }
     }
