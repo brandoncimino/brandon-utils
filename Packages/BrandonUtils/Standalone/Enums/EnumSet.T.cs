@@ -139,11 +139,6 @@ namespace BrandonUtils.Standalone.Enums {
 
         bool ICollection<T>.IsReadOnly => ShouldBeReadOnly;
 
-        [NotNull]
-        public override string ToString() {
-            return this.Prettify();
-        }
-
         void ICollection<T>.Add(T item) {
             throw new NotImplementedException("can't add, ok?");
         }
