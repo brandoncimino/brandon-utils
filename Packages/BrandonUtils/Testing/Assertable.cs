@@ -55,7 +55,6 @@ namespace BrandonUtils.Testing {
             Nickname = nickname ?? GetNicknameSupplier(actual, constraint);
         }
 
-
         public override string ToString() {
             return this.FormatAssertable().JoinLines() ?? base.ToString();
         }
@@ -74,14 +73,14 @@ namespace BrandonUtils.Testing {
         }
 
         [NotNull]
-        internal static Func<string> GetNicknameSupplier([CanBeNull] Delegate dgate, [CanBeNull] IResolveConstraint constraint) {
-            return () => GetNickname(dgate, constraint);
+        internal static Func<string> GetNicknameSupplier([CanBeNull] Delegate dgate, [CanBeNull] IResolveConstraint constraint, [CanBeNull] PrettificationSettings settings = default) {
+            return () => GetNickname(dgate, constraint, settings);
         }
 
         [NotNull]
-        private static string GetNickname([CanBeNull] Delegate dgate, [CanBeNull] IResolveConstraint constraint) {
-            var dName = dgate?.Prettify();
-            var cName = constraint?.Prettify();
+        private static string GetNickname([CanBeNull] Delegate dgate, [CanBeNull] IResolveConstraint constraint, [CanBeNull] PrettificationSettings settings) {
+            var dName = dgate?.Prettify(settings);
+            var cName = constraint?.Prettify(settings);
             var parts = new[] { dName, cName };
             return parts.NonBlank().JoinString(" 🗜 ");
         }
