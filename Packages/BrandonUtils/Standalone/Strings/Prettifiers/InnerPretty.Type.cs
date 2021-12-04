@@ -71,8 +71,9 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
             };
         }
 
-        internal static string WithTypeLabel([CanBeNull] this string thing, [NotNull] Type labelType, [CanBeNull] PrettificationSettings settings) {
-            return $"{labelType.GetTypeLabel(settings)}{thing}";
+        [NotNull]
+        internal static string WithTypeLabel([CanBeNull] this string thing, [NotNull] Type labelType, [NotNull] PrettificationSettings settings, string joiner = "") {
+            return $"{labelType.GetTypeLabel(settings)}{joiner}{thing}";
         }
     }
 }
