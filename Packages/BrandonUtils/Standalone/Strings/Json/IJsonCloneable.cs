@@ -1,4 +1,6 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+
+using JetBrains.Annotations;
 
 using Newtonsoft.Json;
 
@@ -32,6 +34,23 @@ namespace BrandonUtils.Standalone.Strings.Json {
         public static T JsonClone<T>([CanBeNull] this T original, [CanBeNull] JsonSerializerSettings settings = default) where T : IJsonCloneable {
             var json = JsonConvert.SerializeObject(original, settings!);
             return JsonConvert.DeserializeObject<T>(json, settings);
+        }
+
+        /// <summary>
+        /// Creates a <see cref="JsonClone{T}(T,Newtonsoft.Json.JsonSerializerSettings)"/> of this <typeparamref name="T"/>, while also performing some arbitrary <paramref name="modifications"/> to the new clone.
+        /// </summary>
+        /// <param name="original"></param>
+        /// <param name="modifications"></param>
+        /// <param name="settings"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        [CanBeNull]
+        [ContractAnnotation("original:null => null")]
+        [ContractAnnotation("original:notnull => notnull")]
+        public static T JsonClone<T>([CanBeNull] this T original, [CanBeNull] Action<T> modifications, [CanBeNull] JsonSerializerSettings settings = default) where T : IJsonCloneable {
+            var clone = original.JsonClone(settings);
+            modifications?.Invoke(clone);
+            return clone;
         }
     }
 }
