@@ -69,8 +69,8 @@ namespace BrandonUtils.Standalone.Strings {
 
         private static Type SimplifyTypeSwitch([NotNull] Type type, [NotNull] PrettificationSettings settings, int recurCount = 0) {
             if (SimplestTypes.ContainsKey(type)) {
-                settings.TraceWriter.Verbose(() => $"🦠 Could not simplify {type.Name} any further!");
-                return SimplestTypes[type];
+                var simplest = SimplestTypes[type];
+                settings.TraceWriter.Verbose(() => $"🦠 Could not simplify {type.Name} past {simplest.Name}!", recurCount + 2);
             }
 
             var simplified = type switch {
@@ -82,16 +82,16 @@ namespace BrandonUtils.Standalone.Strings {
             };
 
             if (simplified == type) {
-                settings.TraceWriter.Verbose(() => $"🤏 {type} simplified to the same type {simplified}; returning fully simplified {simplified}", 2);
+                settings.TraceWriter.Verbose(() => $"🦠 {type} simplified to the same type {simplified}; returning fully simplified {simplified}", recurCount + 2);
+                return simplified;
             }
             else if (recurCount > 30) {
                 throw new BrandonException($"REACHED RECUR LIMIT: {nameof(simplified)}: {simplified} != {nameof(type)}: {type}!");
             }
             else {
-                settings.TraceWriter.Verbose(() => $"original {type} simplified to {simplified}; recurring...");
+                settings.TraceWriter.Verbose(() => $"🤏 original {type} simplified to {simplified}; recurring...", recurCount + 2);
+                return SimplifyTypeSwitch(simplified, settings, ++recurCount);
             }
-
-            return simplified == type ? simplified : SimplifyTypeSwitch(simplified, settings, ++recurCount);
         }
     }
 }
