@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
+using BrandonUtils.Standalone.Exceptions;
+using BrandonUtils.Standalone.Reflection;
 using BrandonUtils.Standalone.Strings.Json;
 
 using JetBrains.Annotations;
@@ -46,7 +48,8 @@ namespace BrandonUtils.Standalone.Strings {
                 [typeof(Type)]                   = typeof(Type),
                 // ReSharper disable once PossibleMistakenCallToGetType.2
                 [typeof(Type).GetType()] = typeof(Type),
-                [typeof(IPrettifiable)]  = typeof(IPrettifiable)
+                [typeof(IPrettifiable)]  = typeof(IPrettifiable),
+                [typeof(object)]         = typeof(object),
             }
         );
 
@@ -55,48 +58,40 @@ namespace BrandonUtils.Standalone.Strings {
         /// </summary>
         /// <param name="type">the original <see cref="Type"/></param>
         /// <param name="settings"></param>
-        /// <param name="indent"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         [NotNull]
         [Pure]
-        internal static Type SimplifyType([NotNull] Type type, [CanBeNull] PrettificationSettings settings, int indent = 0) {
-            settings ??= Prettification.DefaultPrettificationSettings;
+        internal static Type SimplifyType([NotNull] Type type, [CanBeNull] PrettificationSettings settings) {
+            settings = Prettification.ResolveSettings(settings);
+            return SimplifyTypeSwitch(type, settings);
+        }
 
-            settings.TraceWriter.Verbose(() => $"🤏 Simplifying Type: {type}", indent);
-            indent++;
-
-            Type simplified = type;
-
-            // check for some exact, immediate types we've identified
+        private static Type SimplifyTypeSwitch([NotNull] Type type, [NotNull] PrettificationSettings settings, int recurCount = 0) {
             if (SimplestTypes.ContainsKey(type)) {
-                simplified = SimplestTypes[type];
-                settings.TraceWriter.Verbose(() => $"🔬 {type.Name} => {simplified.Name}", indent);
-                return simplified;
+                settings.TraceWriter.Verbose(() => $"🦠 Could not simplify {type.Name} any further!");
+                return SimplestTypes[type];
             }
 
-            // treat all Enums the same
-            // TODO: If we wind up with an enum that we want special prettification for (which seems likely), then we will have to modify this logic.
-            if (type.IsEnum && type != typeof(Enum)) {
-                simplified = typeof(Enum);
-                settings.TraceWriter.Verbose(() => $"🔬 {type.Name}.{nameof(type.IsEnum)} == {true} => {simplified.Name}", indent);
-                return simplified;
+            var simplified = type switch {
+                { IsEnum: true }                                => typeof(Enum),
+                { IsPrimitive: true }                           => typeof(object),
+                { } when type.Implements(typeof(IPrettifiable)) => typeof(IPrettifiable),
+                { IsConstructedGenericType: true }              => type.GetGenericTypeDefinition(),
+                _                                               => type,
+            };
+
+            if (simplified == type) {
+                settings.TraceWriter.Verbose(() => $"🤏 {type} simplified to the same type {simplified}; returning fully simplified {simplified}", 2);
+            }
+            else if (recurCount > 30) {
+                throw new BrandonException($"REACHED RECUR LIMIT: {nameof(simplified)}: {simplified} != {nameof(type)}: {type}!");
+            }
+            else {
+                settings.TraceWriter.Verbose(() => $"original {type} simplified to {simplified}; recurring...");
             }
 
-            if (type.GetInterface(nameof(IPrettifiable)) != null) {
-                simplified = typeof(IPrettifiable);
-                settings.TraceWriter.Verbose(() => $"🔬 {type.Name} implements {typeof(IPrettifiable)} => {simplified.Name}", indent);
-                return simplified;
-            }
-
-            if (type.IsConstructedGenericType) {
-                simplified = type.GetGenericTypeDefinition();
-                settings.TraceWriter.Verbose(() => $"🔬 {type.Name}.{nameof(type.IsConstructedGenericType)} == {true} => {simplified.Name}", indent);
-                return SimplifyType(simplified, settings, indent);
-            }
-
-            settings.TraceWriter.Verbose(() => $"🦠 Could not simplify {type.Name} past {simplified.Name}", indent);
-            return type;
+            return simplified == type ? simplified : SimplifyTypeSwitch(simplified, settings, ++recurCount);
         }
     }
 }
