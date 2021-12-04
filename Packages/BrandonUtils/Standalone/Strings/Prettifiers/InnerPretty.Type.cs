@@ -73,7 +73,7 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
 
         [NotNull]
         internal static string WithTypeLabel([CanBeNull] this string thing, [NotNull] Type labelType, [NotNull] PrettificationSettings settings, string joiner = "") {
-            return $"{labelType.GetTypeLabel(settings)}{joiner}{thing}";
+            return new[] { labelType.GetTypeLabel(settings), thing }.NonNull().JoinString(joiner);
         }
     }
 }
