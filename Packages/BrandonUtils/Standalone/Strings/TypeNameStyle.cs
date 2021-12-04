@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 
+using BrandonUtils.Standalone.Enums;
 using BrandonUtils.Standalone.Reflection;
 using BrandonUtils.Standalone.Strings.Json;
 using BrandonUtils.Standalone.Strings.Prettifiers;
@@ -8,9 +10,9 @@ using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone.Strings {
     public enum TypeNameStyle {
-        None,
-        Full,
-        Short
+        None  = 0,
+        Short = 1,
+        Full  = 2,
     }
 
     public static class TypeNameStyleExtensions {
@@ -33,6 +35,12 @@ namespace BrandonUtils.Standalone.Strings {
             }
 
             return $"[{str}]";
+        }
+
+        public static TypeNameStyle Reduce(this TypeNameStyle style, int steps = 1) {
+            var newStep = (int)style - steps;
+            newStep = newStep.Clamp(0, BEnum.GetValues<TypeNameStyle>().Cast<int>().Max());
+            return (TypeNameStyle)newStep;
         }
     }
 }
