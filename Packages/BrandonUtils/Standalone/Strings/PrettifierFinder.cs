@@ -38,7 +38,7 @@ namespace BrandonUtils.Standalone.Strings {
             IEnumerable<OptionalPrettifierFinder> finders
         ) {
             settings = Prettification.ResolveSettings(settings);
-            settings.TraceWriter.Verbose(() => $"🔎 Attempting to find an {nameof(IPrettifier)} for the type {type}");
+            settings.TraceWriter.Verbose(() => $"🔎 Attempting to find an {nameof(IPrettifier)} for the type {type.Name}");
             var simplified = PrettificationTypeSimplifier.SimplifyType(type, settings);
 
             var prettifier = Optional.Optional.FirstWithValue<OptionalPrettifierFinder, IPrettifier>(

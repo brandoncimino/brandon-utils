@@ -82,14 +82,14 @@ namespace BrandonUtils.Standalone.Strings {
             };
 
             if (simplified == type) {
-                settings.TraceWriter.Verbose(() => $"🦠 {type} simplified to the same type {simplified}; returning fully simplified {simplified}", recurCount + 2);
+                settings.TraceWriter.Verbose(() => $"🦠 {type.Name} simplified to the same type {simplified.Name}; returning fully simplified {simplified.Name}", recurCount + 2);
                 return simplified;
             }
             else if (recurCount > 30) {
                 throw new BrandonException($"REACHED RECUR LIMIT: {nameof(simplified)}: {simplified} != {nameof(type)}: {type}!");
             }
             else {
-                settings.TraceWriter.Verbose(() => $"🤏 original {type} simplified to {simplified}; recurring...", recurCount + 2);
+                settings.TraceWriter.Verbose(() => $"🤏 original {type.Name} simplified to {simplified.Name}; recurring...", recurCount + 2);
                 return SimplifyTypeSwitch(simplified, settings, ++recurCount);
             }
         }

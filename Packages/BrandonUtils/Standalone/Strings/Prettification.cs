@@ -63,7 +63,7 @@ namespace BrandonUtils.Standalone.Strings {
         public static string Prettify([CanBeNull] this object cinderella, [CanBeNull] PrettificationSettings settings) {
             settings = ResolveSettings(settings);
 
-            settings.TraceWriter.Verbose(() => $"👸 Prettifying [{cinderella?.GetType()}]{cinderella}");
+            settings.TraceWriter.Verbose(() => $"👸 Prettifying [{cinderella?.GetType().Name}]");
 
             if (cinderella == null) {
                 return settings.NullPlaceholder.Value ?? "";
