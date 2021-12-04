@@ -37,9 +37,9 @@ namespace BrandonUtils.Standalone.Strings {
             [NotNull, ItemNotNull, InstantHandle]
             IEnumerable<OptionalPrettifierFinder> finders
         ) {
-            settings ??= Prettification.DefaultPrettificationSettings;
+            settings = Prettification.ResolveSettings(settings);
             settings.TraceWriter.Verbose(() => $"🔎 Attempting to find an {nameof(IPrettifier)} for the type {type}");
-            var simplified = PrettificationTypeSimplifier.SimplifyType(type, settings, 0);
+            var simplified = PrettificationTypeSimplifier.SimplifyType(type, settings);
 
             var prettifier = Optional.Optional.FirstWithValue<OptionalPrettifierFinder, IPrettifier>(
                 finders,
@@ -113,6 +113,8 @@ namespace BrandonUtils.Standalone.Strings {
         [ItemNotNull]
         internal static Optional<IPrettifier> FindToStringOverridePrettifier([CanBeNull] IPrettifierDatabase prettifierDatabase, [NotNull] Type type, [NotNull] PrettificationSettings settings) {
             settings.TraceWriter.Verbose(() => $"-> {nameof(FindToStringOverridePrettifier)}({type.Name})", 1);
+            settings.TraceWriter.Warning(() => $"{nameof(FindToStringOverridePrettifier)} is currently DISABLED!");
+            return default;
             var toString = type.GetToStringOverride();
             return toString != null ? Optional.Optional.Of(PrettifierDatabase.ToStringPrettifier) : default;
         }
