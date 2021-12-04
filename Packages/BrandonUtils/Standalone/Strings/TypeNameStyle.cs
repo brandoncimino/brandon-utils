@@ -17,7 +17,7 @@ namespace BrandonUtils.Standalone.Strings {
 
     public static class TypeNameStyleExtensions {
         [NotNull]
-        public static string GetTypeLabel([CanBeNull] this Type type, [CanBeNull] PrettificationSettings settings) {
+        public static string GetTypeLabel(this Type? type, PrettificationSettings? settings) {
             settings = Prettification.ResolveSettings(settings);
 
             var style = type?.IsEnum == true ? settings.EnumLabelStyle : settings.TypeLabelStyle;

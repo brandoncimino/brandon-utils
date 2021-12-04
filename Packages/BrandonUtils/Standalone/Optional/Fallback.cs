@@ -50,8 +50,7 @@ namespace BrandonUtils.Standalone.Optional {
         public T FallbackValue { get; }
 
         [JsonProperty(IsReference = true, ItemIsReference = true, NullValueHandling = NullValueHandling.Ignore)]
-        [CanBeNull]
-        public Fallback<T> FallbackSource { get; }
+        public Fallback<T>? FallbackSource { get; }
 
         public int Count => ExplicitValue.Count;
 

@@ -102,7 +102,7 @@ namespace BrandonUtils.Standalone.Strings {
         }
 
         [NotNull]
-        private string PrettifyGeneric([CanBeNull] object cinderella, [CanBeNull] PrettificationSettings settings) {
+        private string PrettifyGeneric(object? cinderella, PrettificationSettings? settings) {
             settings ??= Prettification.DefaultPrettificationSettings;
 
             settings.TraceWriter.Verbose(() => $"🕵️ Using generic prettification for [{cinderella?.GetType()}");

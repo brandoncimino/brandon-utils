@@ -15,7 +15,7 @@ namespace BrandonUtils.Standalone.Randomization {
 
         /// <returns>a random <see cref="double"/> in the range of <c>[0..1]</c>, i.e. <c><![CDATA[0 <= x <= 1]]></c></returns>
         [Pure]
-        public static double NextDoubleInclusive([CanBeNull] this Random generator) {
+        public static double NextDoubleInclusive(this Random? generator) {
             const int nextIntMax = int.MaxValue - 1;
             return (double)generator.OrDefault().Next() / nextIntMax;
         }
@@ -23,7 +23,7 @@ namespace BrandonUtils.Standalone.Randomization {
         /// <param name="generator"></param>
         /// <returns>a random sign (either 1 or -1)</returns>
         [Pure]
-        public static int Sign([CanBeNull] this Random generator) {
+        public static int Sign(this Random? generator) {
             return generator.OrDefault().Next(2) == 0 ? -1 : 1;
         }
 
@@ -37,7 +37,7 @@ namespace BrandonUtils.Standalone.Randomization {
         /// <param name="generator">the <see cref="Random"/> instance that will generate numbers. Defaults to <see cref="Gen"/></param>
         /// <returns>a <see cref="double"/> that is up to <paramref name="radius"/> away from <paramref name="center"/></returns>
         [Pure]
-        public static double Near(double center, double radius, [CanBeNull] Random generator = default) {
+        public static double Near(double center, double radius, Random? generator = default) {
             return generator.Near(center, radius);
         }
 
@@ -45,7 +45,7 @@ namespace BrandonUtils.Standalone.Randomization {
          * <inheritdoc cref="Near(double,double,System.Random)"/>
          */
         [Pure]
-        public static double Near([CanBeNull] this Random generator, double center, double radius) {
+        public static double Near(this Random? generator, double center, double radius) {
             return center + generator.Double(-radius, radius);
         }
 
@@ -82,7 +82,7 @@ namespace BrandonUtils.Standalone.Randomization {
         /// <exception cref="BrandonException">if we fail to select any of the <paramref name="weightedChoices"/></exception>
         [CanBeNull]
         public static T FromWeightedList<T>(
-            [CanBeNull] this Random generator,
+            this Random? generator,
             [NotNull, InstantHandle]
             IEnumerable<(T choice, double weight)> weightedChoices
         ) {
@@ -111,7 +111,7 @@ namespace BrandonUtils.Standalone.Randomization {
         }
 
         [CanBeNull]
-        public static T FromWeightedList<T>([CanBeNull] this Random generator, [NotNull, InstantHandle] IEnumerable<(T choice, int weight)> weightedChoices) {
+        public static T FromWeightedList<T>(this Random? generator, [NotNull, InstantHandle] IEnumerable<(T choice, int weight)> weightedChoices) {
             return generator.FromWeightedList(weightedChoices.Select(it => (it.choice, it.weight.ToDouble())));
         }
 
@@ -128,12 +128,12 @@ namespace BrandonUtils.Standalone.Randomization {
         /// <exception cref="ArgumentOutOfRangeException">if any of the <paramref name="weightedChoices"/>' <see cref="IDictionary{TKey,TValue}.Values"/> <see cref="Mathb.IsNegative(double)"/></exception>
         /// <exception cref="BrandonException">if we fail to select an entry <i>(this should not occur under normal circumstances)</i></exception>
         [NotNull]
-        public static T FromWeightedList<T>([CanBeNull] this Random generator, [NotNull] IDictionary<T, double> weightedChoices) {
+        public static T FromWeightedList<T>(this Random? generator, [NotNull] IDictionary<T, double> weightedChoices) {
             return generator.FromWeightedList(weightedChoices.Select(it => (it.Key, it.Value)))!;
         }
 
         [NotNull]
-        public static T FromWeightedList<T>([CanBeNull] this Random generator, [NotNull] IDictionary<T, int> weightedChoices) {
+        public static T FromWeightedList<T>(this Random? generator, [NotNull] IDictionary<T, int> weightedChoices) {
             return generator.FromWeightedList(weightedChoices.Select(it => (it.Key, it.Value)))!;
         }
 
@@ -150,7 +150,7 @@ namespace BrandonUtils.Standalone.Randomization {
         /// <exception cref="ArgumentOutOfRangeException">if any of the results of <paramref name="weightSelector"/> are <c><![CDATA[< 0]]></c></exception>
         [CanBeNull]
         public static T FromWeightedList<T>(
-            [CanBeNull] this Random generator,
+            this Random? generator,
             [NotNull, ItemCanBeNull, InstantHandle]
             IEnumerable<T> choices,
             [NotNull] Func<T, double> weightSelector
@@ -171,7 +171,7 @@ namespace BrandonUtils.Standalone.Randomization {
         #endregion
 
         [NotNull]
-        internal static Random OrDefault([CanBeNull] this Random generator) {
+        internal static Random OrDefault(this Random? generator) {
             return generator ?? Gen;
         }
 
@@ -180,28 +180,28 @@ namespace BrandonUtils.Standalone.Randomization {
         /// <param name="generator"></param>
         /// <returns>a random <see cref="bool"/> (true or false)</returns>
         [Pure]
-        public static bool Bool([CanBeNull] this Random generator) => generator.OrDefault().Next(2) == 0;
+        public static bool Bool(this Random? generator) => generator.OrDefault().Next(2) == 0;
 
-        public static int      Int([CanBeNull] this      Random generator, int      min, int      max) => generator.OrDefault().Next(min, max);
-        public static long     Long([CanBeNull] this     Random generator, long     min, long     max) => (min, max).LerpInt(generator.NextDoubleInclusive());
-        public static float    Float([CanBeNull] this    Random generator, float    min, float    max) => (min, max).Lerp(generator.NextDoubleInclusive().ToFloat());
-        public static double   Double([CanBeNull] this   Random generator, double   min, double   max) => (min, max).Lerp(generator.NextDoubleInclusive());
-        public static decimal  Decimal([CanBeNull] this  Random generator, decimal  min, decimal  max) => (min, max).Lerp(generator.NextDoubleInclusive().ToDecimal());
-        public static TimeSpan TimeSpan([CanBeNull] this Random generator, TimeSpan min, TimeSpan max) => (min, max).Lerp(generator.NextDoubleInclusive());
-        public static DateTime DateTime([CanBeNull] this Random generator, DateTime min, DateTime max) => (min, max).Lerp(generator.NextDoubleInclusive());
-        public static int      Int([CanBeNull] this      Random generator, int      max) => generator.Int(0, max);
-        public static long     Long([CanBeNull] this     Random generator, long     max) => generator.Long(0, max);
-        public static float    Float([CanBeNull] this    Random generator, float    max) => generator.Float(0, max);
-        public static double   Double([CanBeNull] this   Random generator, double   max) => generator.Double(0, max);
-        public static decimal  Decimal([CanBeNull] this  Random generator, decimal  max) => generator.Decimal(0, max);
-        public static TimeSpan TimeSpan([CanBeNull] this Random generator, TimeSpan max) => generator.TimeSpan(default, max);
-        public static DateTime DateTime([CanBeNull] this Random generator, DateTime max) => generator.DateTime(default, max);
+        public static int      Int(this         Random? generator, int      min, int      max) => generator.OrDefault().Next(min, max);
+        public static long     Long(this        Random? generator, long     min, long     max) => (min, max).LerpInt(generator.NextDoubleInclusive());
+        public static float    Float(this       Random? generator, float    min, float    max) => (min, max).Lerp(generator.NextDoubleInclusive().ToFloat());
+        public static double   Double(this      Random? generator, double   min, double   max) => (min, max).Lerp(generator.NextDoubleInclusive());
+        public static decimal  Decimal(this     Random? generator, decimal  min, decimal  max) => (min, max).Lerp(generator.NextDoubleInclusive().ToDecimal());
+        public static TimeSpan TimeSpan(this    Random? generator, TimeSpan min, TimeSpan max) => (min, max).Lerp(generator.NextDoubleInclusive());
+        public static DateTime DateTime(this    Random? generator, DateTime min, DateTime max) => (min, max).Lerp(generator.NextDoubleInclusive());
+        public static int      Int(this         Random? generator, int      max) => generator.Int(0, max);
+        public static long     Long(this        Random? generator, long     max) => generator.Long(0, max);
+        public static float    Float(this       Random? generator, float    max) => generator.Float(0, max);
+        public static double   Double(this      Random? generator, double   max) => generator.Double(0, max);
+        public static decimal  Decimal(this     Random? generator, decimal  max) => generator.Decimal(0, max);
+        public static TimeSpan TimeSpan(this    Random? generator, TimeSpan max) => generator.TimeSpan(default, max);
+        public static DateTime DateTime(this Random? generator, DateTime max) => generator.DateTime(default, max);
 
         /**
          * <inheritdoc cref="NextDoubleInclusive"/>
          * <remarks>Shorthand for <see cref="NextDoubleInclusive"/></remarks>
          */
-        public static double Double([CanBeNull] this Random generator) => generator.NextDoubleInclusive();
+        public static double Double(this Random? generator) => generator.NextDoubleInclusive();
 
         #endregion
     }

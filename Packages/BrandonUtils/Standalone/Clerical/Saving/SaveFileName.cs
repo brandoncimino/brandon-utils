@@ -66,7 +66,7 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
         }
 
         [ContractAnnotation("null => stop")]
-        private static string Validate_Nickname([CanBeNull] string nickname) {
+        private static string Validate_Nickname(string? nickname) {
             if (nickname.IsNullOrEmpty()) {
                 throw new ArgumentNullException(nameof(nickname), $"Must not be null or empty, but was [{nickname}]!");
             }

@@ -15,12 +15,12 @@ namespace BrandonUtils.Standalone.Strings {
     /// </summary>
     internal static class PrettificationTypeSimplifier {
         internal class SimplifiedType {
-            [NotNull]   public readonly  Type                   Original;
-            [NotNull]   public           Type                   Simplified => _simplified.Value;
-            [NotNull]   private readonly Lazy<Type>             _simplified;
-            [CanBeNull] private readonly PrettificationSettings Settings;
+            [NotNull] public readonly  Type                    Original;
+            [NotNull] public           Type                    Simplified => _simplified.Value;
+            [NotNull] private readonly Lazy<Type>              _simplified;
+            private readonly PrettificationSettings? Settings;
 
-            public SimplifiedType(Type original, [CanBeNull] PrettificationSettings settings = default) {
+            public SimplifiedType(Type original, PrettificationSettings? settings = default) {
                 Original    = original;
                 _simplified = new Lazy<Type>(Simplify);
                 Settings    = settings;
@@ -62,7 +62,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// <exception cref="ArgumentNullException"></exception>
         [NotNull]
         [Pure]
-        internal static Type SimplifyType([NotNull] Type type, [CanBeNull] PrettificationSettings settings) {
+        internal static Type SimplifyType([NotNull] Type type, PrettificationSettings? settings) {
             settings = Prettification.ResolveSettings(settings);
             return SimplifyTypeSwitch(type, settings);
         }

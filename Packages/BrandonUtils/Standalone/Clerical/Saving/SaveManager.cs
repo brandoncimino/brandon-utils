@@ -23,7 +23,7 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
             return new SaveFile<TData>(SaveFolder, nickname, timeStamp, Settings.SaveFileExtension);
         }
 
-        public IOrderedEnumerable<SaveFile<TData>> EnumerateSaveFiles([CanBeNull] string nickname = "*") {
+        public IOrderedEnumerable<SaveFile<TData>> EnumerateSaveFiles(string? nickname = "*") {
             nickname ??= "*";
             var searchPattern = new SaveFileName() {
                 Nickname      = nickname,

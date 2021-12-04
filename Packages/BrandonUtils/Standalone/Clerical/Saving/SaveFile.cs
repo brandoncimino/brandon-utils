@@ -18,7 +18,7 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
             [NotNull] ISaveFolder folder,
             [NotNull] string      nickname,
             DateTime              timeStamp,
-            [CanBeNull] string    extension = SaveFileName.DefaultExtension,
+            string?            extension = SaveFileName.DefaultExtension,
             TData                 data      = default
         )
             : this(

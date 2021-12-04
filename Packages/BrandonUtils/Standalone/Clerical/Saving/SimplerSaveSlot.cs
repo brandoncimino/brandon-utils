@@ -19,9 +19,9 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
         [NotNull] private FileInfo MyFile     => new FileInfo(MyFilePath);
 
         public SimplerSaveSlot(
-            SaveFolder                      saveFolder,
-            [NotNull]   string              nickname,
-            [CanBeNull] SaveManagerSettings settings = default
+            SaveFolder                     saveFolder,
+            [NotNull] string               nickname,
+            SaveManagerSettings? settings = default
         ) {
             if (string.IsNullOrWhiteSpace(nickname)) {
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(nickname));

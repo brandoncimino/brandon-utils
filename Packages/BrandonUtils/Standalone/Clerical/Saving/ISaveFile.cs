@@ -28,14 +28,14 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
         /// <param name="duplicateFileResolution">determines what we should do when a file already exists</param>
         /// <param name="jsonSettings">optional <see cref="JsonSerializerSettings"/></param>
         /// <returns></returns>
-        public ISaveFile<TData> Save(DuplicateFileResolution duplicateFileResolution, [CanBeNull] JsonSerializerSettings jsonSettings = default);
+        public ISaveFile<TData> Save(DuplicateFileResolution duplicateFileResolution, JsonSerializerSettings? jsonSettings = default);
 
         /**
          * <inheritdoc cref="Save(BrandonUtils.Standalone.Clerical.DuplicateFileResolution,Newtonsoft.Json.JsonSerializerSettings)"/>
          */
-        public ISaveFile<TData> Save([CanBeNull] SaveManagerSettings saveSettings = default);
+        public ISaveFile<TData> Save(SaveManagerSettings? saveSettings = default);
 
         [NotNull]
-        public ISaveFile<TData> Load([CanBeNull] SaveManagerSettings saveSettings = default);
+        public ISaveFile<TData> Load(SaveManagerSettings? saveSettings = default);
     }
 }

@@ -22,16 +22,16 @@ namespace BrandonUtils.Standalone.Exceptions {
             IEnumerable<object> superset,
             [NotNull, ItemNotNull]
             IEnumerable<object> expectedValues,
-            [CanBeNull] string    messagePrefix  = default,
-            [CanBeNull] Exception innerException = default
+            string?       messagePrefix  = default,
+            Exception? innerException = default
         )
             : base(BuildMessage(superset, expectedValues, messagePrefix), innerException) { }
 
         [NotNull]
         private static string BuildMessage(
-            [NotNull]   IEnumerable<object> superset,
-            [CanBeNull] IEnumerable<object> valuesThatShouldBeThere,
-            [CanBeNull] string              messagePrefix
+            [NotNull] IEnumerable<object> superset,
+            IEnumerable<object>?          valuesThatShouldBeThere,
+            string?                    messagePrefix
         ) {
             PrettificationSettings prettySettings = new PrettificationSettings() {
                 TypeLabelStyle = { Value = TypeNameStyle.Full }
@@ -68,10 +68,10 @@ namespace BrandonUtils.Standalone.Exceptions {
         /// <param name="messagePrefix">A user-provided message, which will be <b>prepended</b> to the built-in message.</param>
         /// <param name="innerException">The <see cref="Exception"/> that caused this, if any.</param>
         public EnumNotInSetException(
-            [NotNull]   IEnumerable<T> superset,
-            [CanBeNull] IEnumerable<T> expectedValues,
-            string                     messagePrefix  = null,
-            Exception                  innerException = null
+            [NotNull] IEnumerable<T>  superset,
+            IEnumerable<T>? expectedValues,
+            string                    messagePrefix  = null,
+            Exception                 innerException = null
         ) : base(messagePrefix, innerException) {
             _baseMessage  = BuildMessage(superset, expectedValues);
             MessagePrefix = messagePrefix;
@@ -84,7 +84,7 @@ namespace BrandonUtils.Standalone.Exceptions {
             Exception                innerException = null
         ) : this(superset, Enumerable.Repeat(invalidValue, 1), messagePrefix, innerException) { }
 
-        private string BuildMessage([NotNull] IEnumerable<T> superset, [CanBeNull] IEnumerable<T> valuesThatShouldBeThere) {
+        private string BuildMessage([NotNull] IEnumerable<T> superset, IEnumerable<T>? valuesThatShouldBeThere) {
             PrettificationSettings prettySettings = new PrettificationSettings() {
                 TypeLabelStyle = { Value = TypeNameStyle.Full }
             };

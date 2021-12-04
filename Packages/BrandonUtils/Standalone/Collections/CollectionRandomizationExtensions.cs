@@ -20,7 +20,7 @@ namespace BrandonUtils.Standalone.Collections {
         [Pure]
         [CanBeNull]
         [ContractAnnotation("collection:null => stop")]
-        public static T Random<T>([NotNull, ItemCanBeNull] this ICollection<T> collection, [CanBeNull] Random generator = default) {
+        public static T Random<T>([NotNull, ItemCanBeNull] this ICollection<T> collection, Random? generator = default) {
             if (collection == null) {
                 throw new ArgumentNullException(nameof(collection));
             }
@@ -43,7 +43,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <returns>a <see cref="Random{T}"/> entry from <paramref name="collection"/></returns>
         [CanBeNull]
         [ContractAnnotation("collection:null => stop")]
-        public static T GrabRandom<T>([NotNull, ItemCanBeNull] this ICollection<T> collection, [CanBeNull] Random generator = default) {
+        public static T GrabRandom<T>([NotNull, ItemCanBeNull] this ICollection<T> collection, Random? generator = default) {
             if (collection == null) {
                 throw new ArgumentNullException(nameof(collection));
             }
@@ -88,7 +88,7 @@ namespace BrandonUtils.Standalone.Collections {
         [ContractAnnotation("source:null => stop")]
         [Pure]
         [LinqTunnel]
-        public static IEnumerable<T> Randomize<T>([NotNull, ItemCanBeNull] this IEnumerable<T> source, [CanBeNull] Random randomizer = default) {
+        public static IEnumerable<T> Randomize<T>([NotNull, ItemCanBeNull] this IEnumerable<T> source, Random? randomizer = default) {
             if (source == null) {
                 throw new ArgumentNullException(nameof(source));
             }

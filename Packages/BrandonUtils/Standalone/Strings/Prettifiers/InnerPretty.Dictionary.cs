@@ -10,6 +10,7 @@ using BrandonUtils.Standalone.Enums;
 using BrandonUtils.Standalone.Exceptions;
 using BrandonUtils.Standalone.Optional;
 using BrandonUtils.Standalone.Reflection;
+using BrandonUtils.Standalone.Strings.Json;
 
 using JetBrains.Annotations;
 
@@ -126,12 +127,12 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
         }
 
         private class Dic {
-            public Col Keys;
-            public Col Vals;
+            public readonly Col Keys = new Col();
+            public readonly Col Vals = new Col();
 
             [NotNull, ItemNotNull]
             public IEnumerable<string> GetLines([CanBeNull] PrettificationSettings settings) {
-                settings ??= Prettification.DefaultPrettificationSettings.Copy();
+                settings ??= Prettification.DefaultPrettificationSettings.JsonClone();
                 // calculate the various widths
                 var keyLines = Keys.GetLines(settings).ToArray();
                 var valLines = Vals.GetLines(settings).ToArray();
@@ -152,6 +153,14 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
             (IEnumerable<object> cells, object header) vals,
             [CanBeNull] PrettificationSettings         settings
         ) {
+            if (keys.cells == null || keys.header == null) {
+                Console.WriteLine($"🔑s were null!! {keys}");
+            }
+
+            if (vals.cells == null || vals.header == null) {
+                Console.WriteLine($"📱s were null!! {vals}");
+            }
+
             return new Dic {
                     Keys = {
                         Cells  = keys.cells,
@@ -264,7 +273,7 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
         /// <typeparam name="TValue"></typeparam>
         /// <returns></returns>
         [NotNull]
-        internal static string PrettifyDictionary<TKey, TValue>(IDictionary<TKey, TValue> dictionary, PrettificationSettings settings = default) {
+        internal static string PrettifyDictionary<TKey, TValue>(IDictionary<TKey, TValue> dictionary, [NotNull] PrettificationSettings settings) {
             return PrettifyDictionary(
                 dictionary.Keys.Cast<object>().ToList(),
                 dictionary.Values.Cast<object>().ToList(),

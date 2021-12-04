@@ -32,7 +32,7 @@ namespace BrandonUtils.Standalone.Optional {
         }
 
         [NotNull]
-        public override object ReadJson([NotNull] JsonReader reader, [NotNull] Type objectType, [CanBeNull] object existingValue, [NotNull] JsonSerializer serializer) {
+        public override object ReadJson([NotNull] JsonReader reader, [NotNull] Type objectType, object? existingValue, [NotNull] JsonSerializer serializer) {
             var elementType = objectType.GetGenericArguments()[0];
             var arType      = elementType.MakeArrayType();
             var asIList     = serializer.Deserialize(reader, arType) as IList ?? throw new NullReferenceException($"Got a null value when deserializing {objectType.Prettify()} to the intermediate type {arType.Prettify()} as {nameof(IList)}");

@@ -9,8 +9,7 @@ namespace BrandonUtils.Standalone.Attributes {
     public class BackingFieldForAttribute : BrandonAttribute {
         [NotNull] public string BackedPropertyName { get; }
 
-        [CanBeNull]
-        public PropertyInfo BackedProperty { get; }
+        public PropertyInfo? BackedProperty { get; }
 
         public BackingFieldForAttribute([NotNull] string backedPropertyName) {
             BackedPropertyName = backedPropertyName;

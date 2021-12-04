@@ -11,6 +11,6 @@ namespace BrandonUtils.Standalone.Strings {
     public interface IPrettifiable {
         [NotNull]
         [Pure]
-        public string Prettify([CanBeNull] PrettificationSettings settings = default);
+        public string Prettify(PrettificationSettings? settings = default);
     }
 }

@@ -22,8 +22,7 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
         [ItemNotNull]
         public IEnumerable<ISaveFile<TData>> EnumerateSaveFiles();
 
-        [CanBeNull]
-        public ISaveFile<TData> LatestFile();
+        public ISaveFile<TData>? LatestFile();
 
         [NotNull]
         public ISaveFile<TData> Save(TData saveData, DateTime now);

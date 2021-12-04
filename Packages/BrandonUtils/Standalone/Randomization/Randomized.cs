@@ -13,7 +13,7 @@ namespace BrandonUtils.Standalone.Randomization {
 
         protected Randomized() { }
 
-        public Randomized([NotNull] Func<Random, T> randomizer, [CanBeNull] Random generator = default) {
+        public Randomized([NotNull] Func<Random, T> randomizer, Random? generator = default) {
             Generator  = generator ?? Brandom.Gen;
             Randomizer = randomizer;
         }

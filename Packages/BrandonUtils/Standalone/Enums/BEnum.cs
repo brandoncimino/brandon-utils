@@ -51,18 +51,18 @@ namespace BrandonUtils.Standalone.Enums {
         /// <returns></returns>
         [NotNull]
         public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(
-            [CanBeNull] string argumentName,
-            T                  enumValue,
-            [CanBeNull, InstantHandle]
-            IEnumerable<T> allowedValues = default
+            string? argumentName,
+            T                   enumValue,
+            [InstantHandle]
+            IEnumerable<T>? allowedValues = default
         ) where T : struct, Enum {
             return new InvalidEnumArgumentException(argumentName, (int)(object)enumValue, typeof(T));
         }
 
         [NotNull]
         public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(
-            [CanBeNull] string argumentName,
-            T?                 enumValue
+            string? argumentName,
+            T?                  enumValue
         ) where T : struct, Enum {
             return new InvalidEnumArgumentException(argumentName, -1, typeof(T));
         }
@@ -71,7 +71,7 @@ namespace BrandonUtils.Standalone.Enums {
 
         [NotNull]
         private static string BuildEnumNotInSetMessage(
-            [CanBeNull] string              paramName,
+            string?             paramName,
             [NotNull]   Type                enumType,
             [NotNull]   IEnumerable<object> checkedValues,
             [NotNull]   IEnumerable<object> allowedValues
@@ -99,7 +99,7 @@ namespace BrandonUtils.Standalone.Enums {
 
         [NotNull]
         public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(
-            [CanBeNull] string         argumentName,
+            string?        argumentName,
             [NotNull]   IEnumerable<T> checkedValues,
             [NotNull]   IEnumerable<T> allowedValues
         ) where T : struct, Enum {
@@ -115,7 +115,7 @@ namespace BrandonUtils.Standalone.Enums {
 
         [NotNull]
         public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(
-            [CanBeNull] string          argumentName,
+            string?         argumentName,
             [NotNull]   IEnumerable<T?> checkedValues,
             [NotNull]   IEnumerable<T?> allowedValues
         ) where T : struct, Enum {

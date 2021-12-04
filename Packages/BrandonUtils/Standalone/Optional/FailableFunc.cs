@@ -21,8 +21,7 @@ namespace BrandonUtils.Standalone.Optional {
         internal Optional<TValue> SafeValue => HasValue ? _value : default;
         public   TValue           Value     => HasValue ? _value.Value : throw FailableException.FailedException(this, _excuse);
 
-        [ItemCanBeNull]
-        private readonly Optional<Exception> _excuse;
+        private readonly Optional<Exception?> _excuse;
 
         /// <returns><see cref="_excuse"/>.<see cref="IOptional{T}.Value"/> if present and non-null; otherwise, returns <see cref="NoExcuseExcuse"/></returns>
         [NotNull]
@@ -86,11 +85,11 @@ namespace BrandonUtils.Standalone.Optional {
             return Optional.AreEqual(this, other);
         }
 
-        public static bool operator ==([ItemCanBeNull] FailableFunc<TValue> a, [CanBeNull, ItemCanBeNull] IOptional<TValue> b) {
+        public static bool operator ==([ItemCanBeNull] FailableFunc<TValue> a, [ItemCanBeNull] IOptional<TValue>? b) {
             return Optional.AreEqual(a, b);
         }
 
-        public static bool operator !=([ItemCanBeNull] FailableFunc<TValue> a, [CanBeNull, ItemCanBeNull] IOptional<TValue> b) {
+        public static bool operator !=([ItemCanBeNull] FailableFunc<TValue> a, [ItemCanBeNull] IOptional<TValue>? b) {
             return !Optional.AreEqual(a, b);
         }
 

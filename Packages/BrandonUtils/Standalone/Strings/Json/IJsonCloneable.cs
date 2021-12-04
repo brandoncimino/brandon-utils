@@ -31,7 +31,7 @@ namespace BrandonUtils.Standalone.Strings.Json {
         [CanBeNull]
         [ContractAnnotation("original:null => null")]
         [ContractAnnotation("original:notnull => notnull")]
-        public static T JsonClone<T>([CanBeNull] this T original, [CanBeNull] JsonSerializerSettings settings = default) where T : IJsonCloneable {
+        public static T JsonClone<T>([CanBeNull] this T original, JsonSerializerSettings? settings = default) where T : IJsonCloneable {
             var json = JsonConvert.SerializeObject(original, settings!);
             return JsonConvert.DeserializeObject<T>(json, settings);
         }
@@ -47,7 +47,7 @@ namespace BrandonUtils.Standalone.Strings.Json {
         [CanBeNull]
         [ContractAnnotation("original:null => null")]
         [ContractAnnotation("original:notnull => notnull")]
-        public static T JsonClone<T>([CanBeNull] this T original, [CanBeNull] Action<T> modifications, [CanBeNull] JsonSerializerSettings settings = default) where T : IJsonCloneable {
+        public static T JsonClone<T>([CanBeNull] this T original, Action<T>? modifications, JsonSerializerSettings? settings = default) where T : IJsonCloneable {
             var clone = original.JsonClone(settings);
             modifications?.Invoke(clone);
             return clone;

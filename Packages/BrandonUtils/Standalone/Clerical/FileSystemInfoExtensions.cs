@@ -17,8 +17,7 @@ namespace BrandonUtils.Standalone.Clerical {
 
         [ContractAnnotation("null => null")]
         [ContractAnnotation("notnull => notnull")]
-        [CanBeNull]
-        public static Uri ToUri([CanBeNull] this FileSystemInfo fileSystemInfo) {
+        public static Uri? ToUri(this FileSystemInfo? fileSystemInfo) {
             return fileSystemInfo switch {
                 null              => null,
                 DirectoryInfo dir => new Uri(dir.FullName.AppendIfMissing(Path.DirectorySeparatorChar.ToString())),
@@ -29,8 +28,7 @@ namespace BrandonUtils.Standalone.Clerical {
 
         [ContractAnnotation("null => null")]
         [ContractAnnotation("notnull => notnull")]
-        [CanBeNull]
-        public static Uri ToUri([CanBeNull] this IHasFileSystemInfo hasFileSystemInfo) {
+        public static Uri? ToUri(this IHasFileSystemInfo? hasFileSystemInfo) {
             return hasFileSystemInfo?.FileSystemInfo.ToUri();
         }
 
@@ -73,7 +71,7 @@ namespace BrandonUtils.Standalone.Clerical {
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static void MustBeParentOf([CanBeNull] this DirectoryInfo parent, [CanBeNull] FileSystemInfo child) {
+        public static void MustBeParentOf(this DirectoryInfo? parent, FileSystemInfo? child) {
             CheckNull(parent, child);
 
             if (parent.IsParentOf(child) == false) {
@@ -83,15 +81,15 @@ namespace BrandonUtils.Standalone.Clerical {
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static void MustBeParentOf([CanBeNull] this DirectoryInfo parent, [CanBeNull] IHasFileSystemInfo child) => MustBeParentOf(parent, child!.FileSystemInfo);
+        public static void MustBeParentOf(this DirectoryInfo? parent, IHasFileSystemInfo? child) => MustBeParentOf(parent, child!.FileSystemInfo);
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static void MustBeParentOf([CanBeNull] this IHasDirectoryInfo parent, [CanBeNull] FileSystemInfo child) => MustBeParentOf(parent!.Directory!, child);
+        public static void MustBeParentOf(this IHasDirectoryInfo? parent, FileSystemInfo? child) => MustBeParentOf(parent!.Directory!, child);
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static void MustBeParentOf([CanBeNull] this IHasDirectoryInfo parent, [CanBeNull] IHasFileSystemInfo child) => MustBeParentOf(parent!.Directory!, child!.FileSystemInfo);
+        public static void MustBeParentOf(this IHasDirectoryInfo? parent, IHasFileSystemInfo? child) => MustBeParentOf(parent!.Directory!, child!.FileSystemInfo);
 
         #endregion
 
@@ -119,7 +117,7 @@ namespace BrandonUtils.Standalone.Clerical {
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static void MustBeChildOf([CanBeNull] this FileSystemInfo child, [CanBeNull] DirectoryInfo parent) {
+        public static void MustBeChildOf(this FileSystemInfo? child, DirectoryInfo? parent) {
             CheckNull(parent, child);
 
             if (child.IsChildOf(parent) == false) {
@@ -129,20 +127,20 @@ namespace BrandonUtils.Standalone.Clerical {
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static void MustBeChildOf([CanBeNull] this FileSystemInfo child, [CanBeNull] IHasDirectoryInfo parent) => child.MustBeChildOf(parent!.Directory!);
+        public static void MustBeChildOf(this FileSystemInfo? child, IHasDirectoryInfo? parent) => child.MustBeChildOf(parent!.Directory!);
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static void MustBeChildOf([CanBeNull] this IHasFileSystemInfo child, [CanBeNull] DirectoryInfo parent) => child!.FileSystemInfo.MustBeChildOf(parent);
+        public static void MustBeChildOf(this IHasFileSystemInfo? child, DirectoryInfo? parent) => child!.FileSystemInfo.MustBeChildOf(parent);
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static void MustBeChildOf([CanBeNull] this IHasFileSystemInfo child, [CanBeNull] IHasDirectoryInfo parent) => child.MustBeChildOf(parent!.Directory!);
+        public static void MustBeChildOf(this IHasFileSystemInfo? child, IHasDirectoryInfo? parent) => child.MustBeChildOf(parent!.Directory!);
 
         #endregion
 
         [NotNull]
-        public static string GetChildPath([NotNull] this DirectoryInfo parent, [CanBeNull] string relativePath) {
+        public static string GetChildPath([NotNull] this DirectoryInfo parent, string? relativePath) {
             if (parent == null) {
                 throw new ArgumentNullException(nameof(parent));
             }

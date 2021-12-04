@@ -16,10 +16,10 @@ namespace BrandonUtils.Standalone.Chronic {
 
         [NotNull] public static ExecutionTime MeasureExecution([NotNull, InstantHandle] Action actionBeingTimed) => MeasureExecution(default, actionBeingTimed);
 
-        [NotNull] public static ExecutionTime MeasureExecution([CanBeNull] string nickname, [NotNull, InstantHandle] Action actionBeingTimed) => MeasureExecution(nickname, actionBeingTimed, new Stopwatch());
+        [NotNull] public static ExecutionTime MeasureExecution(string? nickname, [NotNull, InstantHandle] Action actionBeingTimed) => MeasureExecution(nickname, actionBeingTimed, new Stopwatch());
 
         [NotNull]
-        private static ExecutionTime MeasureExecution([CanBeNull] string nickname, [NotNull] Action actionBeingTimed, [NotNull] Stopwatch stopwatch) {
+        private static ExecutionTime MeasureExecution(string? nickname, [NotNull] Action actionBeingTimed, [NotNull] Stopwatch stopwatch) {
             stopwatch.Stop();
             stopwatch.Reset();
             stopwatch.Start();
@@ -34,8 +34,8 @@ namespace BrandonUtils.Standalone.Chronic {
 
         [NotNull]
         public static ExecutionTime MeasureExecution<T>(
-            [CanBeNull] string nickname,
-            [CanBeNull] T      input,
+            string? nickname,
+            [CanBeNull] T       input,
             [NotNull, InstantHandle]
             Action<T> actionBeingTimed
         ) {

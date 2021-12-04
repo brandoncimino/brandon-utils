@@ -31,7 +31,7 @@ namespace BrandonUtils.Standalone.Strings {
 
 
         [NotNull]
-        public static PrettificationSettings ResolveSettings([CanBeNull] PrettificationSettings settings) {
+        public static PrettificationSettings ResolveSettings(PrettificationSettings? settings) {
             return settings ?? PrettificationSettings.DefaultSettings;
         }
 
@@ -39,8 +39,7 @@ namespace BrandonUtils.Standalone.Strings {
             Prettifiers.Register(prettifier);
         }
 
-        [CanBeNull]
-        public static IPrettifier UnregisterPrettifier([NotNull] Type prettifierType) {
+        public static IPrettifier? UnregisterPrettifier([NotNull] Type prettifierType) {
             return Prettifiers.Deregister(prettifierType);
         }
 
@@ -54,13 +53,13 @@ namespace BrandonUtils.Standalone.Strings {
 
         [Pure]
         [NotNull]
-        public static string Prettify([CanBeNull] this object cinderella) {
+        public static string Prettify(this object? cinderella) {
             return cinderella.Prettify(default);
         }
 
         [Pure]
         [NotNull]
-        public static string Prettify([CanBeNull] this object cinderella, [CanBeNull] PrettificationSettings settings) {
+        public static string Prettify(this object? cinderella, PrettificationSettings? settings) {
             settings = ResolveSettings(settings);
 
             settings.TraceWriter.Info(() => $"👸 Prettifying [{cinderella?.GetType().Name}]");
@@ -84,7 +83,7 @@ namespace BrandonUtils.Standalone.Strings {
         }
 
         [NotNull]
-        internal static string LastResortPrettifier([CanBeNull] object cinderella, [CanBeNull] PrettificationSettings settings) {
+        internal static string LastResortPrettifier(object? cinderella, PrettificationSettings? settings) {
             settings ??= new PrettificationSettings();
 
             settings.TraceWriter.Verbose(() => $"⛑ Using the LAST RESORT prettifier for [{cinderella?.GetType()}]: {nameof(Convert.ToString)}!");

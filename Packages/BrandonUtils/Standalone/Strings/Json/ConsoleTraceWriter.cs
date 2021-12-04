@@ -16,7 +16,7 @@ namespace BrandonUtils.Standalone.Strings.Json {
     /// </summary>
     [PublicAPI]
     public class ConsoleTraceWriter : ITraceWriter {
-        [CanBeNull] public string Nickname { get; }
+        public string? Nickname { get; }
 
         [NotNull]
         [ItemNotNull]
@@ -33,15 +33,15 @@ namespace BrandonUtils.Standalone.Strings.Json {
 
         public TraceLevel LevelFilter { get; set; }
 
-        public ConsoleTraceWriter([CanBeNull] string nickname = default) {
+        public ConsoleTraceWriter(string? nickname = default) {
             Nickname = nickname;
         }
 
-        public ConsoleTraceWriter([CanBeNull] Type owner) : this(owner.Prettify()) { }
+        public ConsoleTraceWriter(Type? owner) : this(owner.Prettify()) { }
 
-        public ConsoleTraceWriter([CanBeNull] object self) : this(self?.GetType()) { }
+        public ConsoleTraceWriter(object? self) : this(self?.GetType()) { }
 
-        public void Trace(TraceLevel level, [CanBeNull] string message, [CanBeNull] Exception ex) {
+        public void Trace(TraceLevel level, string? message, Exception? ex) {
             var msg = new[] {
                     GetTraceLevelIcon(level),
                     GetFullName(),
