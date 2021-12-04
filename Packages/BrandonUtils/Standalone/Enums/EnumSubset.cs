@@ -20,7 +20,7 @@ namespace BrandonUtils.Standalone.Enums {
     /// </example>
     /// <typeparam name="T"></typeparam>
     [Obsolete("Please use " + nameof(EnumSet) + " instead, which is a proper " + nameof(HashSet<object>) + " implementation")]
-    public class EnumSubset<T> : ICollection<T> where T : Enum {
+    public class EnumSubset<T> : ICollection<T> where T : struct, Enum {
         /// <summary>
         /// The backing <see cref="IList{T}"/> for the <see cref="EnumSubset{T}"/>.
         /// </summary>
@@ -159,7 +159,7 @@ namespace BrandonUtils.Standalone.Enums {
 
     [Obsolete(nameof(EnumSubset<DayOfWeek>) + " is obsolete; please use " + nameof(EnumSet<DayOfWeek>))]
     public static class EnumSubsetExtensions {
-        public static EnumSubset<T> ToEnumSubset<T>(this IEnumerable<T> source) where T : Enum {
+        public static EnumSubset<T> ToEnumSubset<T>(this IEnumerable<T> source) where T : struct, Enum {
             return new EnumSubset<T>(source);
         }
     }
