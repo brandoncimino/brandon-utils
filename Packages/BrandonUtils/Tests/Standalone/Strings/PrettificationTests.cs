@@ -17,8 +17,6 @@ using BrandonUtils.Standalone.Strings.Prettifiers;
 using BrandonUtils.Testing;
 using BrandonUtils.Tests.Standalone.Reflection;
 
-using Newtonsoft.Json;
-
 using NUnit.Framework;
 
 using Is = NUnit.Framework.Is;
@@ -28,7 +26,7 @@ namespace BrandonUtils.Tests.Standalone.Strings {
     public class PrettificationTests {
         [SetUp]
         public void SetDefaultPrettificationSettings() {
-            Prettification.DefaultPrettificationSettings.TraceWriter = new ConsoleTraceWriter() { LevelFilter = TraceLevel.Verbose };
+            PrettificationSettings.DefaultSettings.TraceWriter = new ConsoleTraceWriter() { LevelFilter = TraceLevel.Verbose };
         }
 
         public class Expectation {
@@ -207,7 +205,7 @@ int (int, string)
         [TestCase(typeof(int),                                                       typeof(int))]
         [TestCase(typeof(Professor<IPrettifiable>),                                  typeof(IPrettifiable))]
         public void SimplifiedTypes(Type original, Type simplified) {
-            var actual = PrettificationTypeSimplifier.SimplifyType(original, Prettification.DefaultPrettificationSettings, 0);
+            var actual = PrettificationTypeSimplifier.SimplifyType(original, Prettification.DefaultPrettificationSettings);
             Asserter.Against(actual)
                     .And(Is.EqualTo(simplified))
                     .Invoke();
@@ -641,25 +639,24 @@ List<int>[
             var original = new PrettificationSettings() {
                 HeaderStyle          = { Value = HeaderStyle.None },
                 TableHeaderSeparator = { Value = "💄" },
-                NullPlaceholder      = { Value = "⛑" }
+                NullPlaceholder      = { Value = "⛑" },
+                PreferredLineStyle   = { Value = LineStyle.Dynamic }
             };
-
-            Console.WriteLine($"ORIGINAL: {original}");
-
-            Console.WriteLine($"header style: {original.HeaderStyle}");
-            Console.WriteLine($"\t-> pretty: {original.HeaderStyle.Prettify(new PrettificationSettings())}");
-            Console.WriteLine($"separator: {original.TableHeaderSeparator}");
-
-            Console.WriteLine($"JSON: {JsonConvert.SerializeObject(original)}");
 
             var copy = original.JsonClone();
 
-            Console.WriteLine($"COPY: {copy}");
-
             Asserter.Against(copy)
+                    .WithPrettificationSettings(new PrettificationSettings())
                     .And(Has.Property(nameof(copy.HeaderStyle)).EqualTo(original.HeaderStyle))
                     .And(Has.Property(nameof(copy.TableHeaderSeparator)).EqualTo(original.TableHeaderSeparator))
                     .And(Has.Property(nameof(copy.NullPlaceholder)).EqualTo(original.NullPlaceholder))
+                    .And(Has.Property(nameof(copy.PreferredLineStyle)).EqualTo(original.PreferredLineStyle))
+                    .And(Has.Property(nameof(copy.LineLengthLimit)).EqualTo(original.LineLengthLimit))
+                    .AndComparingFallbacks(copy.HeaderStyle,          original.HeaderStyle)
+                    .AndComparingFallbacks(copy.TableHeaderSeparator, original.TableHeaderSeparator)
+                    .AndComparingFallbacks(copy.NullPlaceholder,      original.NullPlaceholder)
+                    .AndComparingFallbacks(copy.PreferredLineStyle,   original.PreferredLineStyle)
+                    .AndComparingFallbacks(copy.LineLengthLimit,      original.LineLengthLimit)
                     .And(Is.Not.SameAs(original))
                     .Invoke();
         }
@@ -670,6 +667,18 @@ List<int>[
             typeof(IDictionary),
             typeof(IEnumerable)
         };
+
+        [Test]
+        [TestCase(DayOfWeek.Monday, TypeNameStyle.Full,  nameof(DayOfWeek) + "." + nameof(DayOfWeek.Monday))]
+        [TestCase(DayOfWeek.Monday, TypeNameStyle.Short, nameof(DayOfWeek) + "." + nameof(DayOfWeek.Monday))]
+        [TestCase(DayOfWeek.Monday, TypeNameStyle.None,  nameof(DayOfWeek.Monday))]
+        public void PrettifyEnumTypeLabel(Enum value, TypeNameStyle enumLabelStyle, string expectedString) {
+            var settings = new PrettificationSettings() {
+                EnumLabelStyle = { Value = enumLabelStyle }
+            };
+
+            Assert.That(DayOfWeek.Monday.Prettify(settings), Is.EqualTo(expectedString));
+        }
 
         [Test]
         public void DoInterfaceAndInheritFindDifferentPrettifiers([ValueSource(nameof(PrettyTypesWithInterfaces))] Type t) {

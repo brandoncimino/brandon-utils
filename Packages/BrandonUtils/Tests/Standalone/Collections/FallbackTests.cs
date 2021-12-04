@@ -69,8 +69,8 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
             var deserialized = JsonConvert.DeserializeObject<Fallback<Fallback<string>>>(serializedJson);
             Asserter.Against(deserialized)
-                    .And(Asserters.CompareFallbacks(deserialized,       parent))
-                    .And(Asserters.CompareFallbacks(deserialized.Value, child))
+                    .AndComparingFallbacks(deserialized,       parent)
+                    .AndComparingFallbacks(deserialized.Value, child)
                     .Invoke();
         }
 
@@ -104,7 +104,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
                     .And(Has.Property(nameof(deserialized.Value)).EqualTo(exp))
                     .And(Has.Property(nameof(deserialized.ExplicitValue)).EqualTo(exp))
                     .And(Has.Property(nameof(deserialized.FallbackValue)).EqualTo(fb))
-                    .And(Asserters.CompareFallbacks(deserialized, expected))
+                    .AndComparingFallbacks(deserialized, expected)
                     .Invoke();
         }
     }

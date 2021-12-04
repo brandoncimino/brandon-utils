@@ -1,5 +1,7 @@
 ﻿using System;
 
+using BrandonUtils.Standalone.Strings;
+
 using JetBrains.Annotations;
 
 namespace BrandonUtils.Testing {
@@ -9,5 +11,7 @@ namespace BrandonUtils.Testing {
         [CanBeNull] Func<string> Heading { get; }
 
         int Indent { get; set; }
+
+        PrettificationSettings PrettificationSettings { get; }
     }
 }

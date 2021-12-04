@@ -17,6 +17,8 @@ namespace BrandonUtils.Testing {
     public abstract class MultipleAsserter<TSelf, TActual> : IMultipleAsserter where TSelf : MultipleAsserter<TSelf, TActual>, new() {
         private const string HeadingIcon = "🧪";
 
+        public PrettificationSettings PrettificationSettings { get; protected set; }
+
         private Optional<ActualValueDelegate<TActual>> _actual;
         /// <summary>
         /// The actual value being asserted against (if there is one)
@@ -286,6 +288,15 @@ namespace BrandonUtils.Testing {
 
         #endregion
 
+        #region WithPrettificationSettings
+
+        public TSelf WithPrettificationSettings(PrettificationSettings settings) {
+            PrettificationSettings = settings;
+            return Self;
+        }
+
+        #endregion
+
         #region With Indent
 
         [MustUseReturnValue]
@@ -309,7 +320,7 @@ namespace BrandonUtils.Testing {
         );
 
         private IAssertable Test_Action_AgainstActual((Action<TActual> action, Func<string> nickname) ass) {
-            var actual = Actual.OrElseThrow(ActualIsEmptyException($"Could not execute the {ass.GetType().Prettify()} {ass.action.Method.Name}"));
+            var actual = Actual.OrElseThrow(ActualIsEmptyException($"Could not execute the {ass.GetType().Prettify(PrettificationSettings)} {ass.action.Method.Name}"));
             return new Assertable(
                 ass.nickname ?? Assertable.GetNicknameSupplier(ass.action, default),
                 () => ass.action.Invoke(actual.Invoke()),
@@ -374,7 +385,7 @@ namespace BrandonUtils.Testing {
         }
 
         private Func<InvalidOperationException> ActualIsEmptyException(string message) {
-            return () => new InvalidOperationException($"{message}: this {GetType().Prettify()} doesn't have {nameof(Actual)} value!");
+            return () => new InvalidOperationException($"{message}: this {GetType().Prettify(PrettificationSettings)} doesn't have {nameof(Actual)} value!");
         }
 
         #endregion
