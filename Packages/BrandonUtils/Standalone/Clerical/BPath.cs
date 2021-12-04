@@ -112,7 +112,7 @@ namespace BrandonUtils.Standalone.Clerical {
             return path.StartsWith(DirectorySeparatorPattern);
         }
 
-        [NotNull]
+
         public static string EnsureTrailingSeparator(string? path, DirectorySeparator separator = DirectorySeparator.Universal) {
             if (path == null) {
                 return separator.ToCharString();
@@ -126,7 +126,7 @@ namespace BrandonUtils.Standalone.Clerical {
             );
         }
 
-        [NotNull]
+
         public static string StripLeadingSeparator(string? path, DirectorySeparator separator = DirectorySeparator.Universal) {
             if (path == null) {
                 return "";
@@ -139,23 +139,23 @@ namespace BrandonUtils.Standalone.Clerical {
             );
         }
 
-        [NotNull]
+
         public static string NormalizeSeparators(string? path, DirectorySeparator separator = DirectorySeparator.Universal) {
             return path.IsBlank() ? "" : DirectorySeparatorPattern.Replace(path.Trim(), separator.ToCharString());
         }
 
-        [NotNull]
+
         public static string JoinPath(
-            string?    parent,
+            string? parent,
             string? child
         ) {
             return JoinPath(parent, child, default(DirectorySeparator));
         }
 
-        [NotNull]
+
         public static string JoinPath(
             string?            parent,
-            string?         child,
+            string?            child,
             DirectorySeparator separator
         ) {
             parent = parent?.Trim().TrimEnd(DirectorySeparatorPattern);
@@ -164,21 +164,21 @@ namespace BrandonUtils.Standalone.Clerical {
             return NormalizeSeparators(path, separator);
         }
 
-        [NotNull]
+
         public static string JoinPath(
             DirectoryInfo?     parentDirectory,
-            string?         child,
+            string?            child,
             DirectorySeparator separator = DirectorySeparator.Universal
         ) {
             return JoinPath(parentDirectory?.FullName, child, separator);
         }
 
-        [NotNull]
+
         public static string JoinPath(params string?[]? parts) {
             return JoinPath(parts, default(DirectorySeparator));
         }
 
-        [NotNull]
+
         public static string JoinPath(IEnumerable<string?>? parts, DirectorySeparator separator = DirectorySeparator.Universal) {
             return parts?.Aggregate((pathSoFar, nextPart) => JoinPath(pathSoFar, nextPart, separator)) ?? "";
         }

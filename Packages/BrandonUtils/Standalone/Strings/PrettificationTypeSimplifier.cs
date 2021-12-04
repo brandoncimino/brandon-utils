@@ -15,9 +15,9 @@ namespace BrandonUtils.Standalone.Strings {
     /// </summary>
     internal static class PrettificationTypeSimplifier {
         internal class SimplifiedType {
-            [NotNull] public readonly  Type                    Original;
-            [NotNull] public           Type                    Simplified => _simplified.Value;
-            [NotNull] private readonly Lazy<Type>              _simplified;
+            public readonly  Type                    Original;
+            public           Type                    Simplified => _simplified.Value;
+            private readonly Lazy<Type>              _simplified;
             private readonly PrettificationSettings? Settings;
 
             public SimplifiedType(Type original, PrettificationSettings? settings = default) {
@@ -26,12 +26,12 @@ namespace BrandonUtils.Standalone.Strings {
                 Settings    = settings;
             }
 
-            [NotNull]
+
             private Type Simplify() {
                 return SimplifyType(Original, Settings);
             }
 
-            [NotNull]
+
             public override string ToString() {
                 return $"{Original.Name} 🤏 {Simplified.Name}";
             }
@@ -60,14 +60,13 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="settings"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        [NotNull]
         [Pure]
-        internal static Type SimplifyType([NotNull] Type type, PrettificationSettings? settings) {
+        internal static Type SimplifyType(Type type, PrettificationSettings? settings) {
             settings = Prettification.ResolveSettings(settings);
             return SimplifyTypeSwitch(type, settings);
         }
 
-        private static Type SimplifyTypeSwitch([NotNull] Type type, [NotNull] PrettificationSettings settings, int recurCount = 0) {
+        private static Type SimplifyTypeSwitch(Type type, PrettificationSettings settings, int recurCount = 0) {
             if (SimplestTypes.ContainsKey(type)) {
                 var simplest = SimplestTypes[type];
                 settings.TraceWriter.Verbose(() => $"🦠 Could not simplify {type.Name} past {simplest.Name}!", recurCount + 2);

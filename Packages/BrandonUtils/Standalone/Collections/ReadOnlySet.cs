@@ -13,15 +13,15 @@ namespace BrandonUtils.Standalone.Collections {
     ///</summary>
     [PublicAPI]
     public class ReadOnlySet<T> : ISet<T>, IReadOnlyCollection<T> {
-        [NotNull] private readonly ISet<T> RealSet;
+        private readonly ISet<T> RealSet;
 
         public ReadOnlySet() : this(new HashSet<T>()) { }
 
-        public ReadOnlySet([NotNull] ISet<T> original) {
+        public ReadOnlySet(ISet<T> original) {
             RealSet = original ?? throw new ArgumentNullException(nameof(original));
         }
 
-        [NotNull]
+
         private static NotSupportedException ReadOnlyException() {
             return new NotSupportedException("Collection is read-only.");
         }

@@ -4,8 +4,6 @@ using BrandonUtils.Standalone;
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Enums;
 
-using JetBrains.Annotations;
-
 using NUnit.Framework.Constraints;
 
 namespace BrandonUtils.Testing {
@@ -34,13 +32,13 @@ namespace BrandonUtils.Testing {
         }.JoinLines();
 
         public ApproximationConstraint(
-            object expectedValue,
-            object threshold,
+            object    expectedValue,
+            object    threshold,
             Clusivity minClusivity,
             Clusivity maxClusivity
         ) : base(
-            (IComparable) Coercively.Subtract(expectedValue, threshold),
-            (IComparable) Coercively.Add(expectedValue, threshold)
+            (IComparable)Coercively.Subtract(expectedValue, threshold),
+            (IComparable)Coercively.Add(expectedValue, threshold)
         ) {
             ExpectedValue = expectedValue;
             Threshold     = threshold;
@@ -50,7 +48,7 @@ namespace BrandonUtils.Testing {
             MaxClusivity  = maxClusivity;
         }
 
-        public override ConstraintResult ApplyTo([NotNull] object actual) {
+        public override ConstraintResult ApplyTo(object actual) {
             var minCompare = ComparisonAdapter.Default.Compare(MinValue, actual);
             var minCheck   = MinClusivity == Clusivity.Inclusive ? minCompare <= 0 : minCompare < 0;
             var maxCompare = ComparisonAdapter.Default.Compare(MaxValue, actual);
@@ -60,8 +58,8 @@ namespace BrandonUtils.Testing {
         }
 
         public ApproximationConstraint(
-            object expectedValue,
-            object threshold,
+            object    expectedValue,
+            object    threshold,
             Clusivity clusivity = Clusivity.Inclusive
         ) : this(
             expectedValue,
@@ -75,7 +73,7 @@ namespace BrandonUtils.Testing {
             GetDefaultThreshold(expectedValue)
         ) { }
 
-        public ApproximationConstraint(DateTime expectedValue, TimeSpan? threshold = default, Clusivity clusivity = Clusivity.Inclusive) : this((object) expectedValue, threshold) { }
+        public ApproximationConstraint(DateTime expectedValue, TimeSpan? threshold = default, Clusivity clusivity = Clusivity.Inclusive) : this((object)expectedValue, threshold) { }
 
         /// <summary>
         /// Formats <paramref name="obj"/> in a similar style to NUnit's "MsgUtils" (which, unfortunately, is an <see langword="internal"/> class...)

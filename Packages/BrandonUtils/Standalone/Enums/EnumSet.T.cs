@@ -18,15 +18,15 @@ namespace BrandonUtils.Standalone.Enums {
     public class EnumSet<T> : HashSet<T>, ICollection<T> where T : struct, Enum {
         #region Constructors
 
-        public EnumSet([NotNull] params T[] enumValues) : base(enumValues) { }
+        public EnumSet(params T[] enumValues) : base(enumValues) { }
 
-        public EnumSet([NotNull] params IEnumerable<T>[] setsToBeUnionized) : base(setsToBeUnionized.SelectMany(it => it)) { }
+        public EnumSet(params IEnumerable<T>[] setsToBeUnionized) : base(setsToBeUnionized.SelectMany(it => it)) { }
 
         #region Inherited Constructors
 
         public EnumSet() { }
-        public EnumSet([NotNull] IEnumerable<T> collection) : base(collection) { }
-        protected EnumSet(SerializationInfo     info, StreamingContext context) : base(info, context) { }
+        public EnumSet(IEnumerable<T>       collection) : base(collection) { }
+        protected EnumSet(SerializationInfo info, StreamingContext context) : base(info, context) { }
 
         #endregion Inherited Constructors
 
@@ -79,7 +79,7 @@ namespace BrandonUtils.Standalone.Enums {
         // /**
         //  * <inheritdoc cref="MustContain(T[])"/>
         //  */
-        // [NotNull]
+        //
         // public EnumSet<T> MustContain(T expectedValue) {
         //     if (!Contains(expectedValue)) {
         //         throw new EnumNotInSetException<T>(this, expectedValue);

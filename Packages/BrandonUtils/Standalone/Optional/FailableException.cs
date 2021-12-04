@@ -2,8 +2,6 @@
 
 using BrandonUtils.Standalone.Strings;
 
-using JetBrains.Annotations;
-
 namespace BrandonUtils.Standalone.Optional {
     /// <summary>
     /// Static methods for building <see cref="Exception"/>s used by <see cref="IFailable{TExcuse}"/> implementations.
@@ -27,8 +25,8 @@ namespace BrandonUtils.Standalone.Optional {
             throw new InvalidOperationException(msg);
         }
 
-        [NotNull]
-        internal static InvalidOperationException FailedException<TValue>([NotNull] IFailableFunc<TValue> failableFunc, Optional<Exception> actualExcuse) {
+
+        internal static InvalidOperationException FailedException<TValue>(IFailableFunc<TValue> failableFunc, Optional<Exception> actualExcuse) {
             return new InvalidOperationException($"Unable to retrieve the {typeof(TValue).Prettify()} {nameof(failableFunc.Value)} from the {failableFunc.GetType().Prettify()} because it failed!", actualExcuse.OrElse(default));
         }
     }

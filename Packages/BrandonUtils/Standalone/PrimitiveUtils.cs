@@ -120,7 +120,7 @@ namespace BrandonUtils.Standalone {
         /// <param name="value">some random junk</param>
         /// <returns>true if the value is assignable to any of the <see cref="NumericTypes"/></returns>
         [ContractAnnotation("null => stop")]
-        public static bool IsNumber([NotNull] this object value) {
+        public static bool IsNumber(this object value) {
             if (value == null) {
                 throw new ArgumentNullException(nameof(value));
             }
@@ -146,18 +146,18 @@ namespace BrandonUtils.Standalone {
 
         #region Convert.To{x}
 
-        public static short   ToShort([CanBeNull] this   object obj) => Convert.ToInt16(obj);
-        public static ushort  ToUShort([CanBeNull] this  object obj) => Convert.ToUInt16(obj);
-        public static int     ToInt([CanBeNull] this     object obj) => Convert.ToInt32(obj);
-        public static uint    ToUInt([CanBeNull] this    object obj) => Convert.ToUInt32(obj);
-        public static long    ToLong([CanBeNull] this    object obj) => Convert.ToInt64(obj);
-        public static ulong   ToULong([CanBeNull] this   object obj) => Convert.ToUInt64(obj);
-        public static float   ToFloat([CanBeNull] this   object obj) => Convert.ToSingle(obj);
-        public static double  ToDouble([CanBeNull] this  object obj) => Convert.ToDouble(obj);
-        public static decimal ToDecimal([CanBeNull] this object obj) => Convert.ToDecimal(obj);
-        public static byte    ToByte([CanBeNull] this    object obj) => Convert.ToByte(obj);
-        public static sbyte   ToSByte([CanBeNull] this   object obj) => Convert.ToSByte(obj);
-        public static bool    ToBool([CanBeNull] this    object obj) => Convert.ToBoolean(obj);
+        public static short   ToShort(this   object? obj) => Convert.ToInt16(obj);
+        public static ushort  ToUShort(this  object? obj) => Convert.ToUInt16(obj);
+        public static int     ToInt(this     object? obj) => Convert.ToInt32(obj);
+        public static uint    ToUInt(this    object? obj) => Convert.ToUInt32(obj);
+        public static long    ToLong(this    object? obj) => Convert.ToInt64(obj);
+        public static ulong   ToULong(this   object? obj) => Convert.ToUInt64(obj);
+        public static float   ToFloat(this   object? obj) => Convert.ToSingle(obj);
+        public static double  ToDouble(this  object? obj) => Convert.ToDouble(obj);
+        public static decimal ToDecimal(this object? obj) => Convert.ToDecimal(obj);
+        public static byte    ToByte(this    object? obj) => Convert.ToByte(obj);
+        public static sbyte   ToSByte(this   object? obj) => Convert.ToSByte(obj);
+        public static bool    ToBool(this    object? obj) => Convert.ToBoolean(obj);
 
         #endregion
 
@@ -168,7 +168,6 @@ namespace BrandonUtils.Standalone {
 
         /// <param name="value">a <see cref="bool"/></param>
         /// <returns>either <see cref="TrueIcon"/> or <see cref="FalseIcon"/></returns>
-        [NotNull]
         public static string Icon(this bool value) {
             return value ? TrueIcon : FalseIcon;
         }

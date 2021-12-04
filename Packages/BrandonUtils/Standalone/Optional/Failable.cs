@@ -20,9 +20,9 @@ namespace BrandonUtils.Standalone.Optional {
         public           IReadOnlyCollection<Type> IgnoredExceptionTypes { get; }
         public           Optional<Exception>       IgnoredException      { get; }
 
-        public Failable([NotNull, InstantHandle] Action failableAction, [NotNull, ItemNotNull] params Type[] ignoredExceptionTypes) : this(failableAction, ignoredExceptionTypes.AsEnumerable()) { }
+        public Failable([InstantHandle] Action failableAction, params Type[] ignoredExceptionTypes) : this(failableAction, ignoredExceptionTypes.AsEnumerable()) { }
 
-        public Failable([NotNull, InstantHandle] Action failableAction, [NotNull, ItemNotNull] IEnumerable<Type> ignoredExceptionTypes) {
+        public Failable([InstantHandle] Action failableAction, IEnumerable<Type> ignoredExceptionTypes) {
             IgnoredExceptionTypes = ignoredExceptionTypes.Must(ReflectionUtils.IsExceptionType).ToArray();
 
             if (failableAction == null) {
@@ -46,7 +46,7 @@ namespace BrandonUtils.Standalone.Optional {
             }
         }
 
-        [NotNull]
+
         public override string ToString() {
             return $"{(Failed ? $"{FailIcon} [{Excuse}]" : SuccessIcon)}";
         }

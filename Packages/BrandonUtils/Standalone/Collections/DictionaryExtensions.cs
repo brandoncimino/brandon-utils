@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using JetBrains.Annotations;
-
 namespace BrandonUtils.Standalone.Collections {
     public static class DictionaryExtensions {
-        [CanBeNull]
-        public static TValue GetOrDefault<TKey, TValue>(
-            [NotNull] this IDictionary<TKey, TValue> dic,
-            [NotNull]      TKey                      key,
-            [CanBeNull]    TValue                    fallback = default
+        public static TValue? GetOrDefault<TKey, TValue>(
+            this IDictionary<TKey, TValue> dic,
+            TKey                           key,
+            TValue?                        fallback = default
         ) {
             if (dic == null) {
                 throw new ArgumentNullException(nameof(dic));
@@ -22,11 +19,10 @@ namespace BrandonUtils.Standalone.Collections {
             return dic.ContainsKey(key) ? dic[key] : fallback;
         }
 
-        [CanBeNull]
-        public static TValue GetOrDefault<TKey, TValue>(
-            [NotNull] this IDictionary<TKey, TValue> dic,
-            [NotNull]      TKey                      key,
-            [NotNull]      Func<TValue>              fallbackSupplier
+        public static TValue? GetOrDefault<TKey, TValue>(
+            this IDictionary<TKey, TValue> dic,
+            TKey                           key,
+            Func<TValue>                   fallbackSupplier
         ) {
             if (dic == null) {
                 throw new ArgumentNullException(nameof(dic));

@@ -41,7 +41,7 @@ namespace BrandonUtils.Standalone.Clerical {
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
         [Pure]
-        public static bool IsParentOf([NotNull] this DirectoryInfo parent, [NotNull] FileSystemInfo child) {
+        public static bool IsParentOf(this DirectoryInfo parent, FileSystemInfo child) {
             if (parent == null) {
                 throw new ArgumentNullException(nameof(parent));
             }
@@ -55,15 +55,15 @@ namespace BrandonUtils.Standalone.Clerical {
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static bool IsParentOf([NotNull] this DirectoryInfo parent, [NotNull] IHasFileSystemInfo child) => parent.IsParentOf(child.FileSystemInfo);
+        public static bool IsParentOf(this DirectoryInfo parent, IHasFileSystemInfo child) => parent.IsParentOf(child.FileSystemInfo);
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static bool IsParentOf([NotNull] this IHasDirectoryInfo parent, [NotNull] FileSystemInfo child) => parent.Directory!.IsParentOf(child);
+        public static bool IsParentOf(this IHasDirectoryInfo parent, FileSystemInfo child) => parent.Directory!.IsParentOf(child);
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static bool IsParentOf([NotNull] this IHasDirectoryInfo parent, [NotNull] IHasFileSystemInfo child) => parent.IsParentOf(child.FileSystemInfo);
+        public static bool IsParentOf(this IHasDirectoryInfo parent, IHasFileSystemInfo child) => parent.IsParentOf(child.FileSystemInfo);
 
         #endregion
 
@@ -97,19 +97,19 @@ namespace BrandonUtils.Standalone.Clerical {
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static bool IsChildOf([NotNull] this FileSystemInfo child, [NotNull] DirectoryInfo parent) => parent.IsParentOf(child);
+        public static bool IsChildOf(this FileSystemInfo child, DirectoryInfo parent) => parent.IsParentOf(child);
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static bool IsChildOf([NotNull] this FileSystemInfo child, [NotNull] IHasDirectoryInfo parent) => parent.IsParentOf(child);
+        public static bool IsChildOf(this FileSystemInfo child, IHasDirectoryInfo parent) => parent.IsParentOf(child);
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static bool IsChildOf([NotNull] this IHasFileSystemInfo child, [NotNull] DirectoryInfo parent) => parent.IsParentOf(child);
+        public static bool IsChildOf(this IHasFileSystemInfo child, DirectoryInfo parent) => parent.IsParentOf(child);
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static bool IsChildOf([NotNull] this IHasFileSystemInfo child, [NotNull] IHasDirectoryInfo parent) => parent.IsParentOf(child);
+        public static bool IsChildOf(this IHasFileSystemInfo child, IHasDirectoryInfo parent) => parent.IsParentOf(child);
 
         #endregion
 
@@ -139,8 +139,8 @@ namespace BrandonUtils.Standalone.Clerical {
 
         #endregion
 
-        [NotNull]
-        public static string GetChildPath([NotNull] this DirectoryInfo parent, string? relativePath) {
+
+        public static string GetChildPath(this DirectoryInfo parent, string? relativePath) {
             if (parent == null) {
                 throw new ArgumentNullException(nameof(parent));
             }
@@ -180,8 +180,8 @@ namespace BrandonUtils.Standalone.Clerical {
             }
         }
 
-        [NotNull]
-        private static string FamilyString([NotNull] DirectoryInfo parent, [NotNull] FileSystemInfo child) {
+
+        private static string FamilyString(DirectoryInfo parent, FileSystemInfo child) {
             Console.WriteLine(parent.Prettify());
 
             return new Dictionary<object, object>() {
@@ -194,7 +194,7 @@ namespace BrandonUtils.Standalone.Clerical {
 
         #region Existential
 
-        public static void MustNotExist([NotNull] this FileSystemInfo fileSystemInfo) {
+        public static void MustNotExist(this FileSystemInfo fileSystemInfo) {
             if (fileSystemInfo == null) {
                 throw new ArgumentNullException(nameof(fileSystemInfo));
             }
@@ -205,7 +205,7 @@ namespace BrandonUtils.Standalone.Clerical {
             }
         }
 
-        public static void MustNotExist([NotNull] this IHasFileSystemInfo fileSystemInfo) {
+        public static void MustNotExist(this IHasFileSystemInfo fileSystemInfo) {
             if (fileSystemInfo == null) {
                 throw new ArgumentNullException(nameof(fileSystemInfo));
             }
@@ -216,7 +216,7 @@ namespace BrandonUtils.Standalone.Clerical {
             }
         }
 
-        public static void MustExist([NotNull] this FileSystemInfo fileSystemInfo) {
+        public static void MustExist(this FileSystemInfo fileSystemInfo) {
             if (fileSystemInfo == null) {
                 throw new ArgumentNullException(nameof(fileSystemInfo));
             }
@@ -227,7 +227,7 @@ namespace BrandonUtils.Standalone.Clerical {
             }
         }
 
-        public static void MustExist([NotNull] this IHasFileSystemInfo fileSystemInfo) {
+        public static void MustExist(this IHasFileSystemInfo fileSystemInfo) {
             if (fileSystemInfo == null) {
                 throw new ArgumentNullException(nameof(fileSystemInfo));
             }

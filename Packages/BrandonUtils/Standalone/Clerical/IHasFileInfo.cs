@@ -1,7 +1,5 @@
 ﻿using System.IO;
 
-using JetBrains.Annotations;
-
 namespace BrandonUtils.Standalone.Clerical {
     /// <summary>
     /// Indicates that the implementer contains a meaningful <see cref="FileInfo"/> reference, stored in <see cref="File"/>.
@@ -17,7 +15,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <remarks>
         /// I named this "File" to match <see cref="FileInfo"/>.<see cref="FileInfo.Directory"/>.
         /// </remarks>
-        [NotNull]
+
         public FileInfo File { get; }
     }
 }

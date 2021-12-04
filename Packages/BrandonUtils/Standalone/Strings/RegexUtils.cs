@@ -207,7 +207,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// <returns>true if <paramref name="input"/> ends with <paramref name="pattern"/></returns>
         [ContractAnnotation("input:null => false")]
         [Pure]
-        public static bool EndsWith(this string? input, [NotNull] Regex pattern) {
+        public static bool EndsWith(this string? input, Regex pattern) {
             return input != null && new Regex($"{pattern}$").IsMatch(input);
         }
 
@@ -219,7 +219,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// <returns>true if <paramref name="input"/> starts with <paramref name="pattern"/></returns>
         [ContractAnnotation("input:null => false")]
         [Pure]
-        public static bool StartsWith(this string? input, [NotNull] Regex pattern) {
+        public static bool StartsWith(this string? input, Regex pattern) {
             return input != null && new Regex($"^{pattern}").IsMatch(input);
         }
 

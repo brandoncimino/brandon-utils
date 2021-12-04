@@ -58,6 +58,6 @@ namespace BrandonUtils.Testing {
             return new Asserter<T>(actualValueDelegate);
         }
 
-        [Pure] public static Asserter<object> WithHeading([CanBeNull] string heading) => new Asserter<object>().WithHeading(heading);
+        [Pure] public static Asserter<object> WithHeading(string? heading) => new Asserter<object>().WithHeading(heading);
     }
 }

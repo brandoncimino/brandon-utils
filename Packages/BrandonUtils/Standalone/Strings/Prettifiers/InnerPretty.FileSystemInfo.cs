@@ -12,7 +12,7 @@ using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone.Strings.Prettifiers {
     internal static partial class InnerPretty {
-        public static string PrettifyFileSystemInfo([NotNull] FileSystemInfo item, [CanBeNull] PrettificationSettings settings = default) {
+        public static string PrettifyFileSystemInfo(FileSystemInfo item, PrettificationSettings? settings = default) {
             settings ??= Prettification.DefaultPrettificationSettings;
 
             return settings.PreferredLineStyle == LineStyle.Single
@@ -20,20 +20,20 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
                        : PrettifyWithChildren(item, settings).JoinLines();
         }
 
-        [NotNull, ItemNotNull]
-        private static IEnumerable<string> SummarizeChildren([NotNull] DirectoryInfo directoryInfo) {
+        [return: System.Diagnostics.CodeAnalysis.NotNull]
+        private static IEnumerable<string> SummarizeChildren(DirectoryInfo directoryInfo) {
             var childCount = directoryInfo.EnumerateFileSystemInfos().Count();
             return new[] { $"{StringUtils.Ellipsis}({childCount} children)" };
         }
 
-        [NotNull, ItemNotNull]
-        private static IEnumerable<string> EnumerateChildren([NotNull] DirectoryInfo dir, [CanBeNull] PrettificationSettings settings, int depthLimit, int currentDepth) {
+        [return: System.Diagnostics.CodeAnalysis.NotNull]
+        private static IEnumerable<string> EnumerateChildren(DirectoryInfo dir, PrettificationSettings? settings, int depthLimit, int currentDepth) {
             return dir.EnumerateFileSystemInfos()
                       .SelectMany(it => PrettifyWithChildren(it, settings, depthLimit, currentDepth));
         }
 
-        [NotNull]
-        private static string GetIcon([NotNull] FileSystemInfo item) {
+
+        private static string GetIcon(FileSystemInfo item) {
             return item switch {
                 FileInfo _      => BPath.FileIcon,
                 DirectoryInfo _ => BPath.ClosedFolderIcon,
@@ -41,13 +41,13 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
             };
         }
 
-        private static string PrettifySingleItem([NotNull] FileSystemInfo item, [NotNull] PrettificationSettings settings, int currentDepth = 0) {
+        private static string PrettifySingleItem(FileSystemInfo item, PrettificationSettings settings, int currentDepth = 0) {
             var itemName = currentDepth == 0 ? item.ToUri().ToString() : item.Name;
             return itemName.Prefix(GetIcon(item), " ");
         }
 
-        [NotNull]
-        private static IEnumerable<string> PrettifyWithChildren(FileSystemInfo item, [CanBeNull] PrettificationSettings settings, [NonNegativeValue] int depthLimit = 2, int currentDepth = 0) {
+
+        private static IEnumerable<string> PrettifyWithChildren(FileSystemInfo item, PrettificationSettings? settings, [NonNegativeValue] int depthLimit = 2, int currentDepth = 0) {
             /*
              * 📂 Folder
              *   | File

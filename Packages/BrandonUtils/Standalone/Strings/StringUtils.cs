@@ -66,11 +66,10 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="indentChar">The <see cref="char"/> that is <see cref="Repeat(char,int,string)"/>ed to build a single indentation. Defaults to <see cref="DefaultIndentChar"/>.</param>
         /// <returns>The indented <see cref="string"/>.</returns>
         /// <seealso cref="Indent(IEnumerable{string},int,int,char)"/>
-        [CanBeNull]
         [ContractAnnotation("toIndent:null => null")]
         [ContractAnnotation("toIndent:notnull => notnull")]
-        public static string Indent(
-            [CanBeNull] this string toIndent,
+        public static string? Indent(
+            this string? toIndent,
             [NonNegativeValue]
             int indentCount = 1,
             [NonNegativeValue]
@@ -100,8 +99,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// <returns></returns>
         [ContractAnnotation("toRepeat:null => null")]
         [ContractAnnotation("toRepeat:notnull => notnull")]
-        [CanBeNull]
-        public static string Repeat([CanBeNull] this string toRepeat, [NonNegativeValue] int repetitions, [CanBeNull] string separator = "") {
+        public static string? Repeat(this string? toRepeat, [NonNegativeValue] int repetitions, string? separator = "") {
             if (repetitions.IsPositive() == false) {
                 throw new ArgumentOutOfRangeException(nameof(repetitions));
             }
@@ -119,7 +117,6 @@ namespace BrandonUtils.Standalone.Strings {
         }
 
         /// <inheritdoc cref="Repeat(string,int,string)" />
-        [NotNull]
         public static string Repeat(this char toRepeat, [NonNegativeValue] int repetitions, string separator = "") {
             if (repetitions.IsPositive() == false) {
                 throw new ArgumentOutOfRangeException(nameof(repetitions));
@@ -156,8 +153,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="stringToJoin"></param>
         /// <param name="separator"></param>
         /// <returns></returns>
-        [NotNull]
-        public static string Join([CanBeNull] this string baseString, [CanBeNull] string stringToJoin, [CanBeNull] string separator = "") {
+        public static string Join(this string? baseString, string? stringToJoin, string? separator = "") {
             return string.IsNullOrEmpty(baseString) ? stringToJoin.ToString("") : string.Join(separator, baseString, stringToJoin);
         }
 
@@ -176,8 +172,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="second"></param>
         /// <param name="separator"></param>
         /// <returns></returns>
-        [NotNull]
-        public static string JoinWith([CanBeNull] this string first, [CanBeNull] string second, [CanBeNull] string separator) {
+        public static string JoinWith(this string? first, string? second, string? separator) {
             separator ??= "";
             first     =   first?.TrimEnd(separator);
             second    =   second?.TrimStart(separator);
@@ -311,12 +306,11 @@ namespace BrandonUtils.Standalone.Strings {
         /// <returns>a <see cref="string"/> no longer than <paramref name="maxLength"/></returns>
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="maxLength"/> is negative</exception>
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="trail"/> is longer than <paramref name="maxLength"/></exception>
-        [NotNull]
         public static string Truncate(
-            [CanBeNull] this string self,
+            this string? self,
             [NonNegativeValue]
             int maxLength,
-            [CanBeNull] string trail = Ellipsis
+            string? trail = Ellipsis
         ) {
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if (maxLength < 0) {
@@ -348,8 +342,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="trail">the <see cref="string"/> used to indicated that <paramref name="self"/> has been <see cref="Truncate"/>d</param>
         /// <returns>a <see cref="string"/> with a <see cref="string.Length"/> of <paramref name="desiredLength"/></returns>
         /// <exception cref="ArgumentException"></exception>
-        [NotNull]
-        public static string ForceToLength([CanBeNull] this string self, [ValueRange(0, long.MaxValue)] int desiredLength, [CanBeNull] string filler = " ", [CanBeNull] string trail = Ellipsis) {
+        public static string ForceToLength(this string? self, [ValueRange(0, long.MaxValue)] int desiredLength, string? filler = " ", string? trail = Ellipsis) {
             self ??= "";
 
             return self.Length.CompareTo(desiredLength).Sign() switch {
@@ -360,9 +353,9 @@ namespace BrandonUtils.Standalone.Strings {
             };
         }
 
-        [NotNull]
+
         [ContractAnnotation("filler:null => stop")]
-        public static string FillRight([CanBeNull] this string self, [NonNegativeValue] int totalLength, [NotNull] string filler) {
+        public static string FillRight(this string? self, [NonNegativeValue] int totalLength, string filler) {
             ValidateFillParameters(filler, totalLength);
 
             self ??= "";
@@ -375,9 +368,9 @@ namespace BrandonUtils.Standalone.Strings {
             return self + filler.Fill(additionalLengthNeeded);
         }
 
-        [NotNull]
+
         [ContractAnnotation("filler:null => stop")]
-        public static string FillLeft([CanBeNull] this string self, [NonNegativeValue] int totalLength, [NotNull] string filler) {
+        public static string FillLeft(this string? self, [NonNegativeValue] int totalLength, string filler) {
             ValidateFillParameters(filler, totalLength);
 
             self ??= "";
@@ -390,9 +383,9 @@ namespace BrandonUtils.Standalone.Strings {
             return self + filler.Fill(additionalLengthNeeded).Reverse().JoinString();
         }
 
-        [NotNull]
+
         [ContractAnnotation("filler:null => stop")]
-        public static string Fill([NotNull] this string filler, [NonNegativeValue] int totalLength) {
+        public static string Fill(this string filler, [NonNegativeValue] int totalLength) {
             ValidateFillParameters(filler, totalLength);
 
             var fullLength  = totalLength / filler.Length;
@@ -402,7 +395,7 @@ namespace BrandonUtils.Standalone.Strings {
         }
 
         [ContractAnnotation("filler:null => stop")]
-        private static void ValidateFillParameters([NotNull] string filler, [NonNegativeValue] int totalLength) {
+        private static void ValidateFillParameters(string filler, [NonNegativeValue] int totalLength) {
             if (filler == null) {
                 throw new ArgumentNullException(nameof(filler));
             }
@@ -423,10 +416,9 @@ namespace BrandonUtils.Standalone.Strings {
             return $"{hRule}\n{middle}\n{hRule}";
         }
 
-        [CanBeNull]
         [ContractAnnotation("input:null => null")]
         [Pure]
-        public static string Trim([CanBeNull] this string input, [NotNull] string trimString) {
+        public static string? Trim(this string? input, string trimString) {
             if (input == null) {
                 return null;
             }
@@ -435,10 +427,9 @@ namespace BrandonUtils.Standalone.Strings {
             return Trim(input, pattern);
         }
 
-        [CanBeNull]
         [ContractAnnotation("input:null => null")]
         [Pure]
-        public static string Trim([CanBeNull] this string input, [NotNull] Regex trimPattern) {
+        public static string? Trim(this string? input, Regex trimPattern) {
             if (input == null) {
                 return null;
             }
@@ -449,10 +440,9 @@ namespace BrandonUtils.Standalone.Strings {
             return match.Success ? match.Groups["trimmed"].Value : input;
         }
 
-        [CanBeNull]
         [ContractAnnotation("input:null => null")]
         [Pure]
-        public static string TrimEnd([CanBeNull] this string input, [NotNull] string trimString) {
+        public static string? TrimEnd(this string? input, string trimString) {
             if (input == null) {
                 return null;
             }
@@ -461,10 +451,9 @@ namespace BrandonUtils.Standalone.Strings {
             return TrimEnd(input, trimPattern);
         }
 
-        [CanBeNull]
         [ContractAnnotation("input:null => null")]
         [Pure]
-        public static string TrimEnd([CanBeNull] this string input, [NotNull] Regex trimPattern) {
+        public static string? TrimEnd(this string? input, Regex trimPattern) {
             if (input == null) {
                 return null;
             }
@@ -475,10 +464,9 @@ namespace BrandonUtils.Standalone.Strings {
             return match.Success ? match.Groups["trimmed"].Value : input;
         }
 
-        [CanBeNull]
         [ContractAnnotation("input:null => null")]
         [Pure]
-        public static string TrimStart([CanBeNull] this string input, string trimString) {
+        public static string? TrimStart(this string? input, string trimString) {
             if (input == null) {
                 return null;
             }
@@ -487,10 +475,9 @@ namespace BrandonUtils.Standalone.Strings {
             return TrimStart(input, pattern);
         }
 
-        [CanBeNull]
         [ContractAnnotation("input:null => null")]
         [Pure]
-        public static string TrimStart([CanBeNull] this string input, [NotNull] Regex pattern) {
+        public static string? TrimStart(this string? input, Regex pattern) {
             if (input == null) {
                 return null;
             }
@@ -576,8 +563,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="options"><see cref="StringSplitOptions"/></param>
         /// <returns>an <see cref="Array"/> containing each individual line from <paramref name="multilineContent"/></returns>
         [Pure]
-        [NotNull, ItemNotNull]
-        public static string[] SplitLines([CanBeNull] this string multilineContent, StringSplitOptions options = default) {
+        public static string[] SplitLines(this string? multilineContent, StringSplitOptions options = default) {
             return multilineContent?.Split(LineBreakSplitters, options) ?? Array.Empty<string>();
         }
 
@@ -591,8 +577,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// <seealso cref="SplitLines(string,System.StringSplitOptions)"/>
         /// <seealso cref="ToStringLines"/>
         [Pure]
-        [NotNull, ItemNotNull]
-        public static string[] SplitLines([CanBeNull, ItemCanBeNull, InstantHandle] this IEnumerable<string> multilineContents, StringSplitOptions options = default) {
+        public static string[] SplitLines([InstantHandle] this IEnumerable<string?>? multilineContents, StringSplitOptions options = default) {
             return multilineContents?.SelectMany(content => content.SplitLines(options)).ToArray() ?? Array.Empty<string>();
         }
 
@@ -603,8 +588,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// <returns>a collection of <see cref="string.Trim()"/>med <see cref="string"/>s</returns>
         [Pure]
         [LinqTunnel]
-        [NotNull, ItemCanBeNull]
-        public static IEnumerable<string> TrimLines([NotNull, ItemCanBeNull] this IEnumerable<string> strings) {
+        public static IEnumerable<string?> TrimLines(this IEnumerable<string?> strings) {
             return strings.Select(it => it?.Trim());
         }
 
@@ -612,13 +596,13 @@ namespace BrandonUtils.Standalone.Strings {
 
         [Pure]
         [NonNegativeValue]
-        public static int LongestLine([CanBeNull, ItemCanBeNull, InstantHandle] this IEnumerable<string> strings) {
+        public static int LongestLine([InstantHandle] this IEnumerable<string?>? strings) {
             return strings?.SelectMany(it => it.SplitLines()).Max(it => it.Length) ?? 0;
         }
 
         [Pure]
         [NonNegativeValue]
-        public static int LongestLine([CanBeNull] this string str) {
+        public static int LongestLine(this string? str) {
             return str.SplitLines().Max(it => it.Length);
         }
 
@@ -628,13 +612,13 @@ namespace BrandonUtils.Standalone.Strings {
 
         [Pure]
         [NonNegativeValue]
-        public static int LineCount([CanBeNull] this string str) {
+        public static int LineCount(this string? str) {
             return str.SplitLines().Length;
         }
 
         [Pure]
         [NonNegativeValue]
-        public static int LineCount([CanBeNull, ItemCanBeNull, InstantHandle] this IEnumerable<string> strings) {
+        public static int LineCount([InstantHandle] this IEnumerable<string?>? strings) {
             return strings.SplitLines().Length;
         }
 
@@ -652,11 +636,9 @@ namespace BrandonUtils.Standalone.Strings {
         [ContractAnnotation("lines:null => null")]
         [ContractAnnotation("lines:notnull => notnull")]
         [Pure]
-        [CanBeNull, ItemNotNull]
         [LinqTunnel]
-        public static IEnumerable<string> Indent(
-            [CanBeNull, ItemCanBeNull]
-            this IEnumerable<string> lines,
+        public static IEnumerable<string>? Indent(
+            this IEnumerable<string?>? lines,
             [NonNegativeValue]
             int indentCount = 1,
             [NonNegativeValue]
@@ -675,8 +657,7 @@ namespace BrandonUtils.Standalone.Strings {
         }
 
         [ContractAnnotation("lines:null => null")]
-        [CanBeNull]
-        public static IEnumerable<string> IndentWithLabel([CanBeNull] this IEnumerable<string> lines, [CanBeNull] string label, [CanBeNull] string joiner = " ") {
+        public static IEnumerable<string>? IndentWithLabel(this IEnumerable<string>? lines, string? label, string? joiner = " ") {
             if (lines == null) {
                 return null;
             }
@@ -769,7 +750,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="obj"></param>
         /// <param name="nullPlaceholder"></param>
         /// <returns></returns>
-        public static string[] ToStringLines([CanBeNull] this object obj, [CanBeNull] string nullPlaceholder = "") {
+        public static string[] ToStringLines(this object? obj, string? nullPlaceholder = "") {
             if (obj is IEnumerable<object> e) {
                 return e.SelectMany(it => it.ToStringLines(nullPlaceholder)).SplitLines();
             }
@@ -791,9 +772,8 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="obj">the original <see cref="object"/></param>
         /// <param name="nullPlaceholder">the <see cref="string"/> returned when <paramref name="obj"/> is <c>null</c></param>
         /// <returns>the <see cref="object.ToString"/> representation of <paramref name="obj"/>, or <c>null</c></returns>
-        [NotNull]
         [ContractAnnotation("nullPlaceholder:null => stop")]
-        public static string ToString([CanBeNull] this object obj, [NotNull] string nullPlaceholder) {
+        public static string ToString(this object? obj, string nullPlaceholder) {
             if (nullPlaceholder == null) {
                 throw new ArgumentNullException(nameof(nullPlaceholder), $"Providing a null value as a {nameof(nullPlaceholder)} is redundant!");
             }
@@ -810,13 +790,12 @@ namespace BrandonUtils.Standalone.Strings {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        [NotNull]
         [ContractAnnotation("formatter:null => stop")]
         [ContractAnnotation("nullPlaceholder:null => stop")]
         public static string ToString<T>(
-            [CanBeNull] this T               obj,
-            [NotNull]        Func<T, string> formatter,
-            [CanBeNull]      string          nullPlaceholder = Prettification.DefaultNullPlaceholder
+            this T?         obj,
+            Func<T, string> formatter,
+            string?         nullPlaceholder = Prettification.DefaultNullPlaceholder
         ) {
             if (nullPlaceholder == null) {
                 throw new ArgumentNullException(nameof(nullPlaceholder), $"Providing a null value as a {nameof(nullPlaceholder)} is redundant!");
@@ -835,10 +814,9 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="str">this <see cref="string"/></param>
         /// <param name="emptyPlaceholder">the fallback string if <paramref name="str"/> <see cref="IsNullOrEmpty"/>. Defaults to <c>""</c></param>
         /// <returns>this <see cref="string"/> or <paramref name="emptyPlaceholder"/></returns>
-        [CanBeNull]
         [ContractAnnotation("emptyPlaceholder:notnull => notnull")]
         [ContractAnnotation("emptyPlaceholder:null => canbenull")]
-        public static string IfEmpty([CanBeNull] this string str, [NotNull] string emptyPlaceholder) {
+        public static string? IfEmpty(this string? str, string emptyPlaceholder) {
             if (emptyPlaceholder == null) {
                 throw new ArgumentNullException(nameof(emptyPlaceholder));
             }
@@ -846,14 +824,14 @@ namespace BrandonUtils.Standalone.Strings {
             return str.IsNullOrEmpty() ? emptyPlaceholder : str;
         }
 
-        [NotNull]
-        public static string OrNullPlaceholder([CanBeNull] this object obj, [CanBeNull] string nullPlaceholder = Prettification.DefaultNullPlaceholder) {
+
+        public static string OrNullPlaceholder(this object? obj, string? nullPlaceholder = Prettification.DefaultNullPlaceholder) {
             nullPlaceholder ??= Prettification.DefaultNullPlaceholder;
             return obj?.ToString() ?? nullPlaceholder;
         }
 
-        [NotNull]
-        public static string OrNullPlaceholder([CanBeNull] this object obj, [CanBeNull] PrettificationSettings settings) {
+
+        public static string OrNullPlaceholder(this object? obj, PrettificationSettings? settings) {
             settings ??= Prettification.DefaultPrettificationSettings;
             return OrNullPlaceholder(obj, settings.NullPlaceholder);
         }
@@ -864,17 +842,16 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="str">this <see cref="string"/></param>
         /// <param name="blankPlaceholder">the fallback string if <paramref name="str"/> <see cref="IsBlank"/>. Defaults to <c>""</c></param>
         /// <returns>this <see cref="string"/> or <paramref name="blankPlaceholder"/></returns>
-        [CanBeNull]
         [ContractAnnotation("blankPlaceholder:notnull => notnull")]
         [ContractAnnotation("blankPlaceholder:null => canbenull")]
-        public static string IfBlank([CanBeNull] this string str, [CanBeNull] string blankPlaceholder) {
+        public static string? IfBlank(this string? str, string? blankPlaceholder) {
             blankPlaceholder ??= "";
             return str.IsBlank() ? blankPlaceholder : str;
         }
 
-        [NotNull]
+
         [ContractAnnotation("null => stop")]
-        public static string MustNotBeBlank([CanBeNull] this string str) {
+        public static string MustNotBeBlank(this string? str) {
             return str.IsNotBlank() ? str : throw new ArgumentException($"The string must not be blank! (Actual: [{str ?? Prettification.DefaultNullPlaceholder}]");
         }
 
@@ -888,7 +865,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="str"></param>
         /// <returns><see cref="string.IsNullOrEmpty"/></returns>
         [ContractAnnotation("null => true", true)]
-        public static bool IsNullOrEmpty([CanBeNull] this string str) {
+        public static bool IsNullOrEmpty(this string? str) {
             return string.IsNullOrEmpty(str);
         }
 
@@ -898,7 +875,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="str">this <see cref="string"/></param>
         /// <returns><see cref="string.IsNullOrWhiteSpace"/></returns>
         [ContractAnnotation("null => true", true)]
-        public static bool IsNullOrWhiteSpace([CanBeNull] this string str) {
+        public static bool IsNullOrWhiteSpace(this string? str) {
             return string.IsNullOrWhiteSpace(str);
         }
 
@@ -906,7 +883,7 @@ namespace BrandonUtils.Standalone.Strings {
          * <inheritdoc cref="IsNullOrEmpty"/>
          */
         [ContractAnnotation("null => true")]
-        public static bool IsEmpty([CanBeNull] this string str) {
+        public static bool IsEmpty(this string? str) {
             return string.IsNullOrEmpty(str);
         }
 
@@ -916,7 +893,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="str">this <see cref="string"/></param>
         /// <returns>!<see cref="IsEmpty"/></returns>
         [ContractAnnotation("null => false")]
-        public static bool IsNotEmpty([CanBeNull] this string str) {
+        public static bool IsNotEmpty(this string? str) {
             return !string.IsNullOrEmpty(str);
         }
 
@@ -926,7 +903,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="str">a <see cref="string"/></param>
         /// <returns><see cref="IsNullOrWhiteSpace"/></returns>
         [ContractAnnotation("null => true", true)]
-        public static bool IsBlank([CanBeNull] this string str) {
+        public static bool IsBlank(this string? str) {
             return str.IsNullOrWhiteSpace();
         }
 
@@ -936,7 +913,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// <param name="str">a <see cref="string"/></param>
         /// <returns><see cref="IsNullOrWhiteSpace"/></returns>
         [ContractAnnotation("null => false", true)]
-        public static bool IsNotBlank([CanBeNull] this string str) {
+        public static bool IsNotBlank(this string? str) {
             return !str.IsBlank();
         }
 
@@ -944,25 +921,24 @@ namespace BrandonUtils.Standalone.Strings {
 
         #region {x}IfMissing
 
-        [NotNull]
-        public static string PrependIfMissing([CanBeNull] this string str, [CanBeNull] string prefix) {
+        public static string PrependIfMissing(this string? str, string? prefix) {
             return PrefixIfMissing(str, prefix);
         }
 
-        [NotNull]
-        public static string PrefixIfMissing([CanBeNull] this string str, [CanBeNull] string prefix) {
+
+        public static string PrefixIfMissing(this string? str, string? prefix) {
             str    ??= "";
             prefix ??= "";
             return str.StartsWith(prefix) == true ? str : str.Prefix(prefix);
         }
 
-        [NotNull]
-        public static string AppendIfMissing([CanBeNull] this string str, [CanBeNull] string suffix) {
+
+        public static string AppendIfMissing(this string? str, string? suffix) {
             return SuffixIfMissing(str, suffix);
         }
 
-        [NotNull]
-        public static string SuffixIfMissing([CanBeNull] this string str, [CanBeNull] string suffix) {
+
+        public static string SuffixIfMissing(this string? str, string? suffix) {
             str    ??= "";
             suffix ??= "";
             return str.EndsWith(suffix) ? str : str.Suffix(suffix);
@@ -972,8 +948,8 @@ namespace BrandonUtils.Standalone.Strings {
 
         #region Substrings
 
-        [NotNull, Pure]
-        public static string SubstringBefore([CanBeNull] this string str, [CanBeNull] string splitter) {
+        [Pure]
+        public static string SubstringBefore(this string? str, string? splitter) {
             if (splitter.IsNullOrEmpty()) {
                 return "";
             }
@@ -982,8 +958,8 @@ namespace BrandonUtils.Standalone.Strings {
             return first > 0 ? str.Substring(0, first.Value) : "";
         }
 
-        [NotNull, Pure]
-        public static string SubstringAfter([CanBeNull] this string str, [CanBeNull] string splitter) {
+        [Pure]
+        public static string SubstringAfter(this string? str, string? splitter) {
             if (str.IsNullOrEmpty() || splitter.IsNullOrEmpty()) {
                 return "";
             }
@@ -992,8 +968,8 @@ namespace BrandonUtils.Standalone.Strings {
             return last.IsBetween(0, str.Length, Clusivity.Exclusive) ? str.Substring(last, str.Length - last) : "";
         }
 
-        [NotNull, Pure]
-        public static string SubstringBefore([CanBeNull] this string str, [NotNull] Regex pattern) {
+        [Pure]
+        public static string SubstringBefore(this string? str, Regex pattern) {
             if (str.IsNullOrEmpty()) {
                 return "";
             }
@@ -1002,8 +978,8 @@ namespace BrandonUtils.Standalone.Strings {
             return match.Success ? str.Substring(0, match.Index) : "";
         }
 
-        [NotNull, Pure]
-        public static string SubstringAfter([CanBeNull] this string str, [NotNull] Regex pattern) {
+        [Pure]
+        public static string SubstringAfter(this string? str, Regex pattern) {
             if (str.IsNullOrEmpty()) {
                 return "";
             }
@@ -1039,7 +1015,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// <returns></returns>
         [ContractAnnotation("str:null => null")]
         [ContractAnnotation("splitter:null => null")]
-        public static (string, string)? Bisect([CanBeNull] this string str, [CanBeNull] string splitter) {
+        public static (string, string)? Bisect(this string? str, string? splitter) {
             if (str.IsNullOrEmpty() || splitter.IsNullOrEmpty()) {
                 return null;
             }
@@ -1063,7 +1039,7 @@ namespace BrandonUtils.Standalone.Strings {
         /// <returns></returns>
         [ContractAnnotation("str:null => null")]
         [ContractAnnotation("splitter:null => null")]
-        public static (string, string)? BisectLast([CanBeNull] this string str, [CanBeNull] string splitter) {
+        public static (string, string)? BisectLast(this string? str, string? splitter) {
             if (str.IsNullOrEmpty() || splitter.IsNullOrEmpty()) {
                 return null;
             }

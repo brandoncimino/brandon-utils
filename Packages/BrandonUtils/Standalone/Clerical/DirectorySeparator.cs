@@ -2,8 +2,6 @@
 
 using BrandonUtils.Standalone.Enums;
 
-using JetBrains.Annotations;
-
 namespace BrandonUtils.Standalone.Clerical {
     public enum DirectorySeparator {
         /// <summary>
@@ -24,7 +22,7 @@ namespace BrandonUtils.Standalone.Clerical {
             };
         }
 
-        [NotNull]
+
         public static string ToCharString(this DirectorySeparator separator) {
             return separator.ToChar().ToString();
         }

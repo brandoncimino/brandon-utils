@@ -6,8 +6,6 @@ using BrandonUtils.Standalone.Reflection;
 using BrandonUtils.Standalone.Strings.Json;
 using BrandonUtils.Standalone.Strings.Prettifiers;
 
-using JetBrains.Annotations;
-
 namespace BrandonUtils.Standalone.Strings {
     public enum TypeNameStyle {
         None  = 0,
@@ -16,7 +14,6 @@ namespace BrandonUtils.Standalone.Strings {
     }
 
     public static class TypeNameStyleExtensions {
-        [NotNull]
         public static string GetTypeLabel(this Type? type, PrettificationSettings? settings) {
             settings = Prettification.ResolveSettings(settings);
 

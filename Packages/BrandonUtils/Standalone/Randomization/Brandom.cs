@@ -57,7 +57,7 @@ namespace BrandonUtils.Standalone.Randomization {
         /// <typeparam name="T">the type of the entries in the <paramref name="weightedList"/></typeparam>
         /// <returns>the <see cref="Enumerable.Sum(System.Collections.Generic.IEnumerable{decimal})"/> of the <paramref name="weightedList"/> weights</returns>
         /// <exception cref="ArgumentOutOfRangeException">if any of the weights are <c><![CDATA[< 0]]></c></exception>
-        private static double GetTotalWeight<T>([NotNull, InstantHandle] IEnumerable<(T choice, double weight)> weightedList) {
+        private static double GetTotalWeight<T>([InstantHandle] IEnumerable<(T choice, double weight)> weightedList) {
             double total = 0;
             foreach (var (_, weight) in weightedList) {
                 if (weight.IsNegative()) {
@@ -80,10 +80,9 @@ namespace BrandonUtils.Standalone.Randomization {
         /// <exception cref="ArgumentNullException">if <paramref name="weightedChoices"/> is null or empty</exception>
         /// <exception cref="ArgumentOutOfRangeException">if any of the <paramref name="weightedChoices"/>' weights is negative</exception>
         /// <exception cref="BrandonException">if we fail to select any of the <paramref name="weightedChoices"/></exception>
-        [CanBeNull]
-        public static T FromWeightedList<T>(
+        public static T? FromWeightedList<T>(
             this Random? generator,
-            [NotNull, InstantHandle]
+            [InstantHandle]
             IEnumerable<(T choice, double weight)> weightedChoices
         ) {
             if (weightedChoices == null) {
@@ -110,8 +109,7 @@ namespace BrandonUtils.Standalone.Randomization {
             throw new BrandonException($"Unable to select an entry from the weighted list! ({nameof(targetWeight)} = {targetWeight}, from {weightedChoices.Prettify()}");
         }
 
-        [CanBeNull]
-        public static T FromWeightedList<T>(this Random? generator, [NotNull, InstantHandle] IEnumerable<(T choice, int weight)> weightedChoices) {
+        public static T? FromWeightedList<T>(this Random? generator, [InstantHandle] IEnumerable<(T choice, int weight)> weightedChoices) {
             return generator.FromWeightedList(weightedChoices.Select(it => (it.choice, it.weight.ToDouble())));
         }
 
@@ -127,13 +125,12 @@ namespace BrandonUtils.Standalone.Randomization {
         /// <exception cref="ArgumentNullException">if any of the <paramref name="weightedChoices"/>' <see cref="IDictionary{TKey,TValue}.Keys"/> is null</exception>
         /// <exception cref="ArgumentOutOfRangeException">if any of the <paramref name="weightedChoices"/>' <see cref="IDictionary{TKey,TValue}.Values"/> <see cref="Mathb.IsNegative(double)"/></exception>
         /// <exception cref="BrandonException">if we fail to select an entry <i>(this should not occur under normal circumstances)</i></exception>
-        [NotNull]
-        public static T FromWeightedList<T>(this Random? generator, [NotNull] IDictionary<T, double> weightedChoices) {
+        public static T FromWeightedList<T>(this Random? generator, IDictionary<T, double> weightedChoices) {
             return generator.FromWeightedList(weightedChoices.Select(it => (it.Key, it.Value)))!;
         }
 
-        [NotNull]
-        public static T FromWeightedList<T>(this Random? generator, [NotNull] IDictionary<T, int> weightedChoices) {
+
+        public static T FromWeightedList<T>(this Random? generator, IDictionary<T, int> weightedChoices) {
             return generator.FromWeightedList(weightedChoices.Select(it => (it.Key, it.Value)))!;
         }
 
@@ -148,12 +145,11 @@ namespace BrandonUtils.Standalone.Randomization {
         /// <exception cref="ArgumentNullException">if <paramref name="choices"/> is null or empty</exception>
         /// <exception cref="ArgumentNullException">if <paramref name="weightSelector"/> is null</exception>
         /// <exception cref="ArgumentOutOfRangeException">if any of the results of <paramref name="weightSelector"/> are <c><![CDATA[< 0]]></c></exception>
-        [CanBeNull]
-        public static T FromWeightedList<T>(
+        public static T? FromWeightedList<T>(
             this Random? generator,
-            [NotNull, ItemCanBeNull, InstantHandle]
-            IEnumerable<T> choices,
-            [NotNull] Func<T, double> weightSelector
+            [InstantHandle]
+            IEnumerable<T?> choices,
+            Func<T, double> weightSelector
         ) {
             if (weightSelector == null) {
                 throw new ArgumentNullException(nameof(weightSelector));
@@ -170,7 +166,7 @@ namespace BrandonUtils.Standalone.Randomization {
 
         #endregion
 
-        [NotNull]
+
         internal static Random OrDefault(this Random? generator) {
             return generator ?? Gen;
         }
@@ -182,19 +178,19 @@ namespace BrandonUtils.Standalone.Randomization {
         [Pure]
         public static bool Bool(this Random? generator) => generator.OrDefault().Next(2) == 0;
 
-        public static int      Int(this         Random? generator, int      min, int      max) => generator.OrDefault().Next(min, max);
-        public static long     Long(this        Random? generator, long     min, long     max) => (min, max).LerpInt(generator.NextDoubleInclusive());
-        public static float    Float(this       Random? generator, float    min, float    max) => (min, max).Lerp(generator.NextDoubleInclusive().ToFloat());
-        public static double   Double(this      Random? generator, double   min, double   max) => (min, max).Lerp(generator.NextDoubleInclusive());
-        public static decimal  Decimal(this     Random? generator, decimal  min, decimal  max) => (min, max).Lerp(generator.NextDoubleInclusive().ToDecimal());
-        public static TimeSpan TimeSpan(this    Random? generator, TimeSpan min, TimeSpan max) => (min, max).Lerp(generator.NextDoubleInclusive());
-        public static DateTime DateTime(this    Random? generator, DateTime min, DateTime max) => (min, max).Lerp(generator.NextDoubleInclusive());
-        public static int      Int(this         Random? generator, int      max) => generator.Int(0, max);
-        public static long     Long(this        Random? generator, long     max) => generator.Long(0, max);
-        public static float    Float(this       Random? generator, float    max) => generator.Float(0, max);
-        public static double   Double(this      Random? generator, double   max) => generator.Double(0, max);
-        public static decimal  Decimal(this     Random? generator, decimal  max) => generator.Decimal(0, max);
-        public static TimeSpan TimeSpan(this    Random? generator, TimeSpan max) => generator.TimeSpan(default, max);
+        public static int      Int(this      Random? generator, int      min, int      max) => generator.OrDefault().Next(min, max);
+        public static long     Long(this     Random? generator, long     min, long     max) => (min, max).LerpInt(generator.NextDoubleInclusive());
+        public static float    Float(this    Random? generator, float    min, float    max) => (min, max).Lerp(generator.NextDoubleInclusive().ToFloat());
+        public static double   Double(this   Random? generator, double   min, double   max) => (min, max).Lerp(generator.NextDoubleInclusive());
+        public static decimal  Decimal(this  Random? generator, decimal  min, decimal  max) => (min, max).Lerp(generator.NextDoubleInclusive().ToDecimal());
+        public static TimeSpan TimeSpan(this Random? generator, TimeSpan min, TimeSpan max) => (min, max).Lerp(generator.NextDoubleInclusive());
+        public static DateTime DateTime(this Random? generator, DateTime min, DateTime max) => (min, max).Lerp(generator.NextDoubleInclusive());
+        public static int      Int(this      Random? generator, int      max) => generator.Int(0, max);
+        public static long     Long(this     Random? generator, long     max) => generator.Long(0, max);
+        public static float    Float(this    Random? generator, float    max) => generator.Float(0, max);
+        public static double   Double(this   Random? generator, double   max) => generator.Double(0, max);
+        public static decimal  Decimal(this  Random? generator, decimal  max) => generator.Decimal(0, max);
+        public static TimeSpan TimeSpan(this Random? generator, TimeSpan max) => generator.TimeSpan(default, max);
         public static DateTime DateTime(this Random? generator, DateTime max) => generator.DateTime(default, max);
 
         /**

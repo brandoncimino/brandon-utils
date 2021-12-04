@@ -16,15 +16,13 @@ namespace BrandonUtils.Standalone.Optional {
     public readonly struct FailableFunc<TValue> : IFailableFunc<TValue>, IEquatable<IOptional<TValue>>, IEquatable<TValue> {
         public bool HasValue { get; }
 
-        [ItemCanBeNull]
-        private readonly Optional<TValue> _value;
-        internal Optional<TValue> SafeValue => HasValue ? _value : default;
-        public   TValue           Value     => HasValue ? _value.Value : throw FailableException.FailedException(this, _excuse);
+        private readonly Optional<TValue?> _value;
+        internal         Optional<TValue>  SafeValue => HasValue ? _value : default;
+        public           TValue            Value     => HasValue ? _value.Value : throw FailableException.FailedException(this, _excuse);
 
         private readonly Optional<Exception?> _excuse;
 
         /// <returns><see cref="_excuse"/>.<see cref="IOptional{T}.Value"/> if present and non-null; otherwise, returns <see cref="NoExcuseExcuse"/></returns>
-        [NotNull]
         private Exception _getExcuseSafely() => _excuse.OrElse(null) ?? NoExcuseExcuse();
 
         public Exception Excuse => Failed ? _getExcuseSafely() : throw FailableException.DidNotFailException(this, _value);
@@ -34,8 +32,8 @@ namespace BrandonUtils.Standalone.Optional {
         public bool Failed => !HasValue;
         public int  Count  => HasValue ? 1 : 0;
 
-        [NotNull, ItemCanBeNull]
-        private IEnumerable<TValue> EnumerableImplementation => HasValue ? Enumerable.Repeat(Value, 1) : Enumerable.Empty<TValue>();
+
+        private IEnumerable<TValue?> EnumerableImplementation => HasValue ? Enumerable.Repeat(Value, 1) : Enumerable.Empty<TValue>();
 
 
         public FailableFunc(Func<TValue> valueSupplier) {
@@ -85,38 +83,38 @@ namespace BrandonUtils.Standalone.Optional {
             return Optional.AreEqual(this, other);
         }
 
-        public static bool operator ==([ItemCanBeNull] FailableFunc<TValue> a, [ItemCanBeNull] IOptional<TValue>? b) {
+        public static bool operator ==(FailableFunc<TValue?> a, IOptional<TValue?>? b) {
             return Optional.AreEqual(a, b);
         }
 
-        public static bool operator !=([ItemCanBeNull] FailableFunc<TValue> a, [ItemCanBeNull] IOptional<TValue>? b) {
+        public static bool operator !=(FailableFunc<TValue?> a, IOptional<TValue?>? b) {
             return !Optional.AreEqual(a, b);
         }
 
-        public static bool operator ==([ItemCanBeNull] FailableFunc<TValue> a, [CanBeNull] TValue b) {
+        public static bool operator ==(FailableFunc<TValue?> a, TValue? b) {
             return Optional.AreEqual(a, b);
         }
 
-        public static bool operator !=([ItemCanBeNull] FailableFunc<TValue> a, [CanBeNull] TValue b) {
+        public static bool operator !=(FailableFunc<TValue?> a, TValue? b) {
             return !Optional.AreEqual(a, b);
         }
 
-        public static bool operator ==([CanBeNull] TValue a, [ItemCanBeNull] FailableFunc<TValue> b) {
+        public static bool operator ==(TValue? a, FailableFunc<TValue?> b) {
             return Optional.AreEqual(a, b);
         }
 
-        public static bool operator !=([CanBeNull] TValue a, [ItemCanBeNull] FailableFunc<TValue> b) {
+        public static bool operator !=(TValue? a, FailableFunc<TValue?> b) {
             return !Optional.AreEqual(a, b);
         }
 
         #endregion
 
-        [NotNull]
+
         public override string ToString() {
             return Optional.ToString(this, new PrettificationSettings());
         }
 
-        [NotNull]
+
         private InvalidOperationException NoExcuseExcuse() {
             return new InvalidOperationException($"This {GetType().PrettifyType(default)} has no {nameof(_excuse)}! This probably means it is a default value, or was created using a no-argument constructor.");
         }

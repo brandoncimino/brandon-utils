@@ -28,10 +28,9 @@ namespace BrandonUtils.Standalone.Strings.Json {
         /// <param name="settings">optional <see cref="JsonSerializerSettings"/></param>
         /// <typeparam name="T"></typeparam>
         /// <returns>a <b>new</b> <typeparamref name="T"/> instance that is a <b>deep clone</b> of <paramref name="original"/></returns>
-        [CanBeNull]
         [ContractAnnotation("original:null => null")]
         [ContractAnnotation("original:notnull => notnull")]
-        public static T JsonClone<T>([CanBeNull] this T original, JsonSerializerSettings? settings = default) where T : IJsonCloneable {
+        public static T? JsonClone<T>(this T? original, JsonSerializerSettings? settings = default) where T : IJsonCloneable {
             var json = JsonConvert.SerializeObject(original, settings!);
             return JsonConvert.DeserializeObject<T>(json, settings);
         }
@@ -44,10 +43,9 @@ namespace BrandonUtils.Standalone.Strings.Json {
         /// <param name="settings"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        [CanBeNull]
         [ContractAnnotation("original:null => null")]
         [ContractAnnotation("original:notnull => notnull")]
-        public static T JsonClone<T>([CanBeNull] this T original, Action<T>? modifications, JsonSerializerSettings? settings = default) where T : IJsonCloneable {
+        public static T? JsonClone<T>(this T? original, Action<T>? modifications, JsonSerializerSettings? settings = default) where T : IJsonCloneable {
             var clone = original.JsonClone(settings);
             modifications?.Invoke(clone);
             return clone;

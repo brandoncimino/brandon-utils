@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 
-using JetBrains.Annotations;
-
 namespace BrandonUtils.Standalone.Optional {
     /// <summary>
     /// A variation on <see cref="IFailable"/> that also includes timing information, e.g. <see cref="StartedAt"/> and <see cref="Duration"/>.
@@ -15,7 +13,7 @@ namespace BrandonUtils.Standalone.Optional {
         public           DateTime  EndedAt   => StartedAt + Duration;
         public           TimeSpan  Duration  { get; }
 
-        public Timeable([NotNull] Action action) {
+        public Timeable(Action action) {
             StartedAt = DateTime.UtcNow;
             var sw = Stopwatch.StartNew();
             Execution = action.Try();

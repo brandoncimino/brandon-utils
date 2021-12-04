@@ -21,9 +21,8 @@ namespace BrandonUtils.Standalone.Chronic {
     /// </remarks>
     [PublicAPI]
     public class AggregateExecutionTime : IComparable<AggregateExecutionTime> {
-        [NotNull] public string Nickname { get; }
+        public string Nickname { get; }
 
-        [NotNull, ItemNotNull]
         public ExecutionTime[] Executions { get; }
 
         public int Iterations => Executions.Length;
@@ -46,7 +45,7 @@ namespace BrandonUtils.Standalone.Chronic {
 
         public double SuccessRate => (double)Executions.Count(it => it.Execution.Failed == false) / Executions.Length;
 
-        internal AggregateExecutionTime([NotNull] string nickname, [NotNull, ItemNotNull] IEnumerable<ExecutionTime> executions) {
+        internal AggregateExecutionTime(string nickname, IEnumerable<ExecutionTime> executions) {
             Executions = executions.ToArray();
             Nickname   = nickname.MustNotBeBlank();
         }
@@ -61,7 +60,7 @@ namespace BrandonUtils.Standalone.Chronic {
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public int CompareTo([NotNull] AggregateExecutionTime other) {
+        public int CompareTo(AggregateExecutionTime other) {
             if (other == null) {
                 throw new ArgumentNullException(nameof(other));
             }
@@ -91,7 +90,7 @@ namespace BrandonUtils.Standalone.Chronic {
             }
         }
 
-        [NotNull]
+
         public override string ToString() {
             if (Executions == null) {
                 throw new ArgumentNullException(nameof(Executions));
@@ -155,7 +154,7 @@ namespace BrandonUtils.Standalone.Chronic {
                 Second = (second.nickname ?? nameof(Second), second.duration);
             }
 
-            [NotNull]
+
             public override string ToString() {
                 return new Dictionary<object, object>() {
                         [First.nickname]     = First.duration,
@@ -167,7 +166,7 @@ namespace BrandonUtils.Standalone.Chronic {
                      .JoinString(", ");
             }
 
-            [NotNull]
+
             public string GetSummary() {
                 return First.duration.CompareTo(Second.duration) switch {
                     -1 => $"[{First.nickname}] is {Mathb.DeltaRatio(Second.duration, First.duration):P0} faster than [{Second.nickname}]",
@@ -178,7 +177,7 @@ namespace BrandonUtils.Standalone.Chronic {
             }
         }
 
-        private TimeComparison Comparing([NotNull] Func<AggregateExecutionTime, TimeSpan> extractor) {
+        private TimeComparison Comparing(Func<AggregateExecutionTime, TimeSpan> extractor) {
             return new TimeComparison(
                 (FirstTimes.Nickname, extractor.Invoke(FirstTimes)),
                 (SecondTimes.Nickname, extractor.Invoke(SecondTimes))
@@ -188,7 +187,7 @@ namespace BrandonUtils.Standalone.Chronic {
         public TimeComparison Total   => Comparing(it => it.Total);
         public TimeComparison Average => Comparing(it => it.Average);
 
-        [NotNull]
+
         public override string ToString() {
             return new Dictionary<object, object>() {
                     [nameof(Total)]   = Total,

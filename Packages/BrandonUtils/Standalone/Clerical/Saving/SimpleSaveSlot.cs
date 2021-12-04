@@ -25,8 +25,8 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
         public string              SaveFileSearchPattern { get; }
 
         public SimpleSaveSlot(
-            SaveFolder                     saveFolder,
-            [NotNull] string               nickname,
+            SaveFolder           saveFolder,
+            string               nickname,
             SaveManagerSettings? settings = default
         ) {
             if (string.IsNullOrWhiteSpace(nickname)) {

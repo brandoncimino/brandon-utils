@@ -10,17 +10,17 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
     public readonly struct SaveFolder : ISaveFolder {
         public const string SaveFolderName = "SaveData";
 
-        public           string PersistentDataPath             { get; }
-        public           string RelativePathFromPersistentData => GameName;
-        [NotNull] public string GameName                       { get; }
+        public string PersistentDataPath             { get; }
+        public string RelativePathFromPersistentData => GameName;
+        public string GameName                       { get; }
 
         public DirectoryInfo  Directory      => new DirectoryInfo(FolderPath);
         public FileSystemInfo FileSystemInfo => Directory;
 
 
         public SaveFolder(
-            [NotNull] string persistentDataPath,
-            [NotNull] string gameName
+            string persistentDataPath,
+            string gameName
         ) {
             if (string.IsNullOrWhiteSpace(persistentDataPath)) {
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(persistentDataPath));
@@ -34,7 +34,7 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
             GameName           = gameName;
         }
 
-        [NotNull]
+
         private string FolderPath => BPath.JoinPath(
             PersistentDataPath,
             SaveFolderName,

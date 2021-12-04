@@ -35,7 +35,7 @@ namespace BrandonUtils.Standalone.Collections {
     /// <typeparam name="TValue">the type of the <see cref="Values"/></typeparam>
     [PublicAPI]
     public class KeyedList<TKey, TValue> : KeyedCollection<TKey, TValue> {
-        [NotNull] protected readonly Func<TValue, TKey> KeyExtractor;
+        protected readonly Func<TValue, TKey> KeyExtractor;
 
         protected override TKey GetKeyForItem(TValue item) {
             return KeyExtractor.Invoke(item);

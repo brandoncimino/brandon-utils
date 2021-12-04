@@ -59,9 +59,8 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <exception cref="ArgumentNullException">if <paramref name="fileInfo"/> is null</exception>
         /// <exception cref="ArgumentNullException">if <paramref name="fileInfo"/>.<see cref="Directory"/> is null</exception>
         /// <exception cref="IOException">if the <see cref="DirectoryInfo"/> couldn't be created</exception>
-        [NotNull]
         [ContractAnnotation("null => stop")]
-        public static DirectoryInfo CreateDirectory([NotNull] this FileInfo fileInfo) {
+        public static DirectoryInfo CreateDirectory(this FileInfo fileInfo) {
             if (fileInfo == null) {
                 throw new ArgumentNullException(nameof(fileInfo));
             }
@@ -72,9 +71,8 @@ namespace BrandonUtils.Standalone.Clerical {
 
         /// <inheritdoc cref="CreateDirectory"/>
         /// <returns>this <paramref name="fileInfo"/>, for method chaining</returns>
-        [NotNull]
         [ContractAnnotation("null => stop")]
-        private static FileInfo EnsureDirectory([NotNull] this FileInfo fileInfo) {
+        private static FileInfo EnsureDirectory(this FileInfo fileInfo) {
             fileInfo.CreateDirectory();
             return fileInfo;
         }
@@ -191,7 +189,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <returns>A new file, or an overwrite of an existing file if <paramref name="overwrite" /> is <see langword="true" />. If the file exists and <paramref name="overwrite" /> is <see langword="false" />, an <see cref="T:System.IO.IOException" /> is thrown.</returns>
         /// <exception cref="ArgumentNullException">This <paramref name="fileInfo"/> is <see langword="null"/>.</exception>
         /// <exception cref="T:System.IO.IOException">An error occurs, or the destination file already exists and <paramref name="overwrite" /> is <see langword="false" />. </exception>
-        public static FileInfo? Backup([NotNull] this FileInfo fileInfo, bool overwrite = false) {
+        public static FileInfo? Backup(this FileInfo fileInfo, bool overwrite = false) {
             if (fileInfo == null) {
                 throw new ArgumentNullException(nameof(fileInfo));
             }
@@ -211,9 +209,8 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <param name="settings">optional <see cref="JsonSerializerSettings"/></param>
         /// <typeparam name="T">the <see cref="Type"/> that the content will be deserialized as</typeparam>
         /// <returns>a new <typeparamref name="T"/> instance</returns>
-        [CanBeNull]
-        public static T Deserialize<T>(
-            [NotNull] this FileInfo                fileInfo,
+        public static T? Deserialize<T>(
+            this FileInfo           fileInfo,
             JsonSerializerSettings? settings = default
         ) {
             fileInfo.MustExist();
@@ -224,9 +221,9 @@ namespace BrandonUtils.Standalone.Clerical {
         }
 
         public static void Serialize<T>(
-            [NotNull] this FileInfo    fileInfo,
-            [CanBeNull]    T           obj,
-            DuplicateFileResolution    duplicateFileResolution = DuplicateFileResolution.Error,
+            this FileInfo           fileInfo,
+            T?                      obj,
+            DuplicateFileResolution duplicateFileResolution = DuplicateFileResolution.Error,
             JsonSerializerSettings? settings                = default
         ) {
             switch (duplicateFileResolution) {
@@ -247,8 +244,8 @@ namespace BrandonUtils.Standalone.Clerical {
         }
 
         public static void SerializeCautiously<T>(
-            [NotNull] this FileInfo                fileInfo,
-            [CanBeNull]    T                       obj,
+            this FileInfo           fileInfo,
+            T?                      obj,
             JsonSerializerSettings? settings = default
         ) {
             fileInfo.MustNotExist();
@@ -256,16 +253,16 @@ namespace BrandonUtils.Standalone.Clerical {
         }
 
         public static void SerializeForcefully<T>(
-            [NotNull] this FileInfo                fileInfo,
-            [CanBeNull]    T                       obj,
+            this FileInfo           fileInfo,
+            T?                      obj,
             JsonSerializerSettings? settings = default
         ) {
             fileInfo.Write(JsonConvert.SerializeObject(obj, settings!));
         }
 
         public static void SerializeSafely<T>(
-            [NotNull] this FileInfo                fileInfo,
-            [CanBeNull]    T                       obj,
+            this FileInfo           fileInfo,
+            T?                      obj,
             JsonSerializerSettings? settings = default
         ) {
             fileInfo.Backup(true);

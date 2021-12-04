@@ -17,7 +17,7 @@ namespace BrandonUtils.Standalone.Optional {
         /// <li><see cref="Excuse"/> should <b>never</b> return <c>null</c>.</li>
         /// </ul>
         /// </remarks>
-        [NotNull]
+
         public Exception Excuse { get; }
 
         /// <summary>

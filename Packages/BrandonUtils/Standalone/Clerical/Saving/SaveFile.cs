@@ -8,18 +8,18 @@ using JetBrains.Annotations;
 namespace BrandonUtils.Standalone.Clerical.Saving {
     [PublicAPI]
     public class SaveFile<TData> : BaseSaveFile<TData> where TData : ISaveData {
-        [NotNull] private readonly SaveFileName _saveFileName;
+        private readonly SaveFileName _saveFileName;
 
         public override string Nickname => _saveFileName.Nickname;
 
         public override DateTime TimeStamp => _saveFileName.TimeStamp;
 
         public SaveFile(
-            [NotNull] ISaveFolder folder,
-            [NotNull] string      nickname,
-            DateTime              timeStamp,
-            string?            extension = SaveFileName.DefaultExtension,
-            TData                 data      = default
+            ISaveFolder folder,
+            string      nickname,
+            DateTime    timeStamp,
+            string?     extension = SaveFileName.DefaultExtension,
+            TData       data      = default
         )
             : this(
                 folder,
@@ -32,9 +32,9 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
             ) { }
 
         internal SaveFile(
-            [NotNull]   ISaveFolder  folder,
-            [NotNull]   SaveFileName saveFileName,
-            [CanBeNull] TData        data = default
+            ISaveFolder  folder,
+            SaveFileName saveFileName,
+            TData?       data = default
         ) : base(
             folder,
             saveFileName.Rendered.MustNotBeBlank(),
@@ -44,9 +44,9 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
         }
 
         public SaveFile(
-            [NotNull]   ISaveFolder folder,
-            [NotNull]   FileInfo    fileInfo,
-            [CanBeNull] TData       data = default
+            ISaveFolder folder,
+            FileInfo    fileInfo,
+            TData?      data = default
         ) : base(
             folder,
             fileInfo,

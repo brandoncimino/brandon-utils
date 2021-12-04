@@ -77,9 +77,7 @@ namespace BrandonUtils.Standalone.Reflection {
         /// <param name="type">The <see cref="Type"/> to retrieve the fields and properties of.</param>
         /// <returns>
         /// </returns>
-        [NotNull]
-        [ItemNotNull]
-        public static IEnumerable<MemberInfo> GetVariables([NotNull] this Type type) {
+        public static IEnumerable<MemberInfo> GetVariables(this Type type) {
             var properties = type.GetProperties(VariablesBindingFlags).Cast<MemberInfo>();
             var fields     = type.GetFields(VariablesBindingFlags).Cast<MemberInfo>();
             return properties.Union(fields).Where(IsVariable);
@@ -93,7 +91,6 @@ namespace BrandonUtils.Standalone.Reflection {
         /// <returns>The <see cref="FieldInfo"/> or <see cref="PropertyInfo"/> named <paramref name="variableName"/></returns>
         /// <exception cref="MissingMemberException">If <paramref name="variableName"/> couldn't be retrieved</exception>
         [Pure]
-        [NotNull]
         public static MemberInfo GetVariableInfo(this Type type, string variableName) {
             var prop = type.GetProperty(variableName, VariablesBindingFlags);
 
@@ -237,18 +234,14 @@ namespace BrandonUtils.Standalone.Reflection {
 
         #region Operations on Fields
 
-        [NotNull]
-        [ItemNotNull]
         [Pure]
         [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
-        private static IEnumerable<string> Get_BackingFieldFor_Names([NotNull] FieldInfo fieldInfo) {
+        private static IEnumerable<string> Get_BackingFieldFor_Names(FieldInfo fieldInfo) {
             return fieldInfo.GetCustomAttributes<BackingFieldForAttribute>().Select(it => it.BackedPropertyName);
         }
 
         [Pure]
-        [NotNull]
-        [ItemNotNull]
-        private static IEnumerable<PropertyInfo> Get_BackingFieldFor_Properties([NotNull] FieldInfo fieldInfo, Type owningType = default) {
+        private static IEnumerable<PropertyInfo> Get_BackingFieldFor_Properties(FieldInfo fieldInfo, Type owningType = default) {
             owningType ??= GetOwningType(fieldInfo);
             var backedPropertyNames = Get_BackingFieldFor_Names(fieldInfo);
             return owningType.GetProperties()
@@ -258,13 +251,13 @@ namespace BrandonUtils.Standalone.Reflection {
         /// <param name="memberInfo"></param>
         /// <returns><c>true</c> if <paramref name="memberInfo"/> is an <a href="https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/auto-implemented-properties">Auto-Property Backing Field</a></returns>
         [Pure]
-        internal static bool IsAutoPropertyBackingField([NotNull] this FieldInfo memberInfo) {
+        internal static bool IsAutoPropertyBackingField(this FieldInfo memberInfo) {
             return Regex.IsMatch(memberInfo.Name, GetAutoPropertyBackingFieldNamePattern());
         }
 
         [Pure]
         [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
-        private static bool UsedIn_BackedBy([NotNull] FieldInfo fieldInfo) {
+        private static bool UsedIn_BackedBy(FieldInfo fieldInfo) {
             // TODO: pass to other method
             var owningType = fieldInfo.ReflectedType ?? fieldInfo.DeclaringType ?? throw ReflectionException.NoOwningTypeException(fieldInfo);
             return owningType.GetProperties(VariablesBindingFlags)
@@ -273,52 +266,48 @@ namespace BrandonUtils.Standalone.Reflection {
         }
 
         [Pure]
-        private static bool IsAnnotatedBackingField([NotNull] FieldInfo fieldInfo) {
+        private static bool IsAnnotatedBackingField(FieldInfo fieldInfo) {
             return Get_BackingFieldFor_Names(fieldInfo).IsNotEmpty() || UsedIn_BackedBy(fieldInfo);
         }
 
         [PublicAPI]
         [Pure]
-        public static bool IsBackingField([NotNull] this MemberInfo fieldInfo) {
+        public static bool IsBackingField(this MemberInfo fieldInfo) {
             return (fieldInfo as FieldInfo)?.IsBackingField() ?? throw ReflectionException.NotAFieldException(fieldInfo);
         }
 
         [PublicAPI]
         [Pure]
-        public static bool IsBackingField([NotNull] this FieldInfo fieldInfo) {
+        public static bool IsBackingField(this FieldInfo fieldInfo) {
             return IsAutoPropertyBackingField(fieldInfo) || IsAnnotatedBackingField(fieldInfo);
         }
 
-        [CanBeNull]
         [Pure]
         [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
-        internal static string Get_BackedAutoProperty_Name([NotNull] FieldInfo fieldInfo) {
+        internal static string? Get_BackedAutoProperty_Name(FieldInfo fieldInfo) {
             var matches = Regex.Match(fieldInfo.Name, GetAutoPropertyBackingFieldNamePattern());
             return matches.Success ? matches.Groups[PropertyCaptureGroupName].Value : null;
         }
 
-        [CanBeNull]
         [Pure]
-        private static PropertyInfo Get_BackedAutoProperty([NotNull] FieldInfo fieldInfo, Type owningType = default) {
+        private static PropertyInfo? Get_BackedAutoProperty(FieldInfo fieldInfo, Type owningType = default) {
             owningType ??= GetOwningType(fieldInfo);
             var autoPropertyName = Get_BackedAutoProperty_Name(fieldInfo);
             return autoPropertyName == null ? null : owningType.GetProperty(autoPropertyName);
         }
 
-        [NotNull]
-        [ItemNotNull]
+
         [Pure]
         [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
-        private static IEnumerable<PropertyInfo> Get_PropertiesAnnotatedWith_BackedBy([NotNull] FieldInfo fieldInfo, Type owningType = default) {
+        private static IEnumerable<PropertyInfo> Get_PropertiesAnnotatedWith_BackedBy(FieldInfo fieldInfo, Type owningType = default) {
             owningType ??= GetOwningType(fieldInfo);
             return owningType.GetProperties(VariablesBindingFlags)
                              .Where(it => Get_BackedBy_BackingFieldName(it) == fieldInfo.Name);
         }
 
-        [NotNull]
-        [ItemNotNull]
+
         [PublicAPI]
-        public static IEnumerable<PropertyInfo> BackedProperties([NotNull] this FieldInfo fieldInfo) {
+        public static IEnumerable<PropertyInfo> BackedProperties(this FieldInfo fieldInfo) {
             var owningType = GetOwningType(fieldInfo);
 
             var propertiesFromFieldAnnotations = Get_BackingFieldFor_Properties(fieldInfo, owningType);
@@ -335,40 +324,35 @@ namespace BrandonUtils.Standalone.Reflection {
 
         #region Operations on Properties
 
-        [CanBeNull]
         [Pure]
         [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
-        private static string Get_BackedBy_BackingFieldName([NotNull] PropertyInfo propertyInfo) {
+        private static string? Get_BackedBy_BackingFieldName(PropertyInfo propertyInfo) {
             return propertyInfo.GetCustomAttribute<BackedByAttribute>()?.BackingFieldName;
         }
 
-        [NotNull]
-        [ItemNotNull]
+
         [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
-        private static IEnumerable<FieldInfo> Get_FieldsAnnotatedWith_BackingFieldFor([NotNull] PropertyInfo propertyInfo, Type owningType = default) {
+        private static IEnumerable<FieldInfo> Get_FieldsAnnotatedWith_BackingFieldFor(PropertyInfo propertyInfo, Type owningType = default) {
             owningType ??= GetOwningType(propertyInfo);
             return owningType.GetFields(VariablesBindingFlags)
                              .Where(it => Get_BackingFieldFor_Names(it).Contains(propertyInfo.Name));
         }
 
-        [CanBeNull]
-        private static FieldInfo Get_BackedBy_Field([NotNull] PropertyInfo propertyInfo, Type owningType = default) {
+        private static FieldInfo? Get_BackedBy_Field(PropertyInfo propertyInfo, Type owningType = default) {
             owningType ??= GetOwningType(propertyInfo);
             var backingFieldName = Get_BackedBy_BackingFieldName(propertyInfo);
             return backingFieldName == null ? null : owningType.GetField(backingFieldName, VariablesBindingFlags);
         }
 
         [Pure]
-        [NotNull]
         [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
-        private static string GetAutoPropertyBackingFieldName([NotNull] PropertyInfo propertyInfo) {
+        private static string GetAutoPropertyBackingFieldName(PropertyInfo propertyInfo) {
             return $"<{propertyInfo.Name}>k__BackingField";
         }
 
         [Pure]
-        [CanBeNull]
         [PublicAPI]
-        public static FieldInfo BackingField([NotNull] this MemberInfo memberInfo) {
+        public static FieldInfo? BackingField(this MemberInfo memberInfo) {
             return (memberInfo as PropertyInfo)?.BackingField() ?? throw ReflectionException.NotAPropertyException(memberInfo);
         }
 
@@ -385,10 +369,9 @@ namespace BrandonUtils.Standalone.Reflection {
         /// </summary>
         /// <param name="propertyInfo">this <see cref="FieldInfo"/></param>
         /// <returns>the <see cref="FieldInfo"/> that backs <paramref name="propertyInfo"/>, if found; otherwise, null</returns>
-        [CanBeNull]
         [PublicAPI]
         [Pure]
-        public static FieldInfo BackingField([NotNull] this PropertyInfo propertyInfo) {
+        public static FieldInfo? BackingField(this PropertyInfo propertyInfo) {
             var owningType = GetOwningType(propertyInfo);
 
             return GetAutoPropertyBackingField(propertyInfo, owningType) ??
@@ -404,17 +387,15 @@ namespace BrandonUtils.Standalone.Reflection {
         /// <param name="propertyNamePattern">A pattern to match the auto-property. Defaults to <c>.*</c></param>
         /// <returns>A <see cref="Regex"/> pattern that will match <a href="https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/auto-implemented-properties">Auto-Property backing names</a>.</returns>
         [Pure]
-        [NotNull]
         private static string GetAutoPropertyBackingFieldNamePattern(
-            [RegexPattern] [NotNull]
+            [RegexPattern]
             string propertyNamePattern = ".*"
         ) {
             return $"<(?<{PropertyCaptureGroupName}>{propertyNamePattern})>k__BackingField";
         }
 
-        [CanBeNull]
         [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
-        private static FieldInfo GetAutoPropertyBackingField([NotNull] PropertyInfo propertyInfo, Type owningType = default) {
+        private static FieldInfo? GetAutoPropertyBackingField(PropertyInfo propertyInfo, Type owningType = default) {
             owningType ??= GetOwningType(propertyInfo);
             return owningType.GetField(GetAutoPropertyBackingFieldName(propertyInfo), AutoPropertyBackingFieldBindingFlags);
         }
@@ -493,7 +474,7 @@ namespace BrandonUtils.Standalone.Reflection {
         /// <returns><see cref="Type.IsGenericType"/> || <see cref="Type.IsGenericTypeDefinition"/></returns>
         [Obsolete("This is redundant, because if IsGenericTypeDefinition is true, then IsGenericType must also be true")]
         [ContractAnnotation("null => false")]
-        public static bool IsGenericTypeOrDefinition([CanBeNull] this Type type) {
+        public static bool IsGenericTypeOrDefinition(this Type? type) {
             return type?.IsGenericType == true;
         }
 
@@ -505,7 +486,7 @@ namespace BrandonUtils.Standalone.Reflection {
         /// <param name="self">this <see cref="Type"/></param>
         /// <param name="interfaceType">the <see cref="Type.IsInterface"/> that this <see cref="Type"/> might implement</param>
         /// <returns>true if this <see cref="Type"/>, or one of its ancestors, implements <paramref name="interfaceType"/></returns>
-        public static bool Implements([CanBeNull] this Type self, [NotNull] Type interfaceType) {
+        public static bool Implements(this Type? self, Type interfaceType) {
             if (interfaceType?.IsInterface != true) {
                 throw new ArgumentException(nameof(interfaceType), $"The type {interfaceType.Prettify()} was not an interface!");
             }
@@ -554,7 +535,7 @@ namespace BrandonUtils.Standalone.Reflection {
         #endregion
 
         [ContractAnnotation("null => false")]
-        public static bool IsEnumerable([CanBeNull] this Type type) {
+        public static bool IsEnumerable(this Type? type) {
             return type.Implements(typeof(IEnumerable<>));
         }
 
@@ -584,7 +565,7 @@ namespace BrandonUtils.Standalone.Reflection {
         /// </remarks>
         /// <param name="type">a <see cref="Type"/></param>
         /// <returns>true if the given <see cref="Type"/> is one of the <see cref="Tuple{T}"/> or <see cref="ValueTuple{T1}"/> types</returns>
-        public static bool IsTupleType([NotNull] this Type type) {
+        public static bool IsTupleType(this Type type) {
             return type.IsGenericTypeOrDefinition() && TupleTypes.Any(it => type.GetGenericTypeDefinition().IsAssignableFrom(it));
         }
 
@@ -592,12 +573,12 @@ namespace BrandonUtils.Standalone.Reflection {
 
         #region Type Ancestry
 
-        public static bool IsExceptionType([NotNull] this Type self) {
+        public static bool IsExceptionType(this Type self) {
             return typeof(Exception).IsAssignableFrom(self);
         }
 
-        [NotNull]
-        internal static Type CommonType([CanBeNull, ItemCanBeNull, InstantHandle] IEnumerable<Type> types) {
+
+        internal static Type CommonType([InstantHandle] IEnumerable<Type?>? types) {
             if (types == null) {
                 return typeof(object);
             }
@@ -625,8 +606,7 @@ namespace BrandonUtils.Standalone.Reflection {
             return mostCommonType ?? typeof(object);
         }
 
-        [CanBeNull]
-        public static Type CommonBaseClass([CanBeNull] Type a, [CanBeNull] Type b) {
+        public static Type? CommonBaseClass(Type? a, Type? b) {
             if (a == null || b == null) {
                 return a ?? b;
             }
@@ -658,27 +638,25 @@ namespace BrandonUtils.Standalone.Reflection {
         //     return overlap.FirstOrDefault();
         // }
 
-        [NotNull]
-        [ItemNotNull]
-        internal static IEnumerable<Type> CommonInterfaces([CanBeNull] Type a, [CanBeNull] Type b) {
+
+        internal static IEnumerable<Type> CommonInterfaces(Type? a, Type? b) {
             var aInts = a.GetAllInterfaces();
             var bInts = b.GetAllInterfaces();
             return aInts.Intersect(bInts);
         }
 
-        [Pure, NotNull]
-        internal static IEnumerable<Type> CommonInterfaces([NotNull, ItemCanBeNull] IEnumerable<Type> types) {
+        [Pure]
+        internal static IEnumerable<Type> CommonInterfaces(IEnumerable<Type?> types) {
             return types.Select(it => it.GetAllInterfaces()).Intersection();
         }
 
 
-        public static IEnumerable<Type> GetAllInterfaces([CanBeNull] this Type type) {
+        public static IEnumerable<Type> GetAllInterfaces(this Type? type) {
             return _GetAllInterfaces(type);
         }
 
         [Pure]
-        [NotNull, ItemNotNull]
-        public static Type[] FindInterfaces([NotNull] this Type type) {
+        public static Type[] FindInterfaces(this Type type) {
             if (type == null) {
                 throw new ArgumentNullException(nameof(type));
             }
@@ -686,7 +664,7 @@ namespace BrandonUtils.Standalone.Reflection {
             return type.FindInterfaces((type1, criteria) => true, default);
         }
 
-        private static IEnumerable<Type> _GetAllInterfaces([CanBeNull] this Type type, [CanBeNull] IEnumerable<Type> soFar = default) {
+        private static IEnumerable<Type> _GetAllInterfaces(this Type? type, IEnumerable<Type>? soFar = default) {
             var ints = (type?.GetInterfaces()).NonNull().ToList();
             soFar = soFar.NonNull();
             if (type?.IsInterface == true) {
@@ -721,7 +699,7 @@ namespace BrandonUtils.Standalone.Reflection {
         [Pure]
         [ContractAnnotation("valueType:null => stop")]
         [ContractAnnotation("variableType:null => stop")]
-        public static bool CanBeAssignedTo([NotNull] this Type valueType, [NotNull] Type variableType) {
+        public static bool CanBeAssignedTo(this Type valueType, Type variableType) {
             if (valueType == null) {
                 throw new ArgumentNullException(nameof(valueType));
             }
@@ -743,7 +721,7 @@ namespace BrandonUtils.Standalone.Reflection {
         [Pure]
         [ContractAnnotation("child:null => stop")]
         [ContractAnnotation("possibleParents:null => stop")]
-        public static bool IsKindOf([NotNull] this Type child, [NotNull, ItemNotNull, InstantHandle] IEnumerable<Type> possibleParents) {
+        public static bool IsKindOf(this Type child, [InstantHandle] IEnumerable<Type> possibleParents) {
             if (child == null) {
                 throw new ArgumentNullException(nameof(child));
             }
@@ -761,7 +739,7 @@ namespace BrandonUtils.Standalone.Reflection {
         [Pure]
         [ContractAnnotation("child:null => stop")]
         [ContractAnnotation("possibleParents:null => stop")]
-        public static bool IsKindOf([NotNull] this Type child, [NotNull, ItemNotNull] params Type[] possibleParents) => IsKindOf(child, possibleParents.AsEnumerable());
+        public static bool IsKindOf(this Type child, params Type[] possibleParents) => IsKindOf(child, possibleParents.AsEnumerable());
 
         /// <summary>
         /// Determines whether a <b>variable</b> of this <see cref="Type"/> is capable of holding a <b>value</b> of <paramref name="valueType"/>.
@@ -777,7 +755,7 @@ namespace BrandonUtils.Standalone.Reflection {
         [Pure]
         [ContractAnnotation("variableType:null => stop")]
         [ContractAnnotation("valueType:null => stop")]
-        public static bool CanHoldValueOf([NotNull] this Type variableType, [NotNull] Type valueType) {
+        public static bool CanHoldValueOf(this Type variableType, Type valueType) {
             if (variableType == null) {
                 throw new ArgumentNullException(nameof(variableType));
             }
@@ -810,7 +788,7 @@ namespace BrandonUtils.Standalone.Reflection {
         /// <returns>true if a variable of <paramref name="variableType"/> could hold <paramref name="obj"/></returns>
         /// <exception cref="ArgumentNullException"></exception>
         [Pure]
-        public static bool CanHold([NotNull] this Type variableType, [CanBeNull] object obj) {
+        public static bool CanHold(this Type variableType, object? obj) {
             if (variableType == null) {
                 throw new ArgumentNullException(nameof(variableType));
             }
@@ -824,8 +802,8 @@ namespace BrandonUtils.Standalone.Reflection {
 
         [Pure]
         public static bool IsInstanceOf(
-            [NotNull] this object obj,
-            [NotNull, ItemNotNull, InstantHandle]
+            this object obj,
+            [InstantHandle]
             IEnumerable<Type> possibleTypes
         ) {
             if (obj == null) {
@@ -841,8 +819,7 @@ namespace BrandonUtils.Standalone.Reflection {
 
         [Pure]
         public static bool IsInstanceOf(
-            [NotNull] this object obj,
-            [NotNull, ItemNotNull]
+            this   object obj,
             params Type[] possibleTypes
         ) => IsInstanceOf(obj, possibleTypes.AsEnumerable());
 
@@ -869,9 +846,8 @@ namespace BrandonUtils.Standalone.Reflection {
         };
 
         [Pure]
-        [NotNull]
         [ContractAnnotation("null => stop")]
-        public static string NameOrKeyword([NotNull] this Type type) {
+        public static string NameOrKeyword(this Type type) {
             if (type == null) {
                 throw new ArgumentNullException(nameof(type));
             }
@@ -945,8 +921,7 @@ namespace BrandonUtils.Standalone.Reflection {
         /// <param name="type">this <see cref="Type"/></param>
         /// <param name="inheritance">whether to include <see cref="Inheritance.Inherited"/> or <see cref="Inheritance.DeclaredOnly"/> methods</param>
         /// <returns>a non-default override of <see cref="object.ToString"/></returns>
-        [CanBeNull]
-        public static MethodInfo GetToStringOverride([CanBeNull] this Type type, Inheritance inheritance) {
+        public static MethodInfo? GetToStringOverride(this Type? type, Inheritance inheritance) {
             if (type == null || type == typeof(object)) {
                 return null;
             }
@@ -956,8 +931,7 @@ namespace BrandonUtils.Standalone.Reflection {
         }
 
         /// <inheritdoc cref="GetToStringOverride(System.Type,BrandonUtils.Standalone.Reflection.ReflectionUtils.Inheritance)"/>
-        [CanBeNull]
-        public static MethodInfo GetToStringOverride([CanBeNull] this Type type) {
+        public static MethodInfo? GetToStringOverride(this Type? type) {
             return GetToStringOverride(type, Inheritance.Inherited);
         }
 

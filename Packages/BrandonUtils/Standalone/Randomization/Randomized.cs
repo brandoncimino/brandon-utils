@@ -3,8 +3,6 @@ using System.Collections.Generic;
 
 using BrandonUtils.Standalone.Collections;
 
-using JetBrains.Annotations;
-
 namespace BrandonUtils.Standalone.Randomization {
     public class Randomized<T> : IRandomized<T> {
         public Func<Random, T> Randomizer { get; protected set; }
@@ -13,7 +11,7 @@ namespace BrandonUtils.Standalone.Randomization {
 
         protected Randomized() { }
 
-        public Randomized([NotNull] Func<Random, T> randomizer, Random? generator = default) {
+        public Randomized(Func<Random, T> randomizer, Random? generator = default) {
             Generator  = generator ?? Brandom.Gen;
             Randomizer = randomizer;
         }

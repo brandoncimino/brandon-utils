@@ -5,21 +5,19 @@ using BrandonUtils.Standalone.Reflection;
 using BrandonUtils.Standalone.Strings.Json;
 using BrandonUtils.Standalone.Strings.Prettifiers;
 
-using JetBrains.Annotations;
-
 namespace BrandonUtils.Standalone.Strings {
     public class Prettifier<T> : IPrettifier<T> {
-        [NotNull] private Func<T, PrettificationSettings, string> PrettificationFunction { get; }
+        private Func<T, PrettificationSettings, string> PrettificationFunction { get; }
 
         public Type PrettifierType { get; }
 
-        [NotNull] public Type PrimaryKey => PrettifierType;
+        public Type PrimaryKey => PrettifierType;
 
         #region Constructors
 
-        public Prettifier([NotNull] Func<T, string> prettifierFunc) : this((it, settings) => prettifierFunc.Invoke(it)) { }
+        public Prettifier(Func<T, string> prettifierFunc) : this((it, settings) => prettifierFunc.Invoke(it)) { }
 
-        public Prettifier([NotNull] Func<T, PrettificationSettings, string> prettifierFunc) {
+        public Prettifier(Func<T, PrettificationSettings, string> prettifierFunc) {
             PrettificationFunction = prettifierFunc;
             PrettifierType         = PrettificationTypeSimplifier.SimplifyType(typeof(T), new PrettificationSettings());
         }
@@ -67,7 +65,7 @@ namespace BrandonUtils.Standalone.Strings {
             }
         }
 
-        public bool CanPrettify([NotNull] Type cinderellaType) {
+        public bool CanPrettify(Type cinderellaType) {
             throw new NotImplementedException("NOT YET FINISHED");
             if (PrettifierType.IsGenericType == false) {
                 return PrettifierType.IsAssignableFrom(cinderellaType);
@@ -92,8 +90,7 @@ namespace BrandonUtils.Standalone.Strings {
 
         #region Helpers
 
-        [NotNull]
-        private T TrySlipper([NotNull] object cinderella) {
+        private T TrySlipper(object cinderella) {
             if (cinderella is T princess) {
                 return princess;
             }
@@ -101,7 +98,7 @@ namespace BrandonUtils.Standalone.Strings {
             throw new InvalidCastException($"Couldn't prettify [{cinderella.GetType().PrettifyType(default)}]{cinderella} because it wasn't the right type, {PrettifierType.PrettifyType(default)}!");
         }
 
-        [NotNull]
+
         private string PrettifyGeneric(object? cinderella, PrettificationSettings? settings) {
             settings ??= Prettification.DefaultPrettificationSettings;
 
@@ -119,7 +116,7 @@ namespace BrandonUtils.Standalone.Strings {
 
         #endregion
 
-        [NotNull]
+
         public override string ToString() {
             return $"{GetType().Name} for [{PrettifierType.Name}] via [{PrettificationFunction.Method.Name}]";
         }

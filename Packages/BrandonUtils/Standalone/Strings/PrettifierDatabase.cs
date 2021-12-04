@@ -7,16 +7,14 @@ using System.Reflection;
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Strings.Prettifiers;
 
-using JetBrains.Annotations;
-
 namespace BrandonUtils.Standalone.Strings {
     public interface IPrettifierDatabase {
-        [CanBeNull] IPrettifier Find([NotNull] Type type);
+        IPrettifier? Find(Type type);
 
-        void                    Register([NotNull]   IPrettifier prettifier);
-        [CanBeNull] IPrettifier Deregister([NotNull] Type        type);
+        void         Register(IPrettifier prettifier);
+        IPrettifier? Deregister(Type      type);
 
-        [CanBeNull] IPrettifier Find([NotNull] Func<IPrettifier, bool> predicate);
+        IPrettifier? Find(Func<IPrettifier, bool> predicate);
     }
 
     public class PrettifierDatabase : IPrettifierDatabase {
@@ -61,7 +59,7 @@ namespace BrandonUtils.Standalone.Strings {
                               .FirstOrDefault();
         }
 
-        [NotNull]
+
         public static PrettifierDatabase GetDefaultPrettifiers() {
             return new PrettifierDatabase(
                 new Prettifier<string>(Convert.ToString),
@@ -86,8 +84,8 @@ namespace BrandonUtils.Standalone.Strings {
             );
         }
 
-        internal static string PrettifyPrettifiable([NotNull] IPrettifiable prettifiable, [NotNull] PrettificationSettings settings) => prettifiable.Prettify(settings);
-        internal static string PrettifyToString([NotNull]     object        obj,          [NotNull] PrettificationSettings settings) => obj.ToString();
+        internal static string PrettifyPrettifiable(IPrettifiable prettifiable, PrettificationSettings settings) => prettifiable.Prettify(settings);
+        internal static string PrettifyToString(object            obj,          PrettificationSettings settings) => obj.ToString();
 
         #region Special High-Priority Prettifiers
 

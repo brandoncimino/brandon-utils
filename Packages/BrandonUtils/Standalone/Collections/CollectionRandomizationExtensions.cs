@@ -18,9 +18,8 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T">The type of the <see cref="Collection{T}"/></typeparam>
         /// <returns>a random <see cref="Enumerable.ElementAt{TSource}"/> from the given <paramref name="collection"/>.</returns>
         [Pure]
-        [CanBeNull]
         [ContractAnnotation("collection:null => stop")]
-        public static T Random<T>([NotNull, ItemCanBeNull] this ICollection<T> collection, Random? generator = default) {
+        public static T? Random<T>(this ICollection<T?> collection, Random? generator = default) {
             if (collection == null) {
                 throw new ArgumentNullException(nameof(collection));
             }
@@ -41,9 +40,8 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="generator">the <see cref="System.Random"/> instance to generate random values with. Defaults to <see cref="Brandom.Gen"/></param>
         /// <typeparam name="T">the type of the elements in the original <see cref="ICollection{T}"/></typeparam>
         /// <returns>a <see cref="Random{T}"/> entry from <paramref name="collection"/></returns>
-        [CanBeNull]
         [ContractAnnotation("collection:null => stop")]
-        public static T GrabRandom<T>([NotNull, ItemCanBeNull] this ICollection<T> collection, Random? generator = default) {
+        public static T? GrabRandom<T>(this ICollection<T?> collection, Random? generator = default) {
             if (collection == null) {
                 throw new ArgumentNullException(nameof(collection));
             }
@@ -64,7 +62,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="toBeRandomized">the <see cref="ICollection{T}"/> that <i>will be modified</i></param>
         /// <typeparam name="T">the type of the entries in <paramref name="toBeRandomized"/></typeparam>
         [ContractAnnotation("toBeRandomized:null => stop")]
-        internal static void RandomizeEntries<T>([NotNull, ItemCanBeNull] this ICollection<T> toBeRandomized) {
+        internal static void RandomizeEntries<T>(this ICollection<T?> toBeRandomized) {
             if (toBeRandomized == null) {
                 throw new ArgumentNullException(nameof(toBeRandomized));
             }
@@ -84,11 +82,10 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="randomizer"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        [NotNull, ItemCanBeNull]
         [ContractAnnotation("source:null => stop")]
         [Pure]
         [LinqTunnel]
-        public static IEnumerable<T> Randomize<T>([NotNull, ItemCanBeNull] this IEnumerable<T> source, Random? randomizer = default) {
+        public static IEnumerable<T?> Randomize<T>(this IEnumerable<T?> source, Random? randomizer = default) {
             if (source == null) {
                 throw new ArgumentNullException(nameof(source));
             }

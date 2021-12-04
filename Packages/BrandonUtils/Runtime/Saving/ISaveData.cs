@@ -2,8 +2,6 @@
 
 using BrandonUtils.Timing;
 
-using JetBrains.Annotations;
-
 using Newtonsoft.Json;
 
 namespace BrandonUtils.Saving {
@@ -13,7 +11,6 @@ namespace BrandonUtils.Saving {
      * Specifies the generic behaviors of save data - saving, loading, checking the times of that and stuff - but not any of the actual data that the save data should contain.
      */
     public interface ISaveData {
-        [NotNull]
         [JsonProperty]
         string Nickname { get; }
         [JsonProperty]
