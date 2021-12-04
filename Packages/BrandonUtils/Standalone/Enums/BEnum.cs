@@ -12,28 +12,33 @@ using JetBrains.Annotations;
 namespace BrandonUtils.Standalone.Enums {
     [PublicAPI]
     public static class BEnum {
+        [NotNull]
+        [ContractAnnotation("null => stop")]
+        private static Type MustBeEnumType([NotNull] this Type enumType) {
+            return enumType?.IsEnum == true ? enumType : throw new ArgumentException($"{enumType.PrettifyType(default)} is not an enum type!");
+        }
+
+        [NotNull]
+        [ContractAnnotation("null => stop")]
+        private static Type MustMatchTypeArgument<T>([NotNull] this Type enumType) {
+            return enumType == typeof(T) ? enumType : throw new ArgumentException($"The {nameof(enumType)} {enumType.Prettify()} was not the same as the type argument <{nameof(T)}> {typeof(T).Prettify()}!");
+        }
+
         /// <typeparam name="T">an <see cref="Enum"/> type</typeparam>
         /// <returns>an array containing the <see cref="Type.GetEnumValues"/> of <typeparamref name="T"/>.</returns>
         /// <exception cref="ArgumentException">if <typeparamref name="T"/> is not an <see cref="Enum"/> type</exception>
-        public static T[] GetValues<T>() where T : Enum {
-            var enumType = typeof(T);
-            if (enumType.IsEnum) {
-                return enumType.GetEnumValues().Cast<T>().ToArray();
-            }
-
-            throw new ArgumentException($"{enumType.PrettifyType(default)} is not an enum type!");
+        [NotNull]
+        public static T[] GetValues<T>() where T : struct, Enum {
+            return GetValues<T>(typeof(T));
         }
 
-        public static T[] GetValues<T>(Type enumType) where T : struct, Enum {
-            if (typeof(T) != enumType) {
-                throw new ArgumentException($"The {nameof(enumType)} {enumType.PrettifyType(default)} was not the same as the type argument {nameof(T)}!");
-            }
-
-            if (!enumType.IsEnum) {
-                throw new ArgumentException($"{enumType.PrettifyType(default)} is not an enum type!");
-            }
-
-            return enumType.GetEnumValues().Cast<T>().ToArray();
+        [NotNull]
+        public static T[] GetValues<T>([NotNull] Type enumType) where T : struct, Enum {
+            return enumType.MustBeEnumType()
+                           .MustMatchTypeArgument<T>()
+                           .GetEnumValues()
+                           .Cast<T>()
+                           .ToArray();
         }
 
         /// <summary>
@@ -122,6 +127,18 @@ namespace BrandonUtils.Standalone.Enums {
                     allowedValues.Cast<object>()
                 )
             );
+        }
+
+        #endregion
+
+        #region Max / Min
+
+        public static T Min<T>() where T : struct, Enum {
+            return GetValues<T>().Min();
+        }
+
+        public static T Max<T>() where T : struct, Enum {
+            return GetValues<T>().Max();
         }
 
         #endregion
