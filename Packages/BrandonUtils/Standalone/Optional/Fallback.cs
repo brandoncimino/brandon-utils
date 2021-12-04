@@ -38,7 +38,7 @@ namespace BrandonUtils.Standalone.Optional {
         /// <see cref="ExplicitValue"/>, if present; otherwise, <see cref="FallbackValue"/>.
         /// </summary>
         public T Value {
-            get => ExplicitValue.GetValueOrDefault(FallbackValue);
+            get => ExplicitValue.OrElseGet(() => FallbackSource == null ? FallbackValue : FallbackSource.Value);
             set => ExplicitValue = value;
         }
 
@@ -49,12 +49,22 @@ namespace BrandonUtils.Standalone.Optional {
         [JsonProperty(Order = int.MinValue)]
         public T FallbackValue { get; }
 
+        [JsonProperty(IsReference = true, ItemIsReference = true, NullValueHandling = NullValueHandling.Ignore)]
+        [CanBeNull]
+        public Fallback<T> FallbackSource { get; }
+
         public int Count => ExplicitValue.Count;
 
         #region Constructors
 
         public Fallback([CanBeNull] T fallbackValue = default) {
-            FallbackValue = fallbackValue;
+            FallbackValue  = fallbackValue;
+            FallbackSource = null;
+        }
+
+        public Fallback([NotNull] Fallback<T> fallbackFallback) {
+            FallbackValue  = default;
+            FallbackSource = fallbackFallback;
         }
 
         #endregion
@@ -128,7 +138,9 @@ namespace BrandonUtils.Standalone.Optional {
 
         [NotNull]
         public override string ToString() {
-            return Optional.ToString(this, new PrettificationSettings());
+            var t        = typeof(T);
+            var settings = new PrettificationSettings();
+            return $"{t.Prettify(settings)}[{FallbackValue.Prettify(settings)},{ExplicitValue.Select(it => it.Prettify()).OrElse("")}]";
         }
     }
 }
