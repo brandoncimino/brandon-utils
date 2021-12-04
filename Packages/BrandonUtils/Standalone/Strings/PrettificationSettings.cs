@@ -10,7 +10,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace BrandonUtils.Standalone.Strings {
     public class PrettificationSettings : IJsonCloneable {
-        public static Func<PrettificationSettings> DefaultSupplier = () => new PrettificationSettings();
+        public static PrettificationSettings DefaultSettings { get; set; } = new PrettificationSettings();
 
         /// <summary>
         /// When the <see cref="PreferredLineStyle"/> is <see cref="LineStyle.Dynamic"/>, <see cref="LineLengthLimit"/> is used to decide between <see cref="LineStyle.Multi"/> and <see cref="LineStyle.Single"/>.
@@ -36,9 +36,7 @@ namespace BrandonUtils.Standalone.Strings {
 
         [NotNull]
         public static PrettificationSettings GetDefault([CanBeNull] Action<PrettificationSettings> modifications = default) {
-            var settings = DefaultSupplier.Invoke();
-            modifications?.Invoke(settings);
-            return settings;
+            return DefaultSettings.JsonClone(modifications);
         }
 
         [NotNull]

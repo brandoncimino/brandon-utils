@@ -22,17 +22,17 @@ namespace BrandonUtils.Standalone.Strings {
             PrettifierFinders.FindInheritedPrettifier
         };
 
-        [NotNull] private static PrettificationSettings _defaultSettings = new PrettificationSettings();
         [NotNull]
+        [Obsolete]
         public static PrettificationSettings DefaultPrettificationSettings {
-            [NotNull] get => _defaultSettings;
-            [CanBeNull] set => _defaultSettings = value ?? new PrettificationSettings();
+            [NotNull] get => PrettificationSettings.DefaultSettings;
+            [CanBeNull] set => PrettificationSettings.DefaultSettings = value;
         }
 
 
         [NotNull]
         public static PrettificationSettings ResolveSettings([CanBeNull] PrettificationSettings settings) {
-            return settings ?? DefaultPrettificationSettings;
+            return settings ?? PrettificationSettings.DefaultSettings;
         }
 
         public static void RegisterPrettifier([NotNull] IPrettifier prettifier) {
@@ -87,7 +87,7 @@ namespace BrandonUtils.Standalone.Strings {
         internal static string LastResortPrettifier([CanBeNull] object cinderella, [CanBeNull] PrettificationSettings settings) {
             settings ??= new PrettificationSettings();
 
-            settings.TraceWriter.Verbose(() => $"⛑ Using the LAST RESORT prettifier for [{cinderella?.GetType()}]{cinderella}: {nameof(Convert.ToString)}!");
+            settings.TraceWriter.Verbose(() => $"⛑ Using the LAST RESORT prettifier for [{cinderella?.GetType()}]: {nameof(Convert.ToString)}!");
 
             return Convert.ToString(cinderella);
         }
