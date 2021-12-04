@@ -39,7 +39,7 @@ namespace BrandonUtils.Standalone.Strings {
         public string Prettify(object cinderella, PrettificationSettings settings = default) {
             settings ??= Prettification.DefaultPrettificationSettings;
 
-            settings.TraceWriter.Verbose(() => $"⚠ DANGEROUSLY prettifying [{cinderella?.GetType()}]{cinderella}");
+            settings.TraceWriter.Verbose(() => $"⚠ DANGEROUSLY prettifying [{cinderella?.GetType().Name}]");
 
             if (cinderella == null) {
                 return settings.NullPlaceholder;
@@ -55,7 +55,7 @@ namespace BrandonUtils.Standalone.Strings {
         public string PrettifySafely(object cinderella, PrettificationSettings settings = default) {
             settings ??= Prettification.DefaultPrettificationSettings;
 
-            settings.TraceWriter.Verbose(() => $"🦺 SAFELY prettifying [{cinderella?.GetType().Name}]{cinderella}");
+            settings.TraceWriter.Verbose(() => $"🦺 SAFELY prettifying [{cinderella?.GetType().Name}]");
 
             try {
                 return Prettify(cinderella, settings);
