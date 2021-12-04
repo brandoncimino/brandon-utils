@@ -1,18 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using JetBrains.Annotations;
+
 namespace BrandonUtils.Standalone.Randomization {
     public class FromWeightedList<T> : Randomized<T> {
-        public readonly Func<T, double> WeightExtractor;
+        public FromWeightedList(ICollection<T> choices, Func<T, double> weightExtractor, Random? generator = default) : base(gen => Brandom.FromWeightedList(gen, choices, weightExtractor), generator) { }
 
-        public FromWeightedList(ICollection<T> choices, Func<T, double> weightExtractor) : base(() => Brandom.FromWeightedList(choices, weightExtractor)) {
-            this.WeightExtractor = weightExtractor;
-        }
+        public FromWeightedList(IDictionary<T, double> weightedChoices, Random?    generator = default) : base(gen => Brandom.FromWeightedList(gen, weightedChoices), generator) { }
+        public FromWeightedList(IDictionary<T, int>    weightedChoices, Random? generator = default) : base(gen => Brandom.FromWeightedList(gen, weightedChoices), generator) { }
 
-        public FromWeightedList(IDictionary<T, double> weightedChoices) : base(() => Brandom.FromWeightedList(weightedChoices)) { }
+        public FromWeightedList(
+            [NotNull] IEnumerable<(T, double)> weightedChoices,
+            Random?                  generator = default
+        ) : base(gen => gen.FromWeightedList(weightedChoices), generator) { }
 
-        public FromWeightedList(IDictionary<T, int> weightedChoices) : base(() => Brandom.FromWeightedList(weightedChoices)) { }
-
-        public FromWeightedList(IDictionary<T, float> weightedChoices) : base(() => Brandom.FromWeightedList(weightedChoices)) { }
+        public FromWeightedList(
+            [NotNull] IEnumerable<(T, int)> weightedChoices,
+            Random?               generator = default
+        ) : base(gen => gen.FromWeightedList(weightedChoices), generator) { }
     }
 }

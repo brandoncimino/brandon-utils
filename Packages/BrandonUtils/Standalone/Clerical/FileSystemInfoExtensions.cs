@@ -4,6 +4,7 @@ using System.Diagnostics.Contracts;
 using System.IO;
 
 using BrandonUtils.Standalone.Strings;
+using BrandonUtils.Standalone.Strings.Prettifiers;
 
 using JetBrains.Annotations;
 
@@ -16,8 +17,7 @@ namespace BrandonUtils.Standalone.Clerical {
 
         [ContractAnnotation("null => null")]
         [ContractAnnotation("notnull => notnull")]
-        [CanBeNull]
-        public static Uri ToUri([CanBeNull] this FileSystemInfo fileSystemInfo) {
+        public static Uri? ToUri(this FileSystemInfo? fileSystemInfo) {
             return fileSystemInfo switch {
                 null              => null,
                 DirectoryInfo dir => new Uri(dir.FullName.AppendIfMissing(Path.DirectorySeparatorChar.ToString())),
@@ -28,8 +28,7 @@ namespace BrandonUtils.Standalone.Clerical {
 
         [ContractAnnotation("null => null")]
         [ContractAnnotation("notnull => notnull")]
-        [CanBeNull]
-        public static Uri ToUri([CanBeNull] this IHasFileSystemInfo hasFileSystemInfo) {
+        public static Uri? ToUri(this IHasFileSystemInfo? hasFileSystemInfo) {
             return hasFileSystemInfo?.FileSystemInfo.ToUri();
         }
 
@@ -72,7 +71,7 @@ namespace BrandonUtils.Standalone.Clerical {
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static void MustBeParentOf([CanBeNull] this DirectoryInfo parent, [CanBeNull] FileSystemInfo child) {
+        public static void MustBeParentOf(this DirectoryInfo? parent, FileSystemInfo? child) {
             CheckNull(parent, child);
 
             if (parent.IsParentOf(child) == false) {
@@ -82,15 +81,15 @@ namespace BrandonUtils.Standalone.Clerical {
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static void MustBeParentOf([CanBeNull] this DirectoryInfo parent, [CanBeNull] IHasFileSystemInfo child) => MustBeParentOf(parent, child!.FileSystemInfo);
+        public static void MustBeParentOf(this DirectoryInfo? parent, IHasFileSystemInfo? child) => MustBeParentOf(parent, child!.FileSystemInfo);
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static void MustBeParentOf([CanBeNull] this IHasDirectoryInfo parent, [CanBeNull] FileSystemInfo child) => MustBeParentOf(parent!.Directory!, child);
+        public static void MustBeParentOf(this IHasDirectoryInfo? parent, FileSystemInfo? child) => MustBeParentOf(parent!.Directory!, child);
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static void MustBeParentOf([CanBeNull] this IHasDirectoryInfo parent, [CanBeNull] IHasFileSystemInfo child) => MustBeParentOf(parent!.Directory!, child!.FileSystemInfo);
+        public static void MustBeParentOf(this IHasDirectoryInfo? parent, IHasFileSystemInfo? child) => MustBeParentOf(parent!.Directory!, child!.FileSystemInfo);
 
         #endregion
 
@@ -118,7 +117,7 @@ namespace BrandonUtils.Standalone.Clerical {
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static void MustBeChildOf([CanBeNull] this FileSystemInfo child, [CanBeNull] DirectoryInfo parent) {
+        public static void MustBeChildOf(this FileSystemInfo? child, DirectoryInfo? parent) {
             CheckNull(parent, child);
 
             if (child.IsChildOf(parent) == false) {
@@ -128,27 +127,44 @@ namespace BrandonUtils.Standalone.Clerical {
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static void MustBeChildOf([CanBeNull] this FileSystemInfo child, [CanBeNull] IHasDirectoryInfo parent) => child.MustBeChildOf(parent!.Directory!);
+        public static void MustBeChildOf(this FileSystemInfo? child, IHasDirectoryInfo? parent) => child.MustBeChildOf(parent!.Directory!);
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static void MustBeChildOf([CanBeNull] this IHasFileSystemInfo child, [CanBeNull] DirectoryInfo parent) => child!.FileSystemInfo.MustBeChildOf(parent);
+        public static void MustBeChildOf(this IHasFileSystemInfo? child, DirectoryInfo? parent) => child!.FileSystemInfo.MustBeChildOf(parent);
 
         [ContractAnnotation("parent:null => stop")]
         [ContractAnnotation("child:null => stop")]
-        public static void MustBeChildOf([CanBeNull] this IHasFileSystemInfo child, [CanBeNull] IHasDirectoryInfo parent) => child.MustBeChildOf(parent!.Directory!);
+        public static void MustBeChildOf(this IHasFileSystemInfo? child, IHasDirectoryInfo? parent) => child.MustBeChildOf(parent!.Directory!);
 
         #endregion
 
+        [NotNull]
+        public static string GetChildPath([NotNull] this DirectoryInfo parent, string? relativePath) {
+            if (parent == null) {
+                throw new ArgumentNullException(nameof(parent));
+            }
+
+            Console.WriteLine(
+                new Dictionary<object, object>() {
+                    [nameof(parent)]       = parent,
+                    [nameof(relativePath)] = relativePath,
+                    ["joined"]             = BPath.JoinPath(parent, relativePath)
+                }.Prettify(new PrettificationSettings() { LineLengthLimit = { Value = int.MaxValue } })
+            );
+
+            return BPath.JoinPath(parent, relativePath);
+        }
+
         private static InvalidOperationException NotMyChildException(DirectoryInfo parent, FileSystemInfo child) {
             return new InvalidOperationException(
-                $"The {nameof(parent)} {parent.GetType().Prettify()} does not contain the {nameof(child)} {child.GetType().Prettify()}! {FamilyString(parent, child)}"
+                $"The {nameof(parent)} {parent.GetType().Prettify()} does not contain the {nameof(child)} {child.GetType().Prettify()}!\n{FamilyString(parent, child)}"
             );
         }
 
         private static InvalidOperationException NotMyMomException(FileSystemInfo child, DirectoryInfo parent) {
             return new InvalidOperationException(
-                $"The {nameof(child)} {child.GetType().Prettify()} isn't contained by the {nameof(parent)} {parent.GetType().Prettify()}! {FamilyString(parent, child)}"
+                $"The {nameof(child)} {child.GetType().Prettify()} isn't contained by the {nameof(parent)} {parent.GetType().Prettify()}!\n{FamilyString(parent, child)}"
             );
         }
 
@@ -164,10 +180,13 @@ namespace BrandonUtils.Standalone.Clerical {
             }
         }
 
-        private static string FamilyString(DirectoryInfo parent, FileSystemInfo child) {
-            return new Dictionary<string, FileSystemInfo>() {
-                [nameof(parent)] = parent,
-                [nameof(child)]  = child
+        [NotNull]
+        private static string FamilyString([NotNull] DirectoryInfo parent, [NotNull] FileSystemInfo child) {
+            Console.WriteLine(parent.Prettify());
+
+            return new Dictionary<object, object>() {
+                [nameof(parent)] = InnerPretty.PrettifyFileSystemInfo(parent),
+                [nameof(child)]  = InnerPretty.PrettifyFileSystemInfo(child)
             }.Prettify();
         }
 

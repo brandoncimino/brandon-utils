@@ -13,7 +13,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <remarks>
         /// This is named "Directory", and annotated with <see cref="CanBeNullAttribute"/>, in order to match <see cref="FileInfo"/>.<see cref="FileInfo.Directory"/>.
         /// </remarks>
-        [CanBeNull]
+        [NotNull]
         public DirectoryInfo Directory { get; }
     }
 }

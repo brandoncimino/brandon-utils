@@ -191,8 +191,7 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <returns>A new file, or an overwrite of an existing file if <paramref name="overwrite" /> is <see langword="true" />. If the file exists and <paramref name="overwrite" /> is <see langword="false" />, an <see cref="T:System.IO.IOException" /> is thrown.</returns>
         /// <exception cref="ArgumentNullException">This <paramref name="fileInfo"/> is <see langword="null"/>.</exception>
         /// <exception cref="T:System.IO.IOException">An error occurs, or the destination file already exists and <paramref name="overwrite" /> is <see langword="false" />. </exception>
-        [CanBeNull]
-        public static FileInfo Backup([NotNull] this FileInfo fileInfo, bool overwrite = false) {
+        public static FileInfo? Backup([NotNull] this FileInfo fileInfo, bool overwrite = false) {
             if (fileInfo == null) {
                 throw new ArgumentNullException(nameof(fileInfo));
             }
@@ -214,8 +213,8 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <returns>a new <typeparamref name="T"/> instance</returns>
         [CanBeNull]
         public static T Deserialize<T>(
-            [NotNull] this FileInfo               fileInfo,
-            [CanBeNull]    JsonSerializerSettings settings = default
+            [NotNull] this FileInfo                fileInfo,
+            JsonSerializerSettings? settings = default
         ) {
             fileInfo.MustExist();
             return JsonConvert.DeserializeObject<T>(
@@ -225,10 +224,10 @@ namespace BrandonUtils.Standalone.Clerical {
         }
 
         public static void Serialize<T>(
-            [NotNull] this FileInfo            fileInfo,
-            [CanBeNull]    T                   obj,
-            DuplicateFileResolution            duplicateFileResolution = DuplicateFileResolution.Error,
-            [CanBeNull] JsonSerializerSettings settings                = default
+            [NotNull] this FileInfo    fileInfo,
+            [CanBeNull]    T           obj,
+            DuplicateFileResolution    duplicateFileResolution = DuplicateFileResolution.Error,
+            JsonSerializerSettings? settings                = default
         ) {
             switch (duplicateFileResolution) {
                 case DuplicateFileResolution.Error:
@@ -248,26 +247,26 @@ namespace BrandonUtils.Standalone.Clerical {
         }
 
         public static void SerializeCautiously<T>(
-            [NotNull] this FileInfo               fileInfo,
-            [CanBeNull]    T                      obj,
-            [CanBeNull]    JsonSerializerSettings settings = default
+            [NotNull] this FileInfo                fileInfo,
+            [CanBeNull]    T                       obj,
+            JsonSerializerSettings? settings = default
         ) {
             fileInfo.MustNotExist();
             fileInfo.Write(JsonConvert.SerializeObject(obj, settings!));
         }
 
         public static void SerializeForcefully<T>(
-            [NotNull] this FileInfo               fileInfo,
-            [CanBeNull]    T                      obj,
-            [CanBeNull]    JsonSerializerSettings settings = default
+            [NotNull] this FileInfo                fileInfo,
+            [CanBeNull]    T                       obj,
+            JsonSerializerSettings? settings = default
         ) {
             fileInfo.Write(JsonConvert.SerializeObject(obj, settings!));
         }
 
         public static void SerializeSafely<T>(
-            [NotNull] this FileInfo               fileInfo,
-            [CanBeNull]    T                      obj,
-            [CanBeNull]    JsonSerializerSettings settings = default
+            [NotNull] this FileInfo                fileInfo,
+            [CanBeNull]    T                       obj,
+            JsonSerializerSettings? settings = default
         ) {
             fileInfo.Backup(true);
             fileInfo.SerializeForcefully(obj, settings);

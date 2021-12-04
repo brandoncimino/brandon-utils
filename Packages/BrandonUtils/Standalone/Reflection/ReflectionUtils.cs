@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 using BrandonUtils.Standalone.Attributes;
@@ -13,10 +15,15 @@ using BrandonUtils.Standalone.Strings.Prettifiers;
 
 using JetBrains.Annotations;
 
+using Pure = System.Diagnostics.Contracts.PureAttribute;
+
 namespace BrandonUtils.Standalone.Reflection {
     /// <summary>
     /// Contains utilities for <see cref="System.Reflection"/>.
+    ///
+    /// TODO: Split this class up. For example, the <see cref="Type"/> extensions should be in their own class
     /// </summary>
+    [PublicAPI]
     public static class ReflectionUtils {
         /// <summary>
         /// Returns the <see cref="MethodInfo"/> for this method that <b><i>called <see cref="ThisMethod"/></i></b>.
@@ -195,7 +202,7 @@ namespace BrandonUtils.Standalone.Reflection {
                 return (T)value;
             }
             catch (InvalidCastException e) {
-                throw e.ModifyMessage($"A member for {variableInfo.Prettify(TypeNameStyle.Full)} was found on the [{obj.GetType().Name}]'{obj}', but it couldn't be cast to a {typeof(T).PrettifyType()}!");
+                throw e.ModifyMessage($"A member for {variableInfo.Prettify(TypeNameStyle.Full)} was found on the [{obj.GetType().Name}]'{obj}', but it couldn't be cast to a {typeof(T).PrettifyType(default)}!");
             }
         }
 
@@ -484,8 +491,71 @@ namespace BrandonUtils.Standalone.Reflection {
 
         /// <param name="type">a <see cref="Type"/> that might be generic</param>
         /// <returns><see cref="Type.IsGenericType"/> || <see cref="Type.IsGenericTypeDefinition"/></returns>
-        public static bool IsGenericTypeOrDefinition([NotNull] this Type type) {
-            return type.IsGenericType || type.IsGenericTypeDefinition;
+        [Obsolete("This is redundant, because if IsGenericTypeDefinition is true, then IsGenericType must also be true")]
+        [ContractAnnotation("null => false")]
+        public static bool IsGenericTypeOrDefinition([CanBeNull] this Type type) {
+            return type?.IsGenericType == true;
+        }
+
+        #region Type.Implements(Type)
+
+        /// <summary>
+        /// Determines whether this <see cref="Type"/> implements the given interface <see cref="Type"/>.
+        /// </summary>
+        /// <param name="self">this <see cref="Type"/></param>
+        /// <param name="interfaceType">the <see cref="Type.IsInterface"/> that this <see cref="Type"/> might implement</param>
+        /// <returns>true if this <see cref="Type"/>, or one of its ancestors, implements <paramref name="interfaceType"/></returns>
+        public static bool Implements([CanBeNull] this Type self, [NotNull] Type interfaceType) {
+            if (interfaceType?.IsInterface != true) {
+                throw new ArgumentException(nameof(interfaceType), $"The type {interfaceType.Prettify()} was not an interface!");
+            }
+
+            // null can't implement anything
+            if (self == null) {
+                return false;
+            }
+
+            // when self is an interface, we have to do some extra checks, because GetInterface() won't return itself
+            if (self.IsInterface && SelfImplements(self, interfaceType)) {
+                return true;
+            }
+
+            // if the interface is a constructed generic, we need to be more specific with the check, because GetInterface() doesn't take generic type parameters into account
+            if (interfaceType.IsConstructedGenericType) {
+                return interfaceType.IsAssignableFrom(self);
+            }
+
+            // finally, if we didn't trigger any special cases, we use GetInterface()
+            return self.GetInterface(interfaceType.Name) != null;
+        }
+
+        /// <summary>
+        /// Used when both <paramref name="self"/> and <paramref name="other"/> <see cref="Type.IsInterface"/>s to see if <paramref name="self"/> implements <paramref name="other"/>.
+        /// </summary>
+        /// <param name="self"></param>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        private static bool SelfImplements(Type self, Type other) {
+            if (self == other) {
+                return true;
+            }
+
+            if (self.IsGenericType != other.IsGenericType) {
+                return false;
+            }
+
+            if (self.IsConstructedGenericType && other.IsGenericTypeDefinition) {
+                self = self.GetGenericTypeDefinition();
+            }
+
+            return other.IsAssignableFrom(self);
+        }
+
+        #endregion
+
+        [ContractAnnotation("null => false")]
+        public static bool IsEnumerable([CanBeNull] this Type type) {
+            return type.Implements(typeof(IEnumerable<>));
         }
 
         private static readonly Type[] TupleTypes = {
@@ -516,6 +586,379 @@ namespace BrandonUtils.Standalone.Reflection {
         /// <returns>true if the given <see cref="Type"/> is one of the <see cref="Tuple{T}"/> or <see cref="ValueTuple{T1}"/> types</returns>
         public static bool IsTupleType([NotNull] this Type type) {
             return type.IsGenericTypeOrDefinition() && TupleTypes.Any(it => type.GetGenericTypeDefinition().IsAssignableFrom(it));
+        }
+
+        #endregion
+
+        #region Type Ancestry
+
+        public static bool IsExceptionType([NotNull] this Type self) {
+            return typeof(Exception).IsAssignableFrom(self);
+        }
+
+        [NotNull]
+        internal static Type CommonType([CanBeNull, ItemCanBeNull, InstantHandle] IEnumerable<Type> types) {
+            if (types == null) {
+                return typeof(object);
+            }
+
+            types = types.ToList();
+            var baseClass = CommonBaseClass(types);
+            if (baseClass != typeof(object)) {
+                return baseClass;
+            }
+
+            var commonInterfaces = CommonInterfaces(types);
+            return commonInterfaces.FirstOrDefault() ?? typeof(object);
+        }
+
+        internal static Type CommonBaseClass(IEnumerable<Type> types) {
+            Type mostCommonType = default;
+
+            foreach (var t in types) {
+                mostCommonType = CommonBaseClass(mostCommonType, t);
+                if (mostCommonType == typeof(object)) {
+                    return mostCommonType;
+                }
+            }
+
+            return mostCommonType ?? typeof(object);
+        }
+
+        [CanBeNull]
+        public static Type CommonBaseClass([CanBeNull] Type a, [CanBeNull] Type b) {
+            if (a == null || b == null) {
+                return a ?? b;
+            }
+
+            while (true) {
+                if (a == b) {
+                    return a;
+                }
+
+                if (a.IsAssignableFrom(b)) {
+                    return a;
+                }
+
+                if (b.IsAssignableFrom(a)) {
+                    return b;
+                }
+
+                if (a.BaseType == null) {
+                    return typeof(object);
+                }
+
+                a = a.BaseType;
+            }
+        }
+
+        // [CanBeNull]
+        // internal static Type CommonInterface([CanBeNull] Type a, [CanBeNull] Type b) {
+        //     var overlap = CommonInterfaces(a, b).ToList();
+        //     return overlap.FirstOrDefault();
+        // }
+
+        [NotNull]
+        [ItemNotNull]
+        internal static IEnumerable<Type> CommonInterfaces([CanBeNull] Type a, [CanBeNull] Type b) {
+            var aInts = a.GetAllInterfaces();
+            var bInts = b.GetAllInterfaces();
+            return aInts.Intersect(bInts);
+        }
+
+        [Pure, NotNull]
+        internal static IEnumerable<Type> CommonInterfaces([NotNull, ItemCanBeNull] IEnumerable<Type> types) {
+            return types.Select(it => it.GetAllInterfaces()).Intersection();
+        }
+
+
+        public static IEnumerable<Type> GetAllInterfaces([CanBeNull] this Type type) {
+            return _GetAllInterfaces(type);
+        }
+
+        [Pure]
+        [NotNull, ItemNotNull]
+        public static Type[] FindInterfaces([NotNull] this Type type) {
+            if (type == null) {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            return type.FindInterfaces((type1, criteria) => true, default);
+        }
+
+        private static IEnumerable<Type> _GetAllInterfaces([CanBeNull] this Type type, [CanBeNull] IEnumerable<Type> soFar = default) {
+            var ints = (type?.GetInterfaces()).NonNull().ToList();
+            soFar = soFar.NonNull();
+            if (type?.IsInterface == true) {
+                soFar = soFar.Union(type);
+            }
+
+            return (soFar ?? new List<Type>())
+                   .Union(ints)
+                   .Concat(ints.SelectMany(ti => _GetAllInterfaces(ti, soFar)))
+                   .Distinct();
+        }
+
+        private static IEnumerable<Type> Ancestors(this Type type) {
+            var ancestors = new List<Type>();
+
+            while (type != null) {
+                ancestors.Add(type);
+                type = type.BaseType;
+            }
+
+            return ancestors;
+        }
+
+        /// <summary>
+        /// An idiomatic inverse of <see cref="Type.IsAssignableFrom"/> because I always get confused by that.
+        /// </summary>
+        /// <param name="valueType"></param>
+        /// <param name="variableType"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        [PublicAPI]
+        [Pure]
+        [ContractAnnotation("valueType:null => stop")]
+        [ContractAnnotation("variableType:null => stop")]
+        public static bool CanBeAssignedTo([NotNull] this Type valueType, [NotNull] Type variableType) {
+            if (valueType == null) {
+                throw new ArgumentNullException(nameof(valueType));
+            }
+
+            if (variableType == null) {
+                throw new ArgumentNullException(nameof(variableType));
+            }
+
+            return variableType.IsAssignableFrom(valueType);
+        }
+
+        /// <summary>
+        /// Determines whether this <see cref="Type"/> is an inheritor of any of the <paramref name="possibleParents"/> via <see cref="Type.IsAssignableFrom"/>
+        /// </summary>
+        /// <param name="child">this <see cref="Type"/></param>
+        /// <param name="possibleParents">the <see cref="Type"/>s that might be <see cref="Type.IsAssignableFrom"/> <paramref name="child"/></param>
+        /// <returns>true if any of the <paramref name="possibleParents"/> <see cref="Type.IsAssignableFrom"/> <paramref name="child"/></returns>
+        /// <exception cref="ArgumentNullException">if <paramref name="child"/> or <paramref name="possibleParents"/> is null</exception>
+        [Pure]
+        [ContractAnnotation("child:null => stop")]
+        [ContractAnnotation("possibleParents:null => stop")]
+        public static bool IsKindOf([NotNull] this Type child, [NotNull, ItemNotNull, InstantHandle] IEnumerable<Type> possibleParents) {
+            if (child == null) {
+                throw new ArgumentNullException(nameof(child));
+            }
+
+            if (possibleParents == null) {
+                throw new ArgumentNullException(nameof(possibleParents));
+            }
+
+            return possibleParents.Any(it => it.IsAssignableFrom(child));
+        }
+
+        /**
+         * <inheritdoc cref="IsKindOf(System.Type,System.Collections.Generic.IEnumerable{System.Type})"/>
+         */
+        [Pure]
+        [ContractAnnotation("child:null => stop")]
+        [ContractAnnotation("possibleParents:null => stop")]
+        public static bool IsKindOf([NotNull] this Type child, [NotNull, ItemNotNull] params Type[] possibleParents) => IsKindOf(child, possibleParents.AsEnumerable());
+
+        /// <summary>
+        /// Determines whether a <b>variable</b> of this <see cref="Type"/> is capable of holding a <b>value</b> of <paramref name="valueType"/>.
+        /// </summary>
+        /// <remarks>
+        /// An idiomatic alias for <see cref="Type.IsAssignableFrom"/> because I always get confused by that.
+        /// </remarks>
+        /// <param name="variableType"></param>
+        /// <param name="valueType"></param>
+        /// <returns>true if <paramref name="variableType"/> <see cref="Type.IsAssignableFrom"/> <paramref name="valueType"/></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        [PublicAPI]
+        [Pure]
+        [ContractAnnotation("variableType:null => stop")]
+        [ContractAnnotation("valueType:null => stop")]
+        public static bool CanHoldValueOf([NotNull] this Type variableType, [NotNull] Type valueType) {
+            if (variableType == null) {
+                throw new ArgumentNullException(nameof(variableType));
+            }
+
+            if (valueType == null) {
+                throw new ArgumentNullException(nameof(valueType));
+            }
+
+            return variableType.IsAssignableFrom(valueType);
+        }
+
+        /// <summary>
+        /// Determines whether a variable of this <see cref="Type"/> is capable of being assigned the given value.
+        /// </summary>
+        /// <remarks>
+        /// This is similar to <see cref="Type.IsInstanceOfType"/>, except that it handles null <paramref name="obj"/> differently by checking
+        /// <paramref name="variableType"/> <see cref="Type.IsValueType"/>:
+        /// <code><![CDATA[
+        /// typeof(int).IsInstanceOfType(null);     // false
+        /// typeof(int).CanHold(null);              // false (because int is a value type)
+        /// ]]></code>
+        ///
+        /// <code><![CDATA[
+        /// typeof(string).IsInstanceOfType(null);  // false
+        /// typeof(string).CanHold(null);           // true  (because string is a reference type)
+        /// ]]></code>
+        /// </remarks>
+        /// <param name="variableType">this <see cref="Type"/></param>
+        /// <param name="obj">the <see cref="object"/> that this <see cref="Type"/> might hold</param>
+        /// <returns>true if a variable of <paramref name="variableType"/> could hold <paramref name="obj"/></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        [Pure]
+        public static bool CanHold([NotNull] this Type variableType, [CanBeNull] object obj) {
+            if (variableType == null) {
+                throw new ArgumentNullException(nameof(variableType));
+            }
+
+            if (obj == null) {
+                return variableType.IsValueType == false;
+            }
+
+            return variableType.IsInstanceOfType(obj);
+        }
+
+        [Pure]
+        public static bool IsInstanceOf(
+            [NotNull] this object obj,
+            [NotNull, ItemNotNull, InstantHandle]
+            IEnumerable<Type> possibleTypes
+        ) {
+            if (obj == null) {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
+            if (possibleTypes == null) {
+                throw new ArgumentNullException(nameof(possibleTypes));
+            }
+
+            return possibleTypes.Any(it => it.IsInstanceOfType(obj));
+        }
+
+        [Pure]
+        public static bool IsInstanceOf(
+            [NotNull] this object obj,
+            [NotNull, ItemNotNull]
+            params Type[] possibleTypes
+        ) => IsInstanceOf(obj, possibleTypes.AsEnumerable());
+
+        #endregion
+
+        #region Type Keywords
+
+        private static readonly Dictionary<Type, string> TypeKeywords = new Dictionary<Type, string>() {
+            [typeof(int)]     = "int",
+            [typeof(uint)]    = "uint",
+            [typeof(short)]   = "short",
+            [typeof(ushort)]  = "ushort",
+            [typeof(long)]    = "long",
+            [typeof(ulong)]   = "ulong",
+            [typeof(double)]  = "double",
+            [typeof(float)]   = "float",
+            [typeof(bool)]    = "bool",
+            [typeof(byte)]    = "byte",
+            [typeof(decimal)] = "decimal",
+            [typeof(sbyte)]   = "sbyte",
+            [typeof(char)]    = "char",
+            [typeof(object)]  = "object",
+            [typeof(string)]  = "string"
+        };
+
+        [Pure]
+        [NotNull]
+        [ContractAnnotation("null => stop")]
+        public static string NameOrKeyword([NotNull] this Type type) {
+            if (type == null) {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            return TypeKeywords.GetOrDefault(type, () => type.Name) ?? throw new InvalidOperationException();
+        }
+
+        #endregion
+
+        #region Compiler Generation
+
+        public static bool IsCompilerGenerated(this MethodInfo methodInfo) {
+            return methodInfo.GetCustomAttribute<CompilerGeneratedAttribute>() != null;
+        }
+
+        public static bool IsCompilerGenerated(this Type type) {
+            return type.GetCustomAttribute<CompilerGeneratedAttribute>() != null;
+        }
+
+        public static bool IsCompilerGenerated(this Delegate dgate) {
+            return dgate.Method.DeclaringType.IsCompilerGenerated();
+        }
+
+        #endregion
+
+        #region ToString
+
+        public enum Inheritance {
+            Inherited,
+            DeclaredOnly
+        }
+
+        /// <summary>
+        /// Returns this <see cref="Type"/>'s override of <see cref="object.ToString"/>, if present.
+        /// </summary>
+        /// <remarks>
+        /// By default, this will return any <see cref="object.ToString"/> method with a <see cref="MemberInfo.DeclaringType"/> other than <see cref="object"/>.
+        /// This means that a <see cref="object.ToString"/> method declared in a <b>parent class</b> will be returned.
+        /// This behavior can be controlled by specifying <see cref="Inheritance.Inherited"/> or <see cref="Inheritance.DeclaredOnly"/>.
+        ///
+        /// <p/><b>📝 Note:</b><br/> This will not return <see cref="MethodBase.IsAbstract"/> methods, which includes:
+        /// <ul>
+        /// <li>Methods declared <c>abstract</c> inside of <c>abstract</c> classes</li>
+        /// <li>Methods declared inside of interfaces</li>
+        /// </ul>
+        /// </remarks>
+        /// <example>
+        /// Say we have the following classes, where <c>Parent</c> declares an override of <see cref="object.ToString"/>:
+        /// <code><![CDATA[
+        /// class Parent {
+        ///     public override ToString() => "Parent.ToString";
+        /// }
+        ///
+        /// class Child : Parent { }
+        /// ]]></code>
+        ///
+        /// The <see cref="Inheritance"/> parameter determines whether <c>Child.GetToStringOverride()</c> will return <c>Parent</c>'s <see cref="object.ToString"/> method:
+        /// <code><![CDATA[
+        /// public static void Example(){
+        ///     typeof(Parent).GetToStringOverride();               // -> Parent.ToString
+        ///     typeof(Parent).GetToStringOverride(Inherited);      // -> Parent.ToString
+        ///     typeof(Parent).GetToStringOverride(DeclaredOnly);   // -> Parent.ToString
+        ///
+        ///     typeof(Child).GetToStringOverride();                // -> Parent.ToString
+        ///     typeof(Child).GetToStringOverride(Inherited);       // -> Parent.ToString
+        ///     typeof(Child).GetToStringOverride(DeclaredOnly);    // -> null
+        /// }
+        /// ]]>
+        /// </code>
+        /// </example>
+        /// <param name="type">this <see cref="Type"/></param>
+        /// <param name="inheritance">whether to include <see cref="Inheritance.Inherited"/> or <see cref="Inheritance.DeclaredOnly"/> methods</param>
+        /// <returns>a non-default override of <see cref="object.ToString"/></returns>
+        [CanBeNull]
+        public static MethodInfo GetToStringOverride([CanBeNull] this Type type, Inheritance inheritance) {
+            if (type == null || type == typeof(object)) {
+                return null;
+            }
+
+            var toString = type.GetMethod(nameof(ToString), new Type[] { });
+            return toString?.IsAbstract == true || toString?.DeclaringType == typeof(object) ? null : toString;
+        }
+
+        /// <inheritdoc cref="GetToStringOverride(System.Type,BrandonUtils.Standalone.Reflection.ReflectionUtils.Inheritance)"/>
+        [CanBeNull]
+        public static MethodInfo GetToStringOverride([CanBeNull] this Type type) {
+            return GetToStringOverride(type, Inheritance.Inherited);
         }
 
         #endregion

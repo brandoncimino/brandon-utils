@@ -4,6 +4,8 @@ using BrandonUtils.Standalone.Exceptions;
 using BrandonUtils.Standalone.Optional;
 using BrandonUtils.Testing;
 
+using JetBrains.Annotations;
+
 using NUnit.Framework;
 
 using Is = NUnit.Framework.Is;
@@ -31,12 +33,11 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
         private static class Validate {
             public static void FailedFailable<T>(FailableFunc<T> failableFunc) {
-                AssertAll.Of(
-                    () => Assert.That(failableFunc, Has.Property(nameof(failableFunc.HasValue)).False),
-                    () => Assert.That(failableFunc, Has.Property(nameof(failableFunc.Failed)).True),
-                    () => Assert.DoesNotThrow(() => Console.WriteLine(failableFunc.Excuse)),
-                    () => Assert.Throws<InvalidOperationException>(() => Console.WriteLine(failableFunc.Value))
-                );
+                Asserter.Against(failableFunc)
+                        .And(Has.Property(nameof(failableFunc.HasValue)).False)
+                        .And(Has.Property(nameof(failableFunc.Failed)).True)
+                        .And(it => it.Value, Throws.InvalidOperationException)
+                        .Invoke();
             }
 
             public static void PassedFailable<T>(FailableFunc<T> failableFunc) {
@@ -50,8 +51,9 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
             public static void Equality<T>(FailableFunc<T> failableFunc, Optional<T> optional, bool expectedEquality) {
                 AssertAll.Of(
-                    () => Assert.That(failableFunc == optional,                      Is.EqualTo(expectedEquality), "failable == optional"),
-                    () => Assert.That(optional == failableFunc,                      Is.EqualTo(expectedEquality), "optional == failable"),
+                    () => Assert.That(failableFunc == optional, Is.EqualTo(expectedEquality), "failable == optional"),
+                    // no longer supported through ==
+                    // () => Assert.That(optional     == failableFunc,                  Is.EqualTo(expectedEquality), "optional == failable"),
                     () => Assert.That(failableFunc.Equals(optional),                 Is.EqualTo(expectedEquality), "failable.Equals(optional)"),
                     () => Assert.That(optional.Equals(failableFunc),                 Is.EqualTo(expectedEquality), "optional.Equals(failable)"),
                     () => Assert.That(Optional.AreEqual(optional,     failableFunc), Is.EqualTo(expectedEquality), "Optional.AreEqual(optional, failable)"),
@@ -72,7 +74,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
             public static void Equality<T>(FailableFunc<T> failableFunc, T expectedValue, bool expectedEquality) {
                 AssertAll.Of(
-                    () => Assert.That(failableFunc == expectedValue,                   Is.EqualTo(expectedEquality), "failable == expectedValue"),
+                    () => Assert.That(failableFunc  == expectedValue,                  Is.EqualTo(expectedEquality), "failable == expectedValue"),
                     () => Assert.That(expectedValue == failableFunc,                   Is.EqualTo(expectedEquality), "expectedValue == failable"),
                     () => Assert.That(failableFunc.Equals(expectedValue),              Is.EqualTo(expectedEquality), "failable.Equals(expectedValue)"),
                     () => Assert.That(Optional.AreEqual(failableFunc,  expectedValue), Is.EqualTo(expectedEquality), "Optional.AreEqual(failable, expectedValue)"),
@@ -80,15 +82,12 @@ namespace BrandonUtils.Tests.Standalone.Collections {
                 );
             }
 
-            public static void ObjectEquality<T>(FailableFunc<T> failableFunc, object obj, bool expectedEquality) {
-                AssertAll.Of(
-                    () => Assert.That(failableFunc.Equals(obj), Is.EqualTo(expectedEquality), "failable.Equals(obj)"),
-                    () => {
-                        if (obj != null) {
-                            Assert.That(obj.Equals(failableFunc), Is.EqualTo(expectedEquality), "obj.Equals(failable)");
-                        }
-                    }
-                );
+            public static void ObjectEquality<T>(FailableFunc<T> failableFunc, [CanBeNull] object obj, bool expectedEquality = true) {
+                Asserter.Against(failableFunc)
+                        .WithHeading($"[{failableFunc}] should {(expectedEquality ? "be" : "not be")} equal to [{obj}]")
+                        .And(it => it.Equals(obj),  Is.EqualTo(expectedEquality))
+                        .And(it => Equals(it, obj), Is.EqualTo(expectedEquality))
+                        .Invoke();
             }
         }
 
@@ -172,19 +171,26 @@ namespace BrandonUtils.Tests.Standalone.Collections {
         [Test]
         public void FailableDefault() {
             FailableFunc<int> failableFunc = default;
-            AssertAll.Of(
-                () => Validate.FailedFailable(failableFunc),
-                () => Assert.That(failableFunc, Has.Property(nameof(failableFunc.Excuse)).Null)
-            );
+            Validate.FailedFailable(failableFunc);
+        }
+
+        [Test]
+        public void FailableNoArgConstructor() {
+            var failableFunc = new FailableFunc<int>();
+            Validate.FailedFailable(failableFunc);
         }
 
         [Test]
         public void FailableSuccessObjectEquality() {
             var failable  = Optional.Try(Succeed);
             var failable2 = Optional.Try(Succeed);
+
             AssertAll.Of(
                 () => Validate.ObjectEquality(failable, Expected_Value, true),
-                () => Validate.ObjectEquality(failable, failable2,      true)
+                () => Validate.ObjectEquality(failable, failable2,      true),
+                () => Assert.That(failable       == Expected_Value, "failable == Expected_Value"),
+                () => Assert.That(failable       == failable2,      "failable == failable2"),
+                () => Assert.That(Expected_Value == failable,       "Expected_Value == failable")
             );
         }
 

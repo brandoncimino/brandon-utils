@@ -1,24 +1,35 @@
 ﻿using System;
 
+using BrandonUtils.Standalone.Strings;
+
+using JetBrains.Annotations;
+
 namespace BrandonUtils.Standalone.Optional {
     /// <summary>
     /// Static methods for building <see cref="Exception"/>s used by <see cref="IFailable{TExcuse}"/> implementations.
     /// </summary>
     internal static class FailableException {
-        private static string DidNotFailMessage<TExcuse>(IFailable<TExcuse> failable) where TExcuse : Exception {
+        private static string DidNotFailMessage(IFailable failable) {
             return $"Unable to retrieve the {nameof(failable.Excuse)} from the {failable.GetType().Name} because {nameof(failable.Failed)} == {failable.Failed}!";
         }
 
-        internal static InvalidOperationException DidNotFailException<TExcuse>(IFailable<TExcuse> failable) where TExcuse : Exception {
+        internal static InvalidOperationException DidNotFailException(IFailable failable) {
             return new InvalidOperationException(DidNotFailMessage(failable));
         }
 
-        internal static InvalidOperationException DidNotFailException<TValue, TExcuse>(IFailableFunc<TValue, TExcuse> failableFunc) where TExcuse : Exception {
-            return new InvalidOperationException($"{DidNotFailMessage(failableFunc)} (Actual {nameof(failableFunc.Value)}: {failableFunc.Value})");
+        internal static InvalidOperationException DidNotFailException<TValue>(IFailableFunc<TValue> failableFunc, Optional<TValue> actualValue) {
+            var msg = DidNotFailMessage(failableFunc);
+
+            if (actualValue.HasValue) {
+                msg += $"({nameof(actualValue)}: {actualValue})";
+            }
+
+            throw new InvalidOperationException(msg);
         }
 
-        internal static InvalidOperationException FailedException<TValue, TExcuse>(IFailableFunc<TValue, TExcuse> failableFunc) where TExcuse : Exception {
-            return new InvalidOperationException($"Unable to retrieve the {typeof(TValue).Name} {nameof(failableFunc.Value)} from the {failableFunc.GetType().Name} because it failed!", failableFunc.Excuse);
+        [NotNull]
+        internal static InvalidOperationException FailedException<TValue>([NotNull] IFailableFunc<TValue> failableFunc, Optional<Exception> actualExcuse) {
+            return new InvalidOperationException($"Unable to retrieve the {typeof(TValue).Prettify()} {nameof(failableFunc.Value)} from the {failableFunc.GetType().Prettify()} because it failed!", actualExcuse.OrElse(default));
         }
     }
 }

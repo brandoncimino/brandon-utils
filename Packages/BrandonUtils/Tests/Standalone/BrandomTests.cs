@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 using BrandonUtils.Standalone;
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Randomization;
 using BrandonUtils.Testing;
+
+using JetBrains.Annotations;
 
 using NUnit.Framework;
 
@@ -24,51 +25,49 @@ namespace BrandonUtils.Tests.Standalone {
             Assert.That(picks, Is.SupersetOf(ls));
 
             var groups                = picks.Group();
-            var expectedHitsPerChoice = (double) numberOfPicks / numberOfChoices;
+            var expectedHitsPerChoice = (double)numberOfPicks / numberOfChoices;
 
             Assert.That(groups, Has.All.Values().Approximately(expectedHitsPerChoice, expectedHitsPerChoice / 2));
         }
 
-        private static Dictionary<string, int> BuildWeighted(params int[] weights) {
-            return Enumerable.Range(0, weights.Count()).ToDictionary(it => $"[{it}]", it => weights[it]);
+        private static IEnumerable<(string choice, int weight)> BuildWeighted(params int[] weights) {
+            return weights.Select((it, i) => (i.ToString(), it));
         }
 
-        private static Dictionary<T, double> BuildWeightPortion<T>(Dictionary<T, double> weighted) {
-            var totalWeight = weighted.Values.Sum();
-            return weighted.ToDictionary(it => it.Key, it => (double) it.Value / totalWeight);
+        private static IDictionary<T, double> BuildWeightedPortion<T, T2>(
+            [NotNull, InstantHandle]
+            IEnumerable<(T choice, T2 weight)> weighted
+        ) {
+            weighted = weighted.ToList();
+            var totalWeight = weighted.Select(it => it.Item2)
+                                      .Sum(it => it.ToDouble());
+            return weighted.ToDictionary(it => it.choice, it => it.weight.ToDouble() / totalWeight);
         }
 
-        private static Dictionary<T, double> BuildWeightedPortion<T>(Dictionary<T, int> weighted) {
-            var totalWeight = weighted.Values.Sum();
-            Console.WriteLine(totalWeight);
-            return weighted.ToDictionary(
-                it => it.Key,
-                it => (double) it.Value / totalWeight
-            );
-        }
-
-        private static Dictionary<T, float> BuildWeightedPortion<T>(Dictionary<T, float> weighted) {
-            var totalWeight = weighted.Values.Sum();
-            return weighted.ToDictionary(it => it.Key, it => it.Value / totalWeight);
-        }
-
-        [TestCase(1000, new int[] {1, 1, 1, 5, 2, 3, 7, 8})]
+        [TestCase(1000, new int[] { 1, 1, 1, 5, 2, 3, 7, 8 })]
         public void FromWeightedList(int numberOfPicks, params int[] weights) {
             var weighted = BuildWeighted(weights);
 
-            var picks = numberOfPicks.Repeat(it => Brandom.FromWeightedList(weighted)).ToList();
+            var picks = numberOfPicks.Repeat(it => Brandom.Gen.FromWeightedList(weighted)).ToList();
 
             AssertPicks(picks, weighted);
         }
 
-        private static void AssertPicks(List<string> picks, Dictionary<string, int> weighted) {
-            Assert.That(picks, Is.SupersetOf(weighted.Keys));
+        private static void AssertPicks(
+            [CanBeNull, ItemCanBeNull]
+            IReadOnlyCollection<string> picks,
+            [NotNull, InstantHandle]
+            IEnumerable<(string choice, int weight)> weighted
+        ) {
+            weighted = weighted?.ToArray();
+            var choices = weighted.Select(it => it.choice);
+            Assert.That(picks?.Distinct(), Is.EquivalentTo(choices.Distinct()), "All of the choices were picked at least once, and all of the picks were choices");
 
             var groups = picks.Group();
             var expectedHits = BuildWeightedPortion(weighted)
                 .ToDictionary(
                     it => it.Key,
-                    it => picks.Count * it.Value
+                    it => picks?.Count * it.Value
                 );
 
             foreach (var g in groups) {
@@ -77,9 +76,9 @@ namespace BrandonUtils.Tests.Standalone {
         }
 
         [Test]
-        [TestCase(1000, new[] {1, 2, 3, 4, 15, 3})]
+        [TestCase(1000, new[] { 1, 2, 3, 4, 15, 3 })]
         public void RandomizedFromWeightedList(int numberOfPicks, params int[] weights) {
-            var weighted = BuildWeighted(weights);
+            var weighted = BuildWeighted(weights).ToArray();
 
             var fromWeightedList = Randomized.FromWeightedList(weighted);
 

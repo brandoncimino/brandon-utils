@@ -1,9 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 
+using BrandonUtils.Standalone.Strings;
+
 using JetBrains.Annotations;
+
+using Newtonsoft.Json;
+
+using Pure = System.Diagnostics.Contracts.PureAttribute;
 
 namespace BrandonUtils.Standalone.Optional {
     /// <inheritdoc cref="IOptional{T}"/>
@@ -12,7 +19,8 @@ namespace BrandonUtils.Standalone.Optional {
     /// This gives access to the full suite of <see cref="System.Linq"/> extension methods.
     /// </remarks>
     [PublicAPI]
-    public readonly struct Optional<T> : IEquatable<T>, IEquatable<IOptional<T>>, IOptional<T> {
+    [JsonConverter(typeof(OptionalJsonConverter))]
+    public readonly struct Optional<T> : IEquatable<T>, IEquatable<Optional<T>>, IOptional<T> {
         public override int GetHashCode() {
             unchecked {
                 return (EqualityComparer<T>.Default.GetHashCode(_value) * 397) ^ HasValue.GetHashCode();
@@ -42,7 +50,7 @@ namespace BrandonUtils.Standalone.Optional {
         /// </remarks>
         public bool HasValue { get; }
 
-        [NotNull] public T Value => HasValue ? _value : throw OptionalException.IsEmptyException(this);
+        public T Value => HasValue ? _value : throw OptionalException.IsEmptyException(this);
 
         public Optional(T value) {
             _value   = value;
@@ -65,24 +73,25 @@ namespace BrandonUtils.Standalone.Optional {
             return ((IEnumerable)GetEnumerable()).GetEnumerator();
         }
 
-        public bool Equals(T            other) => Optional.AreEqual(this, other);
-        public bool Equals(IOptional<T> other) => Optional.AreEqual(this, other);
+        public bool Equals(T           other) => Optional.AreEqual(this, other);
+        public bool Equals(Optional<T> other) => Optional.AreEqual(this, other);
 
-        public static bool operator ==(Optional<T> a, IOptional<T> b) => Optional.AreEqual(a, b);
-        public static bool operator !=(Optional<T> a, IOptional<T> b) => !Optional.AreEqual(a, b);
+        // 📝 NOTE: No longer considering IOptional<T> for comparisons because going between structs and interfaces is clunky and weird
+        [Pure] public static bool operator ==(Optional<T> a, Optional<T> b) => Optional.AreEqual(a, b);
+        [Pure] public static bool operator !=(Optional<T> a, Optional<T> b) => !Optional.AreEqual(a, b);
 
         // NOTE: An equality comparator for a left-side IOptional isn't supported because it would cause ambiguity with other operators.
         // public static bool operator ==(IOptional<T> a, Optional<T> b) => Optional.AreEqual(a, b);
         // public static bool operator !=(IOptional<T> a, Optional<T> b) => !Optional.AreEqual(a, b);
 
-        public static bool operator ==(T a, Optional<T> b) => Optional.AreEqual(a, b);
-        public static bool operator !=(T a, Optional<T> b) => !Optional.AreEqual(a, b);
+        [Pure] public static bool operator ==([CanBeNull] T a, Optional<T>   b) => Optional.AreEqual(a, b);
+        [Pure] public static bool operator !=([CanBeNull] T a, Optional<T>   b) => !Optional.AreEqual(a, b);
+        [Pure] public static bool operator ==(Optional<T>   a, [CanBeNull] T b) => Optional.AreEqual(a, b);
+        [Pure] public static bool operator !=(Optional<T>   a, [CanBeNull] T b) => !Optional.AreEqual(a, b);
 
-        public static bool operator ==(Optional<T> a, T b) => Optional.AreEqual(a, b);
-        public static bool operator !=(Optional<T> a, T b) => !Optional.AreEqual(a, b);
-
+        [NotNull]
         public override string ToString() {
-            return Optional.ToString(this);
+            return Optional.ToString(this, new PrettificationSettings());
         }
 
         #endregion

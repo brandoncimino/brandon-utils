@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 
 using BrandonUtils.Standalone.Collections;
@@ -7,6 +8,8 @@ using BrandonUtils.Standalone.Enums;
 using BrandonUtils.Standalone.Strings;
 
 using JetBrains.Annotations;
+
+using Pure = System.Diagnostics.Contracts.PureAttribute;
 
 namespace BrandonUtils.Standalone.Optional {
     /// <summary>
@@ -23,8 +26,66 @@ namespace BrandonUtils.Standalone.Optional {
         /// <param name="value"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static Optional<T> Of<T>(T value) {
+        [ItemCanBeNull]
+        public static Optional<T> Of<T>([CanBeNull] T value) {
             return new Optional<T>(value);
+        }
+
+        /// <summary>
+        /// Similar to <see cref="Of{T}"/>, but will treat a null <typeparamref name="T"/> <paramref name="value"/> as <see cref="Empty{T}"/>.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        [ItemNotNull]
+        public static Optional<T> OfNullable<T>([CanBeNull] T value) {
+            return value == null ? default : Of(value);
+        }
+
+        /// <summary>
+        /// A more verbose way to say <c>"default"</c>, if that's what you're into.
+        /// </summary>
+        /// <typeparam name="T">the underlying type of the <see cref="Optional{T}"/></typeparam>
+        /// <returns>an empty <see cref="Optional{T}"/></returns>
+        [ItemNotNull]
+        public static Optional<T> Empty<T>() {
+            return default;
+        }
+
+        /// <summary>
+        /// Executes <paramref name="predicate"/>, and if it returns <c>true</c>, returns the result of <paramref name="supplier"/>.
+        /// </summary>
+        /// <remarks>
+        /// It is possible...sleepy
+        /// TODO: Should this be called `GetIf`...? That sounds more grammatically correct, but the parameters are ordered <paramref name="predicate"/> then <paramref name="supplier"/>...
+        /// </remarks>
+        /// <param name="predicate"></param>
+        /// <param name="supplier"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        [ItemNotNull]
+        public static Optional<T> IfGet<T>([NotNull, InstantHandle] Func<bool> predicate, [NotNull] Func<T> supplier) {
+            return predicate.Invoke() ? Of(supplier.Invoke()) : default;
+        }
+
+        /// <summary>
+        /// Converts an <see cref="IOptional{T}"/> to an <see cref="Optional{T}"/>.
+        /// </summary>
+        /// <remarks>
+        /// Technically, this creates a "new" <see cref="Optional{T}"/> even of the input <paramref name="optional"/> was already an <see cref="Optional{T}"/> -
+        /// this is to mimic the usage of <see cref="Enumerable.ToList{TSource}"/>, etc., which always return new objects.
+        ///
+        /// However, because <see cref="Optional{T}"/> is a <see cref="ValueType"/>, this isn't a particularly meaningful distinction.
+        /// </remarks>
+        /// <param name="optional">this <see cref="IOptional{T}"/></param>
+        /// <typeparam name="T">the type of the underlying value in <paramref name="optional"/></typeparam>
+        /// <returns>a new <see cref="Optional{T}"/> containing the same <see cref="IOptional{T}.Value"/> as <paramref name="optional"/>; or an empty <see cref="Optional{T}"/> if <paramref name="optional"/> was null</returns>
+        [ItemCanBeNull]
+        public static Optional<T> ToOptional<T>([ItemCanBeNull] this IOptional<T>? optional) {
+            return optional switch {
+                null => default,
+                _    => optional.Select(Of).OrElse(default)
+            };
         }
 
         /// <summary>
@@ -46,7 +107,9 @@ namespace BrandonUtils.Standalone.Optional {
         /// <remarks>
         /// Corresponds to Guava's <a href="https://guava.dev/releases/21.0/api/docs/com/google/common/collect/MoreCollectors.html#toOptional--">MoreCollectors.toOptional()</a>.
         /// </remarks>
-        public static Optional<T> ToOptional<T>(this IEnumerable<T> source) {
+        /// <exception cref="InvalidOperationException">if <paramref name="source"/> contains <b>more than one element</b>.</exception>
+        [ItemCanBeNull]
+        public static Optional<T> ToOptional<T>([ItemCanBeNull, InstantHandle] this IEnumerable<T>? source) {
             if (source == null) {
                 return default;
             }
@@ -55,9 +118,82 @@ namespace BrandonUtils.Standalone.Optional {
             return ls.Any() ? Of(ls.Single()) : default;
         }
 
+        #region Flatten
+
         /// <summary>
-        /// Attempts to <see cref="Func{TResult}.Invoke"/> <see cref="functionThatMightFail"/>, returning a <see cref="FailableFunc{TValue,TExcuse}"/>
-        /// that contains either the successful result or the <see cref="IFailableFunc{TValue,TExcuse}.Excuse"/> for failure.
+        /// Reduces a nested <see cref="Optional{T}"/> of <see cref="Optional{T}"/>s into a simple <see cref="Optional{T}"/>.
+        /// </summary>
+        /// <example>
+        /// <code><![CDATA[Optional.Of(Optional.Of(Optional.Of(5))).Flatten() == Optional.Of(5)]]></code>
+        /// </example>
+        /// <param name="optional">a <a href="https://en.wikipedia.org/w/index.php?title=%D0%9C%D0%B0%D1%82%D1%80%D1%91%D1%88%D0%BA%D0%B0">матрёшка</a> <see cref="Optional{T}"/></param>
+        /// <typeparam name="T">the "most reduced" type of the <see cref="Optional{T}"/></typeparam>
+        /// <returns>a single-tier <see cref="Optional{T}"/></returns>
+        [Pure]
+        [ItemCanBeNull]
+        public static Optional<T> Flatten<T>(this Optional<Optional<T>> optional) => optional.OrDefault();
+
+        /**
+         * <inheritdoc cref="Flatten{T}(BrandonUtils.Standalone.Optional.Optional{BrandonUtils.Standalone.Optional.Optional{T}})"/>
+         */
+        [Pure]
+        [ItemCanBeNull]
+        public static Optional<T> Flatten<T>(this Optional<Optional<Optional<T>>> optional) => optional.OrDefault().Flatten();
+
+        /**
+         * <inheritdoc cref="Flatten{T}(BrandonUtils.Standalone.Optional.Optional{BrandonUtils.Standalone.Optional.Optional{T}})"/>
+         */
+        [Pure]
+        [ItemCanBeNull]
+        public static Optional<T> Flatten<T>(this Optional<Optional<Optional<Optional<T>>>> optional) => optional.OrDefault().Flatten();
+
+        /**
+         * <inheritdoc cref="Flatten{T}(BrandonUtils.Standalone.Optional.Optional{BrandonUtils.Standalone.Optional.Optional{T}})"/>
+         */
+        [Pure]
+        [ItemCanBeNull]
+        public static Optional<T> Flatten<T>(this Optional<Optional<Optional<Optional<Optional<T>>>>> optional) => optional.OrDefault().Flatten();
+
+        #endregion
+
+        [Pure]
+        [ItemCanBeNull]
+        [LinqTunnel]
+        public static IOptional<TOut>? Select<TIn, TOut>(
+            [ItemCanBeNull]
+            this IOptional<TIn>? optional,
+            [NotNull] Func<TIn, TOut> selector
+        ) {
+            return optional?.AsEnumerable().Select(selector).ToOptional();
+        }
+
+        /// <summary>
+        /// Provides a "default" <see cref="object.ToString"/> method for <see cref="IOptional{T}"/> implementations to use.
+        /// </summary>
+        /// <param name="optional">an <see cref="IOptional{T}"/></param>
+        /// <param name="settings">optional <see cref="PrettificationSettings"/></param>
+        /// <typeparam name="T">the underlying type of the <see cref="IOptional{T}"/></typeparam>
+        /// <returns>a <see cref="object.ToString"/> representation of the given <see cref="IOptional{T}"/></returns>
+        [NotNull]
+        public static string ToString<T>([ItemCanBeNull] IOptional<T>? optional, PrettificationSettings? settings) {
+            var realType   = optional?.GetType() ?? typeof(T);
+            var prettyType = realType.Prettify(settings);
+            if (optional == null) {
+                return $"({prettyType}){NullPlaceholder}";
+            }
+            else {
+                var valueString = optional.HasValue ? optional.Value.Prettify(settings) : EmptyPlaceholder;
+                return $"{prettyType}[{valueString}]";
+            }
+        }
+
+        #region Failables
+
+        #region FailableFunc
+
+        /// <summary>
+        /// Attempts to <see cref="Func{TResult}.Invoke"/> <see cref="functionThatMightFail"/>, returning a <see cref="FailableFunc{TValue}"/>
+        /// that contains either the successful result or the <see cref="IFailableFunc{TValue}.Excuse"/> for failure.
         /// </summary>
         /// <param name="functionThatMightFail"></param>
         /// <typeparam name="T"></typeparam>
@@ -65,19 +201,69 @@ namespace BrandonUtils.Standalone.Optional {
         /// <example>
         /// TODO: Add an example, but I'm tired right now and when I started writing one instead made <see cref="DayOfWeekExtensions.IsSchoolNight"/>
         /// </example>
-        public static FailableFunc<T> Try<T>(this Func<T> functionThatMightFail) {
+        public static FailableFunc<T> Try<T>([NotNull, InstantHandle] this Func<T> functionThatMightFail) {
+            if (functionThatMightFail == null) {
+                throw new ArgumentNullException(nameof(functionThatMightFail));
+            }
+
             return new FailableFunc<T>(functionThatMightFail);
         }
 
+        public static FailableFunc<TOut> Try<TIn, TOut>(
+            this Func<TIn, TOut> functionThatMightFail,
+            TIn                  input
+        ) {
+            return new FailableFunc<TOut>(() => functionThatMightFail.Invoke(input));
+        }
+
+        public static FailableFunc<TOut> Try<T1, T2, TOut>(
+            this Func<T1, T2, TOut> functionThatMightFail,
+            T1                      arg1,
+            T2                      arg2
+        ) {
+            return new FailableFunc<TOut>(() => functionThatMightFail.Invoke(arg1, arg2));
+        }
+
+        public static FailableFunc<TOut> Try<T1, T2, T3, TOut>(
+            this Func<T1, T2, T3, TOut> functionThatMightFail,
+            T1                          arg1,
+            T2                          arg2,
+            T3                          arg3
+        ) {
+            return new FailableFunc<TOut>(() => functionThatMightFail.Invoke(arg1, arg2, arg3));
+        }
+
+        #endregion
+
+        #region Failable Action
+
         /// <summary>
         /// Attempts to <see cref="Action.Invoke"/> <see cref="actionThatMightFail"/>, returning a <see cref="Failable"/>
-        /// that (might) contain the <see cref="IFailableFunc{TValue,TExcuse}.Excuse"/> for failure.
+        /// that (might) contain the <see cref="IFailableFunc{TValue}.Excuse"/> for failure.
+        /// </summary>
+        /// <param name="actionThatMightFail">the <see cref="Action"/> being executed</param>
+        /// <returns>a <see cref="Failable"/> containing information about execution of the <paramref name="actionThatMightFail"/></returns>
+        public static Failable Try([NotNull, InstantHandle] this Action actionThatMightFail) => new Failable(actionThatMightFail);
+
+        public static Failable Try<T>([NotNull, InstantHandle] this                  Action<T>                  actionThatMightFail, T  argument)                                 => new Failable(() => actionThatMightFail.Invoke(argument));
+        public static Failable Try<T1, T2>([NotNull, InstantHandle] this             Action<T1, T2>             actionThatMightFail, T1 arg1, T2 arg2)                            => new Failable(() => actionThatMightFail.Invoke(arg1, arg2));
+        public static Failable Try<T1, T2, T3>([NotNull, InstantHandle] this         Action<T1, T2, T3>         actionThatMightFail, T1 arg1, T2 arg2, T3 arg3)                   => new Failable(() => actionThatMightFail.Invoke(arg1, arg2, arg3));
+        public static Failable Try<T1, T2, T3, T4>([NotNull, InstantHandle] this     Action<T1, T2, T3, T4>     actionThatMightFail, T1 arg1, T2 arg2, T3 arg3, T4 arg4)          => new Failable(() => actionThatMightFail.Invoke(arg1, arg2, arg3, arg4));
+        public static Failable Try<T1, T2, T3, T4, T5>([NotNull, InstantHandle] this Action<T1, T2, T3, T4, T5> actionThatMightFail, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5) => new Failable(() => actionThatMightFail.Invoke(arg1, arg2, arg3, arg4, arg5));
+
+        /// <summary>
+        /// Attempts to execute this <see cref="Action"/>, capturing <see cref="Exception"/>s and returning a <see cref="Timeable"/>
+        /// that describes what happened.
         /// </summary>
         /// <param name="actionThatMightFail"></param>
         /// <returns></returns>
-        public static Failable Try(this Action actionThatMightFail) {
-            return new Failable(actionThatMightFail);
+        public static Timeable TryTimed([NotNull, InstantHandle] this Action actionThatMightFail) {
+            return new Timeable(actionThatMightFail);
         }
+
+        #endregion
+
+        #endregion
 
         #region GetValueOrDefault
 
@@ -94,28 +280,49 @@ namespace BrandonUtils.Standalone.Optional {
         /// <param name="optional">this <see cref="IOptional{T}"/></param>
         /// <param name="fallback">the return value if this <see cref="CollectionUtils.IsEmpty{T}"/></param>
         /// <returns><see cref="IOptional{T}.Value"/> if it this <see cref="IOptional{T}.HasValue"/>; otherwise, returns <see cref="fallback"/>.</returns>
-        public static T GetValueOrDefault<T>([CanBeNull] [ItemCanBeNull] this IOptional<T> optional, [CanBeNull] T fallback) {
-            return optional is { HasValue: true } ? optional.Value : fallback;
+        [CanBeNull]
+        public static T GetValueOrDefault<T>([ItemCanBeNull] this IOptional<T>? optional, [CanBeNull] T fallback) {
+            return optional?.HasValue == true ? optional.Value : fallback;
+        }
+
+        /**
+         * <inheritdoc cref="GetValueOrDefault{T}(BrandonUtils.Standalone.Optional.IOptional{T},T)"/>
+         */
+        [CanBeNull]
+        public static T OrElse<T>([ItemCanBeNull] this IOptional<T>? optional, [CanBeNull] T fallback) {
+            return optional.GetValueOrDefault(fallback);
+        }
+
+        [CanBeNull]
+        public static T OrDefault<T>([ItemCanBeNull] this IOptional<T>? optional) {
+            return optional.OrElse(default);
         }
 
         /// <summary>
         /// Returns <see cref="IOptional{T}.Value"/> if it is present; otherwise, <see cref="Func{TResult}.Invoke"/>s <see cref="fallbackSupplier"/>.
         /// </summary>
         /// <remarks>
-        /// Corresponds to Java's <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html#orElseGet-java.util.function.Supplier-">Optional.orElseGet()</a>,
-        /// but with C#-style naming that matches <see cref="Nullable{T}"/>.<see cref="Nullable{T}.GetValueOrDefault()"/>.
+        /// Corresponds to:
+        /// Corresponds to Java's <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html#orElseGet-java.util.function.Supplier-">Optional.orElseGet()</a>.
         /// </remarks>
         /// <param name="optional">this <see cref="IOptional{T}"/></param>
         /// <param name="fallbackSupplier">a <see cref="Func{TResult}"/> that produces a <see cref="T"/> if <see cref="IOptional{T}.Value"/> isn't present</param>
         /// <returns><see cref="IOptional{T}.Value"/> if this <see cref="IOptional{T}.HasValue"/>; otherwise, <see cref="Func{TResult}.Invoke"/>s <see cref="fallbackSupplier"/></returns>
-        public static T GetValueOrDefault<T>([CanBeNull] this IOptional<T> optional, [NotNull] Func<T> fallbackSupplier) {
+        [CanBeNull]
+        public static T GetValueOrDefault<T>([ItemCanBeNull] this IOptional<T>? optional, [NotNull] Func<T> fallbackSupplier) {
             if (fallbackSupplier == null) {
                 throw new ArgumentNullException(nameof(fallbackSupplier));
             }
 
-            // woah...this some new-fangled way to say:
-            // return optional != null && optional.HasValue ? optional.Value : fallbackSupplier.Invoke();
-            return optional is { HasValue: true } ? optional.Value : fallbackSupplier.Invoke();
+            return optional?.HasValue == true ? optional.Value : fallbackSupplier.Invoke();
+        }
+
+        /**
+         * <inheritdoc cref="GetValueOrDefault{T}(BrandonUtils.Standalone.Optional.IOptional{T},Func{T})"/>
+         */
+        [CanBeNull]
+        public static T OrElseGet<T>([ItemCanBeNull] this IOptional<T>? optional, [NotNull] Func<T> fallbackSupplier) {
+            return optional.GetValueOrDefault(fallbackSupplier);
         }
 
         #endregion
@@ -127,7 +334,8 @@ namespace BrandonUtils.Standalone.Optional {
         /// <ul>
         /// <li>If <b>both</b> <see cref="a"/> and <see cref="b"/> are <b>empty</b>, then they are considered <b>equal</b>.</li>
         /// <li>If <b>both</b> <see cref="a"/> and <see cref="b"/> are <c>null</c>, then they are considered <b>equal</b>.</li>
-        /// <li>A <c>null</c> <see cref="IOptional{T}"/> is <b><i>NOT</i></b></li> considered equal to an <see cref="IOptional{T}"/> with a <c>null</c> <see cref="IOptional{T}.Value"/>!
+        /// <li>If <b>both</b> <see cref="a"/> and <see cref="b"/> <i><b>contain</b></i> <c>null</c>, then they are considered <b>equal</b>.</li>
+        /// <li>A <c>null</c> <see cref="IOptional{T}"/> is <b><i>NOT</i></b> considered equal to an <see cref="IOptional{T}"/> with a <c>null</c> <see cref="IOptional{T}.Value"/>!</li>
         /// </ul>
         /// </summary>
         /// <remarks>
@@ -142,7 +350,10 @@ namespace BrandonUtils.Standalone.Optional {
         /// <returns>the equality of the underlying <see cref="IOptional{T}.Value"/>s of <see cref="a"/> and <see cref="b"/></returns>
         /// <seealso cref="AreEqual{T}(BrandonUtils.Standalone.Optional.IOptional{T},T)"/>
         /// <seealso cref="AreEqual{T}(T,BrandonUtils.Standalone.Optional.IOptional{T})"/>
-        public static bool AreEqual<T>([CanBeNull] IOptional<T> a, [CanBeNull] IOptional<T> b) {
+        [ContractAnnotation("a:null, b:null => true")]
+        [ContractAnnotation("a:null, b:notnull => false")]
+        [ContractAnnotation("a:notnull, b:null => false")]
+        public static bool AreEqual<T>(IOptional<T>? a, IOptional<T>? b) {
             // return true if EITHER:
             // - a & b are the same object, OR
             // - a & b are both null
@@ -173,7 +384,6 @@ namespace BrandonUtils.Standalone.Optional {
         /// <remarks>
         /// <ul>
         /// <li>A null <see cref="IOptional{T}"/> should <b>not</b> be considered equal to a null <typeparamref name="T"/></li>
-        /// <li>Anm
         /// </ul>
         /// </remarks>
         /// <param name="a">an <see cref="IOptional{T}"/></param>
@@ -182,9 +392,10 @@ namespace BrandonUtils.Standalone.Optional {
         /// <returns>the equality of (<paramref name="a"/>.<see cref="IOptional{T}.Value"/>) and (<paramref name="b"/>)</returns>
         /// <seealso cref="AreEqual{T}(BrandonUtils.Standalone.Optional.IOptional{T},BrandonUtils.Standalone.Optional.IOptional{T})"/>
         /// <seealso cref="AreEqual{T}(T,BrandonUtils.Standalone.Optional.IOptional{T})"/>
-        public static bool AreEqual<T>([CanBeNull] IOptional<T> a, [CanBeNull] T b) {
+        [ContractAnnotation("a:null => false")]
+        public static bool AreEqual<T>(IOptional<T>? a, [CanBeNull] T b) {
             // this method compares the _value_ of `a` to `b`, which means a value has to exist
-            if (ReferenceEquals(a, null)) {
+            if (!(a is { HasValue: true })) {
                 return false;
             }
 
@@ -203,29 +414,38 @@ namespace BrandonUtils.Standalone.Optional {
         /// <returns>the equality of (<paramref name="a"/>) and (<paramref name="b"/>.<see cref="IOptional{T}.Value"/>)</returns>
         /// <seealso cref="AreEqual{T}(BrandonUtils.Standalone.Optional.IOptional{T},BrandonUtils.Standalone.Optional.IOptional{T})"/>
         /// <seealso cref="AreEqual{T}(BrandonUtils.Standalone.Optional.IOptional{T},T)"/>
-        public static bool AreEqual<T>([CanBeNull] T a, [CanBeNull] IOptional<T> b) {
+        [ContractAnnotation("b:null => false")]
+        public static bool AreEqual<T>([CanBeNull] T a, IOptional<T>? b) {
             return AreEqual(b, a);
         }
 
         #endregion AreEqual
 
+        #region IfPresent
+
         /// <summary>
-        /// Provides a "default" <see cref="object.ToString"/> method for <see cref="IOptional{T}"/> implementations to use.
+        /// If this <see cref="IOptional{T}.HasValue"/>, <see cref="Action{T}.Invoke"/> <paramref name="actionIfPresent"/>.
+        /// Otherwise, do nothing.
         /// </summary>
-        /// <param name="optional">an <see cref="IOptional{T}"/></param>
-        /// <typeparam name="T">the underlying type of the <see cref="IOptional{T}"/></typeparam>
-        /// <returns>a <see cref="object.ToString"/> representation of the given <see cref="IOptional{T}"/></returns>
-        public static string ToString<T>([CanBeNull] IOptional<T> optional) {
-            var realType   = optional?.GetType() ?? typeof(T);
-            var prettyType = realType.Prettify();
-            if (optional == null) {
-                return $"({prettyType}){NullPlaceholder}";
-            }
-            else {
-                var valueString = optional.HasValue ? optional.Value.Prettify() : EmptyPlaceholder;
-                return $"{prettyType}[{valueString}]";
+        /// <param name="optional">this <see cref="IOptional{T}"/></param>
+        /// <param name="actionIfPresent">an action performed on <see cref="IOptional{T}.Value"/> if this <see cref="IOptional{T}.HasValue"/></param>
+        /// <typeparam name="T">the underlying type of this <see cref="IOptional{T}"/></typeparam>
+        public static void IfPresent<T>([ItemCanBeNull] this IOptional<T>? optional, [NotNull] Action<T> actionIfPresent) {
+            if (optional?.HasValue == true) {
+                actionIfPresent.Invoke(optional.Value);
             }
         }
+
+        /**
+         * <inheritdoc cref="IfPresent{T}(BrandonUtils.Standalone.Optional.IOptional{T},System.Action{T})"/>
+         */
+        public static void IfPresent<T>([CanBeNull] this T? nullable, Action<T> actionIfPresent) where T : struct {
+            if (nullable.HasValue) {
+                actionIfPresent.Invoke(nullable.Value);
+            }
+        }
+
+        #endregion
 
         #region IfPresentOrElse
 
@@ -265,12 +485,12 @@ namespace BrandonUtils.Standalone.Optional {
         /// </remarks>
         /// <param name="optional">this <see cref="IOptional{T}"/></param>
         /// <param name="ifPresent">the "mapping" <see cref="Func{TIn, TResult}"/> to run if this <see cref="IOptional{T}.HasValue"/></param>
-        /// <param name="orElse">the <see cref="Func{TResult}"/> that generates the "default" / "fallback" value when this <see cref="IsEmpty{T}(BrandonUtils.Standalone.Optional.IOptional{T})"/></param>
+        /// <param name="orElse">the <see cref="Func{TResult}"/> that generates the "default" / "fallback" value when this <see cref="IsEmpty{T}"/></param>
         /// <typeparam name="TIn">the underlying type of the original <see cref="IOptional{T}"/></typeparam>
         /// <typeparam name="TOut">the resulting type</typeparam>
         /// <returns></returns>
-        public static TOut IfPresentOrElse<TIn, TOut>(this IOptional<TIn> optional, Func<TIn, TOut> ifPresent, Func<TOut> orElse) {
-            return optional.HasValue ? ifPresent.Invoke(optional.Value) : orElse.Invoke();
+        public static TOut IfPresentOrElse<TIn, TOut>(this IOptional<TIn>? optional, Func<TIn, TOut> ifPresent, Func<TOut> orElse) {
+            return optional?.HasValue == true ? ifPresent.Invoke(optional.Value) : orElse.Invoke();
         }
 
         /// <summary>
@@ -282,10 +502,10 @@ namespace BrandonUtils.Standalone.Optional {
         /// </remarks>
         /// <param name="optional">this <see cref="IOptional{T}"/></param>
         /// <param name="ifPresent">the <see cref="Action{T}"/> to run if this <see cref="IOptional{T}.HasValue"/></param>
-        /// <param name="orElse">the parameterless <see cref="Action"/> to run if this <see cref="IsEmpty{T}(BrandonUtils.Standalone.Optional.IOptional{T})"/></param>
+        /// <param name="orElse">the parameterless <see cref="Action"/> to run if this <see cref="IsEmpty{T}"/></param>
         /// <typeparam name="TIn">the underlying type of this <see cref="Optional{T}"/></typeparam>
-        public static void IfPresentOrElse<TIn>(this IOptional<TIn> optional, Action<TIn> ifPresent, Action orElse) {
-            if (optional.HasValue) {
+        public static void IfPresentOrElse<TIn>(this IOptional<TIn>? optional, Action<TIn> ifPresent, Action orElse) {
+            if (optional?.HasValue == true) {
                 ifPresent.Invoke(optional.Value);
             }
             else {
@@ -340,11 +560,6 @@ namespace BrandonUtils.Standalone.Optional {
 
         #region IsEmpty
 
-        /// <returns>negation of <see cref="IOptional{T}.HasValue"/></returns>
-        // public static bool IsEmpty<T>(this IOptional<T> optional) {
-        //     return !optional.HasValue;
-        // }
-
         /// <returns>negation of <see cref="Nullable{T}.HasValue"/></returns>
         [ContractAnnotation("null => true")]
         [ContractAnnotation("notnull => false")]
@@ -354,25 +569,155 @@ namespace BrandonUtils.Standalone.Optional {
 
         #endregion IsEmpty
 
-        #region Function Fallbacks
+        #region FirstWithValue
 
-        public static Optional<TOut> FirstWithValue<TOut>(IEnumerable<Func<Optional<TOut>>> functions) {
-            return functions.Select(fn => fn.Invoke())
+        /// <summary>
+        /// Returns the <see cref="Enumerable.First{TSource}(System.Collections.Generic.IEnumerable{TSource})"/> entry from <paramref name="optionals"/>
+        /// that <see cref="IOptional{T}.HasValue"/>.
+        /// </summary>
+        /// <param name="optionals">a sequence of <see cref="Optional{T}"/>s</param>
+        /// <typeparam name="T">the underlying type of the <see cref="Optional{T}"/>s</typeparam>
+        /// <returns>the first <see cref="Optional{T}"/> that <see cref="Optional{T}.HasValue"/>; or an empty <see cref="Optional{T}"/> if no values were found</returns>
+        [ItemCanBeNull]
+        public static Optional<T> FirstWithValue<T>(
+            [NotNull] this IEnumerable<Optional<T>> optionals
+        ) {
+            return optionals.FirstOrDefault(it => it.HasValue);
+        }
+
+        #region 0 args (Func<TOut>)
+
+        public static Optional<TOut> FirstWithValue<TOut>(
+            [NotNull, ItemNotNull, InstantHandle]
+            IEnumerable<Func<Optional<TOut>>> functions
+        ) {
+            if (functions == null) {
+                throw new ArgumentNullException(nameof(functions));
+            }
+
+            return functions.Select(fn => fn.MustNotBeNull().Invoke())
                             .FirstOrDefault(it => it.HasValue);
         }
 
-        public static Optional<TOut> FirstWithValue<TOut>(params Func<Optional<TOut>>[] functions) {
-            return FirstWithValue(functions as IEnumerable<Func<Optional<TOut>>>);
+        public static Optional<TOut> FirstWithValue<TOut>(
+            [NotNull, ItemNotNull]
+            params Func<Optional<TOut>>[] functions
+        ) {
+            if (functions == null) {
+                throw new ArgumentNullException(nameof(functions));
+            }
+
+            return FirstWithValue(functions.AsEnumerable());
         }
 
-        public static Optional<TOut> FirstWithValue<TIn, TOut>(TIn input, IEnumerable<Func<TIn, Optional<TOut>>> functions) {
-            return functions.Select(fn => fn.Invoke(input))
-                            .FirstOrDefault(it => it.HasValue);
+        #endregion
+
+        #region 1 arg (Func<TIn, TOut>)
+
+        public static Optional<TOut> FirstWithValue<TIn, TOut>(
+            [CanBeNull] TIn input,
+            [NotNull, ItemNotNull, InstantHandle]
+            IEnumerable<Func<TIn, Optional<TOut>>> functions
+        ) {
+            if (functions == null) {
+                throw new ArgumentNullException(nameof(functions));
+            }
+
+            return functions.Select(fn => fn.MustNotBeNull().Invoke(input))
+                            .FirstWithValue();
         }
 
-        public static Optional<TOut> FirstWithValue<TIn, TOut>(TIn input, params Func<TIn, Optional<TOut>>[] functions) {
-            return FirstWithValue(input, functions as IEnumerable<Func<TIn, Optional<TOut>>>);
+        public static Optional<TOut> FirstWithValue<TIn, TOut>(
+            [CanBeNull] TIn input,
+            [NotNull, ItemNotNull]
+            params Func<TIn, Optional<TOut>>[] functions
+        ) {
+            if (functions == null) {
+                throw new ArgumentNullException(nameof(functions));
+            }
+
+            return FirstWithValue(input, functions.AsEnumerable());
         }
+
+        #endregion
+
+        #region 2 args (Func<T1, T2, TOut>)
+
+        public static Optional<TOut> FirstWithValue<T1, T2, TOut>(
+            (T1 arg1, T2 arg2) args,
+            [NotNull, ItemNotNull, InstantHandle]
+            IEnumerable<Func<T1, T2, Optional<TOut>>> functions
+        ) {
+            if (functions == null) {
+                throw new ArgumentNullException(nameof(functions));
+            }
+
+            return functions.Select(fn => fn.MustNotBeNull().Invoke(args))
+                            .FirstWithValue();
+        }
+
+        public static Optional<TOut> FirstWithValue<T1, T2, TOut>(
+            (T1 arg1, T2 arg2) args,
+            [NotNull, ItemNotNull]
+            params Func<T1, T2, Optional<TOut>>[] functions
+        ) {
+            if (functions == null) {
+                throw new ArgumentNullException(nameof(functions));
+            }
+
+            return FirstWithValue(args, functions.AsEnumerable());
+        }
+
+        #endregion
+
+        #region 3 args (Func<T1, T2, T3, TOut>)
+
+        public static Optional<TOut> FirstWithValue<T1, T2, T3, TOut>(
+            (T1 arg1, T2 arg2, T3 arg3) args,
+            [NotNull, ItemNotNull, InstantHandle]
+            IEnumerable<Func<T1, T2, T3, Optional<TOut>>> functions
+        ) {
+            if (functions == null) {
+                throw new ArgumentNullException(nameof(functions));
+            }
+
+            return functions.Select(it => it.Invoke(args))
+                            .FirstWithValue();
+        }
+
+        public static Optional<TOut> FirstWithValue<T1, T2, T3, TOut>(
+            (T1 arg1, T2 arg2, T3 arg3) args,
+            [NotNull, ItemNotNull]
+            params Func<T1, T2, T3, Optional<TOut>>[] functions
+        ) {
+            if (functions == null) {
+                throw new ArgumentNullException(nameof(functions));
+            }
+
+            return FirstWithValue(args, functions.AsEnumerable());
+        }
+
+        #endregion
+
+        #region 😱 DYNAMIC
+
+        public static Optional<TResult> FirstWithValue<TDelegate, TResult>(
+            [NotNull, ItemNotNull]
+            IEnumerable<TDelegate> delegates,
+            params object[] inputs
+        ) where TDelegate : Delegate {
+            foreach (var dg in delegates) {
+                var result = dg.DynamicInvoke(inputs);
+
+                if (result is Optional<TResult> { HasValue: true } or) {
+                    return or;
+                }
+            }
+
+            return default;
+        }
+
+        #endregion
 
         #endregion Function Fallbacks
     }

@@ -7,6 +7,40 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [2.35.1]
+
+### Added
+
+- `Mathb`
+  - `IsWhole()`
+  - `ShiftDecimal()`
+  - `Squared()`
+  - `Cubed()`
+  - `Pow()`
+  - `AsInt()`
+  - `AsLong()`
+- `LambdaExtensions.Invoke(Tuple)`
+
+## [2.34.1] - 10/20/21
+
+### Added
+
+- `Brandom.cs`
+  - `NextDoubleInclusive`
+  - Fleshed out primitive types & aligned method names and structures:
+    - `Int()`
+    - `Long()`
+    - `Float()`
+    - `Double()`
+    - `Decimal()`
+    - `DateTime()`
+    - `TimeSpan()`
+- `PrimitiveUtils.To{x}` extensions
+
+### Changed
+
+- Refactored `Brandom` methods into `System.Random` _extensions_ (that default to `Brandom.Gen`)
+
 ## [2.33.2] - 9/30/2021
 
 ### Added

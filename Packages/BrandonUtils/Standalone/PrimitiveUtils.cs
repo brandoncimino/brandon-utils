@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -18,7 +18,7 @@ namespace BrandonUtils.Standalone {
         /// <param name="boolean">a <see cref="bool"/></param>
         /// <returns><c>0</c> if the <see cref="bool"/> is <c>false</c>; <c>1</c> if the <see cref="bool"/> is <c>true</c></returns>
         [Pure]
-        public static int Int(this bool boolean) {
+        public static int ToInt(this bool boolean) {
             return Convert.ToInt32(boolean);
         }
 
@@ -79,31 +79,47 @@ namespace BrandonUtils.Standalone {
         /// <summary>
         /// See <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/integral-numeric-types">Integral Numeric Types</a>
         /// </summary>
-        private static readonly ReadOnlyCollection<Type> IntegralTypes = Array.AsReadOnly(
-            new[] { typeof(byte), typeof(sbyte), typeof(ushort), typeof(short), typeof(int), typeof(uint), typeof(long), typeof(ulong), }
-        );
+        private static readonly IReadOnlyCollection<Type> IntegralTypes = new HashSet<Type>() {
+            typeof(byte),
+            typeof(sbyte),
+            typeof(short),
+            typeof(ushort),
+            typeof(int),
+            typeof(uint),
+            typeof(long),
+            typeof(ulong),
+        };
 
         /// <summary>
         /// See <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/floating-point-numeric-types">Floating-Point Numeric Types</a>
         /// </summary>
-        private static readonly ReadOnlyCollection<Type> FloatingPointTypes = Array.AsReadOnly(
-            new[] { typeof(float), typeof(double), typeof(decimal) }
-        );
+        private static readonly IReadOnlyCollection<Type> FloatingPointTypes = new HashSet<Type>() {
+            typeof(float),
+            typeof(double),
+            typeof(decimal)
+        };
 
         /// <summary>
         /// Both <see cref="IntegralTypes"/> and <see cref="FloatingPointTypes"/>.
         /// </summary>
-        public static readonly ReadOnlyCollection<Type> NumericTypes = FloatingPointTypes.Union(IntegralTypes).ToList().AsReadOnly();
+        public static readonly IReadOnlyCollection<Type> NumericTypes = new HashSet<Type>(IntegralTypes.Union(FloatingPointTypes));
+
         /// <summary>
         /// Special <see cref="NumericTypes"/> that are automatically cast to <see cref="Int32"/> when used in <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/arithmetic-operators">arithmetic</a>.
         /// </summary>
-        public static readonly ReadOnlyCollection<Type> PseudoIntTypes = Array.AsReadOnly(new[] { typeof(byte), typeof(sbyte), typeof(short), typeof(ushort) });
+        public static readonly IReadOnlyCollection<Type> PseudoIntTypes = new HashSet<Type>() {
+            typeof(byte),
+            typeof(sbyte),
+            typeof(short),
+            typeof(ushort)
+        };
 
         /// <summary>
         /// Returns whether or not the given <see cref="value"/> is one of the <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/integral-numeric-types">integral numeric types</a> or <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/floating-point-numeric-types">floating-point numeric types</a>.
         /// </summary>
         /// <param name="value">some random junk</param>
-        /// <returns>true if the value is of a numeric type</returns>
+        /// <returns>true if the value is assignable to any of the <see cref="NumericTypes"/></returns>
+        [ContractAnnotation("null => stop")]
         public static bool IsNumber([NotNull] this object value) {
             if (value == null) {
                 throw new ArgumentNullException(nameof(value));
@@ -124,6 +140,37 @@ namespace BrandonUtils.Standalone {
         [SuppressMessage("ReSharper", "InconsistentNaming")]
         public static bool NOT(this bool value) {
             return !value;
+        }
+
+        #endregion
+
+        #region Convert.To{x}
+
+        public static short   ToShort([CanBeNull] this   object obj) => Convert.ToInt16(obj);
+        public static ushort  ToUShort([CanBeNull] this  object obj) => Convert.ToUInt16(obj);
+        public static int     ToInt([CanBeNull] this     object obj) => Convert.ToInt32(obj);
+        public static uint    ToUInt([CanBeNull] this    object obj) => Convert.ToUInt32(obj);
+        public static long    ToLong([CanBeNull] this    object obj) => Convert.ToInt64(obj);
+        public static ulong   ToULong([CanBeNull] this   object obj) => Convert.ToUInt64(obj);
+        public static float   ToFloat([CanBeNull] this   object obj) => Convert.ToSingle(obj);
+        public static double  ToDouble([CanBeNull] this  object obj) => Convert.ToDouble(obj);
+        public static decimal ToDecimal([CanBeNull] this object obj) => Convert.ToDecimal(obj);
+        public static byte    ToByte([CanBeNull] this    object obj) => Convert.ToByte(obj);
+        public static sbyte   ToSByte([CanBeNull] this   object obj) => Convert.ToSByte(obj);
+        public static bool    ToBool([CanBeNull] this    object obj) => Convert.ToBoolean(obj);
+
+        #endregion
+
+        #region Icons
+
+        private const string TrueIcon  = "✅";
+        private const string FalseIcon = "❌";
+
+        /// <param name="value">a <see cref="bool"/></param>
+        /// <returns>either <see cref="TrueIcon"/> or <see cref="FalseIcon"/></returns>
+        [NotNull]
+        public static string Icon(this bool value) {
+            return value ? TrueIcon : FalseIcon;
         }
 
         #endregion

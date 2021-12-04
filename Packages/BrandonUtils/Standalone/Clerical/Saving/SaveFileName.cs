@@ -53,7 +53,7 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
                 return new SaveFileName() {
                     Nickname      = match.Groups[NicknameGroup.GroupName].Value,
                     TimeStamp     = new DateTime(long.Parse(match.Groups[TimeStampGroup.GroupName].Value)),
-                    FullExtension = match.Groups[NicknameGroup.GroupName].Value,
+                    FullExtension = match.Groups[BPath.ExtensionGroup.GroupName].Value,
                 };
             }
             else {
@@ -66,7 +66,7 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
         }
 
         [ContractAnnotation("null => stop")]
-        private static string Validate_Nickname([CanBeNull] string nickname) {
+        private static string Validate_Nickname(string? nickname) {
             if (nickname.IsNullOrEmpty()) {
                 throw new ArgumentNullException(nameof(nickname), $"Must not be null or empty, but was [{nickname}]!");
             }

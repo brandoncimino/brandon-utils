@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 using BrandonUtils.Standalone.Enums;
@@ -113,5 +115,28 @@ namespace BrandonUtils.Tests.Standalone.Collections {
                 Is.Not.EqualTo(values)
             );
         }
+
+        #region ReadOnlyEnumSet
+
+        [Test]
+        public void enumExc() {
+            throw new NotImplementedException("I don't think this test is finished...what was I trying to do?");
+            var excepts = new Dictionary<string, string>() {
+                ["arg(null, null)"]     = new ArgumentException(null,   (string)null).Message,
+                ["arg(null, yolo)"]     = new ArgumentException(null,   "yolo").Message,
+                ["arg(yolo, null)"]     = new ArgumentException("yolo", (string)null).Message,
+                ["earg(null, -1, DoW)"] = new InvalidEnumArgumentException(null,   -1, typeof(DayOfWeek)).Message,
+                ["earg(null,null)"]     = new InvalidEnumArgumentException(null,   null).Message,
+                ["earg(yolo,null)"]     = new InvalidEnumArgumentException("yolo", null).Message,
+                ["earg(null,npe)"]      = new InvalidEnumArgumentException(null,   new ArgumentNullException()).Message
+            };
+            foreach (var pair in excepts) {
+                Console.WriteLine($"\n{pair.Key} = {pair.Value}");
+            }
+            // throw new ArgumentException(null, (string)null);
+            // throw new InvalidEnumArgumentException(null, -1, typeof(DayOfWeek));
+        }
+
+        #endregion
     }
 }

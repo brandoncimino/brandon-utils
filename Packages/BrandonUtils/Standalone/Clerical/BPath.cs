@@ -21,13 +21,16 @@ namespace BrandonUtils.Standalone.Clerical {
         internal static readonly RegexGroup ExtensionGroup            = new RegexGroup(nameof(ExtensionGroup), @"(\.[^.]+?)+$");
         internal static readonly char[]     Separators                = Enum.GetValues(typeof(DirectorySeparator)).Cast<DirectorySeparator>().Select(DirectorySeparatorExtensions.ToChar).ToArray();
         internal static readonly Regex      DirectorySeparatorPattern = new Regex(@"[\\\/]");
+        internal static readonly string     OpenFolderIcon            = "📂";
+        internal static readonly string     ClosedFolderIcon          = "📁";
+        internal static readonly string     FileIcon                  = "📄";
 
-        public static Failable ValidatePath([CanBeNull] string maybePath) {
+        public static Failable ValidatePath(string? maybePath) {
             Action action = () => _ = Path.GetFullPath(maybePath!);
             return action.Try();
         }
 
-        public static Failable ValidateFileName([CanBeNull] string maybeFileName) {
+        public static Failable ValidateFileName(string? maybeFileName) {
             Action action = () => {
                 ValidateFileNameCharacters(maybeFileName);
                 _ = Path.GetFullPath(maybeFileName!);
@@ -36,7 +39,7 @@ namespace BrandonUtils.Standalone.Clerical {
         }
 
         [ContractAnnotation("null => stop")]
-        private static void ValidateFileNameCharacters([CanBeNull] string maybeFileName) {
+        private static void ValidateFileNameCharacters(string? maybeFileName) {
             if (maybeFileName == null) {
                 throw new ArgumentNullException($"The string [{maybeFileName.ToString(Prettification.DefaultNullPlaceholder)}] wasn't a valid filename: it was blank!");
             }
@@ -48,12 +51,12 @@ namespace BrandonUtils.Standalone.Clerical {
         }
 
         [ContractAnnotation("null => false")]
-        public static bool IsValidPath([CanBeNull] string maybePath) {
+        public static bool IsValidPath(string? maybePath) {
             return ValidatePath(maybePath).Failed == false;
         }
 
         [ContractAnnotation("null => false")]
-        public static bool IsValidFileName([CanBeNull] string maybeFileName) {
+        public static bool IsValidFileName(string? maybeFileName) {
             return ValidateFileName(maybeFileName).Failed == false;
         }
 
@@ -64,9 +67,8 @@ namespace BrandonUtils.Standalone.Clerical {
         /// <remarks>This uses the <see cref="ExtensionGroup"/> <see cref="RegexGroup"/> for matching.</remarks>
         /// <param name="path">a path or file name</param>
         /// <returns><b>all</b> of the extensions at the end of the <paramref name="path"/></returns>
-        [CanBeNull]
         [ContractAnnotation("path:null => null")]
-        public static string[] GetExtensions([CanBeNull] string path) {
+        public static string[]? GetExtensions(string? path) {
             if (path == null) {
                 return null;
             }
@@ -77,9 +79,8 @@ namespace BrandonUtils.Standalone.Clerical {
                    .ToArray();
         }
 
-        [CanBeNull]
         [ContractAnnotation("path:null => null")]
-        public static string GetFullExtension([CanBeNull] string path) {
+        public static string? GetFullExtension(string? path) {
             if (path == null) {
                 return null;
             }
@@ -90,9 +91,8 @@ namespace BrandonUtils.Standalone.Clerical {
                        .Value;
         }
 
-        [CanBeNull]
         [ContractAnnotation("path:null => null")]
-        public static string GetFileNameWithoutExtensions([CanBeNull] string path) {
+        public static string? GetFileNameWithoutExtensions(string? path) {
             if (path == null) {
                 return null;
             }
@@ -103,17 +103,17 @@ namespace BrandonUtils.Standalone.Clerical {
         }
 
         [ContractAnnotation("null => false")]
-        public static bool EndsWithSeparator([CanBeNull] string path) {
+        public static bool EndsWithSeparator(string? path) {
             return path.EndsWith(DirectorySeparatorPattern);
         }
 
         [ContractAnnotation("null => false")]
-        public static bool StartsWithSeparator([CanBeNull] string path) {
+        public static bool StartsWithSeparator(string? path) {
             return path.StartsWith(DirectorySeparatorPattern);
         }
 
         [NotNull]
-        public static string EnsureTrailingSeparator([CanBeNull] string path, DirectorySeparator separator = DirectorySeparator.Universal) {
+        public static string EnsureTrailingSeparator(string? path, DirectorySeparator separator = DirectorySeparator.Universal) {
             if (path == null) {
                 return separator.ToCharString();
             }
@@ -127,7 +127,7 @@ namespace BrandonUtils.Standalone.Clerical {
         }
 
         [NotNull]
-        public static string StripLeadingSeparator([CanBeNull] string path, DirectorySeparator separator = DirectorySeparator.Universal) {
+        public static string StripLeadingSeparator(string? path, DirectorySeparator separator = DirectorySeparator.Universal) {
             if (path == null) {
                 return "";
             }
@@ -140,22 +140,22 @@ namespace BrandonUtils.Standalone.Clerical {
         }
 
         [NotNull]
-        public static string NormalizeSeparators([CanBeNull] string path, DirectorySeparator separator = DirectorySeparator.Universal) {
+        public static string NormalizeSeparators(string? path, DirectorySeparator separator = DirectorySeparator.Universal) {
             return path.IsBlank() ? "" : DirectorySeparatorPattern.Replace(path.Trim(), separator.ToCharString());
         }
 
         [NotNull]
         public static string JoinPath(
-            [CanBeNull] string parent,
-            [CanBeNull] string child
+            string?    parent,
+            string? child
         ) {
             return JoinPath(parent, child, default(DirectorySeparator));
         }
 
         [NotNull]
         public static string JoinPath(
-            [CanBeNull] string parent,
-            [CanBeNull] string child,
+            string?            parent,
+            string?         child,
             DirectorySeparator separator
         ) {
             parent = parent?.Trim().TrimEnd(DirectorySeparatorPattern);
@@ -166,20 +166,20 @@ namespace BrandonUtils.Standalone.Clerical {
 
         [NotNull]
         public static string JoinPath(
-            [CanBeNull] DirectoryInfo parentDirectory,
-            [CanBeNull] string        child,
-            DirectorySeparator        separator = DirectorySeparator.Universal
+            DirectoryInfo?     parentDirectory,
+            string?         child,
+            DirectorySeparator separator = DirectorySeparator.Universal
         ) {
             return JoinPath(parentDirectory?.FullName, child, separator);
         }
 
         [NotNull]
-        public static string JoinPath([CanBeNull, ItemCanBeNull] params string[] parts) {
+        public static string JoinPath(params string?[]? parts) {
             return JoinPath(parts, default(DirectorySeparator));
         }
 
         [NotNull]
-        public static string JoinPath([CanBeNull, ItemCanBeNull] IEnumerable<string> parts, DirectorySeparator separator = DirectorySeparator.Universal) {
+        public static string JoinPath(IEnumerable<string?>? parts, DirectorySeparator separator = DirectorySeparator.Universal) {
             return parts?.Aggregate((pathSoFar, nextPart) => JoinPath(pathSoFar, nextPart, separator)) ?? "";
         }
     }

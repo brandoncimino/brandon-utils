@@ -32,6 +32,7 @@ namespace BrandonUtils.Testing {
     /// <b>NOTE 3:</b> Maybe I will keep this, 'cus stupid <a href="https://docs.nunit.org/articles/nunit/writing-tests/assertions/multiple-asserts.html">NUnit Assert.Multiple()</a> doesn't handle non-<see cref="AssertionException"/>s!!
     /// </remarks>
     [PublicAPI]
+    [Obsolete("Please use the Asserter class instead")]
     public static class AssertAll {
         /// <summary>
         /// <see cref="Action.Invoke"/>s each of the provided <see cref="Action"/>s, returning <b>all</b> of the failures.

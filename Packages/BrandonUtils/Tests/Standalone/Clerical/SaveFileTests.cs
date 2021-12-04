@@ -18,7 +18,7 @@ namespace BrandonUtils.Tests.Standalone.Clerical {
                     saveFile,
                     Has.Property(nameof(saveFile.Nickname)).EqualTo(expectedName),
                     Has.Property(nameof(saveFile.TimeStamp)).EqualTo(expectedTimeStamp),
-                    Has.Property(nameof(saveFile.Name)).EqualTo($"{expectedName}_{expectedTimeStamp.Ticks}{SaveFileName.DefaultExtension}")
+                    Has.Property(nameof(saveFile.FileSystemInfo)).With.Property(nameof(FileSystemInfo.Name)).EqualTo($"{expectedName}_{expectedTimeStamp.Ticks}{SaveFileName.DefaultExtension}")
                 );
             }
         }
@@ -32,7 +32,6 @@ namespace BrandonUtils.Tests.Standalone.Clerical {
             AssertAll.Of(
                 () => Assert.That(saveFile, Has.Property(nameof(saveFile.Data)).Null),
                 () => Assert.That(saveFile, Has.Property(nameof(saveFile.File)).Not.Exist),
-                () => Assert.That(saveFile, Has.Property(nameof(saveFile.Exists)).False),
                 () => Validate.SaveFile_Basic(saveFile, nickname, bDay)
             );
 
@@ -41,7 +40,6 @@ namespace BrandonUtils.Tests.Standalone.Clerical {
             AssertAll.Of(
                 () => Assert.That(saveFile, Has.Property(nameof(saveFile.Data)).Null),
                 () => Assert.That(saveFile, Has.Property(nameof(saveFile.File)).Exist),
-                () => Assert.That(saveFile, Has.Property(nameof(saveFile.Exists)).True),
                 () => Validate.SaveFile_Basic(saveFile, nickname, bDay)
             );
         }
@@ -54,14 +52,14 @@ namespace BrandonUtils.Tests.Standalone.Clerical {
 
             Asserter.Against(saveFile)
                     .And(Has.Property(nameof(saveFile.Data)).Not.Null)
-                    .And(Has.Property(nameof(saveFile.Exists)).False)
+                    .And(Has.Property(nameof(saveFile.FileSystemInfo)).Not.Exist)
                     .Invoke();
 
             saveFile.Save();
 
             Asserter.Against(saveFile)
                     .And(Has.Property(nameof(saveFile.Data)).Not.Null)
-                    .And(Has.Property(nameof(saveFile.Exists)).True)
+                    .And(Has.Property(nameof(saveFile.FileSystemInfo)).Exist)
                     .Invoke();
         }
 

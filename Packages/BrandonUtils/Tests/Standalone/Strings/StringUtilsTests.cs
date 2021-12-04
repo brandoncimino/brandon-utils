@@ -119,9 +119,9 @@ b
 b
 a3",
             @"a1
-...(2/7 lines omitted)
+…(2/7 lines omitted)
 a2
-...(2/7 lines omitted)
+…(2/7 lines omitted)
 a3"
         )]
         [TestCase(
@@ -132,7 +132,7 @@ b
 b
 b",
             @"a1
-...(5/6 lines omitted)"
+…(5/6 lines omitted)"
         )]
         [TestCase(
             @"b
@@ -140,9 +140,9 @@ b
 a
 b
 b",
-            @"...(2/5 lines omitted)
+            @"…(2/5 lines omitted)
 a
-...(2/5 lines omitted)"
+…(2/5 lines omitted)"
         )]
         [TestCase(
             @"b
@@ -150,11 +150,11 @@ a
 b
 a
 b",
-            @"...
+            @"…
 a
-...
+…
 a
-..."
+…"
         )]
         public void CollapseLines(string lines, string expected) {
             var split     = lines.SplitLines();

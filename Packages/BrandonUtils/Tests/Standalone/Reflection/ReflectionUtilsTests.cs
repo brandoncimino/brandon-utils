@@ -1,11 +1,20 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 
+using BrandonUtils.Standalone;
+using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Reflection;
+using BrandonUtils.Standalone.Strings;
+using BrandonUtils.Standalone.Strings.Prettifiers;
+using BrandonUtils.Testing;
 
 using NUnit.Framework;
+
+using Is = NUnit.Framework.Is;
 
 // ReSharper disable MemberCanBePrivate.Local
 // ReSharper disable UnusedAutoPropertyAccessor.Local
@@ -246,6 +255,10 @@ namespace BrandonUtils.Tests.Standalone.Reflection {
             Assert.That(backingField, Has.Property(nameof(MemberInfo.Name)).EqualTo(propertyWithBackingField.BackingFieldName), $"Found a backing field for {propertyWithBackingField}, but it wasn't named {propertyWithBackingField.BackingFieldName}");
         }
 
+        /// <summary>
+        /// TODO: Revisit this test, taking advantage of the <see cref="System.Runtime.CompilerServices.CompilerGeneratedAttribute"/>
+        /// </summary>
+        /// <param name="propertyWithBackingField"></param>
         [Test]
         public void IsBackingField(
             [ValueSource(nameof(AllProperties))]
@@ -309,6 +322,274 @@ namespace BrandonUtils.Tests.Standalone.Reflection {
                    .And.Property(nameof(Constructibles.OptionalParamConstructor.OptionalWasProvided))
                    .True
             );
+        }
+
+        #endregion
+
+        #region Type Ancestry
+
+        [TestCase(
+            new[] { typeof(List<object>), typeof(IList<object>), typeof(IEnumerable<object>) },
+            typeof(IEnumerable<object>)
+        )]
+        [TestCase(
+            new[] {
+                typeof(int),
+                typeof(string)
+            },
+            typeof(IComparable)
+        )]
+        [TestCase(
+            new[] {
+                typeof(List<object>),
+                typeof(Collection<object>)
+            },
+            typeof(IList<object>)
+        )]
+        public void MostCommonType(Type[] types, Type expectedType) {
+            var ass = Asserter.WithHeading($"{nameof(MostCommonType)} for: {types.Prettify()}");
+
+            new[] {
+                (types, "Forward"),
+                (types.Randomize(), "Random"),
+                (types.Reverse(), "Reversed")
+            }.ForEach(
+                it => {
+                    var (typeList, message) = it;
+                    ass.And(() => Assert.That(ReflectionUtils.CommonType(typeList), Is.EqualTo(expectedType), message));
+                }
+            );
+
+            ass.Invoke();
+        }
+
+        public static IEnumerable<KeyValuePair<Type, IEnumerable<Type>>> AllInterfaceExpectations() {
+            return InterfaceExpectations.ExpectedTypes;
+        }
+
+        [Test]
+        public void AllInterfacesTest([ValueSource(nameof(AllInterfaceExpectations))] KeyValuePair<Type, IEnumerable<Type>> expectation) {
+            Assert.That(ReflectionUtils.GetAllInterfaces(expectation.Key).ToList(), Is.EquivalentTo(expectation.Value.Where(it => it.IsInterface).ToList()));
+        }
+
+        [Test]
+        [TestCase(typeof(Duckmobile), typeof(TrainCar), new[] { typeof(ILand), typeof(ICar), typeof(IVehicle) })]
+        public void CommonInterface(Type a, Type b, Type[] expectedOptions) {
+            var actual = ReflectionUtils.CommonInterfaces(a, b);
+
+            Assert.That(actual, Is.EquivalentTo(expectedOptions));
+        }
+
+        #endregion
+
+        #region Assignability (inheritance)
+
+        public class SuperList<T> : List<T> { }
+
+        public class IntList : List<int> { }
+
+        public class SuperIntList : SuperList<int> { }
+
+        [Test]
+        [TestCase(typeof(int[]),                     Should.Pass)]
+        [TestCase(typeof(string),                    Should.Pass)]
+        [TestCase(typeof(KeyedList<int, DayOfWeek>), Should.Pass)]
+        [TestCase(typeof(int),                       Should.Fail)]
+        [TestCase(typeof(int[][][]),                 Should.Pass)]
+        [TestCase(typeof(IEnumerable<object>),       Should.Pass)]
+        [TestCase(typeof(IEnumerable<>),             Should.Pass)]
+        [TestCase(typeof(List<List<int[]>>),         Should.Pass)]
+        [TestCase(typeof(IList<List<object>>),       Should.Pass)]
+        [TestCase(typeof(IDictionary<,>),            Should.Pass)]
+        [TestCase(typeof(SuperList<>),               Should.Pass)]
+        [TestCase(typeof(SuperList<int>),            Should.Pass)]
+        [TestCase(typeof(IntList),                   Should.Pass)]
+        [TestCase(typeof(SuperIntList),              Should.Pass)]
+        [TestCase(typeof(SuperList<object>),         Should.Pass)]
+        [TestCase(typeof(IEnumerable),               Should.Fail)]
+        [TestCase(typeof(IList),                     Should.Fail)]
+        public static void IsEnumerable(Type type, Should should) {
+            Asserter.Against(type)
+                    .WithHeading($"{type.Prettify()} is IEnumerable<>")
+                    .And(ReflectionUtils.IsEnumerable,               should.Constrain())
+                    .And(it => it.Implements(typeof(IEnumerable<>)), should.Constrain())
+                    .Invoke();
+        }
+
+        private static void yolo() {
+            Console.WriteLine("#🐣");
+        }
+
+        private static (Delegate dgate, bool compGen, string nickname)[] Gates = {
+            (new Action(yolo), false, "new Action(yolo)"),
+            (new Func<string>(() => "swag?"), true, "new Func<string>(() => \"swag?\")"),
+            (new Func<Delegate, PrettificationSettings, string>(InnerPretty.PrettifyDelegate), false, "new Func<Delegate, PrettificationSettings, string>(InnerPretty.PrettifyDelegate)"),
+            (new Func<Delegate, PrettificationSettings, string>((del, set) => InnerPretty.PrettifyDelegate(del, set)), true, "new Func<Delegate, PrettificationSettings, string>((del, set) => InnerPretty.PrettifyDelegate(del, set))"),
+            (new Func<bool, string>(it => it.Icon()), true, "it => it.Icon()"),
+            (new Func<bool, string>(PrimitiveUtils.Icon), false, "PrimitiveUtils.Icon"),
+        };
+
+        private void yolocal() {
+            Console.WriteLine("♿💔");
+        }
+
+        private static readonly Action YoAct = yolo;
+
+        private static readonly (Action action, bool compGen, string nickname)[] Actions = {
+            (yolo, false, "yolo"),
+            (() => yolo(), true, "() => yolo()"),
+            (() => _ = 5, true, "() => _ = 5"),
+            (() => { }, true, "() => { }"),
+            (new ReflectionUtilsTests().yolocal, false, "new ReflectionUtilsTests().yolocal"),
+            (() => YoAct.Invoke(), true, "() => YoAct.Invoke()"),
+            (YoAct.Invoke, false, "YoAct.Invoke"),
+            (YoAct, false, "YoAct"),
+            (new Action(YoAct), false, "new Action(YoAct)")
+        };
+
+        #endregion
+
+        #region Compiler-Generated Stuff
+
+        [Test]
+        public void DelegateIsCompilerGenerated() {
+            var ass    = Asserter.WithHeading("Actions");
+            var aGates = Actions.Select(it => ((Delegate)it.action, it.compGen, it.nickname));
+            Gates.Concat(aGates)
+                 .ForEach((dg, cg, nn) => ass.And(() => dg.IsCompilerGenerated(), Is.EqualTo(cg), nn));
+            ass.Invoke();
+        }
+
+        #endregion
+
+        #region Implements
+
+        public interface ISuperList<T> : IList<T> { }
+
+        [Test]
+        [TestCase(typeof(List<>),                            typeof(IEnumerable<>))]
+        [TestCase(typeof(IList<>),                           typeof(ICollection<>))]
+        [TestCase(typeof(SuperList<>),                       typeof(IEnumerable))]
+        [TestCase(typeof(ISuperList<int>),                   typeof(IList<int>))]
+        [TestCase(typeof(ISuperList<int>),                   typeof(IEnumerable))]
+        [TestCase(typeof(IReadOnlyCollection<int>),          typeof(IReadOnlyCollection<>))]
+        [TestCase(typeof(ReadOnlyCollection<int>),           typeof(IReadOnlyCollection<>))]
+        [TestCase(typeof(List<string>),                      typeof(IReadOnlyCollection<string>))]
+        [TestCase(typeof(IList<IList<object>>),              typeof(IEnumerable<IEnumerable<object>>))]
+        [TestCase(typeof(IList<ISuperList<SuperList<int>>>), typeof(IEnumerable<IEnumerable<IEnumerable>>))]
+        public void ImplementsOther(Type self, Type other) {
+            Assume.That(other.IsInterface);
+            Asserter.Against(self)
+                    .And(it => it.Implements(other), Is.True, $"{self.Prettify()} implements {other.Prettify()}")
+                    .Invoke();
+        }
+
+        [Test]
+        [TestCase(typeof(List<>),                   typeof(IList<int>))]
+        [TestCase(typeof(IReadOnlyCollection<int>), typeof(IReadOnlyCollection<string>))]
+        [TestCase(typeof(IList<int>),               typeof(IEnumerable<string>))]
+        [TestCase(typeof(IEnumerable),              typeof(IEnumerable<>))]
+        [TestCase(typeof(IEnumerable<int>),         typeof(IList<int>))]
+        public void Implements_NOT(Type self, Type other) {
+            Assume.That(other.IsInterface, () => $"{nameof(other)} {other.Prettify()} must be an interface!");
+            Asserter.Against(self)
+                    .And(it => it.Implements(other), Is.False, $"{self.Prettify()} does NOT implement {other.Prettify()}")
+                    .Invoke();
+        }
+
+        [Test]
+        [TestCase(typeof(IEnumerable))]
+        [TestCase(typeof(IEnumerable<>))]
+        [TestCase(typeof(IEnumerable<int>))]
+        [TestCase(typeof(IList))]
+        [TestCase(typeof(IList<>))]
+        [TestCase(typeof(IDictionary<,>))]
+        [TestCase(typeof(IList<IDictionary<IList, int>>))]
+        [TestCase(typeof(IList<IList<object>>))]
+        [TestCase(typeof(IEnumerable<IEnumerable<object>>))]
+        [TestCase(typeof(IList<ISuperList<SuperList<int>>>))]
+        public void ImplementsSelf(Type self) {
+            Console.WriteLine($"Type: {self.Prettify()}");
+            Assume.That(self.IsInterface);
+            Asserter.Against(self)
+                    .And(it => it.Implements(it), Is.True, $"{self.Prettify()} implements itself")
+                    .Invoke();
+        }
+
+        #endregion
+
+        #region ToString
+
+        class NoToString { }
+
+        class HasToString {
+            public override string ToString() {
+                return $"I am an explicitly overridden ToString method. I was declared in {nameof(HasToString)}, but exist in {GetType().Prettify()}";
+            }
+        }
+
+        class ChildOfString : HasToString { }
+
+        class ToDoppelganger {
+            public string ToString(int i) {
+                return $"🦹 I tricked you! I am a {GetType().Prettify()}!";
+            }
+        }
+
+        class Doppelface : IDoppelface {
+            string IDoppelface.ToString() {
+                return $"😈 I've fooled you once again! I am {GetType().Prettify()}!";
+            }
+        }
+
+        class Newface {
+            public new string ToString() {
+                return $"🤖";
+            }
+        }
+
+        interface IDoppelface {
+            string ToString();
+        }
+
+        abstract class AbstractSelf {
+            public abstract override string ToString();
+        }
+
+        abstract class IncorporealSelf : AbstractSelf {
+            public override string ToString() => "👻";
+        }
+
+        class SpiritualSelf : IncorporealSelf { }
+
+        class CorporealSelf : IncorporealSelf {
+            public override string ToString() => "💪";
+        }
+
+        class ReifiedSelf : AbstractSelf {
+            public override string ToString() {
+                return "🧠 -> 🙋‍";
+            }
+        }
+
+        [Test]
+        [TestCase(typeof(object),          Should.BeNull)]
+        [TestCase(typeof(NoToString),      Should.BeNull)]
+        [TestCase(typeof(HasToString),     Should.BeNotNull)]
+        [TestCase(typeof(ChildOfString),   Should.BeNotNull)]
+        [TestCase(typeof(List<int>),       Should.BeNull)]
+        [TestCase(typeof(IList<int>),      Should.BeNull)]
+        [TestCase(typeof(ToDoppelganger),  Should.BeNull)]
+        [TestCase(typeof(Doppelface),      Should.BeNull)]
+        [TestCase(typeof(IDoppelface),     Should.BeNull)]
+        [TestCase(typeof(Newface),         Should.BeNotNull)]
+        [TestCase(typeof(AbstractSelf),    Should.BeNull)]
+        [TestCase(typeof(ReifiedSelf),     Should.BeNotNull)]
+        [TestCase(typeof(IncorporealSelf), Should.BeNotNull)]
+        [TestCase(typeof(CorporealSelf),   Should.BeNotNull)]
+        [TestCase(typeof(IncorporealSelf), Should.BeNotNull)]
+        public void PersonalToStringMethod(Type type, Should should) {
+            Assert.That(type.GetToStringOverride, should.Constrain());
         }
 
         #endregion

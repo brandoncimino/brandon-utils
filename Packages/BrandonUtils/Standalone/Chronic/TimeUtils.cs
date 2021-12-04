@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Enums;
 
 using JetBrains.Annotations;
-
-using Newtonsoft.Json;
 
 namespace BrandonUtils.Standalone.Chronic {
     /// <summary>
@@ -26,6 +25,38 @@ namespace BrandonUtils.Standalone.Chronic {
         public static TimeSpan SpanOf(double amount, TimeUnit timeUnit) {
             return timeUnit.SpanOf(amount);
         }
+
+        #region Arithmetic
+
+        #region Addition
+
+        [Pure]
+        public static TimeSpan Add(this TimeSpan span, double amount, TimeUnit unit) {
+            return span + SpanOf(amount, unit);
+        }
+
+        [Pure]
+        public static DateTime Add(this DateTime date, double amount, TimeUnit unit) {
+            return date + SpanOf(amount, unit);
+        }
+
+        #endregion
+
+        #region Subtraction
+
+        [Pure]
+        public static TimeSpan Subtract(this TimeSpan span, double amount, TimeUnit unit) {
+            return span - SpanOf(amount, unit);
+        }
+
+        [Pure]
+        public static DateTime Subtract(this DateTime date, double amount, TimeUnit unit) {
+            return date - SpanOf(amount, unit);
+        }
+
+        #endregion
+
+        #region Division
 
         /// <summary>
         /// Mimics .NET Core's <a href="https://docs.microsoft.com/en-us/dotnet/api/system.timespan.divide">TimeSpan.Divide</a>.
@@ -96,6 +127,10 @@ namespace BrandonUtils.Standalone.Chronic {
             }
         }
 
+        #endregion
+
+        #region Multiplication
+
         /// <summary>
         ///     Multiplies <paramref name="timeSpan" /> by <paramref name="factor" />, returning a new <see cref="TimeSpan" />.
         /// </summary>
@@ -106,6 +141,10 @@ namespace BrandonUtils.Standalone.Chronic {
         public static TimeSpan Multiply(this TimeSpan timeSpan, double factor) {
             return TimeSpan.FromTicks((long)(timeSpan.Ticks * factor));
         }
+
+        #endregion
+
+        #endregion
 
         #region Precision Normalization
 
@@ -287,78 +326,18 @@ namespace BrandonUtils.Standalone.Chronic {
             return TimeSpanFromObject(value) ?? throw new InvalidCastException($"Could not convert {nameof(value)} [{value?.GetType().Name}]{value} to a {nameof(TimeSpan)}!");
         }
 
-        /// <summary>
-        /// Wraps a <see cref="List{T}"/> of <see cref="TimeSpan.Ticks"/> (as <see cref="Times"/>) and provides some convenient Linq methods and a flexible <see cref="CompareTo"/>.
-        /// </summary>
-        /// <remarks>
-        /// From Brandon on 8/15/2021: What <i>is</i> this...?</remarks>
-        [JsonObject(MemberSerialization.OptIn)]
-        public class ExecutionTime : IComparable<ExecutionTime> {
-            public readonly List<long> Times = new List<long>();
-
-            public long MinTicks => Times.Min();
-
-            [JsonProperty]
-            public TimeSpan Min => TimeSpan.FromTicks(MinTicks);
-
-            public long MaxTicks => Times.Max();
-
-            [JsonProperty]
-            public TimeSpan Max => TimeSpan.FromTicks(MaxTicks);
-
-            public double AverageTicks => Times.Average();
-
-            [JsonProperty]
-            public TimeSpan Average => TimeSpan.FromTicks((long)AverageTicks);
-
-            public long TotalTicks => Times.Sum();
-
-            [JsonProperty]
-            public TimeSpan Total => TimeSpan.FromTicks(TotalTicks);
-
-            /// <summary>
-            /// Compares <b><i>this</i></b> to <paramref name="other"/> using <see cref="CompareTo"/> calls against multiple properties:
-            /// <li><see cref="Min"/></li>
-            /// <li><see cref="Max"/></li>
-            /// <li><see cref="Average"/></li>
-            /// Returns -1 or 1 if <b>any</b> properties return that value and <b>none</b> return the other;
-            /// otherwise, returns 0.
-            /// </summary>
-            /// <param name="other"></param>
-            /// <returns></returns>
-            public int CompareTo(ExecutionTime other) {
-                var minCompare = Min.CompareTo(other.Min);
-                var maxCompare = Max.CompareTo(other.Max);
-                var avgCompare = Average.CompareTo(other.Average);
-
-                var compares = new int[] { minCompare, maxCompare, avgCompare };
-                if (compares.Any(it => it > 0) && compares.All(it => it >= 0)) {
-                    return 1;
-                }
-                else if (compares.Any(it => it < 0) && compares.All(it => it <= 0)) {
-                    return -1;
-                }
-                else {
-                    return 0;
-                }
-            }
-
-            public override string ToString() {
-                return JsonConvert.SerializeObject(this, Formatting.Indented);
-            }
+        [Obsolete("Please call " + nameof(MethodTimer) + "." + nameof(MethodTimer.MeasureExecution) + " directly", true)]
+        public static AggregateExecutionTime AverageExecutionTime(Action action, int iterations = 1) {
+            return MethodTimer.MeasureExecution(action, iterations);
         }
 
-        public static ExecutionTime AverageExecutionTime(Action action, int iterations = 1) {
-            var lapTimes = new ExecutionTime();
+        public static TimeUnit LargestUnit(this TimeSpan timeSpan) {
+            return TimeUnitExtensions.Ascending.TakeLast(it => timeSpan.TotalOf(it) > 1);
+        }
 
-            for (int i = 0; i < iterations; i++) {
-                var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-                action();
-                stopwatch.Stop();
-                lapTimes.Times.Add(stopwatch.ElapsedTicks);
-            }
-
-            return lapTimes;
+        public static string FormatSigFiggy(this TimeSpan timeSpan) {
+            // var sigFig =
+            throw new NotImplementedException();
         }
     }
 }

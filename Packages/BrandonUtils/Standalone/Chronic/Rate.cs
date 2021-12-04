@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 using JetBrains.Annotations;
 
@@ -13,7 +14,7 @@ namespace BrandonUtils.Standalone.Chronic {
     /// </remarks>
     [PublicAPI]
     [Serializable]
-    public struct Rate {
+    public struct Rate : IComparable<Rate> {
         private static readonly TimeSpan OneSecond = TimeSpan.FromSeconds(1);
 
         /// <summary>
@@ -31,6 +32,42 @@ namespace BrandonUtils.Standalone.Chronic {
             set => Hertz = IntervalToHertz(value);
         }
 
+        #region Constructors
+
+        /// <summary>
+        /// Creates a new <see cref="Rate"/> instance with the specified <see cref="Hertz"/> value.
+        /// </summary>
+        /// <param name="hertz">the quantity per <see cref="TimeUnit.Seconds"/></param>
+        public Rate(double hertz) {
+            Hertz = hertz;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Rate"/> instance with the specified <see cref="Interval"/> value.
+        /// </summary>
+        /// <param name="interval">the elapsed time to complete a single "event"</param>
+        public Rate(TimeSpan interval) : this() {
+            Interval = interval;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Rate"/> instance from an arbitrary <paramref name="amount"/> over a <paramref name="duration"/>
+        /// </summary>
+        /// <param name="amount">the number of "events" that occured during the <paramref name="duration"/></param>
+        /// <param name="duration">the elapsed <see cref="TimeSpan"/> during which all of the "events" occurred</param>
+        public Rate(double amount, TimeSpan duration) : this() {
+            Interval = duration.Divide(amount);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Rate"/> instance of an arbitrary <paramref name="amount"/> per <see cref="TimeUnit"/>.
+        /// </summary>
+        /// <param name="amount">the number of "events" that occur <paramref name="perTimeUnit"/></param>
+        /// <param name="perTimeUnit">the <see cref="TimeUnit"/> of the rate</param>
+        public Rate(double amount, TimeUnit perTimeUnit) : this(amount, perTimeUnit.SpanOf()) { }
+
+        #endregion
+
         public double Per(TimeSpan timeSpan) {
             return timeSpan.Divide(Interval);
         }
@@ -46,5 +83,45 @@ namespace BrandonUtils.Standalone.Chronic {
         private static TimeSpan HertzToInterval(double hertz) {
             return hertz == 0 ? default : OneSecond.Divide(hertz);
         }
+
+        public int CompareTo(Rate other) {
+            return Hertz.CompareTo(other.Hertz);
+        }
+
+        #region Operators
+
+        #region Arithmetic
+
+        public static Rate operator +(Rate  a, Rate b) => new Rate(a.Hertz + b.Hertz);
+        public static Rate operator -(Rate  a, Rate b) => new Rate(a.Hertz - b.Hertz);
+        public static Rate operator *(Rate  a, Rate b) => new Rate(a.Hertz * b.Hertz);
+        public static Rate operator /(Rate  a, Rate b) => new Rate(a.Hertz / b.Hertz);
+        public static bool operator ==(Rate a, Rate b) => a.Equals(b);
+        public static bool operator !=(Rate a, Rate b) => !(a == b);
+        public static bool operator >=(Rate a, Rate b) => a.Hertz >= b.Hertz;
+        public static bool operator <=(Rate a, Rate b) => a.Hertz <= b.Hertz;
+        public static bool operator >(Rate  a, Rate b) => a.Hertz > b.Hertz;
+        public static bool operator <(Rate  a, Rate b) => a.Hertz < b.Hertz;
+
+        #endregion
+
+        #region Equality
+
+        public bool Equals(Rate other) {
+            return Hertz.Equals(other.Hertz);
+        }
+
+        public override bool Equals(object obj) {
+            return obj is Rate other && Equals(other);
+        }
+
+        [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
+        public override int GetHashCode() {
+            return Hertz.GetHashCode();
+        }
+
+        #endregion
+
+        #endregion
     }
 }

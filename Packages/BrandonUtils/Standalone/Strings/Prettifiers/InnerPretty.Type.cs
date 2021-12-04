@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Enums;
-using BrandonUtils.Standalone.Optional;
 using BrandonUtils.Standalone.Reflection;
 
 using JetBrains.Annotations;
@@ -19,9 +19,13 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
         /// <param name="type">the <see cref="Type"/> to make pretty</param>
         /// <param name="settings">optional <see cref="PrettificationSettings"/></param>
         /// <returns>a pretty <see cref="string"/></returns>
+        [NotNull]
+        [Pure]
         public static string PrettifyType([CanBeNull] this Type type, [CanBeNull] PrettificationSettings settings) {
+            settings ??= Prettification.DefaultPrettificationSettings;
+
             if (type == null) {
-                return settings?.NullPlaceholder.GetValueOrDefault("");
+                return settings.NullPlaceholder;
             }
 
             if (type.IsTupleType()) {
@@ -29,38 +33,36 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
             }
 
             // if the type is generic, we need to trim the `n and replace it with the generic type arguments
-            return type.IsGenericTypeOrDefinition() ? PrettifyGenericType(type, settings) : type.Name;
+            return type.IsGenericTypeOrDefinition() ? PrettifyGenericType(type, settings) : type.NameOrKeyword();
         }
 
-        /**
-         * <inheritdoc cref="PrettifyType(System.Type,BrandonUtils.Standalone.Strings.PrettificationSettings)"/>
-         */
         [NotNull]
-        internal static string PrettifyType([CanBeNull] this Type type) {
-            return PrettifyType(type, default);
-        }
-
-        private static string PrettifyGenericType([CanBeNull] Type genericType, [CanBeNull] PrettificationSettings settings = default) {
+        private static string PrettifyGenericType([CanBeNull] Type genericType, [CanBeNull] PrettificationSettings settings) {
             if (genericType?.IsGenericType != true) {
                 throw new ArgumentException($"{genericType} is not a generic type!", nameof(genericType));
             }
 
-            return genericType.Name.Replace($"`{genericType.GenericTypeArguments.Length}", PrettifyGenericTypeArguments(genericType.GenericTypeArguments, settings));
+            // Make sure to use `.GetGenericArguments()` and not `.GenericTypeArguments`, because the latter will return an empty array for
+            // a generic type definition like `List<>`
+            var genArgs = genericType.GetGenericArguments();
+            return genericType.Name.Replace($"`{genArgs.Length}", PrettifyGenericTypeArguments(genArgs, settings));
         }
 
+        [NotNull]
         private static string PrettifyTupleType(Type tupleType, [CanBeNull] PrettificationSettings settings) {
             var genArgs = tupleType.GetGenericArguments().Select(it => it.PrettifyType(settings));
             return $"({genArgs.JoinString(", ")})";
         }
 
-        private static string PrettifyGenericTypeArguments([CanBeNull] Type[] genericTypeArguments, [CanBeNull] PrettificationSettings settings) {
-            genericTypeArguments ??= Array.Empty<Type>();
+        [NotNull]
+        private static string PrettifyGenericTypeArguments([NotNull, ItemNotNull] IEnumerable<Type> genericTypeArguments, [CanBeNull] PrettificationSettings settings) {
             var stylizedArgs = StylizeGenericTypeArguments(genericTypeArguments, settings);
             return $"<{stylizedArgs}>";
         }
 
-        private static string StylizeGenericTypeArguments([NotNull] [ItemCanBeNull] Type[] genericTypeArguments, [CanBeNull] PrettificationSettings settings) {
-            settings ??= new PrettificationSettings();
+        [NotNull]
+        private static string StylizeGenericTypeArguments([NotNull, ItemCanBeNull] IEnumerable<Type> genericTypeArguments, [CanBeNull] PrettificationSettings settings) {
+            settings ??= Prettification.DefaultPrettificationSettings;
             return settings.TypeLabelStyle.Value switch {
                 TypeNameStyle.None  => "",
                 TypeNameStyle.Full  => genericTypeArguments.Select(it => it.PrettifyType(settings)).JoinString(", "),
@@ -69,8 +71,9 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
             };
         }
 
-        internal static string WithTypeLabel([CanBeNull] this string thing, [NotNull] Type labelType, [CanBeNull] PrettificationSettings settings) {
-            return $"{labelType.GetTypeLabel(settings)}{thing}";
+        [NotNull]
+        internal static string WithTypeLabel([CanBeNull] this string thing, [NotNull] Type labelType, [NotNull] PrettificationSettings settings, string joiner = "") {
+            return new[] { labelType.GetTypeLabel(settings), thing }.NonNull().JoinString(joiner);
         }
     }
 }

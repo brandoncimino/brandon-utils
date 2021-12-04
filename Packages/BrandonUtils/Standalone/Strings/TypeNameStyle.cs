@@ -1,28 +1,46 @@
 ﻿using System;
+using System.Linq;
 
+using BrandonUtils.Standalone.Enums;
+using BrandonUtils.Standalone.Reflection;
+using BrandonUtils.Standalone.Strings.Json;
 using BrandonUtils.Standalone.Strings.Prettifiers;
 
 using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone.Strings {
     public enum TypeNameStyle {
-        None,
-        Full,
-        Short
+        None  = 0,
+        Short = 1,
+        Full  = 2,
     }
 
-    public static class TypeLabelStyleExtensions {
+    public static class TypeNameStyleExtensions {
         [NotNull]
-        public static string GetTypeLabel([CanBeNull] this Type type, [CanBeNull] PrettificationSettings settings) {
-            if (type == null || settings?.TypeLabelStyle == TypeNameStyle.None) {
+        public static string GetTypeLabel(this Type? type, PrettificationSettings? settings) {
+            settings = Prettification.ResolveSettings(settings);
+
+            var style = type?.IsEnum == true ? settings.EnumLabelStyle : settings.TypeLabelStyle;
+
+            settings?.TraceWriter.Verbose(() => $"Using style: {style} (type: {settings.TypeLabelStyle}/{settings.TypeLabelStyle.Value}, enum: {settings.EnumLabelStyle}/{settings.EnumLabelStyle.Value})");
+
+            if (type == null || style == TypeNameStyle.None) {
                 return "";
             }
 
-            return $"[{type.PrettifyType(settings)}]";
+            var str = type.PrettifyType(settings);
+
+            if (type.IsArray || type.IsEnum || type.IsEnumerable()) {
+                return str;
+            }
+
+            return $"[{str}]";
         }
 
-        public static string WithTypeLabel(string thing, Type type, [CanBeNull] PrettificationSettings settings) {
-            return $"{GetTypeLabel(type, settings)}{thing}";
+        public static TypeNameStyle Reduce(this TypeNameStyle style, int steps = 1) {
+            var newStep = (int)style - steps;
+            newStep = newStep.Clamp(0, BEnum.GetValues<TypeNameStyle>().Cast<int>().Max());
+            return (TypeNameStyle)newStep;
         }
     }
 }
