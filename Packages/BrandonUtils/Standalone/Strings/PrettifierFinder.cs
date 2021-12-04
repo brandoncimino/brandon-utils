@@ -48,7 +48,7 @@ namespace BrandonUtils.Standalone.Strings {
                 settings
             );
 
-            settings.TraceWriter.Verbose(
+            settings.TraceWriter.Info(
                 () => prettifier.IfPresentOrElse(
                     it => $"⛳ Found: {it}",
                     () => "🐸 No prettifier found!"
