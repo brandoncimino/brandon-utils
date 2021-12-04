@@ -57,7 +57,7 @@ namespace BrandonUtils.Standalone.Strings.Json {
         private static string GetTraceLevelIcon(TraceLevel traceLevel) {
             return traceLevel switch {
                 TraceLevel.Error   => "🌋",
-                TraceLevel.Info    => "ℹ",
+                TraceLevel.Info    => "📎",
                 TraceLevel.Off     => "🔇",
                 TraceLevel.Verbose => "📜",
                 TraceLevel.Warning => "⚠",
