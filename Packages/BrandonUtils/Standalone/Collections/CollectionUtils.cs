@@ -777,10 +777,20 @@ namespace BrandonUtils.Standalone.Collections {
         /// <returns>a new sequence that begins <b>and</b> ends with <paramref name="bookend"/></returns>
         [Pure]
         [NotNull, ItemCanBeNull]
-        public static IEnumerable<T> Bookend<T>([NotNull, ItemCanBeNull, NoEnumeration] this IEnumerable<T> source, [CanBeNull] T bookend) {
+        [LinqTunnel]
+        public static IEnumerable<T> Bookend<T>([NotNull, ItemCanBeNull] this IEnumerable<T> source, [CanBeNull] T bookend) {
             return source
                    .Prepend(bookend)
                    .Append(bookend);
+        }
+
+        [Pure]
+        [NotNull, ItemCanBeNull]
+        [LinqTunnel]
+        public static IEnumerable<T> Bookend<T>([NotNull, ItemCanBeNull] this IEnumerable<T> source, [CanBeNull] T prefix, [CanBeNull] T suffix) {
+            return source
+                   .Prepend(prefix)
+                   .Append(suffix);
         }
 
         #region AppendNonNull
