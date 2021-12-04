@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Reflection;
 
 using BrandonUtils.Standalone.Optional;
-using BrandonUtils.Standalone.Strings;
 using BrandonUtils.Standalone.Strings.Json;
 using BrandonUtils.Testing;
 
@@ -70,17 +69,9 @@ namespace BrandonUtils.Tests.Standalone.Collections {
 
             var deserialized = JsonConvert.DeserializeObject<Fallback<Fallback<string>>>(serializedJson);
             Asserter.Against(deserialized)
-                    .And(CompareFallbacks(deserialized,       parent))
-                    .And(CompareFallbacks(deserialized.Value, child))
+                    .And(Asserters.CompareFallbacks(deserialized,       parent))
+                    .And(Asserters.CompareFallbacks(deserialized.Value, child))
                     .Invoke();
-        }
-
-        private static IMultipleAsserter CompareFallbacks<T>(Fallback<T> actual, Fallback<T> expected) {
-            return Asserter.Against(actual)
-                           .And(
-                               Is.EqualTo(expected).Using(new FallbackComparer()),
-                               typeof(FallbackComparer).Prettify
-                           );
         }
 
         [Test]
@@ -113,7 +104,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
                     .And(Has.Property(nameof(deserialized.Value)).EqualTo(exp))
                     .And(Has.Property(nameof(deserialized.ExplicitValue)).EqualTo(exp))
                     .And(Has.Property(nameof(deserialized.FallbackValue)).EqualTo(fb))
-                    .And(CompareFallbacks(deserialized, expected))
+                    .And(Asserters.CompareFallbacks(deserialized, expected))
                     .Invoke();
         }
     }
