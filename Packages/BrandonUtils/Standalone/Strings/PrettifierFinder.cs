@@ -115,8 +115,6 @@ namespace BrandonUtils.Standalone.Strings {
             settings.TraceWriter.Verbose(() => $"-> {nameof(FindToStringOverridePrettifier)}({type.Name})", 1);
             settings.TraceWriter.Warning(() => $"{nameof(FindToStringOverridePrettifier)} is currently DISABLED!");
             return default;
-            var toString = type.GetToStringOverride();
-            return toString != null ? Optional.Optional.Of(PrettifierDatabase.ToStringPrettifier) : default;
         }
 
         internal static Optional<IPrettifier> FindInterfacePrettifier([NotNull] IPrettifierDatabase prettifierDatabase, [NotNull] Type type, [NotNull] PrettificationSettings settings) {

@@ -81,7 +81,8 @@ namespace BrandonUtils.Standalone.Strings {
                 new Prettifier<MethodInfo>(InnerPretty.PrettifyMethodInfo),
                 new Prettifier<ParameterInfo>(InnerPretty.PrettifyParameterInfo),
                 new Prettifier<MemberInfo>(InnerPretty.PrettifyMemberInfo),
-                new Prettifier<Delegate>(InnerPretty.PrettifyDelegate)
+                new Prettifier<Delegate>(InnerPretty.PrettifyDelegate),
+                ObjectToStringPrettifier
             );
         }
 
@@ -90,8 +91,8 @@ namespace BrandonUtils.Standalone.Strings {
 
         #region Special High-Priority Prettifiers
 
-        internal static readonly IPrettifier PrettifiablePrettifier = new Prettifier<IPrettifiable>(PrettifyPrettifiable);
-        internal static readonly IPrettifier ToStringPrettifier     = new Prettifier<object>(PrettifyToString);
+        internal static readonly IPrettifier PrettifiablePrettifier   = new Prettifier<IPrettifiable>(PrettifyPrettifiable);
+        internal static readonly IPrettifier ObjectToStringPrettifier = new Prettifier<object>(PrettifyToString);
 
         #endregion
     }
