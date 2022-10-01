@@ -3,8 +3,6 @@ using System.IO;
 
 using BrandonUtils.Standalone.Strings;
 
-using JetBrains.Annotations;
-
 using Newtonsoft.Json;
 
 namespace BrandonUtils.Standalone.Clerical.Saving {
@@ -17,9 +15,9 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
         public abstract DateTime       TimeStamp      { get; }
 
         protected BaseSaveFile(
-            [NotNull]   ISaveFolder folder,
-            [NotNull]   FileInfo    file,
-            [CanBeNull] TData       data
+            ISaveFolder folder,
+            FileInfo    file,
+            TData?      data
         ) {
             folder.MustBeParentOf(file);
             File       = file   ?? throw new ArgumentNullException(nameof(file));
@@ -28,9 +26,9 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
         }
 
         protected BaseSaveFile(
-            [NotNull]   ISaveFolder folder,
-            [NotNull]   string      relativePathToFile,
-            [CanBeNull] TData       data
+            ISaveFolder folder,
+            string      relativePathToFile,
+            TData?      data
         )
             : this(
                 folder ?? throw new ArgumentNullException(nameof(folder)),

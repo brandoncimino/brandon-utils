@@ -7,8 +7,6 @@ using BrandonUtils.Standalone.Reflection;
 using BrandonUtils.Standalone.Strings;
 using BrandonUtils.Testing;
 
-using JetBrains.Annotations;
-
 using NUnit.Framework;
 
 using Is = NUnit.Framework.Is;
@@ -27,7 +25,7 @@ namespace BrandonUtils.Tests.Standalone.Reflection {
             );
         }
 
-        private static void IsBackedBy([CanBeNull] this PropertyInfo propertyInfo, [CanBeNull] FieldInfo expectedBackingField) {
+        private static void IsBackedBy(this PropertyInfo? propertyInfo, FieldInfo? expectedBackingField) {
             AssertAll.Of(
                 $"{propertyInfo.Prettify()} should have the backing field {expectedBackingField.Prettify()}",
                 () => Assert.That(propertyInfo?.BackingField(), Is.Not.Null.And.EqualTo(expectedBackingField)),
@@ -35,14 +33,14 @@ namespace BrandonUtils.Tests.Standalone.Reflection {
             );
         }
 
-        public static void AllHaveBackingField([CanBeNull] [ItemCanBeNull] this IEnumerable<PropertyInfo> propertyInfos, [CanBeNull] FieldInfo expectedBackingField) {
+        public static void AllHaveBackingField(this IEnumerable<PropertyInfo?>? propertyInfos, FieldInfo? expectedBackingField) {
             Asserter
                 .WithHeading($"All of the {nameof(propertyInfos)} should be backed by {expectedBackingField.Prettify()}")
                 .And(propertyInfos?.Select<PropertyInfo, Action>(it => () => it.IsBackedBy(expectedBackingField)))
                 .Invoke();
         }
 
-        private static void BacksProperty([CanBeNull] this FieldInfo backingField, [CanBeNull] [ItemCanBeNull] params PropertyInfo[] expectedBackedProperties) {
+        private static void BacksProperty(this FieldInfo? backingField, params PropertyInfo?[]? expectedBackedProperties) {
             Assert.That(backingField?.BackedProperties(), Is.Not.Null.And.SupersetOf(expectedBackedProperties));
         }
     }

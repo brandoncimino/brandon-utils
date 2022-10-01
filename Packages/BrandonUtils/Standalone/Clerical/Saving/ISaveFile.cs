@@ -11,11 +11,11 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
     /// <typeparam name="TData">the type of the serialized <see cref="Data"/></typeparam>
     [PublicAPI]
     public interface ISaveFile<out TData> : IHasFileInfo where TData : ISaveData {
-        [NotNull] public string Nickname { get; }
+        public string Nickname { get; }
 
-        [NotNull] public ISaveFolder SaveFolder { get; }
+        public ISaveFolder SaveFolder { get; }
 
-        [CanBeNull] public TData Data { get; }
+        public TData? Data { get; }
 
         /// <summary>
         /// The <see cref="DateTime"/> at which the <b><see cref="Data"/> refers to</b>.
@@ -35,7 +35,7 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
          */
         public ISaveFile<TData> Save(SaveManagerSettings? saveSettings = default);
 
-        [NotNull]
+
         public ISaveFile<TData> Load(SaveManagerSettings? saveSettings = default);
     }
 }

@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using JetBrains.Annotations;
-
 namespace BrandonUtils.Standalone.Clerical.Saving {
     public class SimplerSaveSlot<TData> : ISaveSlot<TData> where TData : ISaveData {
         public string              Nickname              { get; }
@@ -14,13 +12,13 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
         public SaveManagerSettings Settings              { get; }
         public string              SaveFileSearchPattern => MyFileName;
 
-        [NotNull] private string   MyFileName => $"{Nickname}{Settings.SaveFileExtension}";
-        [NotNull] private string   MyFilePath => SaveFolder.Directory.GetChildPath(MyFileName);
-        [NotNull] private FileInfo MyFile     => new FileInfo(MyFilePath);
+        private string   MyFileName => $"{Nickname}{Settings.SaveFileExtension}";
+        private string   MyFilePath => SaveFolder.Directory.GetChildPath(MyFileName);
+        private FileInfo MyFile     => new FileInfo(MyFilePath);
 
         public SimplerSaveSlot(
-            SaveFolder                     saveFolder,
-            [NotNull] string               nickname,
+            SaveFolder           saveFolder,
+            string               nickname,
             SaveManagerSettings? settings = default
         ) {
             if (string.IsNullOrWhiteSpace(nickname)) {
@@ -36,7 +34,7 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
             return SaveFolder.EnumerateSaveFiles<TData>(SaveFileSearchPattern);
         }
 
-        [NotNull]
+
         public ISaveFile<TData> LatestFile() {
             return new SimpleSaveFile<TData>(SaveFolder, MyFile);
         }

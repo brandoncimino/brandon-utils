@@ -10,7 +10,6 @@ namespace BrandonUtils.Standalone.Optional {
     [PublicAPI]
     public static class NullableExtensions {
         [Pure]
-        [NotNull]
         public static IEnumerable<T> AsEnumerable<T>(this T? nullableValue) where T : struct {
             return nullableValue.HasValue ? Enumerable.Repeat(nullableValue.Value, 1) : Enumerable.Empty<T>();
         }
@@ -21,12 +20,12 @@ namespace BrandonUtils.Standalone.Optional {
         }
 
         [Pure]
-        public static T? ToNullable<T>([NotNull] this IOptional<T> optional) where T : struct {
+        public static T? ToNullable<T>(this IOptional<T> optional) where T : struct {
             return optional.OrElse(default);
         }
 
         [Pure]
-        public static T? ToNullable<T>([NotNull] this IOptional<T?> optional) where T : struct {
+        public static T? ToNullable<T>(this IOptional<T?> optional) where T : struct {
             return optional.OrElse(default);
         }
     }

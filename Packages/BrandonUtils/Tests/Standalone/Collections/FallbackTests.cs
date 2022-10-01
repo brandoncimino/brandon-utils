@@ -117,7 +117,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
         [ContractAnnotation("x:null, y:null => true")]
         [ContractAnnotation("x:null, y:notnull => false")]
         [ContractAnnotation("x:notnull, y:null => false")]
-        public new bool Equals([CanBeNull] object x, [CanBeNull] object y) {
+        public new bool Equals(object? x, object? y) {
             var xt = x?.GetType();
             var yt = y?.GetType();
 
@@ -132,7 +132,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
             return valEq && fbEq && exEq;
         }
 
-        private static bool IsFallbackType([NotNull] Type type) {
+        private static bool IsFallbackType(Type type) {
             return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Fallback<>);
         }
 

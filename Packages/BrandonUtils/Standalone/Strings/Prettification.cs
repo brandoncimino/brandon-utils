@@ -14,7 +14,7 @@ namespace BrandonUtils.Standalone.Strings {
         internal const           string              DefaultNullPlaceholder = "⛔";
         internal static readonly IPrettifierDatabase Prettifiers            = PrettifierDatabase.GetDefaultPrettifiers();
 
-        [NotNull]
+
         internal static readonly OptionalPrettifierFinder[] Finders = {
             PrettifierFinders.FindExactPrettifier,
             PrettifierFinders.FindToStringOverridePrettifier,
@@ -22,24 +22,23 @@ namespace BrandonUtils.Standalone.Strings {
             PrettifierFinders.FindInheritedPrettifier
         };
 
-        [NotNull]
+
         [Obsolete]
         public static PrettificationSettings DefaultPrettificationSettings {
-            [NotNull] get => PrettificationSettings.DefaultSettings;
+            get => PrettificationSettings.DefaultSettings;
             [CanBeNull] set => PrettificationSettings.DefaultSettings = value;
         }
 
 
-        [NotNull]
         public static PrettificationSettings ResolveSettings(PrettificationSettings? settings) {
             return settings ?? PrettificationSettings.DefaultSettings;
         }
 
-        public static void RegisterPrettifier([NotNull] IPrettifier prettifier) {
+        public static void RegisterPrettifier(IPrettifier prettifier) {
             Prettifiers.Register(prettifier);
         }
 
-        public static IPrettifier? UnregisterPrettifier([NotNull] Type prettifierType) {
+        public static IPrettifier? UnregisterPrettifier(Type prettifierType) {
             return Prettifiers.Deregister(prettifierType);
         }
 
@@ -52,13 +51,11 @@ namespace BrandonUtils.Standalone.Strings {
         #endregion
 
         [Pure]
-        [NotNull]
         public static string Prettify(this object? cinderella) {
             return cinderella.Prettify(default);
         }
 
         [Pure]
-        [NotNull]
         public static string Prettify(this object? cinderella, PrettificationSettings? settings) {
             settings = ResolveSettings(settings);
 
@@ -82,7 +79,7 @@ namespace BrandonUtils.Standalone.Strings {
                 );
         }
 
-        [NotNull]
+
         internal static string LastResortPrettifier(object? cinderella, PrettificationSettings? settings) {
             settings ??= new PrettificationSettings();
 

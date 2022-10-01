@@ -14,12 +14,12 @@ namespace BrandonUtils.Standalone.Chronic {
 
         #region Action (0 args)
 
-        [NotNull] public static ExecutionTime MeasureExecution([NotNull, InstantHandle] Action actionBeingTimed) => MeasureExecution(default, actionBeingTimed);
+        public static ExecutionTime MeasureExecution([InstantHandle] Action actionBeingTimed) => MeasureExecution(default, actionBeingTimed);
 
-        [NotNull] public static ExecutionTime MeasureExecution(string? nickname, [NotNull, InstantHandle] Action actionBeingTimed) => MeasureExecution(nickname, actionBeingTimed, new Stopwatch());
+        public static ExecutionTime MeasureExecution(string? nickname, [InstantHandle] Action actionBeingTimed) => MeasureExecution(nickname, actionBeingTimed, new Stopwatch());
 
-        [NotNull]
-        private static ExecutionTime MeasureExecution(string? nickname, [NotNull] Action actionBeingTimed, [NotNull] Stopwatch stopwatch) {
+
+        private static ExecutionTime MeasureExecution(string? nickname, Action actionBeingTimed, Stopwatch stopwatch) {
             stopwatch.Stop();
             stopwatch.Reset();
             stopwatch.Start();
@@ -32,20 +32,19 @@ namespace BrandonUtils.Standalone.Chronic {
 
         #region Action<T> (1 arg)
 
-        [NotNull]
         public static ExecutionTime MeasureExecution<T>(
             string? nickname,
-            [CanBeNull] T       input,
-            [NotNull, InstantHandle]
+            T?      input,
+            [InstantHandle]
             Action<T> actionBeingTimed
         ) {
             return MeasureExecution(nickname ?? actionBeingTimed.Method.Name, () => actionBeingTimed.Invoke(input));
         }
 
-        [NotNull]
+
         public static ExecutionTime MeasureExecution<T>(
-            [CanBeNull] T input,
-            [NotNull, InstantHandle]
+            T? input,
+            [InstantHandle]
             Action<T> actionBeingTimed
         ) {
             return MeasureExecution(default, input, actionBeingTimed);
@@ -61,9 +60,9 @@ namespace BrandonUtils.Standalone.Chronic {
 
         #region Action (0 args)
 
-        [NotNull] public static AggregateExecutionTime MeasureExecution([NotNull] Action action, [NonNegativeValue] int iterations) => MeasureExecution((default, action), iterations);
+        public static AggregateExecutionTime MeasureExecution(Action action, [NonNegativeValue] int iterations) => MeasureExecution((default, action), iterations);
 
-        [NotNull]
+
         public static AggregateExecutionTime MeasureExecution((string nickname, Action action) actionBeingTimed, [NonNegativeValue] int iterations) {
             if (actionBeingTimed.action == null) {
                 throw new ArgumentNullException(nameof(actionBeingTimed));
@@ -87,7 +86,6 @@ namespace BrandonUtils.Standalone.Chronic {
 
         #region Func<T> (0 args)
 
-        [NotNull]
         public static AggregateExecutionTime MeasureExecution<T>(
             (string nickname, Func<T> func) functionBeingTimed,
             [NonNegativeValue]
@@ -111,7 +109,6 @@ namespace BrandonUtils.Standalone.Chronic {
 
         #region Action<T> (1 arg)
 
-        [NotNull]
         public static AggregateExecutionTime MeasureExecution<T>(
             T                                   input,
             (string nickname, Action<T> action) actionBeingTimed,
@@ -122,10 +119,10 @@ namespace BrandonUtils.Standalone.Chronic {
             return MeasureExecution((actionBeingTimed.nickname, () => actionBeingTimed.action(input)), iterations);
         }
 
-        [NotNull]
+
         public static AggregateExecutionTime MeasureExecution<T>(
-            [CanBeNull] T         input,
-            [NotNull]   Action<T> actionBeingTimed,
+            T?        input,
+            Action<T> actionBeingTimed,
             [NonNegativeValue]
             int iterations
         ) {
@@ -146,12 +143,12 @@ namespace BrandonUtils.Standalone.Chronic {
             throw new NotImplementedException();
         }
 
-        [NotNull]
+
         public static AggregateExecutionComparison MeasureExecution<TIn, TOut>(
             TIn input,
-            [NotNull, InstantHandle]
+            [InstantHandle]
             Func<TIn, TOut> first,
-            [NotNull, InstantHandle]
+            [InstantHandle]
             Func<TIn, TOut> second,
             [NonNegativeValue]
             int iterations
@@ -165,7 +162,6 @@ namespace BrandonUtils.Standalone.Chronic {
 
         #region Action<T1,T2> (2 args)
 
-        [NotNull]
         public static AggregateExecutionTime MeasureExecution<T1, T2>(
             (T1 arg1, T2 arg2)                       input,
             (string nickname, Action<T1, T2> action) actionBeingTimed,
@@ -176,10 +172,10 @@ namespace BrandonUtils.Standalone.Chronic {
             return MeasureExecution((actionBeingTimed.nickname, () => actionBeingTimed.action.Invoke(input)), iterations);
         }
 
-        [NotNull]
+
         public static AggregateExecutionTime MeasureExecution<T1, T2>(
             (T1 arg1, T2 arg2) input,
-            [NotNull, InstantHandle]
+            [InstantHandle]
             Action<T1, T2> actionBeingTimed,
             [NonNegativeValue]
             int iterations
@@ -201,7 +197,6 @@ namespace BrandonUtils.Standalone.Chronic {
 
         #region Action (0 args)
 
-        [NotNull]
         public static AggregateExecutionComparison CompareExecutions(
             (string nickname, Action action) first,
             (string nickname, Action action) second,
@@ -223,8 +218,8 @@ namespace BrandonUtils.Standalone.Chronic {
             return comparison;
         }
 
-        [NotNull]
-        public static AggregateExecutionComparison CompareExecutions([NotNull] Action firstAction, [NotNull] Action secondAction, int iterations) {
+
+        public static AggregateExecutionComparison CompareExecutions(Action firstAction, Action secondAction, int iterations) {
             return CompareExecutions(
                 (default, firstAction),
                 (default, secondAction),
@@ -236,9 +231,8 @@ namespace BrandonUtils.Standalone.Chronic {
 
         #region Action<T> (1 arg)
 
-        [NotNull]
         public static AggregateExecutionComparison CompareExecutions<T>(
-            [CanBeNull] T                       input,
+            T?                                  input,
             (string nickname, Action<T> action) first,
             (string nickname, Action<T> action) second,
             [NonNegativeValue]
@@ -251,11 +245,11 @@ namespace BrandonUtils.Standalone.Chronic {
             );
         }
 
-        [NotNull]
+
         public static AggregateExecutionComparison CompareExecutions<T>(
-            [CanBeNull] T         input,
-            [NotNull]   Action<T> first,
-            [NotNull]   Action<T> second,
+            T?        input,
+            Action<T> first,
+            Action<T> second,
             [NonNegativeValue]
             int iterations
         ) {
@@ -277,7 +271,6 @@ namespace BrandonUtils.Standalone.Chronic {
 
         #region Action<T1,T2> (2 args)
 
-        [NotNull]
         public static AggregateExecutionComparison CompareExecutions<T1, T2>(
             (T1 arg1, T2 arg2)                       input,
             (string nickname, Action<T1, T2> action) first,
@@ -292,11 +285,11 @@ namespace BrandonUtils.Standalone.Chronic {
             );
         }
 
-        [NotNull]
+
         public static AggregateExecutionComparison CompareExecutions<T1, T2>(
-            (T1 arg1, T2 arg2)       input,
-            [NotNull] Action<T1, T2> first,
-            [NotNull] Action<T1, T2> second,
+            (T1 arg1, T2 arg2) input,
+            Action<T1, T2>     first,
+            Action<T1, T2>     second,
             [NonNegativeValue]
             int iterations
         ) {
@@ -312,7 +305,6 @@ namespace BrandonUtils.Standalone.Chronic {
 
         #region Func<T1, T2, TOut> (2 args)
 
-        [NotNull]
         public static AggregateExecutionComparison CompareExecutions<T1, T2, TOut>(
             (T1 arg1, T2 arg2)                         input,
             (string nickname, Func<T1, T2, TOut> func) first,
@@ -330,12 +322,12 @@ namespace BrandonUtils.Standalone.Chronic {
             );
         }
 
-        [NotNull]
+
         public static AggregateExecutionComparison CompareExecutions<T1, T2, TOut>(
             (T1 arg1, T2 arg2) input,
-            [NotNull, InstantHandle]
+            [InstantHandle]
             Func<T1, T2, TOut> first,
-            [NotNull, InstantHandle]
+            [InstantHandle]
             Func<T1, T2, TOut> second,
             [NonNegativeValue]
             int iterations

@@ -7,11 +7,11 @@ namespace BrandonUtils.Standalone.Attributes {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
     [PublicAPI]
     public class BackingFieldForAttribute : BrandonAttribute {
-        [NotNull] public string BackedPropertyName { get; }
+        public string BackedPropertyName { get; }
 
         public PropertyInfo? BackedProperty { get; }
 
-        public BackingFieldForAttribute([NotNull] string backedPropertyName) {
+        public BackingFieldForAttribute(string backedPropertyName) {
             BackedPropertyName = backedPropertyName;
         }
     }

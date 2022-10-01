@@ -12,28 +12,26 @@ using JetBrains.Annotations;
 namespace BrandonUtils.Standalone.Enums {
     [PublicAPI]
     public static class BEnum {
-        [NotNull]
         [ContractAnnotation("null => stop")]
-        private static Type MustBeEnumType([NotNull] this Type enumType) {
+        private static Type MustBeEnumType(this Type enumType) {
             return enumType?.IsEnum == true ? enumType : throw new ArgumentException($"{enumType.PrettifyType(default)} is not an enum type!");
         }
 
-        [NotNull]
+
         [ContractAnnotation("null => stop")]
-        private static Type MustMatchTypeArgument<T>([NotNull] this Type enumType) {
+        private static Type MustMatchTypeArgument<T>(this Type enumType) {
             return enumType == typeof(T) ? enumType : throw new ArgumentException($"The {nameof(enumType)} {enumType.Prettify()} was not the same as the type argument <{nameof(T)}> {typeof(T).Prettify()}!");
         }
 
         /// <typeparam name="T">an <see cref="Enum"/> type</typeparam>
         /// <returns>an array containing the <see cref="Type.GetEnumValues"/> of <typeparamref name="T"/>.</returns>
         /// <exception cref="ArgumentException">if <typeparamref name="T"/> is not an <see cref="Enum"/> type</exception>
-        [NotNull]
         public static T[] GetValues<T>() where T : struct, Enum {
             return GetValues<T>(typeof(T));
         }
 
-        [NotNull]
-        public static T[] GetValues<T>([NotNull] Type enumType) where T : struct, Enum {
+
+        public static T[] GetValues<T>(Type enumType) where T : struct, Enum {
             return enumType.MustBeEnumType()
                            .MustMatchTypeArgument<T>()
                            .GetEnumValues()
@@ -49,32 +47,30 @@ namespace BrandonUtils.Standalone.Enums {
         /// <param name="allowedValues"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        [NotNull]
         public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(
             string? argumentName,
-            T                   enumValue,
+            T       enumValue,
             [InstantHandle]
             IEnumerable<T>? allowedValues = default
         ) where T : struct, Enum {
             return new InvalidEnumArgumentException(argumentName, (int)(object)enumValue, typeof(T));
         }
 
-        [NotNull]
+
         public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(
             string? argumentName,
-            T?                  enumValue
+            T?      enumValue
         ) where T : struct, Enum {
             return new InvalidEnumArgumentException(argumentName, -1, typeof(T));
         }
 
         #region Enum not in set
 
-        [NotNull]
         private static string BuildEnumNotInSetMessage(
             string?             paramName,
-            [NotNull]   Type                enumType,
-            [NotNull]   IEnumerable<object> checkedValues,
-            [NotNull]   IEnumerable<object> allowedValues
+            Type                enumType,
+            IEnumerable<object> checkedValues,
+            IEnumerable<object> allowedValues
         ) {
             var badValues = checkedValues.Except(allowedValues);
 
@@ -97,11 +93,11 @@ namespace BrandonUtils.Standalone.Enums {
             }.JoinLines();
         }
 
-        [NotNull]
+
         public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(
             string?        argumentName,
-            [NotNull]   IEnumerable<T> checkedValues,
-            [NotNull]   IEnumerable<T> allowedValues
+            IEnumerable<T> checkedValues,
+            IEnumerable<T> allowedValues
         ) where T : struct, Enum {
             return new InvalidEnumArgumentException(
                 BuildEnumNotInSetMessage(
@@ -113,11 +109,11 @@ namespace BrandonUtils.Standalone.Enums {
             );
         }
 
-        [NotNull]
+
         public static InvalidEnumArgumentException InvalidEnumArgumentException<T>(
             string?         argumentName,
-            [NotNull]   IEnumerable<T?> checkedValues,
-            [NotNull]   IEnumerable<T?> allowedValues
+            IEnumerable<T?> checkedValues,
+            IEnumerable<T?> allowedValues
         ) where T : struct, Enum {
             return new InvalidEnumArgumentException(
                 BuildEnumNotInSetMessage(

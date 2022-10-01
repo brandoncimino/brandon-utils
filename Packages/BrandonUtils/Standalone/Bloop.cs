@@ -39,12 +39,12 @@ namespace BrandonUtils.Standalone {
             }
         }
 
-        public static void ForEach<T1, T2>([NotNull, InstantHandle] this                     IEnumerable<(T1, T2)>                     enumerable, [NotNull, InstantHandle] Action<T1, T2>                     action) => enumerable.ForEach(it => action.Invoke(it));
-        public static void ForEach<T1, T2, T3>([NotNull, InstantHandle] this                 IEnumerable<(T1, T2, T3)>                 enumerable, [NotNull, InstantHandle] Action<T1, T2, T3>                 action) => enumerable.ForEach(it => action.Invoke(it));
-        public static void ForEach<T1, T2, T3, T4>([NotNull, InstantHandle] this             IEnumerable<(T1, T2, T3, T4)>             enumerable, [NotNull, InstantHandle] Action<T1, T2, T3, T4>             action) => enumerable.ForEach(it => action.Invoke(it));
-        public static void ForEach<T1, T2, T3, T4, T5>([NotNull, InstantHandle] this         IEnumerable<(T1, T2, T3, T4, T5)>         enumerable, [NotNull, InstantHandle] Action<T1, T2, T3, T4, T5>         action) => enumerable.ForEach(it => action.Invoke(it));
-        public static void ForEach<T1, T2, T3, T4, T5, T6>([NotNull, InstantHandle] this     IEnumerable<(T1, T2, T3, T4, T5, T6)>     enumerable, [NotNull, InstantHandle] Action<T1, T2, T3, T4, T5, T6>     action) => enumerable.ForEach(it => action.Invoke(it));
-        public static void ForEach<T1, T2, T3, T4, T5, T6, T7>([NotNull, InstantHandle] this IEnumerable<(T1, T2, T3, T4, T5, T6, T7)> enumerable, [NotNull, InstantHandle] Action<T1, T2, T3, T4, T5, T6, T7> action) => enumerable.ForEach(it => action.Invoke(it));
+        public static void ForEach<T1, T2>([InstantHandle] this                     IEnumerable<(T1, T2)>                     enumerable, [InstantHandle] Action<T1, T2>                     action) => enumerable.ForEach(it => action.Invoke(it));
+        public static void ForEach<T1, T2, T3>([InstantHandle] this                 IEnumerable<(T1, T2, T3)>                 enumerable, [InstantHandle] Action<T1, T2, T3>                 action) => enumerable.ForEach(it => action.Invoke(it));
+        public static void ForEach<T1, T2, T3, T4>([InstantHandle] this             IEnumerable<(T1, T2, T3, T4)>             enumerable, [InstantHandle] Action<T1, T2, T3, T4>             action) => enumerable.ForEach(it => action.Invoke(it));
+        public static void ForEach<T1, T2, T3, T4, T5>([InstantHandle] this         IEnumerable<(T1, T2, T3, T4, T5)>         enumerable, [InstantHandle] Action<T1, T2, T3, T4, T5>         action) => enumerable.ForEach(it => action.Invoke(it));
+        public static void ForEach<T1, T2, T3, T4, T5, T6>([InstantHandle] this     IEnumerable<(T1, T2, T3, T4, T5, T6)>     enumerable, [InstantHandle] Action<T1, T2, T3, T4, T5, T6>     action) => enumerable.ForEach(it => action.Invoke(it));
+        public static void ForEach<T1, T2, T3, T4, T5, T6, T7>([InstantHandle] this IEnumerable<(T1, T2, T3, T4, T5, T6, T7)> enumerable, [InstantHandle] Action<T1, T2, T3, T4, T5, T6, T7> action) => enumerable.ForEach(it => action.Invoke(it));
 
         #endregion
 
@@ -149,9 +149,8 @@ namespace BrandonUtils.Standalone {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         [LinqTunnel]
-        [NotNull]
         [Pure]
-        public static IEnumerable<T> Repeat<T>(this int count, [NotNull] Func<int, T> loopFunction) {
+        public static IEnumerable<T> Repeat<T>(this int count, Func<int, T> loopFunction) {
             return Enumerable.Range(0, count).Select(loopFunction.Invoke);
         }
 

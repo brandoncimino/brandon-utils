@@ -7,6 +7,12 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [3.0.0]
+
+> Updated Unity version from `2021.1.3f1` -> `2021.2.5f1`
+
+- Switched `[NotNull]` and `[CanBeNull]` annotations to `?` suffixes
+
 ## [2.35.1]
 
 ### Added

@@ -4,8 +4,6 @@ using System.Linq;
 
 using BrandonUtils.Standalone.Strings;
 
-using JetBrains.Annotations;
-
 namespace BrandonUtils.Standalone.Clerical.Saving {
     public class SaveManager<TData> where TData : ISaveData {
         private readonly SaveFolder          SaveFolder;
@@ -15,7 +13,7 @@ namespace BrandonUtils.Standalone.Clerical.Saving {
             SaveFolder = saveFolder;
         }
 
-        public SaveFile<TData> GetSaveFile([NotNull] string nickname, DateTime timeStamp) {
+        public SaveFile<TData> GetSaveFile(string nickname, DateTime timeStamp) {
             if (nickname == null) {
                 throw new ArgumentNullException(nameof(nickname));
             }

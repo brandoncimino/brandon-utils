@@ -4,8 +4,6 @@ using BrandonUtils.Standalone.Exceptions;
 using BrandonUtils.Standalone.Optional;
 using BrandonUtils.Testing;
 
-using JetBrains.Annotations;
-
 using NUnit.Framework;
 
 using Is = NUnit.Framework.Is;
@@ -82,7 +80,7 @@ namespace BrandonUtils.Tests.Standalone.Collections {
                 );
             }
 
-            public static void ObjectEquality<T>(FailableFunc<T> failableFunc, [CanBeNull] object obj, bool expectedEquality = true) {
+            public static void ObjectEquality<T>(FailableFunc<T> failableFunc, object? obj, bool expectedEquality = true) {
                 Asserter.Against(failableFunc)
                         .WithHeading($"[{failableFunc}] should {(expectedEquality ? "be" : "not be")} equal to [{obj}]")
                         .And(it => it.Equals(obj),  Is.EqualTo(expectedEquality))

@@ -6,8 +6,6 @@ using System.Linq;
 using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Exceptions;
 
-using JetBrains.Annotations;
-
 namespace BrandonUtils.Standalone.Hierarchic {
     [Obsolete("not thrilled")]
     public abstract class Guardian<TGuardian, TDependant> : IGuardian<TGuardian, TDependant> where TGuardian : Guardian<TGuardian, TDependant>
@@ -28,8 +26,7 @@ namespace BrandonUtils.Standalone.Hierarchic {
         /// <param name="orphan">a starving British child</param>
         /// <returns>this <see cref="Guardian{TGuardian,TDependant}"/>, with inversely proportional self-worth and taxes</returns>
         /// <exception cref="BrandonException">if the <see cref="orphan"/> has already been <see cref="Adopt">adopted</see> by a different <see cref="Dependant{TGuardian,TDependant}.Guardian"/></exception>
-        [NotNull]
-        public virtual TGuardian Adopt([NotNull] TDependant orphan) {
+        public virtual TGuardian Adopt(TDependant orphan) {
             if (!ReferenceEquals(orphan.Guardian, this)) {
                 ValidateGuardianship(orphan, $"Couldn't {nameof(Adopt)} the {nameof(orphan)}!");
             }
@@ -47,8 +44,7 @@ namespace BrandonUtils.Standalone.Hierarchic {
         /// <param name="pariah"></param>
         /// <returns></returns>
         /// <exception cref="BrandonException">if the <see cref="pariah"/> isn't one of the <see cref="Dependants"/></exception>
-        [NotNull]
-        public virtual TGuardian Disown([NotNull] TDependant pariah) {
+        public virtual TGuardian Disown(TDependant pariah) {
             if (_dependants.Contains(pariah)) {
                 _dependants.Remove(pariah);
             }

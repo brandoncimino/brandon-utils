@@ -46,24 +46,24 @@ namespace BrandonUtils.Testing {
         }
 
         public static void Unless<T>(
-            [NotNull]   ActualValueDelegate<T> actualValueDelegate,
-            [NotNull]   IResolveConstraint     constraint,
-            [CanBeNull] Func<string>           messageProvider
+            ActualValueDelegate<T> actualValueDelegate,
+            IResolveConstraint     constraint,
+            Func<string>?          messageProvider
         ) {
             var appliedConstraint = constraint.Resolve().ApplyTo(actualValueDelegate);
             HandleConstraintResult(appliedConstraint, messageProvider);
         }
 
         public static void Unless(
-            [NotNull]   TestDelegate       action,
-            [NotNull]   IResolveConstraint constraint,
-            [CanBeNull] Func<string>       messageProvider
+            TestDelegate       action,
+            IResolveConstraint constraint,
+            Func<string>?      messageProvider
         ) {
             var appliedConstraint = constraint.Resolve().ApplyTo(action);
             HandleConstraintResult(appliedConstraint, messageProvider);
         }
 
-        private static void HandleConstraintResult([NotNull] ConstraintResult result, [CanBeNull] Func<string> messageProvider) {
+        private static void HandleConstraintResult(ConstraintResult result, Func<string>? messageProvider) {
             if (result.IsSuccess == false) {
                 var mParts = new[] {
                     messageProvider?.Try().OrDefault(),

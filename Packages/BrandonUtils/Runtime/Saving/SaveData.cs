@@ -143,7 +143,7 @@ namespace BrandonUtils.Saving {
             }
         }
 
-        protected SaveData([NotNull] string nickname) {
+        protected SaveData(string nickname) {
             Nickname = nickname;
         }
 
@@ -279,8 +279,7 @@ namespace BrandonUtils.Saving {
         /// </summary>
         /// <param name="nickname"></param>
         /// <returns>the newly created <see cref="SaveData{T}" /></returns>
-        [NotNull]
-        public static T NewSaveFile([NotNull] string nickname) {
+        public static T NewSaveFile(string nickname) {
             Log(
                 $"Creating a new save file:",
                 $"{nameof(Nickname)}: {nickname}",
@@ -309,8 +308,7 @@ namespace BrandonUtils.Saving {
         /// </remarks>
         /// <param name="nickname">the desired <see cref="Nickname"/></param>
         /// <returns>a new instance of <see cref="T"/></returns>
-        [NotNull]
-        public static T Construct([NotNull] string nickname) {
+        public static T Construct(string nickname) {
             return ReflectionUtils.Construct<T>(nickname);
         }
 
@@ -330,8 +328,7 @@ namespace BrandonUtils.Saving {
         /// <exception cref="ArgumentNullException">If <paramref name="nickname"/> <see cref="string.IsNullOrWhiteSpace"/></exception>
         /// <exception cref="SaveDataException">If a file at <see cref="GetSaveFilePath"/> already exists</exception>
         /// <exception cref="ReSaveDelayException">If <paramref name="useReSaveDelay"/> is <c>true</c> and <see cref="SaveData.ReSaveDelay"/> hasn't elapsed since <see cref="LastSaveTime"/></exception>
-        [NotNull]
-        private static T Save([NotNull] SaveData<T> saveData, [NotNull] string nickname, bool useReSaveDelay = true) {
+        private static T Save(SaveData<T> saveData, string nickname, bool useReSaveDelay = true) {
             if (saveData == null) {
                 throw new ArgumentNullException(nameof(saveData));
             }

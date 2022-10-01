@@ -16,7 +16,6 @@ using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone.Strings.Prettifiers {
     internal static partial class InnerPretty {
-        [NotNull]
         private static Type InferType(IEnumerable stuff) {
             try {
                 return ReflectionUtils.CommonType(stuff.Cast<object>().Select(it => it.GetType()));
@@ -26,13 +25,13 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
             }
         }
 
-        [NotNull]
+
         private static object GetHeader(
-            [NotNull, ItemCanBeNull]
+            [ItemCanBeNull]
             IEnumerable values,
-            [CanBeNull] Type                   valueType,
-            [NotNull]   string                 fallback,
-            [NotNull]   PrettificationSettings settings
+            Type?                  valueType,
+            string                 fallback,
+            PrettificationSettings settings
         ) {
             return settings.HeaderStyle.Value switch {
                 HeaderStyle.None      => fallback,
@@ -42,8 +41,8 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
         }
 
         private static (object keyHeader, object valHeader) GetHeaders(
-            [NotNull]   IDictionary            dictionary,
-            [CanBeNull] PrettificationSettings settings
+            IDictionary             dictionary,
+            PrettificationSettings? settings
         ) {
             settings ??= Prettification.DefaultPrettificationSettings;
             return (
@@ -53,8 +52,8 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
         }
 
         private static (object keyHeader, object valHeader) GetHeaders<TKey, TVal>(
-            [NotNull]   IDictionary<TKey, TVal> dictionary,
-            [CanBeNull] PrettificationSettings  settings
+            IDictionary<TKey, TVal> dictionary,
+            PrettificationSettings? settings
         ) {
             settings ??= Prettification.DefaultPrettificationSettings;
             return (
@@ -76,8 +75,8 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
             return PrettifyDictionary(keys, vals, settings);
         }
 
-        [NotNull]
-        public static string PrettifyDictionary2([NotNull] IDictionary dictionary, [CanBeNull] PrettificationSettings settings = default) {
+
+        public static string PrettifyDictionary2(IDictionary dictionary, PrettificationSettings? settings = default) {
             settings ??= Prettification.DefaultPrettificationSettings;
 
             var keys = dictionary.Keys.Cast<object>();
@@ -100,10 +99,9 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
         }
 
         private class Col {
-            [CanBeNull] public object              Header;
-            public             IEnumerable<object> Cells;
+            public object?             Header;
+            public IEnumerable<object> Cells;
 
-            [NotNull, ItemNotNull]
             public IEnumerable<string> GetLines(PrettificationSettings settings) {
                 settings ??= Prettification.DefaultPrettificationSettings;
                 settings =   settings.JsonClone();
@@ -130,8 +128,7 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
             public readonly Col Keys = new Col();
             public readonly Col Vals = new Col();
 
-            [NotNull, ItemNotNull]
-            public IEnumerable<string> GetLines([CanBeNull] PrettificationSettings settings) {
+            public IEnumerable<string> GetLines(PrettificationSettings? settings) {
                 settings ??= Prettification.DefaultPrettificationSettings.JsonClone();
                 // calculate the various widths
                 var keyLines = Keys.GetLines(settings).ToArray();
@@ -146,12 +143,12 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
             }
         }
 
-        [NotNull]
+
         [SuppressMessage("ReSharper", "UseDeconstructionOnParameter")]
         private static string PrettifyDictionary2(
             (IEnumerable<object> cells, object header) keys,
             (IEnumerable<object> cells, object header) vals,
-            [CanBeNull] PrettificationSettings         settings
+            PrettificationSettings?                    settings
         ) {
             if (keys.cells == null || keys.header == null) {
                 Console.WriteLine($"🔑s were null!! {keys}");
@@ -188,15 +185,12 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
         /// <returns></returns>
         /// <exception cref="NullReferenceException"></exception>
         /// <exception cref="BrandonException"></exception>
-        [NotNull]
         private static string PrettifyDictionary(
-            [NotNull, ItemCanBeNull]
-            IList<object> keys,
-            [NotNull, ItemCanBeNull]
-            IList<object> vals,
-            Optional<object>                   keyHeader,
-            Optional<object>                   valHeader,
-            [CanBeNull] PrettificationSettings settings
+            IList<object?>          keys,
+            IList<object?>          vals,
+            Optional<object>        keyHeader,
+            Optional<object>        valHeader,
+            PrettificationSettings? settings
         ) {
             settings ??= Prettification.DefaultPrettificationSettings;
 
@@ -230,7 +224,7 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
             return lines.JoinLines();
         }
 
-        private static (int keyWidth, int valWidth) CalculateWidths(int unlimitedKeyWidth, int unlimitedValWidth, [NotNull] string columnSeparator, int widthLimit) {
+        private static (int keyWidth, int valWidth) CalculateWidths(int unlimitedKeyWidth, int unlimitedValWidth, string columnSeparator, int widthLimit) {
             widthLimit -= columnSeparator.Length;
 
             if (unlimitedKeyWidth + unlimitedValWidth < widthLimit) {
@@ -247,8 +241,8 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
             return (keyWidth, valWidth);
         }
 
-        [NotNull] private static string PrettifyPair((object value, int width) a,     (object value, int width) b,     [NotNull] PrettificationSettings settings) => $"{PrettifyCell(a.value, a.width, settings)}{settings.TableColumnSeparator}{PrettifyCell(b.value, b.width, settings)}";
-        [NotNull] private static string PrettifyCell(object                    value, int                       width, PrettificationSettings           settings) => value.Prettify(settings).ForceToLength(width);
+        private static string PrettifyPair((object value, int width) a,     (object value, int width) b,     PrettificationSettings settings) => $"{PrettifyCell(a.value, a.width, settings)}{settings.TableColumnSeparator}{PrettifyCell(b.value, b.width, settings)}";
+        private static string PrettifyCell(object                    value, int                       width, PrettificationSettings settings) => value.Prettify(settings).ForceToLength(width);
 
         /**
          * <remarks>I would have this operate on <see cref="KeyedCollection{TKey,TItem}"/>, but unfortunately, <see cref="KeyedCollection{TKey,TItem}.GetKeyForItem"/> is <c>protected</c>.</remarks>
@@ -272,8 +266,7 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <returns></returns>
-        [NotNull]
-        internal static string PrettifyDictionary<TKey, TValue>(IDictionary<TKey, TValue> dictionary, [NotNull] PrettificationSettings settings) {
+        internal static string PrettifyDictionary<TKey, TValue>(IDictionary<TKey, TValue> dictionary, PrettificationSettings settings) {
             return PrettifyDictionary(
                 dictionary.Keys.Cast<object>().ToList(),
                 dictionary.Values.Cast<object>().ToList(),
@@ -283,8 +276,8 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
             );
         }
 
-        [NotNull]
-        internal static string PrettifyDictionary2<TKey, TValue>([NotNull] IDictionary<TKey, TValue> dictionary, [CanBeNull] PrettificationSettings settings = default) {
+
+        internal static string PrettifyDictionary2<TKey, TValue>(IDictionary<TKey, TValue> dictionary, PrettificationSettings? settings = default) {
             return PrettifyDictionary2(
                 (dictionary.Keys.Cast<object>(), typeof(TKey)),
                 (dictionary.Values.Cast<object>(), typeof(TValue)),

@@ -6,8 +6,6 @@ using System.Linq;
 using BrandonUtils.Standalone.Reflection;
 using BrandonUtils.Standalone.Strings;
 
-using JetBrains.Annotations;
-
 using Newtonsoft.Json;
 
 namespace BrandonUtils.Standalone.Optional {
@@ -15,7 +13,7 @@ namespace BrandonUtils.Standalone.Optional {
     /// A custom <see cref="JsonConverter"/> for <see cref="Optional{T}"/>.
     /// </summary>
     public class OptionalJsonConverter : JsonConverter {
-        public override void WriteJson([NotNull] JsonWriter writer, object value, [NotNull] JsonSerializer serializer) {
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {
             serializer.TraceWriter?.Trace(TraceLevel.Info, $"[{GetType().Prettify()}] serializing {value}", default);
             var enumerable = (IEnumerable)value;
             /*
@@ -31,8 +29,8 @@ namespace BrandonUtils.Standalone.Optional {
             JsonSerializer.Create().Serialize(writer, enumerable.Cast<object>().ToList());
         }
 
-        [NotNull]
-        public override object ReadJson([NotNull] JsonReader reader, [NotNull] Type objectType, object? existingValue, [NotNull] JsonSerializer serializer) {
+
+        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer) {
             var elementType = objectType.GetGenericArguments()[0];
             var arType      = elementType.MakeArrayType();
             var asIList     = serializer.Deserialize(reader, arType) as IList ?? throw new NullReferenceException($"Got a null value when deserializing {objectType.Prettify()} to the intermediate type {arType.Prettify()} as {nameof(IList)}");

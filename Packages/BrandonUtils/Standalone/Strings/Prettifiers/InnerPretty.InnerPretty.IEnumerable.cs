@@ -11,15 +11,14 @@ using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone.Strings.Prettifiers {
     internal static partial class InnerPretty {
-        [NotNull]
-        private static IList<T> AsList<T>([NotNull] this IEnumerable<T> enumerable) {
+        private static IList<T> AsList<T>(this IEnumerable<T> enumerable) {
             return enumerable as IList<T> ?? enumerable.ToList();
         }
 
         public static string PrettifyEnumerable(
-            [NotNull] [ItemCanBeNull]
+            [ItemCanBeNull]
             IEnumerable enumerable,
-            [NotNull] PrettificationSettings settings
+            PrettificationSettings settings
         ) {
             var asObjects      = enumerable.Cast<object>();
             var enumerableType = enumerable.GetType();
@@ -39,11 +38,10 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
         }
 
         private static string PrettifyEnumerable_DynamicLine<T>(
-            [NotNull] [ItemCanBeNull]
-            IEnumerable<T> enumerable,
-            [NotNull] Type                   enumerableType,
-            [NotNull] PrettificationSettings outerSettings,
-            [NotNull] PrettificationSettings innerSettings
+            IEnumerable<T?>        enumerable,
+            Type                   enumerableType,
+            PrettificationSettings outerSettings,
+            PrettificationSettings innerSettings
         ) {
             outerSettings.TraceWriter.Verbose(() => $"🎨 via {nameof(PrettifyEnumerable_DynamicLine)}");
             enumerable = enumerable.AsList();
@@ -59,11 +57,10 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
         }
 
         private static string PrettifyEnumerable_MultiLine<T>(
-            [NotNull] [ItemCanBeNull]
-            IEnumerable<T> enumerable,
-            [NotNull] Type                   enumerableType,
-            [NotNull] PrettificationSettings outerSettings,
-            [NotNull] PrettificationSettings innerSettings
+            IEnumerable<T?>        enumerable,
+            Type                   enumerableType,
+            PrettificationSettings outerSettings,
+            PrettificationSettings innerSettings
         ) {
             outerSettings.TraceWriter.Verbose(() => $"🎨 via {nameof(PrettifyEnumerable_MultiLine)}");
             enumerable = enumerable.AsList();
@@ -75,11 +72,10 @@ namespace BrandonUtils.Standalone.Strings.Prettifiers {
         }
 
         private static string PrettifyEnumerable_SingleLine<T>(
-            [NotNull] [ItemCanBeNull]
-            IEnumerable<T> enumerable,
-            [NotNull] Type                   enumerableType,
-            [NotNull] PrettificationSettings outerSettings,
-            [NotNull] PrettificationSettings innerSettings
+            IEnumerable<T?>        enumerable,
+            Type                   enumerableType,
+            PrettificationSettings outerSettings,
+            PrettificationSettings innerSettings
         ) {
             outerSettings.TraceWriter.Verbose(() => $"🎨 via {nameof(PrettifyEnumerable_SingleLine)}");
             var joined = enumerable.Select(it => it.Prettify(innerSettings)).JoinString(", ");

@@ -47,8 +47,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="TKey">the type of the <see cref="IDictionary{TKey,TValue}.Keys"/></typeparam>
         /// <typeparam name="TValue">the type of the <see cref="IDictionary{TKey,TValue}.Values"/></typeparam>
         /// <returns>the removed <typeparamref name="TValue"/>, if any; otherwise, <c>null</c></returns>
-        [CanBeNull]
-        public static TValue Grab<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> dictionary, [NotNull] TKey key) {
+        public static TValue? Grab<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key) {
             if (dictionary.TryGetValue(key, out var val) && dictionary.Remove(key)) {
                 return val;
             }
@@ -67,28 +66,28 @@ namespace BrandonUtils.Standalone.Collections {
         [Pure]
         [ContractAnnotation("null => null")]
         [ContractAnnotation("notnull => notnull")]
-        public static IList<T> Copy<T>([ItemCanBeNull] this IList<T>? oldList) {
+        public static IList<T> Copy<T>(this IList<T?>? oldList) {
             return oldList?.Select(it => it).ToList();
         }
 
         [Pure]
         [ContractAnnotation("null => null")]
         [ContractAnnotation("notnull => notnull")]
-        public static ICollection<T> Copy<T>([ItemCanBeNull] this ICollection<T>? oldCollection) {
+        public static ICollection<T> Copy<T>(this ICollection<T?>? oldCollection) {
             return oldCollection?.Select(it => it).ToList();
         }
 
         [Pure]
         [ContractAnnotation("null => null")]
         [ContractAnnotation("notnull => notnull")]
-        public static IEnumerable<T> Copy<T>([ItemCanBeNull] this IEnumerable<T>? oldList) {
+        public static IEnumerable<T> Copy<T>(this IEnumerable<T?>? oldList) {
             return oldList?.Select(it => it);
         }
 
         [Pure]
         [ContractAnnotation("null => null")]
         [ContractAnnotation("notnull => notnull")]
-        public static T[] Copy<T>([ItemCanBeNull] this T[]? oldArray) {
+        public static T[] Copy<T>(this T?[]? oldArray) {
             return oldArray?.ToArray();
         }
 
@@ -191,7 +190,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <seealso cref="List{T}.ForEach" />
         [ContractAnnotation("dictionary:null => stop")]
         [ContractAnnotation("action:null => stop")]
-        public static void ForEach<TKey, TVal>([NotNull] this IDictionary<TKey, TVal> dictionary, [NotNull, InstantHandle] Action<KeyValuePair<TKey, TVal>> action) {
+        public static void ForEach<TKey, TVal>(this IDictionary<TKey, TVal> dictionary, [InstantHandle] Action<KeyValuePair<TKey, TVal>> action) {
             foreach (var pair in dictionary) {
                 action.Invoke(pair);
             }
@@ -209,7 +208,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="TVal">the type of <see cref="Dictionary{TKey,TValue}.Values"/></typeparam>
         [ContractAnnotation("dictionary:null => stop")]
         [ContractAnnotation("action:null => stop")]
-        public static void ForEach<TKey, TVal>([NotNull] this IDictionary<TKey, TVal> dictionary, [NotNull, InstantHandle] Action<TKey, TVal> action) {
+        public static void ForEach<TKey, TVal>(this IDictionary<TKey, TVal> dictionary, [InstantHandle] Action<TKey, TVal> action) {
             foreach (var pair in dictionary) {
                 action.Invoke(pair.Key, pair.Value);
             }
@@ -221,7 +220,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// </summary>
         [ContractAnnotation("dictionary:null => stop")]
         [ContractAnnotation("action:null => stop")]
-        public static void ForEach<TKey, TVal>([NotNull] this IDictionary<TKey, TVal> dictionary, [NotNull, InstantHandle] Action<TVal> action) {
+        public static void ForEach<TKey, TVal>(this IDictionary<TKey, TVal> dictionary, [InstantHandle] Action<TVal> action) {
             dictionary.Values.ToList().ForEach(action);
         }
 
@@ -236,7 +235,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <returns></returns>
         [ContractAnnotation("enumerable:null => null")]
         [ContractAnnotation("enumerable:notnull => notnull")]
-        public static string? JoinString<T>([ItemCanBeNull] this IEnumerable<T>? enumerable, string? separator = "") {
+        public static string? JoinString<T>(this IEnumerable<T?>? enumerable, string? separator = "") {
             return enumerable == null ? null : string.Join(separator, enumerable);
         }
 
@@ -248,7 +247,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <returns>the result of <see cref="string.Join(string,System.Collections.Generic.IEnumerable{string})"/></returns>
         [ContractAnnotation("enumerable:null => null")]
         [ContractAnnotation("enumerable:notnull => notnull")]
-        public static string? JoinLines<T>([ItemCanBeNull] this IEnumerable<T>? enumerable) {
+        public static string? JoinLines<T>(this IEnumerable<T?>? enumerable) {
             return enumerable == null ? null : string.Join("\n", enumerable);
         }
 
@@ -533,7 +532,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         [Pure]
-        public static Type ItemType<T>([ItemCanBeNull] this IEnumerable<T>? enumerable) {
+        public static Type ItemType<T>(this IEnumerable<T?>? enumerable) {
             return typeof(T);
         }
 
@@ -546,7 +545,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// TODO: Experiment on whether it makes sense to have a special version of <see cref="IsEmpty{T}"/> as an <see cref="IOptional{T}"/> extension method, which would return the inverse of <see cref="IOptional{T}.HasValue"/>. The problem is that this method causes ambiguity with the <see cref="IEnumerable{T}"/> version of <see cref="IOptional{T}"/>
         [Pure]
         [ContractAnnotation("null => true")]
-        public static bool IsEmpty<T>([ItemCanBeNull, InstantHandle] this IEnumerable<T>? enumerable) {
+        public static bool IsEmpty<T>([InstantHandle] this IEnumerable<T?>? enumerable) {
             return enumerable == null || !enumerable.Any();
         }
 
@@ -558,7 +557,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <returns></returns>
         [Pure]
         [ContractAnnotation("null => false")]
-        public static bool IsNotEmpty<T>([ItemCanBeNull] this IEnumerable<T>? enumerable) {
+        public static bool IsNotEmpty<T>(this IEnumerable<T?>? enumerable) {
             return enumerable != null && enumerable.Any();
         }
 
@@ -568,7 +567,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T"></typeparam>
         /// <returns>true if none of the items in <paramref name="enumerable"/> satisfy <paramref name="predicate"/></returns>
         [Pure]
-        public static bool None<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> enumerable, [NotNull] Func<T, bool> predicate) {
+        public static bool None<T>(this IEnumerable<T?> enumerable, Func<T, bool> predicate) {
             return !enumerable.Any(predicate);
         }
 
@@ -582,7 +581,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         [Pure]
-        public static bool ContainsAny<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> enumerable, [NotNull] [ItemCanBeNull] IEnumerable<T> others) {
+        public static bool ContainsAny<T>(this IEnumerable<T?> enumerable, IEnumerable<T?> others) {
             return others.Any(enumerable.Contains);
         }
 
@@ -590,7 +589,7 @@ namespace BrandonUtils.Standalone.Collections {
          * <inheritdoc cref="ContainsAny{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
          */
         [Pure]
-        public static bool ContainsAny<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> enumerable, [NotNull] [ItemCanBeNull] params T[] others) {
+        public static bool ContainsAny<T>(this IEnumerable<T?> enumerable, params T?[] others) {
             return ContainsAny(enumerable, (IEnumerable<T>)others);
         }
 
@@ -602,7 +601,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         [Pure]
-        public static bool ContainsNone<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> enumerable, [NotNull] [ItemCanBeNull] IEnumerable<T> others) {
+        public static bool ContainsNone<T>(this IEnumerable<T?> enumerable, IEnumerable<T?> others) {
             return others.None(enumerable.Contains);
         }
 
@@ -610,7 +609,7 @@ namespace BrandonUtils.Standalone.Collections {
          * <inheritdoc cref="ContainsNone{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
          */
         [Pure]
-        public static bool ContainsNone<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> enumerable, [NotNull] [ItemCanBeNull] params T[] others) {
+        public static bool ContainsNone<T>(this IEnumerable<T?> enumerable, params T?[] others) {
             return ContainsNone(enumerable, (IEnumerable<T>)others);
         }
 
@@ -622,7 +621,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         [Pure]
-        public static bool ContainsAll<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> superset, [NotNull] [ItemCanBeNull] IEnumerable<T> subset) {
+        public static bool ContainsAll<T>(this IEnumerable<T?> superset, IEnumerable<T?> subset) {
             return subset.All(superset.Contains);
         }
 
@@ -630,7 +629,7 @@ namespace BrandonUtils.Standalone.Collections {
          * <inheritdoc cref="ContainsAll{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
          */
         [Pure]
-        public static bool ContainsAll<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> enumerable, [NotNull] [ItemCanBeNull] params T[] others) {
+        public static bool ContainsAll<T>(this IEnumerable<T?> enumerable, params T?[] others) {
             return ContainsAll(enumerable, (IEnumerable<T>)others);
         }
 
@@ -647,7 +646,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <seealso cref="ContainsAll{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
         /// <seealso cref="IsSubsetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
         [Pure]
-        public static bool IsSupersetOf<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> superset, [NotNull] [ItemCanBeNull] IEnumerable<T> subset) {
+        public static bool IsSupersetOf<T>(this IEnumerable<T?> superset, IEnumerable<T?> subset) {
             return ContainsAll(superset, subset);
         }
 
@@ -655,7 +654,7 @@ namespace BrandonUtils.Standalone.Collections {
          * <inheritdoc cref="IsSupersetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
          */
         [Pure]
-        public static bool IsSupersetOf<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> superset, [NotNull] [ItemCanBeNull] params T[] subset) {
+        public static bool IsSupersetOf<T>(this IEnumerable<T?> superset, params T?[] subset) {
             return ContainsAll(superset, subset);
         }
 
@@ -667,7 +666,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T"></typeparam>
         /// <returns>inverse of <see cref="IsSupersetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/></returns>
         [Pure]
-        public static bool IsNotSupersetOf<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> superset, [NotNull] [ItemCanBeNull] IEnumerable<T> subset) {
+        public static bool IsNotSupersetOf<T>(this IEnumerable<T?> superset, IEnumerable<T?> subset) {
             return !IsSupersetOf(superset, subset);
         }
 
@@ -679,7 +678,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T">the <see cref="Type"/> of each individual item</typeparam>
         /// <returns></returns>
         [Pure]
-        public static bool IsSubsetOf<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> subset, [NotNull] [ItemCanBeNull] IEnumerable<T> superset) {
+        public static bool IsSubsetOf<T>(this IEnumerable<T?> subset, IEnumerable<T?> superset) {
             return ContainsAll(superset, subset);
         }
 
@@ -694,7 +693,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T"></typeparam>
         /// <returns>inverse of <see cref="IsSubsetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/></returns>
         [Pure]
-        public static bool IsNotSubsetOf<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> subset, [NotNull] [ItemCanBeNull] IEnumerable<T> superset) {
+        public static bool IsNotSubsetOf<T>(this IEnumerable<T?> subset, IEnumerable<T?> superset) {
             return !IsSubsetOf(superset, subset);
         }
 
@@ -702,7 +701,7 @@ namespace BrandonUtils.Standalone.Collections {
          * <inheritdoc cref="IsSubsetOf{T}(System.Collections.Generic.IEnumerable{T},System.Collections.Generic.IEnumerable{T})"/>
          */
         [Pure]
-        public static bool IsSubsetOf<T>([NotNull] [ItemCanBeNull] this IEnumerable<T> subset, [NotNull] [ItemCanBeNull] params T[] superset) {
+        public static bool IsSubsetOf<T>(this IEnumerable<T?> subset, params T?[] superset) {
             return ContainsAll(superset, subset);
         }
 
@@ -714,7 +713,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T">The type of the elements of <paramref name="source" />.</typeparam>
         /// <returns>the inverse of <see cref="Enumerable.Contains{TSource}(System.Collections.Generic.IEnumerable{TSource},TSource)"/></returns>
         [Pure]
-        public static bool DoesNotContain<T>([NotNull, ItemCanBeNull, InstantHandle] this IEnumerable<T> source, [CanBeNull] T value) {
+        public static bool DoesNotContain<T>([InstantHandle] this IEnumerable<T?> source, T? value) {
             return !source.Contains(value);
         }
 
@@ -728,8 +727,8 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public static bool AddIfMissing<T>(
-            [NotNull] this ICollection<T> collection,
-            [CanBeNull]    T              newItem
+            this ICollection<T> collection,
+            T?                  newItem
         ) {
             if (collection.Contains(newItem)) {
                 return false;
@@ -740,12 +739,10 @@ namespace BrandonUtils.Standalone.Collections {
         }
 
         [LinqTunnel]
-        [NotNull]
         [ContractAnnotation("source:null => stop")]
         public static IEnumerable<T> Union<T>(
-            [NotNull, ItemCanBeNull]
-            this IEnumerable<T> source,
-            [CanBeNull] T newItem
+            this IEnumerable<T?> source,
+            T?                   newItem
         ) {
             if (source == null) {
                 throw new ArgumentNullException(nameof(source));
@@ -755,13 +752,10 @@ namespace BrandonUtils.Standalone.Collections {
         }
 
         [LinqTunnel]
-        [NotNull]
         [ContractAnnotation("source:null => stop")]
         public static IEnumerable<T> Union<T>(
-            [NotNull, ItemCanBeNull]
-            this IEnumerable<T> source,
-            [NotNull, ItemCanBeNull]
-            params T[] others
+            this   IEnumerable<T?> source,
+            params T?[]            others
         ) {
             return source.Union(others.AsEnumerable());
         }
@@ -774,18 +768,16 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T">the type of the elements of <paramref name="source"/></typeparam>
         /// <returns>a new sequence that begins <b>and</b> ends with <paramref name="bookend"/></returns>
         [Pure]
-        [NotNull, ItemCanBeNull]
         [LinqTunnel]
-        public static IEnumerable<T> Bookend<T>([NotNull, ItemCanBeNull] this IEnumerable<T> source, [CanBeNull] T bookend) {
+        public static IEnumerable<T?> Bookend<T>(this IEnumerable<T?> source, T? bookend) {
             return source
                    .Prepend(bookend)
                    .Append(bookend);
         }
 
         [Pure]
-        [NotNull, ItemCanBeNull]
         [LinqTunnel]
-        public static IEnumerable<T> Bookend<T>([NotNull, ItemCanBeNull] this IEnumerable<T> source, [CanBeNull] T prefix, [CanBeNull] T suffix) {
+        public static IEnumerable<T?> Bookend<T>(this IEnumerable<T?> source, T? prefix, T? suffix) {
             return source
                    .Prepend(prefix)
                    .Append(suffix);
@@ -802,11 +794,9 @@ namespace BrandonUtils.Standalone.Collections {
         /// <returns>a new sequence that ends with <paramref name="valueThatMightBeNull"/> if it wasn't <c>null</c></returns>
         [Pure]
         [LinqTunnel]
-        [NotNull, ItemCanBeNull]
-        public static IEnumerable<T> AppendNonNull<T>(
-            [ItemCanBeNull]
-            this IEnumerable<T>? source,
-            [CanBeNull] T valueThatMightBeNull
+        public static IEnumerable<T?> AppendNonNull<T>(
+            this IEnumerable<T?>? source,
+            T?                    valueThatMightBeNull
         ) {
             source = source.EmptyIfNull();
             return valueThatMightBeNull == null ? source : source.Append(valueThatMightBeNull);
@@ -821,12 +811,9 @@ namespace BrandonUtils.Standalone.Collections {
         /// <returns></returns>
         [Pure]
         [LinqTunnel]
-        [NotNull, ItemCanBeNull]
-        public static IEnumerable<T> AppendNonNull<T>(
-            [ItemCanBeNull]
-            this IEnumerable<T>? source,
-            [ItemCanBeNull]
-            IEnumerable<T>? additionalValuesThatMightBeNull
+        public static IEnumerable<T?> AppendNonNull<T>(
+            this IEnumerable<T?>? source,
+            IEnumerable<T?>?      additionalValuesThatMightBeNull
         ) {
             source = source.EmptyIfNull();
             return additionalValuesThatMightBeNull == null ? source : source.Concat(additionalValuesThatMightBeNull.NonNull());
@@ -837,10 +824,9 @@ namespace BrandonUtils.Standalone.Collections {
          */
         [Pure]
         [LinqTunnel]
-        [NotNull]
         public static IEnumerable<T> AppendNonNull<T>(
             this IEnumerable<T>? source,
-            [CanBeNull]      T?              valueThatMightBeNull
+            T?                   valueThatMightBeNull
         ) where T : struct {
             source = source.EmptyIfNull();
             return valueThatMightBeNull.IsEmpty() ? source : source.Append(valueThatMightBeNull.Value);
@@ -850,12 +836,10 @@ namespace BrandonUtils.Standalone.Collections {
          * <inheritdoc cref="AppendNonNull{T}(System.Collections.Generic.IEnumerable{T},IEnumerable{T})"/>
          */
         [Pure]
-        [NotNull]
         [LinqTunnel]
         public static IEnumerable<T> AppendNonNull<T>(
             this IEnumerable<T>? source,
-            [ItemCanBeNull]
-            IEnumerable<T?>? additionalValuesThatMightBeNull
+            IEnumerable<T?>?     additionalValuesThatMightBeNull
         ) where T : struct {
             return source.EmptyIfNull().Concat(additionalValuesThatMightBeNull.NonNull());
         }
@@ -864,25 +848,21 @@ namespace BrandonUtils.Standalone.Collections {
 
         #region PrependNonNull
 
-        [NotNull]
         [Pure]
         [LinqTunnel]
         public static IEnumerable<T> PrependNonNull<T>(
-            [NotNull, ItemCanBeNull]
-            this IEnumerable<T> source,
-            [CanBeNull] T valueThatMightBeNull
+            this IEnumerable<T?> source,
+            T?                   valueThatMightBeNull
         ) {
             return valueThatMightBeNull == null ? source : source.Prepend(valueThatMightBeNull);
         }
 
-        [NotNull]
+
         [Pure]
         [LinqTunnel]
         public static IEnumerable<T> PrependNonNull<T>(
-            [NotNull, ItemCanBeNull]
-            this IEnumerable<T> source,
-            [ItemCanBeNull]
-            IEnumerable<T>? additionalValuesThatMightBeNull
+            this IEnumerable<T?> source,
+            IEnumerable<T?>?     additionalValuesThatMightBeNull
         ) {
             return additionalValuesThatMightBeNull.NonNull().Concat(source);
         }
@@ -899,7 +879,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TElements"></typeparam>
         /// <returns></returns>
-        public static TSource AddNonNull<TSource, TElements>([NotNull] this TSource source, [CanBeNull] TElements valueThatMightBeNull) where TSource : ICollection<TElements> {
+        public static TSource AddNonNull<TSource, TElements>(this TSource source, TElements? valueThatMightBeNull) where TSource : ICollection<TElements> {
             if (valueThatMightBeNull != null) {
                 source.Add(valueThatMightBeNull);
             }
@@ -910,7 +890,7 @@ namespace BrandonUtils.Standalone.Collections {
         /**
          * <inheritdoc cref="AddNonNull{TSource,TElements}(TSource,TElements)"/>
          */
-        public static TSource AddNonNull<TSource, TElements>([NotNull] this TSource source, [CanBeNull] TElements? valueThatMightBeNull) where TSource : ICollection<TElements> where TElements : struct {
+        public static TSource AddNonNull<TSource, TElements>(this TSource source, TElements? valueThatMightBeNull) where TSource : ICollection<TElements> where TElements : struct {
             if (valueThatMightBeNull != null) {
                 source.Add(valueThatMightBeNull.Value);
             }
@@ -926,7 +906,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="TSource">the <see cref="ICollection{T}"/> type of <paramref name="source"/></typeparam>
         /// <typeparam name="TElements">the type of each entry in <paramref name="source"/></typeparam>
         /// <returns>the original <paramref name="source"/></returns>
-        public static TSource AddNonNull<TSource, TElements>([NotNull] this TSource source, [ItemCanBeNull] IEnumerable<TElements>? additionalValuesThatMightBeNull) where TSource : ICollection<TElements> {
+        public static TSource AddNonNull<TSource, TElements>(this TSource source, IEnumerable<TElements?>? additionalValuesThatMightBeNull) where TSource : ICollection<TElements> {
             if (additionalValuesThatMightBeNull == null) {
                 return source;
             }
@@ -943,7 +923,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="TSource">the <see cref="ICollection{T}"/> type of <paramref name="source"/></typeparam>
         /// <typeparam name="TElements">the <see cref="ValueType"/> of <paramref name="source"/>'s entries (which are <see cref="Nullable{T}"/> in <paramref name="nullableValues"/>)</typeparam>
         /// <returns>the original <paramref name="source"/></returns>
-        public static TSource AddNonNull<TSource, TElements>([NotNull] this TSource source, [ItemNotNull] IEnumerable<TElements?>? nullableValues) where TSource : ICollection<TElements> where TElements : struct {
+        public static TSource AddNonNull<TSource, TElements>(this TSource source, [ItemNotNull] IEnumerable<TElements?>? nullableValues) where TSource : ICollection<TElements> where TElements : struct {
             if (nullableValues == null) {
                 return source;
             }
@@ -962,9 +942,8 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="source">the original <see cref="IEnumerable{T}"/></param>
         /// <typeparam name="T">the type of the items in <paramref name="source"/></typeparam>
         /// <returns>a new sequence containing only the non-<c>null</c> entries from <paramref name="source"/></returns>
-        [NotNull]
         [ItemNotNull]
-        public static IEnumerable<T> NonNull<T>([ItemCanBeNull] this IEnumerable<T>? source) {
+        public static IEnumerable<T> NonNull<T>(this IEnumerable<T?>? source) {
             return source == null ? Enumerable.Empty<T>() : source.Where(it => it != null);
         }
 
@@ -976,19 +955,18 @@ namespace BrandonUtils.Standalone.Collections {
          * The entries in the output will be "un-boxed", i.e. <typeparamref name="T"/> rather than <c>T?</c>
          * </remarks>
          */
-        [NotNull]
-        public static IEnumerable<T> NonNull<T>([ItemCanBeNull] this IEnumerable<T?>? source) where T : struct {
+        public static IEnumerable<T> NonNull<T>(this IEnumerable<T?>? source) where T : struct {
             return source == null ? Enumerable.Empty<T>() : source.Where(it => it.HasValue).Select(it => it.Value);
         }
 
         #region NonBlank
 
-        [NotNull, ItemNotNull]
+        [return: System.Diagnostics.CodeAnalysis.NotNull]
         public static IEnumerable<string> NonBlank(this IEnumerable<string?>? lines) {
             return lines == null ? Enumerable.Empty<string>() : lines.Where(it => it.IsNotBlank());
         }
 
-        [NotNull, ItemNotNull]
+        [return: System.Diagnostics.CodeAnalysis.NotNull]
         public static IEnumerable<string> NonEmpty(this IEnumerable<string?>? lines) {
             return lines == null ? Enumerable.Empty<string>() : lines.Where(it => it.IsNotEmpty());
         }
@@ -1008,10 +986,9 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="predicate">a function used to filter the entries in <paramref name="source"/></param>
         /// <typeparam name="T"></typeparam>
         /// <returns>an <see cref="Optional{T}"/> containing the <typeparamref name="T"/> value that matched the <paramref name="predicate"/></returns>
-        [ItemCanBeNull]
-        public static Optional<T> FindFirst<T>(
-            [ItemCanBeNull, InstantHandle]
-            this IEnumerable<T>? source,
+        public static Optional<T?> FindFirst<T>(
+            [InstantHandle]
+            this IEnumerable<T?>? source,
             [InstantHandle]
             Func<T, bool>? predicate = default
         ) {
@@ -1024,23 +1001,21 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <returns>an <see cref="Optional{T}"/> containing the <typeparamref name="TValue"/> of <paramref name="key"/> if <paramref name="source"/> <see cref="IDictionary{TKey,TValue}.ContainsKey"/>; otherwise, an empty <see cref="Optional"/></returns>
-        [ItemCanBeNull]
         [Pure]
-        public static Optional<TValue> Find<TKey, TValue>(
+        public static Optional<TValue?> Find<TKey, TValue>(
             this IDictionary<TKey, TValue>? source,
-            [NotNull]        TKey                       key
+            TKey                            key
         ) {
             source = source.OrEmpty();
             return source.ContainsKey(key) ? source[key] : default(Optional<TValue>);
         }
 
         /// <inheritdoc cref="Find{TKey,TValue}(System.Collections.Generic.IDictionary{TKey,TValue},TKey)"/>
-        [ItemCanBeNull]
         [Pure]
-        public static Optional<TValue> Find<TKey, TValue>(
+        public static Optional<TValue?> Find<TKey, TValue>(
             [ItemCanBeNull]
             this KeyedCollection<TKey, TValue>? source,
-            [NotNull] TKey key
+            TKey key
         ) {
             if (source == null) {
                 return default;
@@ -1057,7 +1032,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="predicate"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns>the index of the first entry in the <paramref name="source"/> that satisfies the <paramref name="predicate"/>; or null if none was found</returns>
-        public static int? FirstIndexOf<T>([ItemCanBeNull, InstantHandle] this IEnumerable<T>? source, [InstantHandle] Func<T, bool> predicate) {
+        public static int? FirstIndexOf<T>([InstantHandle] this IEnumerable<T?>? source, [InstantHandle] Func<T, bool> predicate) {
             var sourceArray = source.EmptyIfNull().ToArray();
             for (int i = 0; i < sourceArray.Length; i++) {
                 if (predicate.Invoke(sourceArray[i])) {
@@ -1079,13 +1054,13 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="takePredicate">the condition used to <see cref="Enumerable.TakeWhile{TSource}(System.Collections.Generic.IEnumerable{TSource},System.Func{TSource,bool})"/></param>
         /// <typeparam name="T">the type of the items in <paramref name="source"/></typeparam>
         /// <returns><see cref="Enumerable.TakeWhile{TSource}(System.Collections.Generic.IEnumerable{TSource},System.Func{TSource,bool})"/>.<see cref="Enumerable.Last{TSource}(System.Collections.Generic.IEnumerable{TSource})"/></returns>
-        [Pure, CanBeNull]
+        [Pure]
         [ContractAnnotation("source:null => stop")]
         [ContractAnnotation("takePredicate:null => stop")]
-        public static T TakeLast<T>(
-            [NotNull, ItemCanBeNull, InstantHandle]
-            this IEnumerable<T> source,
-            [NotNull] Func<T, bool> takePredicate
+        public static T? TakeLast<T>(
+            [InstantHandle]
+            this IEnumerable<T?> source,
+            Func<T, bool> takePredicate
         ) {
             return source.TakeWhile(takePredicate).Last();
         }
@@ -1100,9 +1075,8 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T">the type of the elements in <paramref name="source"/></typeparam>
         /// <returns><paramref name="source"/>, or an <see cref="Enumerable.Empty{TResult}"/> if <paramref name="source"/> was null</returns>
         [Pure]
-        [NotNull, ItemCanBeNull]
         [LinqTunnel]
-        public static IEnumerable<T> EmptyIfNull<T>([ItemCanBeNull, NoEnumeration] this IEnumerable<T>? source) {
+        public static IEnumerable<T?> EmptyIfNull<T>([NoEnumeration] this IEnumerable<T?>? source) {
             return source ?? Enumerable.Empty<T>();
         }
 
@@ -1110,9 +1084,8 @@ namespace BrandonUtils.Standalone.Collections {
          * <inheritdoc cref="EmptyIfNull{T}(System.Collections.Generic.IEnumerable{T})"/>
          */
         [Pure]
-        [NotNull, ItemCanBeNull]
         [LinqTunnel]
-        public static IEnumerable<T> OrEmpty<T>([ItemCanBeNull] this IEnumerable<T>? source) {
+        public static IEnumerable<T?> OrEmpty<T>(this IEnumerable<T?>? source) {
             return source.EmptyIfNull();
         }
 
@@ -1120,9 +1093,8 @@ namespace BrandonUtils.Standalone.Collections {
          * <inheritdoc cref="EmptyIfNull{T}(System.Collections.Generic.IEnumerable{T})"/>
          */
         [Pure]
-        [NotNull, ItemCanBeNull]
         [LinqTunnel]
-        public static T[] EmptyIfNull<T>([ItemCanBeNull] this T[]? source) {
+        public static T?[] EmptyIfNull<T>(this T?[]? source) {
             return source ?? Array.Empty<T>();
         }
 
@@ -1130,9 +1102,8 @@ namespace BrandonUtils.Standalone.Collections {
          * <inheritdoc cref="EmptyIfNull{T}(System.Collections.Generic.IEnumerable{T})"/>
          */
         [Pure]
-        [NotNull, ItemCanBeNull]
         [LinqTunnel]
-        public static T[] OrEmpty<T>([ItemCanBeNull] this T[]? source) {
+        public static T?[] OrEmpty<T>(this T?[]? source) {
             return source.EmptyIfNull();
         }
 
@@ -1140,7 +1111,6 @@ namespace BrandonUtils.Standalone.Collections {
          * <inheritdoc cref="EmptyIfNull{T}(System.Collections.Generic.IEnumerable{T})"/>
          */
         [Pure]
-        [NotNull]
         [LinqTunnel]
         public static IDictionary<TKey, TValue> EmptyIfNull<TKey, TValue>(this IDictionary<TKey, TValue>? source) {
             return source ?? new Dictionary<TKey, TValue>();
@@ -1150,7 +1120,6 @@ namespace BrandonUtils.Standalone.Collections {
          * <inheritdoc cref="EmptyIfNull{T}(System.Collections.Generic.IEnumerable{T})"/>
          */
         [Pure]
-        [NotNull]
         [LinqTunnel]
         public static IDictionary<TKey, TValue> OrEmpty<TKey, TValue>(this IDictionary<TKey, TValue>? source) {
             return source.EmptyIfNull();
@@ -1160,13 +1129,11 @@ namespace BrandonUtils.Standalone.Collections {
 
         #region Intersection
 
-        [NotNull, ItemNotNull]
+        [ItemNotNull]
+        [return: System.Diagnostics.CodeAnalysis.NotNull]
         public static IEnumerable<T> Intersection<T>(
-            [NotNull, ItemCanBeNull]
-            this IEnumerable<T> source,
-            [NotNull, ItemCanBeNull]
-            IEnumerable<T> second,
-            [NotNull, ItemNotNull]
+            this IEnumerable<T?>    source,
+            IEnumerable<T?>         second,
             params IEnumerable<T>[] additional
         ) {
             if (source == null) {
@@ -1184,11 +1151,12 @@ namespace BrandonUtils.Standalone.Collections {
             return additional.Prepend(source).Prepend(second).Intersection();
         }
 
-        [NotNull, ItemNotNull]
+        [ItemNotNull]
+        [return: System.Diagnostics.CodeAnalysis.NotNull]
         public static IEnumerable<T> Intersection<T>(
-            [NotNull, InstantHandle]
+            [InstantHandle]
             this IEnumerable<T> source,
-            [NotNull, ItemNotNull, InstantHandle]
+            [InstantHandle]
             IEnumerable<IEnumerable<T>> others
         ) {
             if (source == null) {
@@ -1202,8 +1170,9 @@ namespace BrandonUtils.Standalone.Collections {
             return others.Prepend(source).Intersection();
         }
 
-        [NotNull, ItemNotNull]
-        public static IEnumerable<T> Intersection<T>([NotNull, ItemNotNull, InstantHandle] this IEnumerable<IEnumerable<T>> sources) {
+        [ItemNotNull]
+        [return: System.Diagnostics.CodeAnalysis.NotNull]
+        public static IEnumerable<T> Intersection<T>([InstantHandle] this IEnumerable<IEnumerable<T>> sources) {
             if (sources == null) {
                 throw new ArgumentNullException(nameof(sources));
             }
@@ -1221,8 +1190,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <param name="source">the original <see cref="IList{T}"/></param>
         /// <typeparam name="T">the type of the elements of <paramref name="source"/></typeparam>
         /// <returns>a <see cref="ReadOnlyCollection{T}"/> wrapper around this <see cref="IList{T}"/></returns>
-        [NotNull, ItemCanBeNull]
-        public static ReadOnlyCollection<T> AsReadOnly<T>([NotNull, ItemCanBeNull] this IList<T> source) {
+        public static ReadOnlyCollection<T?> AsReadOnly<T>(this IList<T?> source) {
             return new ReadOnlyCollection<T>(source);
         }
 
@@ -1233,8 +1201,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="TKey">the type of <paramref name="source"/>'s <see cref="IDictionary{TKey,TValue}.Keys"/></typeparam>
         /// <typeparam name="TValue">the type of <paramref name="source"/>'s <see cref="IDictionary{TKey,TValue}.Values"/></typeparam>
         /// <returns>a <see cref="ReadOnlyDictionary{TKey,TValue}"/> wrapper around this <see cref="IDictionary{TKey,TValue}"/></returns>
-        [NotNull]
-        public static ReadOnlyDictionary<TKey, TValue> AsReadOnly<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> source) {
+        public static ReadOnlyDictionary<TKey, TValue> AsReadOnly<TKey, TValue>(this IDictionary<TKey, TValue> source) {
             return new ReadOnlyDictionary<TKey, TValue>(source);
         }
 
@@ -1242,8 +1209,7 @@ namespace BrandonUtils.Standalone.Collections {
 
         #region ToHashSet
 
-        [NotNull, ItemCanBeNull]
-        public static HashSet<T> ToHashSet<T>([NotNull, ItemCanBeNull] this IEnumerable<T> source, IEqualityComparer<T>? comparer = default) {
+        public static HashSet<T?> ToHashSet<T>(this IEnumerable<T?> source, IEqualityComparer<T>? comparer = default) {
             return new HashSet<T>(source, comparer);
         }
 
@@ -1258,8 +1224,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="TKey">the type of <see cref="IDictionary{TKey,TValue}.Keys"/></typeparam>
         /// <typeparam name="TVal">the type of <see cref="IDictionary{TKey,TValue}.Values"/></typeparam>
         /// <returns>a new <see cref="IDictionary{TKey,TValue}"/></returns>
-        [NotNull]
-        public static IDictionary<TKey, TVal> ToDictionary<TKey, TVal>([NotNull, InstantHandle] this IEnumerable<KeyValuePair<TKey, TVal>> source) {
+        public static IDictionary<TKey, TVal> ToDictionary<TKey, TVal>([InstantHandle] this IEnumerable<KeyValuePair<TKey, TVal>> source) {
             return source.ToDictionary(pair => pair.Key, pair => pair.Value);
         }
 
@@ -1271,8 +1236,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// </remarks>
         /// <param name="dictionary">the original, non-generic <see cref="IDictionary"/></param>
         /// <returns>a generic <see cref="IDictionary{TKey,TValue}"/></returns>
-        [NotNull]
-        public static IDictionary<object, object> ToGeneric([NotNull] this IDictionary dictionary) {
+        public static IDictionary<object, object> ToGeneric(this IDictionary dictionary) {
             var keys = dictionary.Keys.Cast<object>().ToArray();
             var vals = dictionary.Values.Cast<object>().ToArray();
             return keys.Select((k, i) => new KeyValuePair<object, object>(k, vals[i])).ToDictionary();
@@ -1285,8 +1249,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TVal"></typeparam>
         /// <returns></returns>
-        [NotNull]
-        public static IDictionary<TKey, TVal> NonNull<TKey, TVal>([NotNull] this IDictionary<TKey, TVal> source) {
+        public static IDictionary<TKey, TVal> NonNull<TKey, TVal>(this IDictionary<TKey, TVal> source) {
             return source.Where(it => it.Value != null).ToDictionary();
         }
 
@@ -1299,8 +1262,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="TOld">the type of the original <see cref="IDictionary{TKey,TValue}.Values"/></typeparam>
         /// <typeparam name="TNew">the type of the new <see cref="IDictionary{TKey,TValue}.Values"/></typeparam>
         /// <returns>a new <see cref="IDictionary{TKey,TValue}"/></returns>
-        [NotNull]
-        public static IDictionary<TKey, TNew> SelectValues<TKey, TOld, TNew>([NotNull] this IDictionary<TKey, TOld> source, Func<TOld, TNew> selector) {
+        public static IDictionary<TKey, TNew> SelectValues<TKey, TOld, TNew>(this IDictionary<TKey, TOld> source, Func<TOld, TNew> selector) {
             return source.ToDictionary(
                 it => it.Key,
                 it => selector(it.Value)
@@ -1318,10 +1280,8 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="TNew">the type of the new <see cref="IEnumerable{T}"/></typeparam>
         /// <returns>a new <see cref="IEnumerable{T}"/> containing the results of the <paramref name="selector"/></returns>
         /// <seealso cref="ForEach{TKey,TVal}(System.Collections.Generic.IDictionary{TKey,TVal},System.Action{TKey,TVal})"/>
-        [NotNull]
-        [ItemCanBeNull]
         [Pure]
-        public static IEnumerable<TNew> Select<TKey, TVal, TNew>([NotNull] this IDictionary<TKey, TVal> source, [NotNull] Func<TKey, TVal, TNew> selector) {
+        public static IEnumerable<TNew?> Select<TKey, TVal, TNew>(this IDictionary<TKey, TVal> source, Func<TKey, TVal, TNew> selector) {
             return source.Select(kvp => selector.Invoke(kvp.Key, kvp.Value));
         }
 
@@ -1333,8 +1293,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="TKey">the type of the <see cref="IDictionary{TKey,TValue}.Keys"/></typeparam>
         /// <typeparam name="TVal">the type of the <see cref="IDictionary{TKey,TValue}.Values"/></typeparam>
         /// <returns>a new <see cref="IDictionary{TKey,TValue}"/></returns>
-        [NotNull]
-        public static IDictionary<TKey, TVal> WhereValues<TKey, TVal>([NotNull] this IDictionary<TKey, TVal> source, Func<TVal, bool> predicate) {
+        public static IDictionary<TKey, TVal> WhereValues<TKey, TVal>(this IDictionary<TKey, TVal> source, Func<TVal, bool> predicate) {
             return source.Where(it => predicate(it.Value)).ToDictionary();
         }
 
@@ -1349,8 +1308,7 @@ namespace BrandonUtils.Standalone.Collections {
         /// <returns></returns>
         [Pure]
         [LinqTunnel]
-        [NotNull]
-        public static IEnumerable<T> Peek<T>([NotNull, ItemCanBeNull] this IEnumerable<T> source, [NotNull] Action<T> action) {
+        public static IEnumerable<T> Peek<T>(this IEnumerable<T?> source, Action<T> action) {
             return source.Select(
                 it => {
                     action.Invoke(it);
@@ -1369,9 +1327,8 @@ namespace BrandonUtils.Standalone.Collections {
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         [Pure]
-        [NotNull]
         [LinqTunnel]
-        public static IEnumerable<T> Must<T>([NotNull, ItemNotNull] this IEnumerable<T> source, [NotNull] Func<T, bool> predicate, Func<T, Exception>? exceptionSupplier = default) {
+        public static IEnumerable<T> Must<T>([ItemNotNull] this IEnumerable<T> source, Func<T, bool> predicate, Func<T, Exception>? exceptionSupplier = default) {
             return source.Peek(
                 it => {
                     if (predicate.Invoke(it) == false) {
@@ -1394,9 +1351,8 @@ namespace BrandonUtils.Standalone.Collections {
         /// <typeparam name="T">the type of <paramref name="self"/></typeparam>
         /// <returns>an <see cref="IEnumerable{T}"/> containing <paramref name="self"/>, if <paramref name="self"/> is not null; otherwise, <see cref="Enumerable.Empty{TResult}"/></returns>
         [Pure]
-        [NotNull]
         [ItemNotNull]
-        public static IEnumerable<T> WrapInEnumerable<T>([CanBeNull] this T self, [NonNegativeValue] int repetitions = 1) {
+        public static IEnumerable<T> WrapInEnumerable<T>(this T? self, [NonNegativeValue] int repetitions = 1) {
             return Enumerable.Repeat(self, (self != null).ToInt());
         }
     }

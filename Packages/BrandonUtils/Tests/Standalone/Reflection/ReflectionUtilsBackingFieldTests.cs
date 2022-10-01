@@ -7,8 +7,6 @@ using BrandonUtils.Standalone.Reflection;
 using BrandonUtils.Standalone.Strings;
 using BrandonUtils.Testing;
 
-using JetBrains.Annotations;
-
 using NUnit.Framework;
 
 using Is = BrandonUtils.Testing.Is;
@@ -157,7 +155,7 @@ namespace BrandonUtils.Tests.Standalone.Reflection {
             }
         }
 
-        private static void TestPropertiesAreBackedByField([NotNull] object classWithFieldsAndStuff, string expectedBackingFieldName) {
+        private static void TestPropertiesAreBackedByField(object classWithFieldsAndStuff, string expectedBackingFieldName) {
             var allProps = classWithFieldsAndStuff
                            .GetType()
                            .GetProperties(ReflectionUtils.VariablesBindingFlags);

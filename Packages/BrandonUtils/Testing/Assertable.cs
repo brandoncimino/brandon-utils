@@ -4,14 +4,12 @@ using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Optional;
 using BrandonUtils.Standalone.Strings;
 
-using JetBrains.Annotations;
-
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
 
 namespace BrandonUtils.Testing {
     public interface IAssertable : IFailable {
-        [NotNull] public Func<string> Nickname { get; }
+        public Func<string> Nickname { get; }
     }
 
     /// <summary>
@@ -23,8 +21,8 @@ namespace BrandonUtils.Testing {
         public Func<string> Nickname { get; }
 
         private Assertable(
-            [NotNull] Action       action,
-            [NotNull] Func<string> nickname
+            Action       action,
+            Func<string> nickname
         ) : base(
             action,
             typeof(SuccessException)
@@ -33,22 +31,22 @@ namespace BrandonUtils.Testing {
         }
 
         public Assertable(
-            [CanBeNull] Func<string>                                           nickname,
-            [NotNull]   TestDelegate                                           assertion,
-            [NotNull]   IResolveConstraint                                     constraint,
-            [CanBeNull] Func<string>                                           message,
-            [NotNull]   Action<TestDelegate, IResolveConstraint, Func<string>> actionResolver
+            Func<string>?                                          nickname,
+            TestDelegate                                           assertion,
+            IResolveConstraint                                     constraint,
+            Func<string>?                                          message,
+            Action<TestDelegate, IResolveConstraint, Func<string>> actionResolver
         ) : this(
             () => actionResolver.Invoke(assertion, constraint, message),
             nickname ?? GetNicknameSupplier(assertion, constraint)
         ) { }
 
         public Assertable(
-            [CanBeNull] Func<string>                                                          nickname,
-            [NotNull]   ActualValueDelegate<object>                                           actual,
-            [NotNull]   IResolveConstraint                                                    constraint,
-            [CanBeNull] Func<string>                                                          message,
-            [NotNull]   Action<ActualValueDelegate<object>, IResolveConstraint, Func<string>> resolver
+            Func<string>?                                                         nickname,
+            ActualValueDelegate<object>                                           actual,
+            IResolveConstraint                                                    constraint,
+            Func<string>?                                                         message,
+            Action<ActualValueDelegate<object>, IResolveConstraint, Func<string>> resolver
         ) : base(
             () => resolver.Invoke(actual, constraint, message)
         ) {
@@ -60,10 +58,10 @@ namespace BrandonUtils.Testing {
         }
 
         public static IAssertable Assert<TActual>(
-            [CanBeNull] Func<string>                                               nickname,
-            [NotNull]   ActualValueDelegate<TActual>                               actual,
-            [NotNull]   IResolveConstraint                                         constraint,
-            [CanBeNull] Func<string>                                               message,
+            Func<string>?                                                          nickname,
+            ActualValueDelegate<TActual>                                           actual,
+            IResolveConstraint                                                     constraint,
+            Func<string>?                                                          message,
             Action<ActualValueDelegate<TActual>, IResolveConstraint, Func<string>> resolver
         ) {
             return new Assertable(
@@ -72,13 +70,13 @@ namespace BrandonUtils.Testing {
             );
         }
 
-        [NotNull]
-        internal static Func<string> GetNicknameSupplier([CanBeNull] Delegate dgate, [CanBeNull] IResolveConstraint constraint, [CanBeNull] PrettificationSettings settings = default) {
+
+        internal static Func<string> GetNicknameSupplier(Delegate? dgate, IResolveConstraint? constraint, PrettificationSettings? settings = default) {
             return () => GetNickname(dgate, constraint, settings);
         }
 
-        [NotNull]
-        private static string GetNickname([CanBeNull] Delegate dgate, [CanBeNull] IResolveConstraint constraint, [CanBeNull] PrettificationSettings settings) {
+
+        private static string GetNickname(Delegate? dgate, IResolveConstraint? constraint, PrettificationSettings? settings) {
             var dName = dgate?.Prettify(settings);
             var cName = constraint?.Prettify(settings);
             var parts = new[] { dName, cName };

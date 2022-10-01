@@ -35,7 +35,7 @@ namespace BrandonUtils.Tests.Standalone {
         }
 
         private static IDictionary<T, double> BuildWeightedPortion<T, T2>(
-            [NotNull, InstantHandle]
+            [InstantHandle]
             IEnumerable<(T choice, T2 weight)> weighted
         ) {
             weighted = weighted.ToList();
@@ -54,9 +54,8 @@ namespace BrandonUtils.Tests.Standalone {
         }
 
         private static void AssertPicks(
-            [CanBeNull, ItemCanBeNull]
-            IReadOnlyCollection<string> picks,
-            [NotNull, InstantHandle]
+            IReadOnlyCollection<string?>? picks,
+            [InstantHandle]
             IEnumerable<(string choice, int weight)> weighted
         ) {
             weighted = weighted?.ToArray();

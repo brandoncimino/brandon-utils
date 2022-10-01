@@ -26,9 +26,8 @@ namespace BrandonUtils.Standalone.Optional {
         /// <summary>
         /// The <see cref="Optional{T}"/> value that might have been <see cref="Set"/>.
         /// </summary>
-        [ItemCanBeNull]
         [JsonProperty(Order = int.MaxValue)]
-        public Optional<T> ExplicitValue { get; private set; }
+        public Optional<T?> ExplicitValue { get; private set; }
         /// <summary>
         /// Whether or not <see cref="ExplicitValue"/> has been <see cref="Set"/>.
         /// </summary>
@@ -45,9 +44,8 @@ namespace BrandonUtils.Standalone.Optional {
         /// <summary>
         /// The value returned when <see cref="ExplicitValue"/> isn't present.
         /// </summary>
-        [CanBeNull]
         [JsonProperty(Order = int.MinValue)]
-        public T FallbackValue { get; }
+        public T? FallbackValue { get; }
 
         [JsonProperty(IsReference = true, ItemIsReference = true, NullValueHandling = NullValueHandling.Ignore)]
         public Fallback<T>? FallbackSource { get; }
@@ -56,12 +54,12 @@ namespace BrandonUtils.Standalone.Optional {
 
         #region Constructors
 
-        public Fallback([CanBeNull] T fallbackValue = default) {
+        public Fallback(T? fallbackValue = default) {
             FallbackValue  = fallbackValue;
             FallbackSource = null;
         }
 
-        public Fallback([NotNull] Fallback<T> fallbackFallback) {
+        public Fallback(Fallback<T> fallbackFallback) {
             FallbackValue  = default;
             FallbackSource = fallbackFallback;
         }
@@ -70,13 +68,12 @@ namespace BrandonUtils.Standalone.Optional {
 
         #region Factories
 
-        [NotNull]
-        public static Fallback<T> Of([CanBeNull] T fallbackValue) {
+        public static Fallback<T> Of(T? fallbackValue) {
             return new Fallback<T>(fallbackValue);
         }
 
-        [NotNull]
-        public static Fallback<T> Of([CanBeNull] T fallbackValue, [CanBeNull] T explicitValue) {
+
+        public static Fallback<T> Of(T? fallbackValue, T? explicitValue) {
             return new Fallback<T>(fallbackValue).Set(explicitValue);
         }
 
@@ -92,8 +89,7 @@ namespace BrandonUtils.Standalone.Optional {
         /// </remarks>
         /// <param name="explicitValue">the new <see cref="ExplicitValue"/>'s <see cref="Optional{T}.Value"/></param>
         /// <returns>this, for method chaining</returns>
-        [NotNull]
-        public Fallback<T> Set([CanBeNull] T explicitValue) {
+        public Fallback<T> Set(T? explicitValue) {
             ExplicitValue = new Optional<T>(explicitValue);
             return this;
         }
@@ -102,7 +98,6 @@ namespace BrandonUtils.Standalone.Optional {
         /// Sets <see cref="ExplicitValue"/> to an <b>empty</b> <see cref="Optional{T}"/>.
         /// </summary>
         /// <returns>this, for method chaining</returns>
-        [NotNull]
         public Fallback<T> Unset() {
             ExplicitValue = new Optional<T>();
             return this;
@@ -114,8 +109,7 @@ namespace BrandonUtils.Standalone.Optional {
         /// <param name="self">this <see cref="Fallback{T}"/></param>
         /// <returns><see cref="Value"/></returns>
         /// <exception cref="ArgumentNullException">if <paramref name="self"/> is null</exception>
-        [CanBeNull]
-        public static implicit operator T([NotNull] Fallback<T> self) {
+        public static implicit operator T?(Fallback<T> self) {
             if (self == null) {
                 throw new ArgumentNullException(nameof(self));
             }
@@ -135,7 +129,7 @@ namespace BrandonUtils.Standalone.Optional {
 
         #endregion
 
-        [NotNull]
+
         public override string ToString() {
             var t        = typeof(T);
             var settings = new PrettificationSettings();
