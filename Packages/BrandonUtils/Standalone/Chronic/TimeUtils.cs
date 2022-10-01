@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using BrandonUtils.Standalone.Collections;
 using BrandonUtils.Standalone.Enums;
 
 using JetBrains.Annotations;
@@ -13,7 +12,6 @@ namespace BrandonUtils.Standalone.Chronic {
     ///
     /// TODO: Figure out if I want "{X}Extensions" or "{X}Utils"..."{X}Extensions" seems to be the standard practice, but that feels arbitrary - after all, it makes sense to call methods with the syntax TimeUtils.Min(a,b) or TimeUtils.Divide(n), but also maybe a.Min(b)...
     /// </summary>
-    [PublicAPI]
     public static class TimeUtils {
         /// <summary>
         /// Creates a <see cref="TimeSpan"/> of some amount of the given <see cref="TimeUnit"/>.
@@ -202,7 +200,7 @@ namespace BrandonUtils.Standalone.Chronic {
                 TimeUnit.Minutes      => NormalizeMinutes(value),
                 TimeUnit.Hours        => NormalizeHours(value),
                 TimeUnit.Days         => NormalizeDays(value),
-                _                     => throw EnumUtils.InvalidEnumArgumentException(nameof(unit), unit)
+                _                     => throw BEnum.InvalidEnumArgumentException(nameof(unit), unit)
             };
         }
 
@@ -329,15 +327,6 @@ namespace BrandonUtils.Standalone.Chronic {
         [Obsolete("Please call " + nameof(MethodTimer) + "." + nameof(MethodTimer.MeasureExecution) + " directly", true)]
         public static AggregateExecutionTime AverageExecutionTime(Action action, int iterations = 1) {
             return MethodTimer.MeasureExecution(action, iterations);
-        }
-
-        public static TimeUnit LargestUnit(this TimeSpan timeSpan) {
-            return TimeUnitExtensions.Ascending.TakeLast(it => timeSpan.TotalOf(it) > 1);
-        }
-
-        public static string FormatSigFiggy(this TimeSpan timeSpan) {
-            // var sigFig =
-            throw new NotImplementedException();
         }
     }
 }
