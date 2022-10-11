@@ -75,12 +75,13 @@
             <param name="timeUnit">Unit of time to calculate rate for (defaults is per second)</param>
             <returns></returns>
         </member>
-        <member name="M:Humanizer.Bytes.ByteRate.Humanize(System.String,Humanizer.Localisation.TimeUnit)">
+        <member name="M:Humanizer.Bytes.ByteRate.Humanize(System.String,Humanizer.Localisation.TimeUnit,System.Globalization.CultureInfo)">
             <summary>
                 Calculate rate for the quantity of bytes and interval defined by this instance
             </summary>
             <param name="timeUnit">Unit of time to calculate rate for (defaults is per second)</param>
             <param name="format">The string format to use for the number of bytes</param>
+            <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
             <returns></returns>
         </member>
         <member name="T:Humanizer.Bytes.ByteSize">
@@ -3834,7 +3835,26 @@
             <summary>
                 Returns a heading based on the short textual representation of the heading.
             </summary>
+            <param name="heading">The short textual representation of a heading</param>
             <returns>The heading. -1 if the heading could not be parsed.</returns>
+        </member>
+        <member name="M:Humanizer.HeadingExtensions.FromAbbreviatedHeading(System.String,System.Globalization.CultureInfo)">
+            <summary>
+                Returns a heading based on the short textual representation of the heading.
+            </summary>
+            <param name="heading">The short textual representation of a heading</param>
+            <param name="culture">The culture of the heading</param>
+            <returns>The heading. -1 if the heading could not be parsed.</returns>
+        </member>
+        <member name="M:Humanizer.HeadingExtensions.FromHeadingArrow(System.Char)">
+            <summary>
+                Returns a heading based on the heading arrow.
+            </summary>
+        </member>
+        <member name="M:Humanizer.HeadingExtensions.FromHeadingArrow(System.String)">
+            <summary>
+                Returns a heading based on the heading arrow.
+            </summary>
         </member>
         <member name="T:Humanizer.Inflections.Vocabularies">
             <summary>
@@ -4170,6 +4190,9 @@
             <inheritdoc
                     cref="M:Humanizer.Localisation.Formatters.IFormatter.DataUnitHumanize(Humanizer.Localisation.DataUnit,System.Double,System.Boolean)"/>
         </member>
+        <member name="M:Humanizer.Localisation.Formatters.DefaultFormatter.TimeUnitHumanize(Humanizer.Localisation.TimeUnit)">
+            <inheritdoc/>
+        </member>
         <member name="M:Humanizer.Localisation.Formatters.DefaultFormatter.Format(System.String)">
             <summary>
                 Formats the specified resource key.
@@ -4204,6 +4227,9 @@
             </summary>
             <param name="resourceKey"></param>
             <returns></returns>
+        </member>
+        <member name="M:Humanizer.Localisation.Formatters.GermanFormatter.DataUnitHumanize(Humanizer.Localisation.DataUnit,System.Double,System.Boolean)">
+            <inheritdoc/>
         </member>
         <member name="T:Humanizer.Localisation.Formatters.IFormatter">
             <summary>
@@ -4257,6 +4283,13 @@
             <param name="toSymbol">Indicates whether the data unit should be expressed as symbol or full word</param>
             <returns>String representation of the provided DataUnit</returns>
         </member>
+        <member name="M:Humanizer.Localisation.Formatters.IFormatter.TimeUnitHumanize(Humanizer.Localisation.TimeUnit)">
+            <summary>
+                Returns the symbol for the given TimeUnit
+            </summary>
+            <param name="timeUnit">Time unit</param>
+            <returns>String representation of the provided TimeUnit</returns>
+        </member>
         <member name="M:Humanizer.Localisation.NumberToWords.DefaultNumberToWordsConverter.#ctor(System.Globalization.CultureInfo)">
             <summary>
                 Constructor.
@@ -4292,6 +4325,14 @@
             <param name="number"></param>
             <returns></returns>
         </member>
+        <member name="M:Humanizer.Localisation.NumberToWords.GenderedNumberToWordsConverter.Convert(System.Int64,Humanizer.WordForm)">
+            <summary>
+                Converts the number to specific string form using the locale's default grammatical gender
+            </summary>
+            <param name="number"></param>
+            <param name="wordForm"></param>
+            <returns></returns>
+        </member>
         <member name="M:Humanizer.Localisation.NumberToWords.GenderedNumberToWordsConverter.Convert(System.Int64,System.Boolean)">
             <summary>
                 Converts the number to string using the locale's default gramatical gender and adds "and"
@@ -4300,11 +4341,31 @@
             <param name="addAnd">Whether "and" should be included.</param>
             <returns></returns>
         </member>
+        <member name="M:Humanizer.Localisation.NumberToWords.GenderedNumberToWordsConverter.Convert(System.Int64,System.Boolean,Humanizer.WordForm)">
+            <summary>
+                Converts the number to a specific string form using the locale's default gramatical gender and adds
+                "and"
+            </summary>
+            <param name="number"></param>
+            <param name="addAnd"></param>
+            <param name="wordForm"></param>
+            <returns></returns>
+        </member>
         <member name="M:Humanizer.Localisation.NumberToWords.GenderedNumberToWordsConverter.Convert(System.Int64,Humanizer.GrammaticalGender,System.Boolean)">
             <summary>
                 Converts the number to string using the provided grammatical gender
             </summary>
             <param name="number"></param>
+            <param name="gender"></param>
+            <param name="addAnd"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Humanizer.Localisation.NumberToWords.GenderedNumberToWordsConverter.Convert(System.Int64,Humanizer.WordForm,Humanizer.GrammaticalGender,System.Boolean)">
+            <summary>
+                Converts the number to a specific string form using the provided grammatical gender
+            </summary>
+            <param name="number"></param>
+            <param name="wordForm"></param>
             <param name="gender"></param>
             <param name="addAnd"></param>
             <returns></returns>
@@ -4324,11 +4385,43 @@
             <param name="gender"></param>
             <returns></returns>
         </member>
+        <member name="M:Humanizer.Localisation.NumberToWords.GenderedNumberToWordsConverter.ConvertToOrdinal(System.Int32,Humanizer.WordForm)">
+            <summary>
+                Converts the number to specific ordinal string form
+            </summary>
+            <param name="number"></param>
+            <param name="wordForm"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Humanizer.Localisation.NumberToWords.GenderedNumberToWordsConverter.ConvertToOrdinal(System.Int32,Humanizer.GrammaticalGender,Humanizer.WordForm)">
+            <summary>
+                Converts the number to specific ordinal string form using the provided grammatical gender
+            </summary>
+            <param name="number"></param>
+            <param name="gender"></param>
+            <param name="wordForm"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Humanizer.Localisation.NumberToWords.GenderedNumberToWordsConverter.ConvertToTuple(System.Int32)">
+            <summary>
+                Converts integer to named tuple (e.g. 'single', 'double' etc.).
+            </summary>
+            <param name="number"></param>
+            <returns></returns>
+        </member>
         <member name="M:Humanizer.Localisation.NumberToWords.GenderlessNumberToWordsConverter.Convert(System.Int64)">
             <summary>
                 Converts the number to string
             </summary>
             <param name="number"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Humanizer.Localisation.NumberToWords.GenderlessNumberToWordsConverter.Convert(System.Int64,Humanizer.WordForm)">
+            <summary>
+                Converts the number to a specific string form
+            </summary>
+            <param name="number"></param>
+            <param name="wordForm"></param>
             <returns></returns>
         </member>
         <member name="M:Humanizer.Localisation.NumberToWords.GenderlessNumberToWordsConverter.Convert(System.Int64,System.Boolean)">
@@ -4339,11 +4432,30 @@
             <param name="addAnd">Whether "and" should be included.</param>
             <returns></returns>
         </member>
+        <member name="M:Humanizer.Localisation.NumberToWords.GenderlessNumberToWordsConverter.Convert(System.Int64,System.Boolean,Humanizer.WordForm)">
+            <summary>
+                Converts the number to a specific string form
+            </summary>
+            <param name="number"></param>
+            <param name="addAnd">Whether "and" should be included.</param>
+            <param name="wordForm"></param>
+            <returns></returns>
+        </member>
         <member name="M:Humanizer.Localisation.NumberToWords.GenderlessNumberToWordsConverter.Convert(System.Int64,Humanizer.GrammaticalGender,System.Boolean)">
             <summary>
                 Converts the number to string ignoring the provided grammatical gender
             </summary>
             <param name="number"></param>
+            <param name="gender"></param>
+            <param name="addAnd"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Humanizer.Localisation.NumberToWords.GenderlessNumberToWordsConverter.Convert(System.Int64,Humanizer.WordForm,Humanizer.GrammaticalGender,System.Boolean)">
+            <summary>
+                Converts the number to a specific string form ignoring the provided grammatical gender
+            </summary>
+            <param name="number"></param>
+            <param name="wordForm"></param>
             <param name="gender"></param>
             <param name="addAnd"></param>
             <returns></returns>
@@ -4363,6 +4475,30 @@
             <param name="gender"></param>
             <returns></returns>
         </member>
+        <member name="M:Humanizer.Localisation.NumberToWords.GenderlessNumberToWordsConverter.ConvertToOrdinal(System.Int32,Humanizer.WordForm)">
+            <summary>
+                Converts the number to a specific ordinal string form.
+            </summary>
+            <param name="number"></param>
+            <param name="wordForm"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Humanizer.Localisation.NumberToWords.GenderlessNumberToWordsConverter.ConvertToOrdinal(System.Int32,Humanizer.GrammaticalGender,Humanizer.WordForm)">
+            <summary>
+                Converts the number to a specific ordinal string form ignoring the provided grammatical gender.
+            </summary>
+            <param name="number"></param>
+            <param name="gender"></param>
+            <param name="wordForm"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Humanizer.Localisation.NumberToWords.GenderlessNumberToWordsConverter.ConvertToTuple(System.Int32)">
+            <summary>
+                Converts integer to named tuple (e.g. 'single', 'double' etc.).
+            </summary>
+            <param name="number"></param>
+            <returns></returns>
+        </member>
         <member name="T:Humanizer.Localisation.NumberToWords.INumberToWordsConverter">
             <summary>
                 An interface you should implement to localise ToWords and ToOrdinalWords methods
@@ -4375,12 +4511,30 @@
             <param name="number"></param>
             <returns></returns>
         </member>
+        <member name="M:Humanizer.Localisation.NumberToWords.INumberToWordsConverter.Convert(System.Int64,Humanizer.WordForm)">
+            <summary>
+                Converts the number to a specific string form using the locale's default grammatical gender.
+            </summary>
+            <param name="number"></param>
+            <param name="wordForm"></param>
+            <returns></returns>
+        </member>
         <member name="M:Humanizer.Localisation.NumberToWords.INumberToWordsConverter.Convert(System.Int64,System.Boolean)">
             <summary>
                 Converts the number to string using the locale's default grammatical gender with or without adding 'And'
             </summary>
             <param name="number"></param>
             <param name="addAnd">Specify with our without adding "And"</param>
+            <returns></returns>
+        </member>
+        <member name="M:Humanizer.Localisation.NumberToWords.INumberToWordsConverter.Convert(System.Int64,System.Boolean,Humanizer.WordForm)">
+            <summary>
+                Converts the number to a specific string form using the locale's default grammatical gender with or
+                without adding 'And'
+            </summary>
+            <param name="number"></param>
+            <param name="addAnd"></param>
+            <param name="wordForm"></param>
             <returns></returns>
         </member>
         <member name="M:Humanizer.Localisation.NumberToWords.INumberToWordsConverter.Convert(System.Int64,Humanizer.GrammaticalGender,System.Boolean)">
@@ -4392,11 +4546,29 @@
             <param name="addAnd"></param>
             <returns></returns>
         </member>
+        <member name="M:Humanizer.Localisation.NumberToWords.INumberToWordsConverter.Convert(System.Int64,Humanizer.WordForm,Humanizer.GrammaticalGender,System.Boolean)">
+            <summary>
+                Converts the number to a specific string form using the provided grammatical gender.
+            </summary>
+            <param name="number"></param>
+            <param name="wordForm"></param>
+            <param name="gender"></param>
+            <param name="addAnd"></param>
+            <returns></returns>
+        </member>
         <member name="M:Humanizer.Localisation.NumberToWords.INumberToWordsConverter.ConvertToOrdinal(System.Int32)">
             <summary>
                 Converts the number to ordinal string using the locale's default grammatical gender
             </summary>
             <param name="number"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Humanizer.Localisation.NumberToWords.INumberToWordsConverter.ConvertToOrdinal(System.Int32,Humanizer.WordForm)">
+            <summary>
+                Converts the number to a specific ordinal string form using the locale's default grammatical gender.
+            </summary>
+            <param name="number"></param>
+            <param name="wordForm"></param>
             <returns></returns>
         </member>
         <member name="M:Humanizer.Localisation.NumberToWords.INumberToWordsConverter.ConvertToOrdinal(System.Int32,Humanizer.GrammaticalGender)">
@@ -4405,6 +4577,22 @@
             </summary>
             <param name="number"></param>
             <param name="gender"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Humanizer.Localisation.NumberToWords.INumberToWordsConverter.ConvertToOrdinal(System.Int32,Humanizer.GrammaticalGender,Humanizer.WordForm)">
+            <summary>
+                Converts the number to a specific ordinal string form using the provided grammatical gender.
+            </summary>
+            <param name="number"></param>
+            <param name="gender"></param>
+            <param name="wordForm"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Humanizer.Localisation.NumberToWords.INumberToWordsConverter.ConvertToTuple(System.Int32)">
+            <summary>
+                Converts integer to named tuple (e.g. 'single', 'double' etc.).
+            </summary>
+            <param name="number"></param>
             <returns></returns>
         </member>
         <member name="M:Humanizer.Localisation.NumberToWords.Italian.ItalianCardinalNumberCruncher.SplitEveryThreeDigits(System.Int32)">
@@ -4633,6 +4821,15 @@
             <param name="numberString"></param>
             <returns></returns>
         </member>
+        <member name="M:Humanizer.Localisation.Ordinalizers.IOrdinalizer.Convert(System.Int32,System.String,Humanizer.WordForm)">
+            <summary>
+                Ordinalizes the number to a locale's specific form.
+            </summary>
+            <param name="number"></param>
+            <param name="numberString"></param>
+            <param name="wordForm"></param>
+            <returns></returns>
+        </member>
         <member name="M:Humanizer.Localisation.Ordinalizers.IOrdinalizer.Convert(System.Int32,System.String,Humanizer.GrammaticalGender)">
             <summary>
                 Ordinalizes the number using the provided grammatical gender
@@ -4640,6 +4837,16 @@
             <param name="number"></param>
             <param name="numberString"></param>
             <param name="gender"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Humanizer.Localisation.Ordinalizers.IOrdinalizer.Convert(System.Int32,System.String,Humanizer.GrammaticalGender,Humanizer.WordForm)">
+            <summary>
+                Ordinalizes the number to a locale's specific form using the provided grammatical gender.
+            </summary>
+            <param name="number"></param>
+            <param name="numberString"></param>
+            <param name="gender"></param>
+            <param name="wordForm"></param>
             <returns></returns>
         </member>
         <member name="T:Humanizer.Localisation.ResourceKeys">
@@ -4689,6 +4896,26 @@
             </summary>
         </member>
         <member name="M:Humanizer.Localisation.ResourceKeys.TimeSpanHumanize.GetResourceKey(Humanizer.Localisation.TimeUnit,System.Int32,System.Boolean)">
+            <summary>
+                Generates Resource Keys according to convention.
+            </summary>
+            <param name="unit">Time unit,<see cref="T:Humanizer.Localisation.TimeUnit"/>.
+            </param>
+            <param name="count">Number of units, default is One.</param>
+            <param name="toWords">Result to words, default is false.</param>
+            <returns>Resource key, like TimeSpanHumanize_SingleMinute</returns>
+        </member>
+        <member name="T:Humanizer.Localisation.ResourceKeys.TimeUnitSymbol">
+            <summary>
+                Encapsulates the logic required to get the resource keys for TimeUnit.ToSymbol
+            </summary>
+        </member>
+        <member name="F:Humanizer.Localisation.ResourceKeys.TimeUnitSymbol.TimeUnitFormat">
+            <summary>
+                Examples: TimeUnit_Minute, TimeUnit_Hour.
+            </summary>
+        </member>
+        <member name="M:Humanizer.Localisation.ResourceKeys.TimeUnitSymbol.GetResourceKey(Humanizer.Localisation.TimeUnit)">
             <summary>
                 Generates Resource Keys according to convention.
             </summary>
@@ -5504,6 +5731,68 @@
                 Transform a number into words; e.g. 1 => one
             </summary>
         </member>
+        <member name="M:Humanizer.NumberToWordsExtension.ToOrdinalWords(System.Int32,System.Globalization.CultureInfo)">
+            <summary>
+                1.ToOrdinalWords() -> "first"
+            </summary>
+            <param name="number">Number to be turned to ordinal words</param>
+            <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Humanizer.NumberToWordsExtension.ToOrdinalWords(System.Int32,Humanizer.WordForm,System.Globalization.CultureInfo)">
+            <summary>
+                Converts a number to ordinal words supporting locale's specific variations.
+            </summary>
+            <example>
+                In Spanish:
+                <code>
+                    1.ToOrdinalWords(WordForm.Normal) -> "primero" // As in "He llegado el primero".
+                    3.ToOrdinalWords(WordForm.Abbreviation) -> "tercer" // As in "Vivo en el tercer piso"
+                </code>
+            </example>
+            <param name="number">Number to be turned to ordinal words</param>
+            <param name="wordForm">Form of the word, i.e. abbreviation</param>
+            <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
+            <returns>The number converted into ordinal words</returns>
+        </member>
+        <member name="M:Humanizer.NumberToWordsExtension.ToOrdinalWords(System.Int32,Humanizer.GrammaticalGender,System.Globalization.CultureInfo)">
+            <summary>
+                for Brazilian Portuguese locale
+                1.ToOrdinalWords(GrammaticalGender.Masculine) -> "primeiro"
+                1.ToOrdinalWords(GrammaticalGender.Feminine) -> "primeira"
+            </summary>
+            <param name="number">Number to be turned to words</param>
+            <param name="gender">The grammatical gender to use for output words</param>
+            <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Humanizer.NumberToWordsExtension.ToOrdinalWords(System.Int32,Humanizer.GrammaticalGender,Humanizer.WordForm,System.Globalization.CultureInfo)">
+            <summary>
+                Converts a number to ordinal words supporting locale's specific variations.
+            </summary>
+            <example>
+                In Spanish:
+                <code>
+                    3.ToOrdinalWords(GrammaticalGender.Masculine, WordForm.Normal) -> "tercero"
+                    3.ToOrdinalWords(GrammaticalGender.Masculine, WordForm.Abbreviation) -> "tercer"
+                    3.ToOrdinalWords(GrammaticalGender.Feminine, WordForm.Normal) -> "tercera"
+                    3.ToOrdinalWords(GrammaticalGender.Feminine, WordForm.Abbreviation) -> "tercera"
+                </code>
+            </example>
+            <param name="number">Number to be turned to ordinal words</param>
+            <param name="gender">The grammatical gender to use for output words</param>
+            <param name="wordForm">Form of the word, i.e. abbreviation</param>
+            <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
+            <returns>The number converted into ordinal words</returns>
+        </member>
+        <member name="M:Humanizer.NumberToWordsExtension.ToTuple(System.Int32,System.Globalization.CultureInfo)">
+            <summary>
+                1.ToTuple() -> "single"
+            </summary>
+            <param name="number">Number to be turned to tuple</param>
+            <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
+            <returns></returns>
+        </member>
         <member name="M:Humanizer.NumberToWordsExtension.ToWords(System.Int32,System.Globalization.CultureInfo)">
             <summary>
                 3501.ToWords() -> "three thousand five hundred and one"
@@ -5511,6 +5800,23 @@
             <param name="number">Number to be turned to words</param>
             <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
             <returns></returns>
+        </member>
+        <member name="M:Humanizer.NumberToWordsExtension.ToWords(System.Int32,Humanizer.WordForm,System.Globalization.CultureInfo)">
+            <summary>
+                Converts a number to words supporting specific word variations, including grammatical gender, of some
+                locales.
+            </summary>
+            <example>
+                In Spanish, numbers ended in 1 change its form depending on their position in the sentence.
+                <code>
+                    21.ToWords(WordForm.Normal) -> veintiuno // as in "Mi número favorito es el veintiuno".
+                    21.ToWords(WordForm.Abbreviation) -> veintiún // as in "En total, conté veintiún coches"
+                </code>
+            </example>
+            <param name="number">Number to be turned to words</param>
+            <param name="wordForm">Form of the word, i.e. abbreviation</param>
+            <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
+            <returns>The number converted to words</returns>
         </member>
         <member name="M:Humanizer.NumberToWordsExtension.ToWords(System.Int32,System.Boolean,System.Globalization.CultureInfo)">
             <summary>
@@ -5520,6 +5826,23 @@
             <param name="addAnd">To add 'and' before the last number.</param>
             <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
             <returns></returns>
+        </member>
+        <member name="M:Humanizer.NumberToWordsExtension.ToWords(System.Int32,System.Boolean,Humanizer.WordForm,System.Globalization.CultureInfo)">
+            <summary>
+                Converts a number to words supporting specific word variations of some locales.
+            </summary>
+            <example>
+                In Spanish, numbers ended in 1 changes its form depending on their position in the sentence.
+                <code>
+                    21.ToWords(WordForm.Normal) -> veintiuno // as in "Mi número favorito es el veintiuno".
+                    21.ToWords(WordForm.Abbreviation) -> veintiún // as in "En total, conté veintiún coches"
+                </code>
+            </example>
+            <param name="number">Number to be turned to words</param>
+            <param name="addAnd">To add 'and' before the last number</param>
+            <param name="wordForm">Form of the word, i.e. abbreviation</param>
+            <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
+            <returns>The number converted to words</returns>
         </member>
         <member name="M:Humanizer.NumberToWordsExtension.ToWords(System.Int32,Humanizer.GrammaticalGender,System.Globalization.CultureInfo)">
             <summary>
@@ -5537,11 +5860,31 @@
                     1.ToWords(GrammaticalGender.Feminine) -> "אחת"
                 </code>
             </example>
-
             <param name="number">Number to be turned to words</param>
             <param name="gender">The grammatical gender to use for output words</param>
             <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
             <returns></returns>
+        </member>
+        <member name="M:Humanizer.NumberToWordsExtension.ToWords(System.Int32,Humanizer.WordForm,Humanizer.GrammaticalGender,System.Globalization.CultureInfo)">
+            <summary>
+                Converts a number to words supporting specific word variations, including grammatical gender, of some
+                locales.
+            </summary>
+            <example>
+                In Spanish, numbers ended in 1 change its form depending on their position in the sentence.
+                <code>
+                    21.ToWords(WordForm.Normal, GrammaticalGender.Masculine) -> veintiuno // as in "Mi número favorito
+                    es el veintiuno".
+                    21.ToWords(WordForm.Abbreviation, GrammaticalGender.Masculine) -> veintiún // as in "En total, conté
+                    veintiún coches"
+                    21.ToWords(WordForm.Normal, GrammaticalGender.Feminine) -> veintiuna // as in "veintiuna personas"
+                </code>
+            </example>
+            <param name="number">Number to be turned to words</param>
+            <param name="wordForm">Form of the word, i.e. abbreviation</param>
+            <param name="gender">The grammatical gender to use for output words</param>
+            <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
+            <returns>The number converted to words</returns>
         </member>
         <member name="M:Humanizer.NumberToWordsExtension.ToWords(System.Int64,System.Globalization.CultureInfo,System.Boolean)">
             <summary>
@@ -5551,6 +5894,23 @@
             <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
             <param name="addAnd">Whether "and" should be included or not.</param>
             <returns></returns>
+        </member>
+        <member name="M:Humanizer.NumberToWordsExtension.ToWords(System.Int64,Humanizer.WordForm,System.Globalization.CultureInfo,System.Boolean)">
+            <summary>
+                Converts a number to words supporting specific word variations of some locales.
+            </summary>
+            <example>
+                In Spanish, numbers ended in 1 changes its form depending on their position in the sentence.
+                <code>
+                    21.ToWords(WordForm.Normal) -> veintiuno // as in "Mi número favorito es el veintiuno".
+                    21.ToWords(WordForm.Abbreviation) -> veintiún // as in "En total, conté veintiún coches"
+                </code>
+            </example>
+            <param name="number">Number to be turned to words</param>
+            <param name="wordForm">Form of the word, i.e. abbreviation</param>
+            <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
+            <param name="addAnd">To add 'and' before the last number</param>
+            <returns>The number converted to words</returns>
         </member>
         <member name="M:Humanizer.NumberToWordsExtension.ToWords(System.Int64,Humanizer.GrammaticalGender,System.Globalization.CultureInfo)">
             <summary>
@@ -5574,24 +5934,26 @@
             <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
             <returns></returns>
         </member>
-        <member name="M:Humanizer.NumberToWordsExtension.ToOrdinalWords(System.Int32,System.Globalization.CultureInfo)">
+        <member name="M:Humanizer.NumberToWordsExtension.ToWords(System.Int64,Humanizer.WordForm,Humanizer.GrammaticalGender,System.Globalization.CultureInfo)">
             <summary>
-                1.ToOrdinalWords() -> "first"
+                Converts a number to words supporting specific word variations, including grammatical gender, of some
+                locales.
             </summary>
-            <param name="number">Number to be turned to ordinal words</param>
-            <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Humanizer.NumberToWordsExtension.ToOrdinalWords(System.Int32,Humanizer.GrammaticalGender,System.Globalization.CultureInfo)">
-            <summary>
-                for Brazilian Portuguese locale
-                1.ToOrdinalWords(GrammaticalGender.Masculine) -> "primeiro"
-                1.ToOrdinalWords(GrammaticalGender.Feminine) -> "primeira"
-            </summary>
+            <example>
+                In Spanish, numbers ended in 1 changes its form depending on their position in the sentence.
+                <code>
+                    21.ToWords(WordForm.Normal, GrammaticalGender.Masculine) -> veintiuno // as in "Mi número favorito
+                    es el veintiuno".
+                    21.ToWords(WordForm.Abbreviation, GrammaticalGender.Masculine) -> veintiún // as in "En total, conté
+                    veintiún coches"
+                    21.ToWords(WordForm.Normal, GrammaticalGender.Feminine) -> veintiuna // as in "veintiuna personas"
+                </code>
+            </example>
             <param name="number">Number to be turned to words</param>
+            <param name="wordForm">Form of the word, i.e. abbreviation</param>
             <param name="gender">The grammatical gender to use for output words</param>
             <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
-            <returns></returns>
+            <returns>The number converted to words</returns>
         </member>
         <member name="T:Humanizer.OnNoMatch">
             <summary>
@@ -5621,6 +5983,22 @@
             <param name="numberString">The number, in string, to be ordinalized</param>
             <returns></returns>
         </member>
+        <member name="M:Humanizer.OrdinalizeExtensions.Ordinalize(System.String,Humanizer.WordForm)">
+            <summary>
+                Turns a number into an ordinal number used to denote the position in an ordered sequence supporting
+                specific locale's variations.
+            </summary>
+            <example>
+                In Spanish:
+                <code>
+                    "1".Ordinalize(WordForm.Abbreviation) -> 1.er // As in "Vivo en el 1.er piso"
+                    "1".Ordinalize(WordForm.Normal) -> 1.º // As in "Fui el 1º de mi promoción"
+                </code>
+            </example>
+            <param name="numberString">The number, in string, to be ordinalized</param>
+            <param name="wordForm">Form of the word, i.e. abbreviation</param>
+            <returns>The number ordinalized</returns>
+        </member>
         <member name="M:Humanizer.OrdinalizeExtensions.Ordinalize(System.String,System.Globalization.CultureInfo)">
             <summary>
                 Turns a number into an ordinal string used to denote the position in an ordered sequence such as 1st,
@@ -5629,6 +6007,25 @@
             <param name="numberString">The number, in string, to be ordinalized</param>
             <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
             <returns></returns>
+        </member>
+        <member name="M:Humanizer.OrdinalizeExtensions.Ordinalize(System.String,System.Globalization.CultureInfo,Humanizer.WordForm)">
+            <summary>
+                Turns a number into an ordinal number used to denote the position in an ordered sequence supporting
+                specific locale's variations.
+            </summary>
+            <example>
+                In Spanish:
+                <code>
+                    "1".Ordinalize(new CultureInfo("es-ES"),WordForm.Abbreviation) -> 1.er // As in "Vivo en el 1.er
+                    piso"
+                    "1".Ordinalize(new CultureInfo("es-ES"), WordForm.Normal) -> 1.º // As in "Fui el 1º de mi
+                    promoción"
+                </code>
+            </example>
+            <param name="numberString">The number to be ordinalized</param>
+            <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
+            <param name="wordForm">Form of the word, i.e. abbreviation</param>
+            <returns>The number ordinalized</returns>
         </member>
         <member name="M:Humanizer.OrdinalizeExtensions.Ordinalize(System.String,Humanizer.GrammaticalGender)">
             <summary>
@@ -5641,6 +6038,28 @@
             <param name="numberString">The number, in string, to be ordinalized</param>
             <param name="gender">The grammatical gender to use for output words</param>
             <returns></returns>
+        </member>
+        <member name="M:Humanizer.OrdinalizeExtensions.Ordinalize(System.String,Humanizer.GrammaticalGender,Humanizer.WordForm)">
+            <summary>
+                Turns a number into an ordinal number used to denote the position in an ordered sequence supporting
+                specific
+                locale's variations using the grammatical gender provided
+            </summary>
+            <example>
+                In Spanish:
+                <code>
+                    "1".Ordinalize(GrammaticalGender.Masculine, WordForm.Abbreviation) -> 1.er // As in "Vivo en el 1.er
+                    piso"
+                    "1".Ordinalize(GrammaticalGender.Masculine, WordForm.Normal) -> 1.º // As in "Fui el 1º de mi
+                    promoción"
+                    "1".Ordinalize(GrammaticalGender.Feminine, WordForm.Normal) -> 1.ª // As in "Es 1ª vez que hago
+                    esto"
+                </code>
+            </example>
+            <param name="numberString">The number to be ordinalized</param>
+            <param name="gender">The grammatical gender to use for output words</param>
+            <param name="wordForm">Form of the word, i.e. abbreviation</param>
+            <returns>The number ordinalized</returns>
         </member>
         <member name="M:Humanizer.OrdinalizeExtensions.Ordinalize(System.String,Humanizer.GrammaticalGender,System.Globalization.CultureInfo)">
             <summary>
@@ -5655,6 +6074,29 @@
             <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
             <returns></returns>
         </member>
+        <member name="M:Humanizer.OrdinalizeExtensions.Ordinalize(System.String,Humanizer.GrammaticalGender,System.Globalization.CultureInfo,Humanizer.WordForm)">
+            <summary>
+                Turns a number into an ordinal number used to denote the position in an ordered sequence supporting
+                specific
+                locale's variations using the grammatical gender provided
+            </summary>
+            <example>
+                In Spanish:
+                <code>
+                    "1".Ordinalize(GrammaticalGender.Masculine, new CultureInfo("es-ES"),WordForm.Abbreviation) -> 1.er
+                    // As in "Vivo en el 1.er piso"
+                    "1".Ordinalize(GrammaticalGender.Masculine, new CultureInfo("es-ES"), WordForm.Normal) -> 1.º // As
+                    in "Fui el 1º de mi promoción"
+                    "1".Ordinalize(GrammaticalGender.Feminine, new CultureInfo("es-ES"), WordForm.Normal) -> 1.º // As
+                    in "Fui el 1º de mi promoción"
+                </code>
+            </example>
+            <param name="numberString">The number to be ordinalized</param>
+            <param name="gender">The grammatical gender to use for output words</param>
+            <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
+            <param name="wordForm">Form of the word, i.e. abbreviation</param>
+            <returns>The number ordinalized</returns>
+        </member>
         <member name="M:Humanizer.OrdinalizeExtensions.Ordinalize(System.Int32)">
             <summary>
                 Turns a number into an ordinal number used to denote the position in an ordered sequence such as 1st,
@@ -5662,6 +6104,22 @@
             </summary>
             <param name="number">The number to be ordinalized</param>
             <returns></returns>
+        </member>
+        <member name="M:Humanizer.OrdinalizeExtensions.Ordinalize(System.Int32,Humanizer.WordForm)">
+            <summary>
+                Turns a number into an ordinal number used to denote the position in an ordered sequence supporting
+                specific locale's variations.
+            </summary>
+            <example>
+                In Spanish:
+                <code>
+                    1.Ordinalize(WordForm.Abbreviation) -> 1.er // As in "Vivo en el 1.er piso"
+                    1.Ordinalize(WordForm.Normal) -> 1.º // As in "Fui el 1º de mi promoción"
+                </code>
+            </example>
+            <param name="number">The number to be ordinalized</param>
+            <param name="wordForm">Form of the word, i.e. abbreviation</param>
+            <returns>The number ordinalized</returns>
         </member>
         <member name="M:Humanizer.OrdinalizeExtensions.Ordinalize(System.Int32,System.Globalization.CultureInfo)">
             <summary>
@@ -5671,6 +6129,23 @@
             <param name="number">The number to be ordinalized</param>
             <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
             <returns></returns>
+        </member>
+        <member name="M:Humanizer.OrdinalizeExtensions.Ordinalize(System.Int32,System.Globalization.CultureInfo,Humanizer.WordForm)">
+            <summary>
+                Turns a number into an ordinal number used to denote the position in an ordered sequence supporting
+                specific locale's variations.
+            </summary>
+            <example>
+                In Spanish:
+                <code>
+                    1.Ordinalize(new CultureInfo("es-ES"),WordForm.Abbreviation) -> 1.er // As in "Vivo en el 1.er piso"
+                    1.Ordinalize(new CultureInfo("es-ES"), WordForm.Normal) -> 1.º // As in "Fui el 1º de mi promoción"
+                </code>
+            </example>
+            <param name="number">The number to be ordinalized</param>
+            <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
+            <param name="wordForm">Form of the word, i.e. abbreviation</param>
+            <returns>The number ordinalized</returns>
         </member>
         <member name="M:Humanizer.OrdinalizeExtensions.Ordinalize(System.Int32,Humanizer.GrammaticalGender)">
             <summary>
@@ -5684,6 +6159,27 @@
             <param name="gender">The grammatical gender to use for output words</param>
             <returns></returns>
         </member>
+        <member name="M:Humanizer.OrdinalizeExtensions.Ordinalize(System.Int32,Humanizer.GrammaticalGender,Humanizer.WordForm)">
+            <summary>
+                Turns a number into an ordinal number used to denote the position in an ordered sequence supporting
+                specific
+                locale's variations using the grammatical gender provided
+            </summary>
+            <example>
+                In Spanish:
+                <code>
+                    1.Ordinalize(GrammaticalGender.Masculine, WordForm.Abbreviation) -> 1.er // As in "Vivo en el 1.er
+                    piso"
+                    1.Ordinalize(GrammaticalGender.Masculine, WordForm.Normal) -> 1.º // As in "Fui el 1º de mi
+                    promoción"
+                    1.Ordinalize(GrammaticalGender.Feminine, WordForm.Normal) -> 1.ª // As in "Es 1ª vez que hago esto"
+                </code>
+            </example>
+            <param name="number">The number to be ordinalized</param>
+            <param name="gender">The grammatical gender to use for output words</param>
+            <param name="wordForm">Form of the word, i.e. abbreviation</param>
+            <returns>The number ordinalized</returns>
+        </member>
         <member name="M:Humanizer.OrdinalizeExtensions.Ordinalize(System.Int32,Humanizer.GrammaticalGender,System.Globalization.CultureInfo)">
             <summary>
                 Turns a number into an ordinal number used to denote the position in an ordered sequence such as 1st,
@@ -5696,6 +6192,29 @@
             <param name="gender">The grammatical gender to use for output words</param>
             <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
             <returns></returns>
+        </member>
+        <member name="M:Humanizer.OrdinalizeExtensions.Ordinalize(System.Int32,Humanizer.GrammaticalGender,System.Globalization.CultureInfo,Humanizer.WordForm)">
+            <summary>
+                Turns a number into an ordinal number used to denote the position in an ordered sequence supporting
+                specific
+                locale's variations using the grammatical gender provided
+            </summary>
+            <example>
+                In Spanish:
+                <code>
+                    1.Ordinalize(GrammaticalGender.Masculine, new CultureInfo("es-ES"),WordForm.Abbreviation) -> 1.er //
+                    As in "Vivo en el 1.er piso"
+                    1.Ordinalize(GrammaticalGender.Masculine, new CultureInfo("es-ES"), WordForm.Normal) -> 1.º // As in
+                    "Fui el 1º de mi promoción"
+                    1.Ordinalize(GrammaticalGender.Feminine, new CultureInfo("es-ES"), WordForm.Normal) -> 1.º // As in
+                    "Fui el 1º de mi promoción"
+                </code>
+            </example>
+            <param name="number">The number to be ordinalized</param>
+            <param name="gender">The grammatical gender to use for output words</param>
+            <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
+            <param name="wordForm">Form of the word, i.e. abbreviation</param>
+            <returns>The number ordinalized</returns>
         </member>
         <member name="T:Humanizer.Plurality">
             <summary>
@@ -5748,6 +6267,8 @@
         <member name="M:Humanizer.StringDehumanizeExtensions.Dehumanize(System.String)">
             <summary>
                 Dehumanizes a string; e.g. 'some string', 'Some String', 'Some string' -> 'SomeString'
+                If a string is already dehumanized then it leaves it alone 'SomeStringAndAnotherString' ->
+                'SomeStringAndAnotherString'
             </summary>
             <param name="input">The string to be dehumanized</param>
             <returns></returns>
@@ -5848,6 +6369,21 @@
                 default collection formatter for the current culture is used.
             </param>
             <param name="toWords">Uses words instead of numbers if true. E.g. one day.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Humanizer.TimeUnitToSymbolExtensions">
+            <summary>
+                Transform a time unit into a symbol; e.g.
+                <see cref="F:Humanizer.Localisation.TimeUnit.Year"/>
+                => "a"
+            </summary>
+        </member>
+        <member name="M:Humanizer.TimeUnitToSymbolExtensions.ToSymbol(Humanizer.Localisation.TimeUnit,System.Globalization.CultureInfo)">
+            <summary>
+                TimeUnit.Day.ToSymbol() -> "d"
+            </summary>
+            <param name="unit">Unit of time to be turned to a symbol</param>
+            <param name="culture">Culture to use. If null, current thread's UI culture is used.</param>
             <returns></returns>
         </member>
         <member name="T:Humanizer.ShowQuantityAs">
@@ -6168,6 +6704,21 @@
             </summary>
             <param name="input">Integer</param>
             <returns>Named tuple</returns>
+        </member>
+        <member name="T:Humanizer.WordForm">
+            <summary>
+                Options for specifying the form of the word when different variations of the same word exists.
+            </summary>
+        </member>
+        <member name="F:Humanizer.WordForm.Normal">
+            <summary>
+                Indicates the normal form of a written word.
+            </summary>
+        </member>
+        <member name="F:Humanizer.WordForm.Abbreviation">
+            <summary>
+                Indicates the shortened form of a written word
+            </summary>
         </member>
     </members>
 </doc>

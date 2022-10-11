@@ -10,8 +10,13 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [3.1.0]
 
 ### Added
- 
+
 - `Nuget.ps1` & friends
+
+### Updated
+
+- `Jetbrains.Annotations` dependency from `2021.2.0` -> `2022.1.0`
+- `Humanizer.Core` dependency from `2.11.10` -> `2.14.1`
 
 ## [3.0.0]
 
