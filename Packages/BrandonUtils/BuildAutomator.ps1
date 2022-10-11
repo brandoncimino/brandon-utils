@@ -5,26 +5,11 @@
     Butler is downloaded to & expanded in $butler_dir
 
     Uses the UnitySetup module: https://github.com/microsoft/unitysetup.powershell
- #>
+ 
+    TODO: Combine this with `Nuget.psm1`, etc. into a single `UnityDev.psd1` module 
+ 
+ # >
 
-# check if UnitySetup is installed
-if (!(Get-Module UnitySetup -ListAvailable)) {
-    Write-Host -ForegroundColor DarkGray "Installing the dependency, UnitySetup."
-    Install-Module UnitySetup -Scope CurrentUser -AllowClobber -Force -Verbose
-}
-else {
-    Write-Host -ForegroundColor DarkGray "UnitySetup was already installed."
-}
-
-# exit if we aren't actually in a Unity project
-$unity_project_folder = Find-UnityPackageRoot
-$unity_project = Get-UnityProjectInstance $unity_project_folder
-
-if (!$unity_project) {
-    throw "The current directory is not inside of a Unity project! `$PWD: $PWD"
-}
-
-Write-Host -ForegroundColor DarkGray "Discovered Unity project:`n$($unity_project | Format-List | Out-String)"
 
 function Find-ParentFolder($Path, $ParentName) {
     if (Split-Path $Path -Leaf -eq $ParentName) {
@@ -62,34 +47,53 @@ function Find-UnityProjectRoot($Path = $PWD) {
 # Exit if there is any error in the build script
 $ErrorActionPreference = "Stop"
 
-#region Enums
-enum OS {
-    Windows
-    Mac
-    Linux
-}
-function Get-OS() {
-    if ($IsWindows) {
-        return [OS]::Windows
-    }
-    elseif ($IsMacOS) {
-        return [OS]::Mac
-    }
-    elseif ($IsLinux) {
-        return [OS]::Linux
+<#
+.SYNOPSIS
+    Creates the enum `[OS]` (if it doesn't already exist).
+#>
+function Import-OsEnum {
+    #region Enums
+    if ($null -eq ('OS' -as [type])) {
+        Write-Verbose "Enum [OS] does not exist; creating it..."
+
+        enum OS {
+            Windows
+            Mac
+            Linux
+        }
+
+        Update-TypeData -TypeName [OS] -MemberName Current -MemberType ScriptProperty -Value {
+            if ($IsWindows) {
+                return [OS]::Windows
+            }
+            elseif ($IsMacOS) {
+                return [OS]::Mac
+            }
+            elseif ($IsLinux) {
+                return [OS]::Linux
+            }
+            else {
+                throw "Unity projects cannot be built from a Blackberry."
+            }
+        }
     }
     else {
-        throw "You seem to not _have_ an operating system. `$env:OS = $env:OS"
+        Write-Information "⏭ The `[OS]` enum already exists."
     }
 }
+
+Import-OsEnum
 
 enum UnityBuildTarget {
     WebGL
 }
 #endregion
 
-
 #tag::install-butler[]
+<# 
+.SYNOPSIS
+    Downloads and extracts Butler, Itch.io's build automation tool.
+ #>
 function Install-Butler() {
     #region butler constants
     $butler_name = "butler"
@@ -102,7 +106,7 @@ function Install-Butler() {
     }
     #endregion 
 
-    Write-Host -ForegroundColor DarkGray "Installing butler to $butler_dir"
+    Write-Host -ForegroundColor DarkGray "Installing butler to 📁 $butler_dir"
 
     #region Clean the butler dir
     Write-Host -ForegroundColor DarkGray "Cleaning $butler_dir"
@@ -111,7 +115,7 @@ function Install-Butler() {
     #endregion
 
     #region Download the .zip file
-    $butler_release_channel = $butler_release_channels[(Get-Os)]
+    $butler_release_channel = $butler_release_channels[[OS]::Current]
     $butler_url = "$butler_base_url/$butler_release_channel/LATEST/archive/default"
     $out_file_name = "butler.zip"
     $out_file_path = Join-Path $butler_dir $out_file_name
@@ -120,7 +124,7 @@ function Install-Butler() {
 
     Invoke-WebRequest -Uri $butler_url -OutFile $out_file_path
 
-    $butler_zip = Get-Item $out_file_path
+    $butler_zip = Get-Item $out_file_path -ErrorAction Stop
 
     Write-Host -ForegroundColor Green "Downloaded butler to [$butler_zip]"
     #endregion
@@ -171,14 +175,35 @@ function Get-UnityCredentials() {
     Start-UnityEditor -ExecuteMethod Build.Invoke -BatchMode -Quit -LogFile .\build.log -Wait -AdditionalArguments "-BuildArg1 -BuildArg2"
  #>
 function Build-Unity() {
+    # check if UnitySetup is installed
+    # TODO: Why was I doing it this way, instead of using #Requires? (https://devblogs.microsoft.com/scripting/powertip-require-specific-module-in-powershell-script/)
+    if (!(Get-Module UnitySetup -ListAvailable)) {
+        Write-Host -ForegroundColor DarkGray "Installing the dependency, UnitySetup."
+        Install-Module UnitySetup -Scope CurrentUser -AllowClobber -Force -Verbose
+    }
+    else {
+        Write-Host -ForegroundColor DarkGray "UnitySetup was already installed."
+    }
+
+    # exit if we aren't actually in a Unity project
+    $unity_project_folder = Find-UnityPackageRoot
+    $unity_project = Get-UnityProjectInstance $unity_project_folder
+
+    if (!$unity_project) {
+        throw "The current directory is not inside of a Unity project! `$PWD: $PWD"
+    }
+
+    Write-Host -ForegroundColor DarkGray "Discovered Unity project:`n$( $unity_project | Format-List | Out-String )"
+
     Start-UnityEditor -Project $unity_project -ExecuteMethod "BrandonUtils.Editor.CommandLine.BuildAutomator.WebGL" -BatchMode -Quit -Wait -LogFile Logs/build.txt
-    Write-Host -ForegroundColor Green "Succesfully built Unity! WOOH!"
+    Write-Host -ForegroundColor Green "Succesfully built Unity! WOOH! 🎊"
 }
 
-function Compress-Unity(){
-    # compress the webgl folder into a .zip file
+function Compress-Unity() {
+    Write-Error "TODO: compress the webgl folder into a .zip file"
 }
 
 function Deploy-Unity() {
-
+    Write-Error "TODO: Upload the `Compress-Unity` result via Butler"
 }
+
