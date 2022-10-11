@@ -9,6 +9,10 @@ using UnityEngine;
 using UnityEngine.Events;
 
 namespace BrandonUtils.GameOptions {
+    /// <summary>
+    /// A configurable, renderable, serializable setting.
+    /// </summary>
+    [Serializable]
     public abstract class GameOption {
         /// <summary>
         /// The initial value for this <see cref="GameOption"/>.
@@ -125,9 +129,9 @@ namespace BrandonUtils.GameOptions {
         public readonly UnityEvent ValueChangedEvent = new UnityEvent();
 
         protected GameOption(
-            string displayName,
-            string description,
-            object initialValue,
+            string                   displayName,
+            string                   description,
+            object                   initialValue,
             Func<GameOption, string> valueDisplayFunction,
             Func<GameOption, string> labelDisplayFunction
         ) {
@@ -159,7 +163,7 @@ namespace BrandonUtils.GameOptions {
         /// <param name="gameOption"></param>
         /// <returns></returns>
         private static string DisplayLabel_RenderFunction_Default(GameOption gameOption) {
-            var separator = Separators.Contains(gameOption.DisplayName.Last()) ? (char?) null : Separator_Default;
+            var separator = Separators.Contains(gameOption.DisplayName.Last()) ? (char?)null : Separator_Default;
             return $"{gameOption.DisplayName}{separator} {gameOption.DisplayValue}";
         }
 
@@ -185,7 +189,7 @@ namespace BrandonUtils.GameOptions {
         /// <returns></returns>
         public T ValueAs<T>() {
             Type requestedType = typeof(T);
-            return ValueType == requestedType ? (T) Value : throw new InvalidCastException($"The {nameof(GameOption)} {DisplayName} has the value {Value} of type {ValueType.Name}, but was requested as a {requestedType.Name}!");
+            return ValueType == requestedType ? (T)Value : throw new InvalidCastException($"The {nameof(GameOption)} {DisplayName} has the value {Value} of type {ValueType.Name}, but was requested as a {requestedType.Name}!");
         }
     }
 }
