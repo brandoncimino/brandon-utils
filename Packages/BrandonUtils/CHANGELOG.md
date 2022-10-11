@@ -7,6 +7,12 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > **Note:** Dates are in `mm/dd/yyyy` format.
 
+## [3.1.0]
+
+### Added
+ 
+- `Nuget.ps1` & friends
+
 ## [3.0.0]
 
 > Updated Unity version from `2021.1.3f1` -> `2021.2.5f1`

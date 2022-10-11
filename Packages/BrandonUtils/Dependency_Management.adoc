@@ -1,0 +1,26 @@
+﻿= Dependency Management
+
+:nuget: link:https://www.nuget.org/[Nuget]
+:tip-caption: ⏭
+
+Dependencies come in 2 flavors: <<Unity Packages>> and <<Nuget Packages>>.
+
+== Unity Packages
+
+[TIP,title="TL;DR"]
+====
+- Defined in a *Unity project*'s link:../manifest.json[].
+- Downloaded automatically via the https://docs.unity3d.com/Manual/Packages.html[Package Manager].
+- Can include any kind of asset _(prefabs, materials, etc.)_.
+- Can be downloaded directly from https://docs.unity3d.com/Manual/upm-git.html[git].
+====
+
+== Nuget Packages
+
+[TIP,title="TL;DR"]
+====
+- Defined in a **solution**'sfootnote:[Nuget is the standard package manager for _all_ .NET programs, so it is tied to the universal `.sln` ("solution") and `.csproj` ("project") files.] link:package.json[] file.
+- *Embedded* inside of the project, meaning that the code assemblies _(`.dll` files)_ are checked-in to git.
+- _Can_ include non-code files{wj}footnote:[link:https://learn.microsoft.com/en-us/nuget/reference/nuspec#including-content-files[.nuspec reference: Including content files]], but should do this sparingly.
+- Requires link:NuGetCleaner.ps1[] to be run whenever a dependency is updated.
+====

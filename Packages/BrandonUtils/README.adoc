@@ -1,5 +1,6 @@
 ﻿= brandon-utils
 :note-caption: 📰
+:jetbrains-embedded: link:https://forum.unity.com/threads/embedded-jetbrains-annotations-in-v5-unityengine-dll.304819/#:~:text=This%20is%20intentional%2C%20yes%2C%20and%20you%20can%20rely%20on%20the%20attributes%20being%20included%20in%20all%20future%20versions%20of%20Unity.[embedded]
 
 > Stuff link:https://brandoncimino.com[Brandon] wants in every Unity project.
 
@@ -19,15 +20,14 @@ It may be possible to move to https://github.com/jilleJr/Newtonsoft.Json-for-Uni
 - [ ] Improve link:Runtime/Logging/LogUtils.cs[] so that it can be referenced from _any_ assembly
 ** I don't think conditional compiling will work, because the `.asmdef` isn't conditional in that way...
 ** I might have to go _real_ hard, and use https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/partial-classes-and-methods[partial classes]!
-- [ ] Fix usage of JetBrains attributes (e.g. `[UsedImplicitly]`)
-** https://blog.jetbrains.com/dotnet/2018/05/03/what-are-jetbrains-annotations/[This article] references a https://www.nuget.org/packages/JetBrains.Annotations/[`JetBrains.Annotations` NuGet package]
-*** That article is from `2018`, but it looks like the settings it references still exist
-*** I don't understand why I would have to get a NuGet package, though - aren't these annotations built-in to Rider?
-*** It looks like they do get packaged along with a "Unity Core" reference, but I don't want that in the standalone code
-*** It might be better for the standalone code to just bite the bullet and use the NuGet package, anyways
-*** Actually I think the `package.json` file might work with NuGet anyways
-*** [x] [.line-through]#Attempt via `com.unity.ide.rider` dependency#
-**** Didn't work at all
+** 🆕 _Oct 11, 2022_: I should use the link:https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.logging.ilogger?view=dotnet-plat-ext-6.0[ILogger] interface and have consumers of BrandonUtils pass in an `ILogger` instancefootnote:[https://stackoverflow.com/questions/2764384/logging-in-a-c-sharp-library[Logging in a C# library]]
+- [x] Fix usage of JetBrains attributes (e.g. `[UsedImplicitly]`)
+** This requires a link:Dependency_Management.adoc[Nuget dependency] on the https://www.nuget.org/packages/JetBrains.Annotations/[JetBrains.Annotations] package.
+** The package must be embedded inside of the link:NuGet/[] folder and included in source control.
+** Must *only* be used by link:Standalone/[]footnote:[Unity has a copy of `JetBrains.Annotations` {jetbrains-embedded} inside of it, which is accessible from inside link:Runtime/[] and link:Editor/[].]
+** The `.dll` files must be referenced *explicitly* by ``.asmdef``s
+*** By default, all `.dll` assemblies are imported with "*Implicitly Referenced*" set to `true`
+*** Doing this causes Unity to have a conniption, because it causes naming conflicts with the {jetbrains-embedded} version.
 
 == Naming Convention
 
