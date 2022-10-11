@@ -1,6 +1,6 @@
-﻿<Project>
+﻿<!-- Is this file actually respected at all, or is only the one at the project-level used? -->
+<Project>
     <PropertyGroup>
-        <!-- Trying to get the .csproj files to target netstandard2.1 instead of net471, but it doesn't seem to be working... -->
         <TargetFramework>netstandard2.1</TargetFramework>
         <Nullable>enable</Nullable>
     </PropertyGroup>
