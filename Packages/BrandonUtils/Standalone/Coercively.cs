@@ -20,6 +20,8 @@ namespace BrandonUtils.Standalone {
     /// Coercively(2.5f, 1);    // returns [3.5]:  2.5 + 1   -> 2.5 + 1.0 -> 3.5
     ///
     /// ]]></code>
+    ///
+    /// TODO: This is almost certainly very inefficient and inelegant, and as such should probably be restricted to the <c>BrandonUtils.Testing</c> package.
     /// </remarks>
     public static class Coercively {
         private static Coercive.Operator Addition { get; } = new Coercive.Operator() {
@@ -94,7 +96,7 @@ namespace BrandonUtils.Standalone {
             Double     = (a, b) => a * b,
             Decimal    = (a, b) => a * b,
             String     = (a, b) => a.Repeat(Convert.ToInt32(b)), // this might be inefficient, since it means that b will be converted to a string AND then to an int after - even if it was an int to begin with
-            TimeSpan   = (a, b) => TimeUtils.Multiply(a, Convert.ToDouble(b)),
+            TimeSpan   = (a, b) => a * Convert.ToDouble(b),
         };
 
         public static object Multiply(object multiplicand, object multiplier) {

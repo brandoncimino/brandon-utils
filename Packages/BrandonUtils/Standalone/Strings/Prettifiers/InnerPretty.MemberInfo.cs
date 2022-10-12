@@ -8,7 +8,7 @@ using FowlFever.Conjugal.Affixing;
 namespace BrandonUtils.Standalone.Strings.Prettifiers {
     internal static partial class InnerPretty {
         public static string PrettifyMemberInfo(MemberInfo memberInfo, PrettificationSettings settings) {
-            var typeName   = memberInfo.DeclaringType?.PrettifyType(settings).Suffix(".");
+            var typeName   = memberInfo.DeclaringType?.PrettifyType(settings).Suffix(".").Render();
             var memberName = memberInfo.Name;
             return $"{typeName}{memberName}".WithTypeLabel(memberInfo.GetType(), settings);
         }

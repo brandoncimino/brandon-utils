@@ -121,7 +121,8 @@ namespace BrandonUtils.Standalone.Clerical {
             return NormalizeSeparators(
                 path?.Trim()
                     .TrimEnd(DirectorySeparatorPattern)
-                    .Suffix(separator.ToCharString()),
+                    .Suffix(separator.ToCharString())
+                    .Render(),
                 separator
             );
         }

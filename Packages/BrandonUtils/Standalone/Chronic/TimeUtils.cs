@@ -56,6 +56,7 @@ namespace BrandonUtils.Standalone.Chronic {
 
         #region Division
 
+#if NETSTANDARD_2_0
         /// <summary>
         /// Mimics .NET Core's <a href="https://docs.microsoft.com/en-us/dotnet/api/system.timespan.divide">TimeSpan.Divide</a>.
         /// Does this by converting the given <see cref="TimeSpan" />s into <see cref="TimeSpan.TotalSeconds" /> and performing the division on those.
@@ -87,13 +88,8 @@ namespace BrandonUtils.Standalone.Chronic {
         public static TimeSpan Divide(this TimeSpan dividend, double divisor) {
             return TimeSpan.FromTicks((long)(dividend.Ticks / divisor));
         }
+#endif
 
-
-        /// <inheritdoc cref="Divide(System.TimeSpan,double)"/>
-        [Pure]
-        public static TimeSpan Divide(this DateTime dividend, double divisor) {
-            return dividend.AsTimeSpan().Divide(divisor);
-        }
 
         /// <summary>
         ///     Divides <paramref name="dividend" /> by <paramref name="divisor" />, returning the integer quotient.
@@ -104,15 +100,15 @@ namespace BrandonUtils.Standalone.Chronic {
         [Pure]
         public static double Quotient(this TimeSpan dividend, TimeSpan divisor) {
             ValidateDivisor(divisor);
-            return Math.Floor(Divide(dividend, divisor));
+            return Math.Floor(dividend.Divide(divisor));
         }
 
-        /// <summary>
-        ///     Returns the <see cref="TimeSpan" /> remainder after <paramref name="dividend" /> is divided by <paramref name="divisor" />.
-        /// </summary>
         /// <param name="dividend">The number to be divided (i.e. top of the fraction)</param>
         /// <param name="divisor">The number by which <paramref name="dividend" /> will be divided (i.e. the bottom of the fraction)</param>
-        /// <returns></returns>
+        /// <returns>the <see cref="TimeSpan" /> remainder after <paramref name="dividend" /> is divided by <paramref name="divisor" />.</returns>
+        /// <remarks>
+        /// Unfortunately, while <see cref="TimeSpan.op_Division(System.TimeSpan,System.TimeSpan)"/> was added .NET Standard 2.1, there is no equivalent for <see cref="decimal.op_Modulus"/>.
+        /// </remarks>
         [Pure]
         public static TimeSpan Modulus(this TimeSpan dividend, TimeSpan divisor) {
             ValidateDivisor(divisor);
@@ -129,6 +125,7 @@ namespace BrandonUtils.Standalone.Chronic {
 
         #region Multiplication
 
+#if NETSTANDARD_2_0
         /// <summary>
         ///     Multiplies <paramref name="timeSpan" /> by <paramref name="factor" />, returning a new <see cref="TimeSpan" />.
         /// </summary>
@@ -139,6 +136,7 @@ namespace BrandonUtils.Standalone.Chronic {
         public static TimeSpan Multiply(this TimeSpan timeSpan, double factor) {
             return TimeSpan.FromTicks((long)(timeSpan.Ticks * factor));
         }
+#endif
 
         #endregion
 
@@ -188,6 +186,7 @@ namespace BrandonUtils.Standalone.Chronic {
         /// <example>
         ///     TODO: Add an example, because this is kinda hard to explain without one.
         ///     TODO: Future Brandon, on 8/16/2021, can confirm past Brandon's assessment from 9/22/2020.
+        ///     TODO: Future Future Brandon, on 10/11/2022, can confirm past Brandon's assessment from 8/16/2021 of past past Brandon's assessment from 9/22/2020. Perhaps this meant to be similar to Java's Instant.truncatedTo()? If so, the confusion just comes from the poor name of this method.
         /// </example>
         /// <param name="value"></param>
         /// <param name="unit"></param>
@@ -207,40 +206,6 @@ namespace BrandonUtils.Standalone.Chronic {
         #endregion
 
         /// <summary>
-        /// Corresponds to <see cref="Math.Min(int, int)"/>, etc.
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <param name="c"></param>
-        /// <returns></returns>
-        [Pure]
-        public static DateTime Min(this DateTime a, DateTime b, params DateTime[] c) {
-            return c.Append(a).Append(b).Min();
-        }
-
-        /// <summary>
-        /// Corresponds to <see cref="Math.Max(byte,byte)"/>, etc.
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <param name="c"></param>
-        /// <returns></returns>
-        [Pure]
-        public static DateTime Max(this DateTime a, DateTime b, params DateTime[] c) {
-            return c.Append(a).Append(b).Max();
-        }
-
-        [Pure]
-        public static TimeSpan Min(this TimeSpan a, TimeSpan b, params TimeSpan[] c) {
-            return c.Append(a).Append(b).Min();
-        }
-
-        [Pure]
-        public static TimeSpan Max(this TimeSpan a, TimeSpan b, params TimeSpan[] c) {
-            return c.Append(a).Append(b).Max();
-        }
-
-        /// <summary>
         /// Converts <see cref="DateTime"/> <paramref name="dateTime"/> into a <see cref="TimeSpan"/> representing the elapsed time since <see cref="DateTime.MinValue"/>.
         /// </summary>
         /// <remarks>
@@ -252,16 +217,6 @@ namespace BrandonUtils.Standalone.Chronic {
         [Pure]
         public static TimeSpan AsTimeSpan(this DateTime dateTime) {
             return TimeSpan.FromTicks(dateTime.Ticks);
-        }
-
-        /// <summary>
-        /// Converts <see cref="TimeSpan"/> <paramref name="timeSpan"/> into a <see cref="DateTime"/> representing the date if <paramref name="timeSpan"/> had elapsed since <see cref="DateTime.MinValue"/>.
-        /// </summary>
-        /// <param name="timeSpan"></param>
-        /// <returns></returns>
-        [Pure]
-        public static DateTime AsDateTime(this TimeSpan timeSpan) {
-            return new DateTime(timeSpan.Ticks);
         }
 
         /// <summary>
@@ -322,11 +277,6 @@ namespace BrandonUtils.Standalone.Chronic {
         [Pure]
         public static TimeSpan TimeSpanOf(object value) {
             return TimeSpanFromObject(value) ?? throw new InvalidCastException($"Could not convert {nameof(value)} [{value?.GetType().Name}]{value} to a {nameof(TimeSpan)}!");
-        }
-
-        [Obsolete("Please call " + nameof(MethodTimer) + "." + nameof(MethodTimer.MeasureExecution) + " directly", true)]
-        public static AggregateExecutionTime AverageExecutionTime(Action action, int iterations = 1) {
-            return MethodTimer.MeasureExecution(action, iterations);
         }
     }
 }

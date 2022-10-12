@@ -27,7 +27,7 @@ namespace BrandonUtils.Testing {
             return header
                    .Render()
                    .SplitLines()
-                   .Concat(excuse.Prefix(excusePrefix))
+                   .Concat(excuse.Select(it => it.Prefix(excusePrefix).Render()))
                    .Indent(indent);
         }
 
