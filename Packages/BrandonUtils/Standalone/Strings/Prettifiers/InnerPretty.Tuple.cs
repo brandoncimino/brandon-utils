@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 
 using BrandonUtils.Standalone.Collections;
 
 using FowlFever.Conjugal.Affixing;
-
-using JetBrains.Annotations;
 
 namespace BrandonUtils.Standalone.Strings.Prettifiers {
     internal static partial class InnerPretty {
