@@ -6,5 +6,12 @@
     This script triggers the functions in `Nuget.psm1`, 
     which in turn get their meat from `Nuget.cs`.
 #>
-Import-Module ./Nuget.psm1 -Verbose
-Remove-DuplicateNugets
+param([Parameter()]$Path = $PSScriptRoot)
+
+$ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
+
+Write-Host "Cleaning under: $Path"
+
+Import-Module "$PSScriptRoot/Nuget.psm1" -Verbose -Force
+
+[Nuget]::EnumeratePackages($Path) | Repair-Nuget -Verbose
