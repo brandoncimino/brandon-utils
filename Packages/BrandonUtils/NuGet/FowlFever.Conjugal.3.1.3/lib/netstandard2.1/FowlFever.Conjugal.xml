@@ -1,0 +1,2750 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>FowlFever.Conjugal</name>
+    </assembly>
+    <members>
+        <member name="T:System.Runtime.CompilerServices.IsExternalInit">
+            <summary>
+                Reserved to be used by the compiler for tracking metadata.
+                This class should not be used by developers in source code.
+            </summary>
+            <remarks>
+                This definition is provided by the <i>IsExternalInit</i> NuGet package
+                (https://www.nuget.org/packages/IsExternalInit).
+                Please see https://github.com/manuelroemer/IsExternalInit for more information.
+            </remarks>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.Affixation">
+            <summary>
+                <a href="https://en.wiktionary.org/wiki/affix#English">affix</a>
+                +
+                <a href="https://en.wiktionary.org/wiki/-ation#English">-ation</a>
+                <p/>
+                Represents the act of adding an <a href="https://en.wikipedia.org/wiki/Affix">affix</a> to a word.
+            </summary>
+            <seealso cref="T:FowlFever.Conjugal.Affixing.IAffixed"/>
+            <seealso cref="P:FowlFever.Conjugal.Affixing.Affixation.Flavor"/>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.Affixation.Stem">
+            <inheritdoc cref="P:FowlFever.Conjugal.Affixing.IAffixed.Stem"/>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme">
+            <inheritdoc cref="P:FowlFever.Conjugal.Affixing.AffixRef`1.BoundMorpheme"/>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme2">
+            <inheritdoc cref="P:FowlFever.Conjugal.Affixing.AffixRef`1.SuffixMorpheme"/>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.Affixation.Joiner">
+            <inheritdoc cref="P:FowlFever.Conjugal.Affixing.AffixRef`1.Joiner"/>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.Affixation.Flavor">
+            <inheritdoc cref="P:FowlFever.Conjugal.Affixing.AffixRef`1.Flavor"/>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.Affixation.InsertionPoint">
+            <inheritdoc cref="P:FowlFever.Conjugal.Affixing.AffixRef`1.InsertionPoint"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixation.#ctor(FowlFever.Conjugal.Affixing.AffixFlavor)">
+            <inheritdoc/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixation.Of``1(System.ReadOnlySpan{System.Char},FowlFever.Conjugal.Affixing.AffixRef{``0})">
+            <inheritdoc cref="M:FowlFever.Conjugal.Affixing.AffixRef`1.WithStem(System.ReadOnlySpan{System.Char})"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.Affixation.PartState">
+            <summary>
+                Describes what parts of the
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+                are available.
+            </summary>
+        </member>
+        <member name="F:FowlFever.Conjugal.Affixing.Affixation.PartState.NoStem">
+            <summary>
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+                <see cref="P:System.ReadOnlySpan`1.IsEmpty"/>.
+            </summary>
+        </member>
+        <member name="F:FowlFever.Conjugal.Affixing.Affixation.PartState.NoMorpheme">
+            <summary>
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+                isn't empty, but <b>BOTH</b>
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme"/>
+                <b>AND</b>
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme2"/>
+                are.
+            </summary>
+        </member>
+        <member name="F:FowlFever.Conjugal.Affixing.Affixation.PartState.FullyFormed">
+            <summary>
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+                and
+                <i>
+                    <b>at least 1</b>
+                </i>
+                of
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme"/> &amp;
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme2"/>
+                are non-<see cref="P:System.ReadOnlySpan`1.IsEmpty"/>.
+            </summary>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.Affixation.Length">
+            <summary>
+                The total
+                <see cref="P:System.ReadOnlySpan`1.Length"/>
+                of the individual pieces that make up this<see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>.
+            </summary>
+            <exception cref="T:System.NotImplementedException">if this
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Flavor"/>
+                hasn't been implemented
+            </exception>
+            <exception cref="T:System.ComponentModel.InvalidEnumArgumentException">if this
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Flavor"/>
+                is unknown
+            </exception>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixation.GetFullParts">
+            <returns>the<see cref="T:System.ReadOnlySpan`1"/>s used to
+                <see cref="M:FowlFever.Conjugal.Affixing.Affixation.Render"/>
+                the result when
+                <see cref="M:FowlFever.Conjugal.Affixing.Affixation.GetPartState"/>
+                is<see cref="!:PartState.Normal"/>.
+            </returns>
+            <exception cref="T:System.NotImplementedException">
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Flavor"/>
+                is
+                <see cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Transfix"/>
+                or
+                <see cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Duplifix"/>
+            </exception>
+            <exception cref="T:System.ComponentModel.InvalidEnumArgumentException">
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Flavor"/>
+                is unknown
+            </exception>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixation.Render">
+            <returns>the final result of this
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+            </returns>
+            <exception cref="T:System.NotImplementedException">if this
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Flavor"/>
+                hasn't been implemented
+            </exception>
+            <exception cref="T:System.ComponentModel.InvalidEnumArgumentException">if this
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Flavor"/>
+                is unknown
+            </exception>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixation.Describe">
+            <returns>individual properties of this
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+                for debugging
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixation.ToString">
+            <inheritdoc cref="M:FowlFever.Conjugal.Affixing.Affixation.Render"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixation.op_Implicit(FowlFever.Conjugal.Affixing.Affixation)~System.String">
+            <summary>
+                Implicitly<see cref="M:FowlFever.Conjugal.Affixing.Affixation.Render"/>s this<see
+                    cref="T:FowlFever.Conjugal.Affixing.Affixation"/>.
+            </summary>
+            <remarks>
+                TODO: ref structs like
+                <see cref="T:System.Span`1"/>
+                intentionally <b>don't</b> implicitly become<see cref="T:System.String"/>s. Should we maintain that
+                behavior?
+            </remarks>
+            <param name="affixation">this
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+            </param>
+            <returns>
+                <see cref="M:FowlFever.Conjugal.Affixing.Affixation.Render"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixation.Suffixation(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <summary>
+                Constructs a new
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+                instance with a<see cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Suffix"/>.
+            </summary>
+            <param name="stem">the linguistic
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+            </param>
+            <param name="suffix">the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme"/>
+                appended to the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+            </param>
+            <param name="joiner">the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Joiner"/>
+                interposed betwixt the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+                and<see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme"/>.
+            </param>
+            <returns>a new
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixation.Prefixation(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <summary>
+                Constructs a new
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+                with a<see cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Prefix"/>.
+            </summary>
+            <param name="stem">the linguistic
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+            </param>
+            <param name="prefix">the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme"/>
+                appended to the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+            </param>
+            <param name="joiner">the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Joiner"/>
+                interposed betwixt the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+                and
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme"/>
+            </param>
+            <returns>a new
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixation.Infixation(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.Index,System.ReadOnlySpan{System.Char})">
+            <summary>
+                Constructs a new
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+                with an<see cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Infix"/>.
+            </summary>
+            <param name="stem">the linguistic
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+                that the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme"/>
+                will be <see cref="M:System.String.Insert(System.Int32,System.String)">inserted</see> into
+            </param>
+            <param name="infix">the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme"/>
+                that will be <see cref="M:System.String.Insert(System.Int32,System.String)">inserted</see> into the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+            </param>
+            <param name="insertionPoint">the
+                <see cref="T:System.String"/>
+                index where the<see cref="M:System.String.Insert(System.Int32,System.String)"/>ion will take place
+            </param>
+            <param name="joiner">the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Joiner"/>
+                interposed betwixt the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+                and<see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme"/>.
+            </param>
+            <returns>a new
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixation.Circumfixation(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <summary>
+                Constructs a new
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+                with a<see cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Circumfix"/>.
+            </summary>
+            <remarks>
+                Both
+                <see cref="M:FowlFever.Conjugal.Affixing.Affixation.Circumfixation(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})"/>
+                and
+                <see cref="M:FowlFever.Conjugal.Affixing.Affixation.Ambifixation(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})"/>
+                split the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme"/>
+                into two parts that bookend the<see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>.
+                <ul>If the parts of the
+                    <see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme"/>
+                    are:
+                    <li><b>unique</b>, use
+                        <b>
+                            <see cref="M:FowlFever.Conjugal.Affixing.Affixation.Circumfixation(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+                                Circumfixation</see>:
+                        </b>
+                        <a href="https://en.wiktionary.org/wiki/em-_-en">
+                            <i>em- -en</i>
+                        </a>
+                        in <b>"embooben"</b>
+                        <i>(to endow with assets)</i>
+                    </li>
+                    <li><b>identical</b>, use
+                        <b>
+                            <see cref="M:FowlFever.Conjugal.Affixing.Affixation.Ambifixation(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+                                Ambifixation</see>:
+                        </b>
+                        <a href="https://en.wiktionary.org/wiki/en-_-en">
+                            <i>en- -en</i>
+                        </a>
+                        in <b>"enchicken"</b>"
+                        <i>(to impart the features of poultry)</i>
+                    </li>
+                </ul>
+            </remarks>
+            <param name="stem">the linguistic
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+                that the<see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme"/>s will surround
+            </param>
+            <param name="prefix">the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme"/>
+                that will <b>precede</b> the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+                (i.e. "em" in "embooben")
+            </param>
+            <param name="suffix">the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme2"/>
+                that will <b>succede</b> the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+                (i.e. "en" in "embooben")
+            </param>
+            <param name="joiner">the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Joiner"/>
+                interposed betwixt the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme"/>
+                and the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+            </param>
+            <returns>a new
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixation.Ambifixation(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <summary>
+                Constructs a new
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+                with an<see cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Ambifix"/>.
+            </summary>
+            <remarks>
+                <inheritdoc
+                        cref="M:FowlFever.Conjugal.Affixing.Affixation.Circumfixation(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})"/>
+            </remarks>
+            <param name="stem">the linguistic
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+                that the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme"/>
+                will surround
+            </param>
+            <param name="ambifix">the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme"/>
+                that will appear on <b>BOTH SIDES</b> of the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+            </param>
+            <param name="joiner">the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Joiner"/>
+                interposed betwixt the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme"/>
+                and the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+            </param>
+            <returns>a new
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affixation.Duplifixation(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <summary>
+                Constructs a new<see cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Duplifix"/>-flavored<see
+                    cref="T:FowlFever.Conjugal.Affixing.Affixation"/>, which repeats the
+                <paramref name="stem"/>
+                with an optional<paramref name="joiner"/>.
+            </summary>
+            <param name="stem">the linguistic
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+                that will be repeated
+            </param>
+            <param name="joiner">the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme"/>
+                that will be interposed betwixt the repetitions of the
+                <paramref name="stem"/>
+            </param>
+            <returns>a new
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+            </returns>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.AffixedExtensions">
+            <summary>
+                Provides "default implementation" methods for<see cref="T:FowlFever.Conjugal.Affixing.IAffixed"/>.
+            </summary>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixedExtensions.Render(FowlFever.Conjugal.Affixing.IAffixed)">
+            <summary>
+                The "default" way to produce a
+                <see cref="T:System.String"/>
+                representation of an
+                <see cref="T:FowlFever.Conjugal.Affixing.IAffixed"/>
+                object.
+            </summary>
+            <param name="affixedThing">the
+                <see cref="T:FowlFever.Conjugal.Affixing.IAffixed"/>
+                instance being formatted
+            </param>
+            <returns>the final
+                <see cref="T:System.String"/>
+                representation of the
+                <see cref="T:FowlFever.Conjugal.Affixing.IAffixed"/>
+            </returns>
+            <seealso cref="M:FowlFever.Conjugal.Affixing.Affixation.Render"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixedExtensions.ToAffixation(FowlFever.Conjugal.Affixing.IAffixed)">
+            <param name="affixedThing">an
+                <see cref="T:FowlFever.Conjugal.Affixing.IAffixed"/>
+                instance, whence forth
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+                couldst been doed
+            </param>
+            <returns>a new
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+                built from the
+                <paramref name="affixedThing"/>
+            </returns>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.AffixEqualityExtensions">
+            <summary>
+                Helpers for
+                <see cref="T:System.IEquatable`1"/>
+                implementations.
+            </summary>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.AffixExtensions">
+            <summary>
+                Extension methods for<see cref="T:FowlFever.Conjugal.Affixing.IAffix"/>.
+            </summary>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixExtensions.AffixTo(FowlFever.Conjugal.Affixing.IAffix,System.String)">
+            <param name="affix">this
+                <see cref="T:FowlFever.Conjugal.Affixing.IAffix"/>
+            </param>
+            <param name="stem">the word that will be affixed</param>
+            <returns>an
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+                combining this
+                <see cref="T:FowlFever.Conjugal.Affixing.IAffix"/>
+                and a
+                <paramref name="stem"/>
+            </returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.AffixFlavor">
+            <summary>
+                Enumerates different kinds of <a href="https://en.wikipedia.org/wiki/Affix">affixes</a>.
+            </summary>
+            <remarks>
+                <ul>
+                    <li>
+                        <a href="https://en.wikipedia.org/wiki/Simulfix">Simulfix</a>
+                        is <a href="https://en.wikipedia.org/wiki/Vandalism_on_Wikipedia">Wikipedia vandalism</a>.
+                    </li>
+                    <li>
+                        <a href="https://en.wikipedia.org/wiki/Suprafix">Suprafix</a>
+                        is incorrect.
+                    </li>
+                </ul>
+            </remarks>
+        </member>
+        <member name="F:FowlFever.Conjugal.Affixing.AffixFlavor.Prefix">
+            <summary>
+                Appears <b>before</b> the stem.
+            </summary>
+            <remarks>
+                <a href="https://en.wikipedia.org/wiki/Prefix">Wikipedia - Prefix</a>
+            </remarks>
+            <example>
+                <a href="https://en.wiktionary.org/wiki/re-#English">re-</a>
+                + <a href="https://en.wiktionary.org/wiki/fettle#Verb">fettle</a> = <a
+                    href="https://en.wiktionary.org/wiki/refettle#English">refettle
+            </a>
+                <i>(to fettle again)</i>
+            </example>
+        </member>
+        <member name="F:FowlFever.Conjugal.Affixing.AffixFlavor.Suffix">
+            <summary>
+                Appears <b>after</b> the stem.
+            </summary>
+            <remarks>
+                <a href="https://en.wikipedia.org/wiki/Suffix">Wikipedia - Suffix</a>
+            </remarks>
+            <example>
+                <a href="https://en.wiktionary.org/wiki/funny#English">funny</a>
+                + <a href="https://en.wiktionary.org/wiki/-ly#Etymology_2">-ly</a> = <a
+                    href="https://en.wiktionary.org/wiki/funnily">funnily
+            </a>
+                <i>(occuring in a jocular manner)</i>
+            </example>
+        </member>
+        <member name="F:FowlFever.Conjugal.Affixing.AffixFlavor.Infix">
+            <summary>
+                Appears <b>inside</b> the stem. Often interchangeable with <a
+                    href="https://en.wikipedia.org/wiki/Tmesis">tmesis</a>.
+            </summary>
+            <remarks>
+                <a href="https://en.wikipedia.org/wiki/Infix">Wikipedia - Infix</a>
+            </remarks>
+            <example>
+                <ul>
+
+                    <li>
+                        <b><a href="https://en.wikipedia.org/wiki/Expletive_infixation">Expletive infixation</a>:
+                        </b>
+                        <a href="https://en.wiktionary.org/wiki/metric_ton">metric ton</a> + <a
+                            href="https://en.wiktionary.org/wiki/fuck#English">fuck
+                    </a> = <a href="https://en.wiktionary.org/wiki/metric_fuckton">metric fuckton</a>
+                        <i>(as differentiated from a <a href="https://en.wiktionary.org/wiki/long_ton">long fuck-ton</a>)
+                        </i>
+                    </li>
+
+                    <li>
+                        <b><a href="https://en.wiktionary.org/wiki/-ma-">Homeric infixation</a>:
+                        </b>
+                        <a href="https://en.wiktionary.org/wiki/education#English">education</a> + <a
+                            href="https://en.wiktionary.org/wiki/-ma-#English">-ma-
+                    </a> =
+                        <a href="https://en.wiktionary.org/wiki/edumacation#English">edumacation</a>
+                    </li>
+
+                    <li>
+                        <a href="https://en.wiktionary.org/wiki/house#English">house</a>
+                        + <a href="https://en.wiktionary.org/wiki/-iz-">-iz-</a> = <a
+                            href="https://en.wiktionary.org/wiki/hizouse#English">hizouse
+                    </a>
+                        <i>(<a href="https://en.wikipedia.org/wiki/Real_property">real property</a> owned or developed
+                            by <a href="https://en.wikipedia.org/wiki/Snoop_Dogg">Calvin Cordozar Broadus Jr.</a>)
+                        </i>
+                    </li>
+                </ul>
+            </example>
+        </member>
+        <member name="F:FowlFever.Conjugal.Affixing.AffixFlavor.Circumfix">
+            <summary>
+                <b>Surrounds</b>
+                the stem, where the preceding and succeding strings <b>may</b> be different.
+            </summary>
+            <remarks>
+                <a href="https://en.wikipedia.org/wiki/Circumfix">Wikipedia - Circumfix</a>
+                <p/>
+                📎
+                <see cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Circumfix"/>
+                is a <a href="https://en.wikipedia.org/wiki/hypernym">hypernym</a> of<see
+                    cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Ambifix"/>.
+            </remarks>
+            <example>
+                <a href="https://en.wiktionary.org/wiki/boob#Noun_2">boob</a>
+                + <a href="https://en.wiktionary.org/wiki/em-_-en#English">em- -en</a> = <a
+                    href="https://en.wiktionary.org/wiki/endow">embooben
+            </a>
+                <i>(to provide with assets)</i>
+            </example>
+            <seealso cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Ambifix"/>
+        </member>
+        <member name="F:FowlFever.Conjugal.Affixing.AffixFlavor.Ambifix">
+            <summary>
+                <b>Surrounds</b>
+                the stem, where both the preceding and succeding strings are <b>identical</b>.
+            </summary>
+            <remarks>
+                <a href="https://en.wiktionary.org/wiki/ambifix">Wiktionary - Ambifix</a>
+                <p/>
+                📎
+                <see cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Ambifix"/>
+                is a <a href="https://en.wikipedia.org/wiki/hyponym">hyponym</a> of<see
+                    cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Circumfix"/>.
+            </remarks>
+            <example>
+                <a href="https://en.wiktionary.org/wiki/cold#English">cold</a>
+                + <a href="https://en.wiktionary.org/wiki/en-_-en#English">en- -en</a> = <a
+                    href="https://en.wiktionary.org/wiki/encolden#English">encolden
+            </a>
+                <i>(to approach <a href="https://en.wiktionary.org/wiki/aloof">maximum aloofness</a>)
+                </i>
+            </example>
+            <seealso cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Circumfix"/>
+        </member>
+        <member name="F:FowlFever.Conjugal.Affixing.AffixFlavor.Duplifix">
+            <summary>
+                <b>Duplicates</b>
+                the stem, possibly with <a href="https://en.wiktionary.org/wiki/ablaut">ablaution</a>
+                <i>(<a href="https://en.wikipedia.org/wiki/Ablaut_reduplication">ablaut reduplication</a>)
+                </i>
+                .
+            </summary>
+            <remarks>
+                <list type="table">
+                    <item>
+                        <term>
+                            <b>Exact:</b>
+                        </term>
+                        <description>
+                            <a href="https://en.wiktionary.org/wiki/boo-boo">boo-boo</a>
+                            <i>(a minor injury)</i>
+                        </description>
+                    </item>
+                    <item>
+                        <term>
+                            <b>
+                                <a href="https://en.wiktionary.org/wiki/ablaut">Ablaut</a>:
+                            </b>
+                        </term>
+                        <description>
+                            <a href="https://en.wiktionary.org/wiki/flim-flam#English">flimflam</a>
+                            <i>(<a href="https://en.wiktionary.org/wiki/gobbledygook">gobbledygook</a>, <a
+                                    href="https://en.wiktionary.org/wiki/falderal">falderal</a>, <a
+                                    href="https://en.wiktionary.org/wiki/galimatias">galimatias</a>, <a
+                                    href="https://en.wiktionary.org/wiki/bupkis">bupkis</a>, <a
+                                    href="https://en.wiktionary.org/wiki/clamjamfrey">clamjamfrey</a>)
+                            </i>
+                        </description>
+                    </item>
+                    <item>
+                        <term>
+                            <b>Rhyming:</b>
+                        </term>
+                        <description>
+                            <a href="https://en.wiktionary.org/wiki/honeybunny#English">honeybunny</a>
+                            <i>(a
+                                <a href="https://en.wiktionary.org/wiki/lepus#Latin">lepus</a>
+                                <a href="https://en.wikipedia.org/wiki/Supersaturation">supersaturated</a>
+                                with <a
+                                        href="https://en.wikipedia.org/wiki/Monosaccharide">monosaccharides</a>)
+                            </i>
+                        </description>
+                    </item>
+                    <item>
+                        <term>
+                            <b><a href="https://en.wikipedia.org/wiki/Shm-reduplication">Shm-reduplication</a>:
+                            </b>
+                        </term>
+                        <description><a href="https://en.wiktionary.org/wiki/lecker">lecker</a>, <a
+                                href="https://en.wiktionary.org/wiki/schmecken">schmecker</a>!
+                            <i>(tasty, taste!)</i>
+                        </description>
+                    </item>
+                    <item>
+                        <term>
+                            <b><a href="https://en.wikipedia.org/wiki/Contrastive_focus_reduplication">Contrastive
+                                focus</a>:
+                            </b>
+                        </term>
+                        <description>like,
+                            <a href="https://en.wiktionary.org/wiki/like_like">
+                                <i>like</i>
+                                like
+                            </a>
+                            <i>(to <a href="https://en.wiktionary.org/wiki/crush">crush</a>)
+                            </i>
+                        </description>
+                    </item>
+                </list>
+            </remarks>
+            <example>
+            </example>
+        </member>
+        <member name="F:FowlFever.Conjugal.Affixing.AffixFlavor.Transfix">
+            <summary>
+                Alternates between chunks of the stem and root. Supposedly doesn't exist in English; but I bet it does.
+            </summary>
+            <remarks>
+                <a href="https://en.wikipedia.org/wiki/Transfix">Wikipedia - Transfix</a>
+            </remarks>
+            <example>
+                stem + root = st<i>ro</i>em
+                <i>ot</i>
+            </example>
+        </member>
+        <member name="F:FowlFever.Conjugal.Affixing.AffixFlavor.Disfix">
+            <summary>
+                <b>Removed</b>
+                from the stem.
+            </summary>
+            <remarks>
+                <a href="https://en.wikipedia.org/wiki/Disfix">Wikipedia - Disfix</a>
+            </remarks>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.AffixFlavorExtensions">
+            <summary>
+                Extension methods for<see cref="T:FowlFever.Conjugal.Affixing.AffixFlavor"/>.
+            </summary>
+            <seealso cref="T:FowlFever.Conjugal.Affixing.AffixFlavor"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixFlavorExtensions.ToInterface(FowlFever.Conjugal.Affixing.AffixFlavor)">
+            <summary>
+                Converts an
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixFlavor"/>
+                to the corresponding<see cref="T:FowlFever.Conjugal.Affixing.IAffix"/>-derived interface<see
+                    cref="T:System.Type"/>.
+            </summary>
+            <param name="flavor"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixFlavorExtensions.FromInterface``1">
+            <summary>
+                Retrieves the corresponding
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixFlavor"/>
+                for a given<see cref="T:FowlFever.Conjugal.Affixing.IAffix"/>-derived type
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.AffixRef`1">
+            <inheritdoc cref="T:FowlFever.Conjugal.Affixing.IAffix`1"/>
+            <remarks>
+                This is a
+                <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/struct#ref-struct">
+                    <c>ref struct</c>
+                </a>
+                equivalent of<see cref="T:FowlFever.Conjugal.Affixing.IAffix`1"/>.
+            </remarks>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.AffixRef`1.BoundMorpheme">
+            <summary>
+                The primary
+                <see cref="P:FowlFever.Conjugal.Affixing.AffixRef`1.BoundMorpheme"/>
+                for this<see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>, which can appear anywhere <b>except</b> after
+                the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+                (because that would make it a
+                <see cref="P:FowlFever.Conjugal.Affixing.AffixRef`1.SuffixMorpheme"/>
+                instead).
+            </summary>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.AffixRef`1.SuffixMorpheme">
+            <summary>
+                The
+                <see cref="P:FowlFever.Conjugal.Affixing.AffixRef`1.BoundMorpheme"/>
+                appearing <b>after</b> the<see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>, if any.
+            </summary>
+            <remarks>
+                Needs to be separate from
+                <see cref="P:FowlFever.Conjugal.Affixing.AffixRef`1.BoundMorpheme"/>
+                because
+                <see cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Circumfix"/>
+                contains both a
+                <see cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Prefix"/>
+                <b>and</b> a<see cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Suffix"/>.
+                <p/>
+                Can't be shared with
+                <see cref="P:FowlFever.Conjugal.Affixing.AffixRef`1.BoundMorpheme"/>
+                and split with<see cref="T:System.Index"/>, as I had originally intended, because we are likely to
+                receive the two values as separately allocated<see cref="T:System.String"/>s and therefore disjointed
+                <see cref="T:System.ReadOnlySpan`1"/>s.
+                Instead of allocating a new
+                <see cref="T:System.String"/>
+                that combines the two, we just take the hit of an extra<see cref="T:System.ReadOnlySpan`1"/>, which is
+                16 bytes (but won't require any new allocation...?).
+            </remarks>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.AffixRef`1.Joiner">
+            <inheritdoc cref="P:FowlFever.Conjugal.Affixing.IAffix.Joiner"/>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.AffixRef`1.InsertionPoint">
+            <summary>
+                Where in the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+                the
+                <see cref="P:FowlFever.Conjugal.Affixing.AffixRef`1.BoundMorpheme"/>
+                should be placed.
+            </summary>
+            <remarks>
+                Really only of significance to<see cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Infix"/>es.
+            </remarks>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.AffixRef`1.Flavor">
+            <summary>
+                The
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixFlavor"/>
+                that corresponds to<typeparamref name="TFlavor"/>.
+            </summary>
+            <seealso cref="M:FowlFever.Conjugal.Affixing.AffixFlavorExtensions.FromInterface``1"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRef`1.WithStem(System.ReadOnlySpan{System.Char})">
+            <summary>
+                Applies this affix to a <a href="https://en.wikipedia.org/wiki/Word_stem">word stem</a>, producing an
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>.
+            </summary>
+            <param name="stem">the
+                <see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>
+            </param>
+            <returns>a new
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRef`1.Describe">
+            <returns>a long-form list of all the properties of this
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRef`1.Highlighted">
+            <returns>a silly<see cref="T:FowlFever.Conjugal.Internal.Ansi"/>-highlighted version of
+                <see cref="M:FowlFever.Conjugal.Affixing.AffixRef`1.ToString"/>
+            </returns>
+            <exception cref="T:System.ComponentModel.InvalidEnumArgumentException"></exception>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRef`1.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.CircumSpans">
+            <summary>
+                Holds the 2<see cref="T:System.ReadOnlySpan`1"/>s that correspond to a<see
+                    cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Circumfix"/>'s
+                <see cref="M:FowlFever.Conjugal.Affixing.IPrefix.GetPrefix"/>
+                and<see cref="M:FowlFever.Conjugal.Affixing.ISuffix.GetSuffix"/>.
+            </summary>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.CircumSpans.Prefix">
+            <inheritdoc cref="M:FowlFever.Conjugal.Affixing.IPrefix.GetPrefix"/>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.CircumSpans.Suffix">
+            <inheritdoc cref="M:FowlFever.Conjugal.Affixing.ISuffix.GetSuffix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.CircumSpans.#ctor(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <param name="prefix">
+                <see cref="P:FowlFever.Conjugal.Affixing.CircumSpans.Prefix"/>
+            </param>
+            <param name="suffix">
+                <see cref="P:FowlFever.Conjugal.Affixing.CircumSpans.Suffix"/>
+            </param>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.CircumSpans.Deconstruct(System.ReadOnlySpan{System.Char}@,System.ReadOnlySpan{System.Char}@)">
+            <param name="prefix">
+                <see cref="P:FowlFever.Conjugal.Affixing.CircumSpans.Prefix"/>
+            </param>
+            <param name="suffix">
+                <see cref="P:FowlFever.Conjugal.Affixing.CircumSpans.Suffix"/>
+            </param>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.AffixRefExtensions">
+            <summary>
+                Property accessors for<see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>, which are based on its
+                <see cref="T:FowlFever.Conjugal.Affixing.IAffix`1"/>
+                type parameter.
+            </summary>
+            <remarks>
+                This allows us to pretend that
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+                has interfaces and inheritance by using type constraints.
+            </remarks>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.GetBoundMorpheme(FowlFever.Conjugal.Affixing.AffixRef{FowlFever.Conjugal.Affixing.IPrefix})">
+            <inheritdoc cref="M:FowlFever.Conjugal.Affixing.IPrefix.GetPrefix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.WithBoundMorpheme(FowlFever.Conjugal.Affixing.AffixRef{FowlFever.Conjugal.Affixing.IPrefix},System.ReadOnlySpan{System.Char})">
+            <summary>
+                Creates a new
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+                of
+                <see cref="T:FowlFever.Conjugal.Affixing.IPrefix"/>
+                wth a modified<see
+                    cref="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.GetBoundMorpheme(FowlFever.Conjugal.Affixing.AffixRef{FowlFever.Conjugal.Affixing.IPrefix})"/>
+                .
+            </summary>
+            <param name="prefix">this<see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>, which must be of
+                <see cref="T:FowlFever.Conjugal.Affixing.IPrefix"/>
+            </param>
+            <param name="newPrefix">the new
+                <see cref="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.GetBoundMorpheme(FowlFever.Conjugal.Affixing.AffixRef{FowlFever.Conjugal.Affixing.IPrefix})"/>
+            </param>
+            <returns>a new
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.GetBoundMorpheme(FowlFever.Conjugal.Affixing.AffixRef{FowlFever.Conjugal.Affixing.ISuffix})">
+            <inheritdoc cref="M:FowlFever.Conjugal.Affixing.ISuffix.GetSuffix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.WithBoundMorpheme(FowlFever.Conjugal.Affixing.AffixRef{FowlFever.Conjugal.Affixing.ISuffix},System.ReadOnlySpan{System.Char})">
+            <summary>
+                Creates a new
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+                of
+                <see cref="T:FowlFever.Conjugal.Affixing.ISuffix"/>
+                wth a modified<see
+                    cref="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.GetBoundMorpheme(FowlFever.Conjugal.Affixing.AffixRef{FowlFever.Conjugal.Affixing.ISuffix})"/>
+                .
+            </summary>
+            <param name="suffix">this<see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>, which must be of
+                <see cref="T:FowlFever.Conjugal.Affixing.ISuffix"/>
+            </param>
+            <param name="newSuffix">the new
+                <see cref="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.GetBoundMorpheme(FowlFever.Conjugal.Affixing.AffixRef{FowlFever.Conjugal.Affixing.ISuffix})"/>
+            </param>
+            <returns>a new
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.GetBoundMorpheme(FowlFever.Conjugal.Affixing.AffixRef{FowlFever.Conjugal.Affixing.IInfix})">
+            <inheritdoc cref="P:FowlFever.Conjugal.Affixing.IAffix.BoundMorpheme"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.WithBoundMorpheme(FowlFever.Conjugal.Affixing.AffixRef{FowlFever.Conjugal.Affixing.IInfix},System.ReadOnlySpan{System.Char})">
+            <summary>
+                Creates a new
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+                of
+                <see cref="T:FowlFever.Conjugal.Affixing.IInfix"/>
+                wth a modified<see
+                    cref="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.GetBoundMorpheme(FowlFever.Conjugal.Affixing.AffixRef{FowlFever.Conjugal.Affixing.IInfix})"/>
+                .
+            </summary>
+            <param name="infix">this<see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>, which must be of
+                <see cref="T:FowlFever.Conjugal.Affixing.IInfix"/>
+            </param>
+            <param name="newInfix">the new
+                <see cref="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.GetBoundMorpheme(FowlFever.Conjugal.Affixing.AffixRef{FowlFever.Conjugal.Affixing.IInfix})"/>
+            </param>
+            <returns>a new
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.GetBoundMorphemes``1(FowlFever.Conjugal.Affixing.AffixRef{``0})">
+            <param name="circumfix">this<see cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Circumfix"/>-flavored
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+            </param>
+            <typeparam name="T">an<see cref="T:FowlFever.Conjugal.Affixing.ICircumfix"/>-derived type
+            </typeparam>
+            <returns>(<see cref="M:FowlFever.Conjugal.Affixing.IPrefix.GetPrefix"/>,<see
+                    cref="M:FowlFever.Conjugal.Affixing.ISuffix.GetSuffix"/>)
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.GetPrefix``1(FowlFever.Conjugal.Affixing.AffixRef{``0})">
+            <inheritdoc cref="M:FowlFever.Conjugal.Affixing.IPrefix.GetPrefix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.WithPrefix``1(FowlFever.Conjugal.Affixing.AffixRef{``0},System.ReadOnlySpan{System.Char})">
+            <summary>
+                Creates a new
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+                with a modified<see
+                    cref="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.GetPrefix``1(FowlFever.Conjugal.Affixing.AffixRef{``0})"/>
+                .
+            </summary>
+            <param name="prefix">this
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+            </param>
+            <param name="newPrefix">the new
+                <see cref="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.GetPrefix``1(FowlFever.Conjugal.Affixing.AffixRef{``0})"/>
+            </param>
+            <typeparam name="T">the flavor of the<see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>, which must be a
+                derivative of
+                <see cref="T:FowlFever.Conjugal.Affixing.IPrefix"/>
+            </typeparam>
+            <returns>a new
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.GetSuffix``1(FowlFever.Conjugal.Affixing.AffixRef{``0})">
+            <inheritdoc cref="M:FowlFever.Conjugal.Affixing.ISuffix.GetSuffix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.WithSuffix``1(FowlFever.Conjugal.Affixing.AffixRef{``0},System.ReadOnlySpan{System.Char})">
+            <summary>
+                Creates a new
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+                with a modified<see
+                    cref="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.GetSuffix``1(FowlFever.Conjugal.Affixing.AffixRef{``0})"/>
+                .
+            </summary>
+            <param name="suffix">this
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+            </param>
+            <param name="newSuffix">the new
+                <see cref="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.GetSuffix``1(FowlFever.Conjugal.Affixing.AffixRef{``0})"/>
+            </param>
+            <typeparam name="T">the flavor of the<see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>, which must be a
+                derivative of
+                <see cref="T:FowlFever.Conjugal.Affixing.ISuffix"/>
+            </typeparam>
+            <returns>a new
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.GetInsertionPoint``1(FowlFever.Conjugal.Affixing.AffixRef{``0})">
+            <inheritdoc cref="P:FowlFever.Conjugal.Affixing.IInfix.InsertionPoint"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.WithInsertionPoint``1(FowlFever.Conjugal.Affixing.AffixRef{``0},System.Index)">
+            <summary>
+                Creates a new
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+                with an updated<see cref="P:FowlFever.Conjugal.Affixing.AffixRef`1.InsertionPoint"/>.
+            </summary>
+            <param name="infix">this<see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>, which is of an
+                <see cref="T:FowlFever.Conjugal.Affixing.IInfix"/>
+                derivative
+            </param>
+            <param name="newInsertionPoint">the new
+                <see cref="P:FowlFever.Conjugal.Affixing.AffixRef`1.InsertionPoint"/>
+            </param>
+            <typeparam name="T">a derivative
+                <see cref="T:FowlFever.Conjugal.Affixing.IInfix"/>
+            </typeparam>
+            <returns>a new
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.GetJoiner``1(FowlFever.Conjugal.Affixing.AffixRef{``0})">
+            <inheritdoc cref="P:FowlFever.Conjugal.Affixing.IAffix.Joiner"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.WithJoiner``1(FowlFever.Conjugal.Affixing.AffixRef{``0},System.ReadOnlySpan{System.Char})">
+            <summary>
+                Creates a new
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+                with an updated<see cref="P:FowlFever.Conjugal.Affixing.AffixRef`1.Joiner"/>.
+            </summary>
+            <param name="affixRef">this
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+            </param>
+            <param name="newJoiner">the new
+                <see cref="P:FowlFever.Conjugal.Affixing.AffixRef`1.Joiner"/>
+            </param>
+            <typeparam name="T">the flavor of the
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+            </typeparam>
+            <returns>a new
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.ToAffix``1(FowlFever.Conjugal.Affixing.AffixRef{``0})">
+            <summary>
+                Converts this
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+                to an instance of its
+                <typeparamref name="TFlavor"/>
+                parameter.
+            </summary>
+            <param name="affixRef">this
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+            </param>
+            <typeparam name="TFlavor">a type of
+                <see cref="T:FowlFever.Conjugal.Affixing.IAffix"/>
+            </typeparam>
+            <returns>an instance of
+                <typeparamref name="TFlavor"/>
+            </returns>
+            <exception cref="T:System.ArgumentException">if we don't know how to derive an instance of
+                <typeparamref name="TFlavor"/>
+            </exception>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.ToPrefix``1(FowlFever.Conjugal.Affixing.AffixRef{``0})">
+            <inheritdoc
+                    cref="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.ToAffix``1(FowlFever.Conjugal.Affixing.AffixRef{``0})"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.ToSuffix``1(FowlFever.Conjugal.Affixing.AffixRef{``0})">
+            <inheritdoc
+                    cref="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.ToAffix``1(FowlFever.Conjugal.Affixing.AffixRef{``0})"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.ToInfix``1(FowlFever.Conjugal.Affixing.AffixRef{``0})">
+            <inheritdoc
+                    cref="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.ToAffix``1(FowlFever.Conjugal.Affixing.AffixRef{``0})"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.ToCircumfix``1(FowlFever.Conjugal.Affixing.AffixRef{``0})">
+            <inheritdoc
+                    cref="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.ToAffix``1(FowlFever.Conjugal.Affixing.AffixRef{``0})"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.ToAmbifix``1(FowlFever.Conjugal.Affixing.AffixRef{``0})">
+            <inheritdoc
+                    cref="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.ToAffix``1(FowlFever.Conjugal.Affixing.AffixRef{``0})"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.ToDuplifix``1(FowlFever.Conjugal.Affixing.AffixRef{``0})">
+            <inheritdoc
+                    cref="M:FowlFever.Conjugal.Affixing.AffixRefExtensions.ToAffix``1(FowlFever.Conjugal.Affixing.AffixRef{``0})"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.Affix">
+            <summary>
+                Static factory methods for creating
+                <see cref="T:FowlFever.Conjugal.Affixing.AffixRef`1"/>
+                instances.
+            </summary>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affix.Prefix(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <inheritdoc cref="T:FowlFever.Conjugal.Affixing.Prefix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affix.Suffix(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <inheritdoc cref="T:FowlFever.Conjugal.Affixing.Suffix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affix.Infix(System.ReadOnlySpan{System.Char},System.Index,System.ReadOnlySpan{System.Char})">
+            <inheritdoc cref="T:FowlFever.Conjugal.Affixing.Infix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affix.Circumfix(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <inheritdoc cref="T:FowlFever.Conjugal.Affixing.Circumfix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affix.Ambifix(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <inheritdoc cref="T:FowlFever.Conjugal.Affixing.Ambifix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Affix.Duplifix(System.ReadOnlySpan{System.Char})">
+            <inheritdoc cref="T:FowlFever.Conjugal.Affixing.Duplifix"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.Ambifix">
+            <inheritdoc cref="T:FowlFever.Conjugal.Affixing.IAmbifix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Ambifix.#ctor(System.String,System.String)">
+            <inheritdoc cref="T:FowlFever.Conjugal.Affixing.IAmbifix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Ambifix.Equals(FowlFever.Conjugal.Affixing.ICircumfix)">
+            <inheritdoc/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Ambifix.Equals(FowlFever.Conjugal.Affixing.IAmbifix)">
+            <inheritdoc/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.Circumfix">
+            <inheritdoc cref="T:FowlFever.Conjugal.Affixing.ICircumfix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Circumfix.#ctor(System.String,System.String,System.String)">
+            <inheritdoc cref="T:FowlFever.Conjugal.Affixing.ICircumfix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Circumfix.Equals(FowlFever.Conjugal.Affixing.ICircumfix)">
+            <inheritdoc/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Circumfix.Equals(FowlFever.Conjugal.Affixing.IAmbifix)">
+            <inheritdoc/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.Duplifix">
+            <inheritdoc cref="T:FowlFever.Conjugal.Affixing.IDuplifix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Duplifix.#ctor(System.String)">
+            <inheritdoc cref="T:FowlFever.Conjugal.Affixing.IDuplifix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Duplifix.Equals(FowlFever.Conjugal.Affixing.IDuplifix)">
+            <inheritdoc/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.IAffix">
+            <summary>
+                Represents a
+                <see cref="P:FowlFever.Conjugal.Affixing.IAffix.BoundMorpheme"/>
+                that can be attached to a stem via<see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>.
+            </summary>
+            <remarks>
+                <see cref="T:FowlFever.Conjugal.Affixing.IAffix"/>
+                includes <b>only</b> the "extra" bits, e.g. <i>-ing</i> in
+                <i>genuflect
+                    <b>ing</b>
+                </i>
+                .
+                The interface
+                <see cref="T:FowlFever.Conjugal.Affixing.IAffixed"/>
+                is equivalent to
+                <see cref="T:FowlFever.Conjugal.Affixing.IAffix"/>
+                + a<see cref="P:FowlFever.Conjugal.Affixing.IAffixed.Stem"/>.
+            </remarks>
+            <seealso cref="T:FowlFever.Conjugal.Affixing.IAffixed"/>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.IAffix.AffixFlavor">
+            <summary>
+                The kind of <a href="https://en.wikipedia.org/wiki/affix">affix</a> being utilized.
+            </summary>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.IAffix.Joiner">
+            <summary>
+                A
+                <see cref="T:System.String"/>
+                interposed betwixt the stem and<see cref="P:FowlFever.Conjugal.Affixing.IAffix.BoundMorpheme"/>.
+            </summary>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.IAffix.BoundMorpheme">
+            <summary>
+                The <a href="https://en.wiktionary.org/wiki/bound_morpheme">bound morpheme</a> used to
+                <see cref="M:FowlFever.Conjugal.Affixing.AffixedExtensions.Render(FowlFever.Conjugal.Affixing.IAffixed)"/>
+                the final result.
+            </summary>
+            <example>
+                <i>-ing</i>
+                in
+                <i>genuflecting</i>
+            </example>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.IAffix`1">
+            <summary>
+                Represents a strongly typed<see cref="T:FowlFever.Conjugal.Affixing.IAffix"/>, where the
+                <typeparamref name="TFlavor"/>
+                type parameter determines the<see cref="T:FowlFever.Conjugal.Affixing.AffixFlavor"/>.
+            </summary>
+            <typeparam name="TFlavor">a subtype of
+                <see cref="T:FowlFever.Conjugal.Affixing.IAffix`1"/>
+                corresponding to one of the<see cref="T:FowlFever.Conjugal.Affixing.AffixFlavor"/>s
+            </typeparam>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.IAffix`1.Self">
+            <summary>
+                Supports the <a href="https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern">curiously
+                recurring template pattern</a>.
+            </summary>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.IAffixed">
+            <summary>
+                Represents a
+                <see cref="T:System.String"/>
+                that can be<see
+                    cref="M:FowlFever.Conjugal.Affixing.AffixedExtensions.Render(FowlFever.Conjugal.Affixing.IAffixed)"/>
+                ed via<see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>.
+            </summary>
+            <remarks>
+                Equivalent to an
+                <see cref="T:FowlFever.Conjugal.Affixing.IAffix"/>
+                + a<see cref="P:FowlFever.Conjugal.Affixing.IAffixed.Stem"/>.
+            </remarks>
+            <seealso cref="T:FowlFever.Conjugal.QuanticString"/>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.IAffixed.Stem">
+            <summary>
+                The <a href="https://en.wikipedia.org/wiki/Word_stem">linguistic stem</a> used to
+                <see cref="M:FowlFever.Conjugal.Affixing.AffixedExtensions.Render(FowlFever.Conjugal.Affixing.IAffixed)"/>
+                the final result.
+            </summary>
+            <example>
+                <i>boob</i>
+                in
+                <i>boobies</i>
+            </example>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.IAmbifix">
+            <inheritdoc cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Ambifix"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.ICircumfix">
+            <inheritdoc cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Circumfix"/>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.ICircumfix.Prefix">
+            <inheritdoc cref="M:FowlFever.Conjugal.Affixing.IPrefix.GetPrefix"/>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.ICircumfix.Suffix">
+            <inheritdoc cref="M:FowlFever.Conjugal.Affixing.ISuffix.GetSuffix"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.IDisfix">
+            <inheritdoc cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Disfix"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.IDuplifix">
+            <inheritdoc cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Duplifix"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.IInfix">
+            <inheritdoc cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Infix"/>
+        </member>
+        <member name="P:FowlFever.Conjugal.Affixing.IInfix.InsertionPoint">
+            <summary>
+                Where in the
+                <see cref="P:FowlFever.Conjugal.Affixing.IAffixed.Stem"/>
+                the
+                <see cref="P:FowlFever.Conjugal.Affixing.IAffix.BoundMorpheme"/>
+                will occur.
+            </summary>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.Infix">
+            <inheritdoc cref="T:FowlFever.Conjugal.Affixing.IInfix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Infix.#ctor(System.String,System.Index,System.String)">
+            <inheritdoc cref="T:FowlFever.Conjugal.Affixing.IInfix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Infix.Equals(FowlFever.Conjugal.Affixing.IInfix)">
+            <inheritdoc/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.IPrefix">
+            <inheritdoc cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Prefix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.IPrefix.GetPrefix">
+            <returns>The
+                <see cref="P:FowlFever.Conjugal.Affixing.IAffix.BoundMorpheme"/>
+                that will appear <b>before</b> the<see cref="P:FowlFever.Conjugal.Affixing.IAffixed.Stem"/>.
+            </returns>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.ISuffix">
+            <inheritdoc cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Suffix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.ISuffix.GetSuffix">
+            <returns>The
+                <see cref="P:FowlFever.Conjugal.Affixing.IAffix.BoundMorpheme"/>
+                that will appear <b>after</b> the<see cref="P:FowlFever.Conjugal.Affixing.IAffixed.Stem"/>.
+            </returns>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.ITransfix">
+            <inheritdoc cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Transfix"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.Prefix">
+            <inheritdoc cref="T:FowlFever.Conjugal.Affixing.IPrefix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Prefix.#ctor(System.String,System.String)">
+            <inheritdoc cref="T:FowlFever.Conjugal.Affixing.IPrefix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Prefix.Equals(FowlFever.Conjugal.Affixing.IPrefix)">
+            <inheritdoc/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.StringAffixationExtensions">
+            <summary>
+                <see cref="T:System.String"/>
+                extension methods that apply <a href="https://en.wikipedia.org/wiki/Affix">affixes</a> to stems.
+            </summary>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.StringAffixationExtensions.Suffix(System.String,System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <summary>
+                Appends
+                <paramref name="suffix"/>
+                to<paramref name="stem"/>, returning a<see cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Suffix"/>
+                -flavored
+                <see cref="T:FowlFever.Conjugal.Affixing.Affixation"/>
+            </summary>
+            <param name="stem">the original, "base"
+                <see cref="T:System.String"/>
+                <i>(🏫<see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>)
+                </i>
+            </param>
+            <param name="suffix">the
+                <see cref="T:System.String"/>
+                to be appended to
+                <paramref name="stem"/>
+                <i>(🏫<see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme"/>)
+                </i>
+            </param>
+            <param name="joiner">a
+                <see cref="T:System.String"/>
+                interposed betwixt
+                <paramref name="stem"/>
+                and
+                <paramref name="suffix"/>
+                <i>(🏫<see cref="P:FowlFever.Conjugal.Affixing.Affixation.Joiner"/>)
+                </i>
+            </param>
+            <returns>the<see cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Suffix"/>ed
+                <see cref="M:FowlFever.Conjugal.Affixing.Affixation.Suffixation(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.StringAffixationExtensions.Suffix(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <inheritdoc
+                    cref="M:FowlFever.Conjugal.Affixing.StringAffixationExtensions.Suffix(System.String,System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.StringAffixationExtensions.Prefix(System.String,System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <summary>
+                Prepends
+                <paramref name="prefix"/>
+                to<paramref name="stem"/>.
+            </summary>
+            <param name="stem">the original, "base"
+                <see cref="T:System.String"/>
+                <i>(🏫<see cref="P:FowlFever.Conjugal.Affixing.Affixation.Stem"/>)
+                </i>
+            </param>
+            <param name="prefix">the
+                <see cref="T:System.String"/>
+                to be appended to
+                <paramref name="stem"/>
+                <i>(🏫<see cref="P:FowlFever.Conjugal.Affixing.Affixation.BoundMorpheme"/>)
+                </i>
+            </param>
+            <param name="joiner">a
+                <see cref="T:System.String"/>
+                interposed betwixt
+                <paramref name="stem"/>
+                and
+                <paramref name="prefix"/>
+                <i>(🏫<see cref="P:FowlFever.Conjugal.Affixing.Affixation.Joiner"/>)
+                </i>
+            </param>
+            <returns>the<see cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Prefix"/>ed
+                <see cref="M:FowlFever.Conjugal.Affixing.Affixation.Prefixation(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.StringAffixationExtensions.Prefix(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <inheritdoc
+                    cref="M:FowlFever.Conjugal.Affixing.StringAffixationExtensions.Prefix(System.String,System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.StringAffixationExtensions.Infix(System.String,System.ReadOnlySpan{System.Char},System.Index,System.ReadOnlySpan{System.Char})">
+            <inheritdoc cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Infix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.StringAffixationExtensions.Infix(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.Index,System.ReadOnlySpan{System.Char})">
+            <inheritdoc cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Infix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.StringAffixationExtensions.Circumfix(System.String,System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <inheritdoc cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Circumfix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.StringAffixationExtensions.Circumfix(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <inheritdoc
+                    cref="M:FowlFever.Conjugal.Affixing.StringAffixationExtensions.Circumfix(System.String,System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.StringAffixationExtensions.Ambifix(System.String,System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <inheritdoc cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Ambifix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.StringAffixationExtensions.Ambifix(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <inheritdoc cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Ambifix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.StringAffixationExtensions.Duplifix(System.String,System.ReadOnlySpan{System.Char})">
+            <inheritdoc cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Duplifix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.StringAffixationExtensions.Duplifix(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <inheritdoc cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Duplifix"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Affixing.Suffix">
+            <inheritdoc cref="T:FowlFever.Conjugal.Affixing.ISuffix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Suffix.#ctor(System.String,System.String)">
+            <inheritdoc cref="T:FowlFever.Conjugal.Affixing.ISuffix"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Affixing.Suffix.Equals(FowlFever.Conjugal.Affixing.ISuffix)">
+            <inheritdoc/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Annotations.AbbreviationAttribute">
+            <summary>
+                Defines an abbreviated form of a<see cref="T:System.Type"/>'s<see
+                    cref="T:FowlFever.Conjugal.Annotations.LemmaAttribute"/>.
+            </summary>
+        </member>
+        <member name="T:FowlFever.Conjugal.Annotations.CollectiveNounAttribute">
+            <summary>
+                Denotes a <a href="https://en.wikipedia.org/wiki/Collective_noun#Terms_of_venery">term of venery</a>,
+                i.e., <a href="https://archive.org/details/bokeofsaintalban00bernuoft/page/114/mode/2up?view=theater">
+                the compaynys of beestys and fowlys</a>.
+            </summary>
+            <example>
+                From the <a href="https://en.wikipedia.org/wiki/Book_of_Saint_Albans#Hunting">Book of Saint Albans</a>'s <a
+                    href="https://archive.org/details/bokeofsaintalban00bernuoft/page/114/mode/2up?view=theater">the
+                compaynys of beestys and fowlys</a>:
+                <ul>
+                    <li>A superfluity of nuns</li>
+                    <li>a feast of brewers</li>
+                    <li>a goring of butchers</li>
+                    <li>an observance of hermits</li>
+                    <li>a school of clerks</li>
+                    <li>a doctrine of doctors</li>
+                    <li>a tabernacle of bakers</li>
+                    <li>a prudence of vicars</li>
+                    <li>a state of princes</li>
+                    <li>a congregation of people</li>
+                    <li>a diligence of messengers</li>
+                    <li>a discretion of priests</li>
+                    <li>an execution of officers</li>
+                    <li>an eloquence of lawyers</li>
+                    <li>a drunkenship of cobblers</li>
+                    <li>a proud showing of tailors</li>
+                    <li>a skulk of thieves</li>
+                    <li>an unkindness of ravens</li>
+                    <li>a clattering of choughs</li>
+                    <li>a murmuration of starlings</li>
+                    <li>a charm of goldfinches</li>
+                </ul>
+                See also:
+                <a href="https://www.merriam-webster.com/words-at-play/a-drudge-of-lexicographers-presents-collective-nouns/geese-ducks-swans-and-their-location">
+                    A Drudge of Lexicographers Presents: Collective Nouns
+                </a>
+            </example>
+            <seealso cref="F:FowlFever.Conjugal.Countability.Collective"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Annotations.ConjugalAttribute">
+            <summary>
+                The base class of all<see cref="N:FowlFever.Conjugal.Annotations"/>.
+            </summary>
+        </member>
+        <member name="T:FowlFever.Conjugal.Annotations.CountabilityAttribute">
+            <summary>
+                Explicitly defines this class's<see cref="P:FowlFever.Conjugal.IPlurable.Countability"/>.
+            </summary>
+            <seealso cref="T:FowlFever.Conjugal.Annotations.CountableAttribute"/>
+            <seealso cref="T:FowlFever.Conjugal.Annotations.UncountableAttribute"/>
+        </member>
+        <member name="F:FowlFever.Conjugal.Annotations.CountabilityAttribute.Countability">
+            <inheritdoc cref="T:FowlFever.Conjugal.Annotations.CountabilityAttribute"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Annotations.CountabilityAttribute.#ctor(FowlFever.Conjugal.Countability)">
+            <inheritdoc cref="T:FowlFever.Conjugal.Annotations.CountabilityAttribute"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Annotations.CountableAttribute">
+            <summary>
+                Equivalent to [<see cref="T:FowlFever.Conjugal.Annotations.CountabilityAttribute"/>(<see
+                    cref="F:FowlFever.Conjugal.Countability.Countable"/>)]
+            </summary>
+            <seealso cref="T:FowlFever.Conjugal.Annotations.CountabilityAttribute"/>
+            <seealso cref="T:FowlFever.Conjugal.Annotations.UncountableAttribute"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Annotations.CountableAttribute.#ctor">
+            <inheritdoc cref="T:FowlFever.Conjugal.Annotations.CountableAttribute"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Annotations.LemmaAttribute">
+            <summary>
+                Explicitly defines the
+                <see cref="P:FowlFever.Conjugal.Conjugation.Lemma"/>
+                of the annotated<see cref="T:System.Type"/>.
+            </summary>
+            <remarks>
+                <a href="https://en.wikipedia.org/wiki/Lemma_(morphology)">Wikipedia - Lemma (morphology)</a>
+            </remarks>
+        </member>
+        <member name="F:FowlFever.Conjugal.Annotations.LemmaAttribute.Lemma">
+            <inheritdoc cref="T:FowlFever.Conjugal.Annotations.LemmaAttribute"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Annotations.LemmaAttribute.#ctor(System.String)">
+            <inheritdoc cref="T:FowlFever.Conjugal.Annotations.LemmaAttribute"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Annotations.PlurableWrapperAttribute">
+            <summary>
+                A base class for<see cref="T:FowlFever.Conjugal.Annotations.ConjugalAttribute"/>s that wrap a single
+                <see cref="T:FowlFever.Conjugal.Plurable"/>
+                <see cref="P:FowlFever.Conjugal.Annotations.PlurableWrapperAttribute.Value"/>.
+                Provides constructors that mimic<see cref="T:FowlFever.Conjugal.Plurable"/>'s.
+            </summary>
+            <seealso cref="T:FowlFever.Conjugal.Annotations.AbbreviationAttribute"/>
+            <seealso cref="T:FowlFever.Conjugal.Annotations.TermOfVeneryAttribute"/>
+        </member>
+        <member name="P:FowlFever.Conjugal.Annotations.PlurableWrapperAttribute.Value">
+            <summary>
+                The
+                <see cref="T:FowlFever.Conjugal.Plurable"/>
+                that this
+                <see cref="T:FowlFever.Conjugal.Annotations.PlurableWrapperAttribute"/>
+                contains.
+            </summary>
+        </member>
+        <member name="M:FowlFever.Conjugal.Annotations.PlurableWrapperAttribute.#ctor(System.String,FowlFever.Conjugal.Countability)">
+            <summary>
+                Constructs a new
+                <see cref="T:FowlFever.Conjugal.Annotations.PlurableWrapperAttribute"/>
+                using:
+                <ul>
+                    <li>An explicit
+                        <see cref="P:FowlFever.Conjugal.IPlurable.Singular"/>
+                        form
+                    </li>
+                    <li>A
+                        <see cref="P:FowlFever.Conjugal.IPlurable.Plural"/>
+                        derived from a
+                        <see cref="T:FowlFever.Conjugal.Countability"/>
+                    </li>
+                </ul>
+            </summary>
+            <param name="singular">the
+                <see cref="P:FowlFever.Conjugal.IPlurable.Singular"/>
+                form
+            </param>
+            <param name="countability">a<see cref="T:FowlFever.Conjugal.Countability"/>, from which the
+                <see cref="P:FowlFever.Conjugal.IPlurable.Plural"/>
+                will be derived
+            </param>
+            <seealso cref="M:FowlFever.Conjugal.Plurable.Of(System.String,FowlFever.Conjugal.Countability)"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Annotations.PlurableWrapperAttribute.#ctor(System.String)">
+            <summary>
+                Constructs a new
+                <see cref="T:FowlFever.Conjugal.Annotations.PlurableWrapperAttribute"/>
+                wrapping an
+                <see cref="M:FowlFever.Conjugal.Plurable.Uncountable(System.String)"/>
+                <see cref="T:FowlFever.Conjugal.IPlurable"/>.
+            </summary>
+            <param name="singularAndPlural">the
+                <see cref="T:System.String"/>
+                used as <b>both</b> the
+                <see cref="P:FowlFever.Conjugal.IPlurable.Singular"/>
+                and
+                <see cref="P:FowlFever.Conjugal.IPlurable.Plural"/>
+                forms
+            </param>
+        </member>
+        <member name="M:FowlFever.Conjugal.Annotations.PlurableWrapperAttribute.#ctor(System.String,System.String)">
+            <summary>
+                Constructs a new
+                <see cref="T:FowlFever.Conjugal.Annotations.PlurableWrapperAttribute"/>
+                wrapping an explicitly defined
+                <see cref="P:FowlFever.Conjugal.IPlurable.Singular"/>
+                and<see cref="P:FowlFever.Conjugal.IPlurable.Plural"/>.
+            </summary>
+            <param name="singular">the
+                <see cref="P:FowlFever.Conjugal.IPlurable.Singular"/>
+            </param>
+            <param name="plural">the
+                <see cref="P:FowlFever.Conjugal.IPlurable.Plural"/>
+            </param>
+        </member>
+        <member name="M:FowlFever.Conjugal.Annotations.PlurableWrapperAttribute.#ctor(System.String,System.String,FowlFever.Conjugal.Countability)">
+            <summary>
+                Constructs a <a href="https://en.wikipedia.org/wiki/Syntactic_sugar">sugary</a> new<see
+                    cref="T:FowlFever.Conjugal.Annotations.PlurableWrapperAttribute"/>.
+            </summary>
+            <param name="singular">the
+                <see cref="P:FowlFever.Conjugal.IPlurable.Singular"/>
+                form
+            </param>
+            <param name="plural">the
+                <see cref="P:FowlFever.Conjugal.IPlurable.Plural"/>
+                form
+            </param>
+            <param name="countability">an explicit<see cref="T:FowlFever.Conjugal.Countability"/>.
+                <br/>If omitted, we
+                <see cref="M:FowlFever.Conjugal.Plurable.InferCountability(System.String,System.String)"/>
+                instead.
+            </param>
+        </member>
+        <member name="T:FowlFever.Conjugal.Annotations.PluralAttribute">
+            <summary>
+                Explicitly determines this class's
+                <see cref="P:FowlFever.Conjugal.IPlurable.Plural"/>
+                conjugations.
+            </summary>
+            <seealso cref="P:FowlFever.Conjugal.IPlurable.Plural"/>
+        </member>
+        <member name="F:FowlFever.Conjugal.Annotations.PluralAttribute.Plural">
+            <inheritdoc cref="T:FowlFever.Conjugal.Annotations.PluralAttribute"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Annotations.PluralAttribute.#ctor(System.String)">
+            <inheritdoc cref="T:FowlFever.Conjugal.Annotations.PluralAttribute"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Annotations.PreferredCasingAttribute">
+            <summary>
+                Overrides this classes<see cref="P:FowlFever.Conjugal.IConjugal.PreferredCasing"/>.
+            </summary>
+            <remarks>
+                The
+                <see cref="P:FowlFever.Conjugal.IConjugal.PreferredCasing"/>
+                will take precedence over a
+                <see cref="T:Humanizer.LetterCasing"/>
+                inferred from other sources,
+                such as from<see cref="P:FowlFever.Conjugal.IConjugal.IsProperNoun"/>.
+            </remarks>
+        </member>
+        <member name="F:FowlFever.Conjugal.Annotations.PreferredCasingAttribute.Casing">
+            <inheritdoc cref="T:FowlFever.Conjugal.Annotations.PreferredCasingAttribute"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Annotations.PreferredCasingAttribute.#ctor(Humanizer.LetterCasing)">
+            <inheritdoc cref="T:FowlFever.Conjugal.Annotations.PreferredCasingAttribute"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Annotations.ProperNounAttribute">
+            <summary>
+                Overrides this class's
+                <see cref="P:FowlFever.Conjugal.IConjugal.IsProperNoun"/>
+                value.
+            </summary>
+            <remarks>
+                The
+                <see cref="P:FowlFever.Conjugal.IConjugal.IsProperNoun"/>
+                value is used to determine the
+                <see cref="T:Humanizer.LetterCasing"/>
+                for this class.
+                However,<see cref="P:FowlFever.Conjugal.IConjugal.PreferredCasing"/>, if present, will take precedence.
+            </remarks>
+            <seealso cref="P:FowlFever.Conjugal.IConjugal.IsProperNoun"/>
+            <seealso cref="P:FowlFever.Conjugal.IConjugal.PreferredCasing"/>
+        </member>
+        <member name="F:FowlFever.Conjugal.Annotations.ProperNounAttribute.IsProperNoun">
+            <inheritdoc cref="T:FowlFever.Conjugal.Annotations.ProperNounAttribute"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Annotations.ProperNounAttribute.#ctor(System.Boolean)">
+            <inheritdoc cref="T:FowlFever.Conjugal.Annotations.ProperNounAttribute"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Annotations.SingularAttribute">
+            <summary>
+                Overrides this class's
+                <see cref="!:IConjugal.Singular"/>
+                form.
+            </summary>
+            <remarks>
+                This attribute should only be used for <a
+                    href="https://en.wiktionary.org/wiki/Category:English_pluralia_tantum">pluralia tantum</a>,
+                i.e., words whose <a href="https://en.wikipedia.org/wiki/Lemma_(morphology)">lemma</a> is
+                <b>not singular</b>
+                (see: <a href="https://en.wiktionary.org/wiki/pants">pants</a>, <a
+                    href="https://en.wiktionary.org/wiki/bristols">bristols</a>).
+                Otherwise, you should use the<see cref="T:FowlFever.Conjugal.Annotations.LemmaAttribute"/>.
+            </remarks>
+            <example>
+                The word <a href="https://en.wiktionary.org/wiki/pants">pants</a> does not have a singular form.
+                Therefore, the
+                <see cref="T:FowlFever.Conjugal.Annotations.LemmaAttribute"/>
+                should be set to <c>"pants"</c>, while the
+                <see cref="T:FowlFever.Conjugal.Annotations.SingularAttribute"/>
+                should be set to <c>"pair of pants"</c>.
+            </example>
+            <seealso cref="!:IConjugal.Singular"/>
+            <seealso cref="P:FowlFever.Conjugal.IConjugal.Lemma"/>
+        </member>
+        <member name="F:FowlFever.Conjugal.Annotations.SingularAttribute.Singular">
+            <summary>
+                The
+                <see cref="P:FowlFever.Conjugal.IPlurable.Singular"/>
+                form of this class.
+            </summary>
+        </member>
+        <member name="M:FowlFever.Conjugal.Annotations.SingularAttribute.#ctor(System.String)">
+            <inheritdoc cref="T:FowlFever.Conjugal.Annotations.SingularAttribute"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Annotations.TermOfVeneryAttribute">
+            <inheritdoc/>
+            <summary>
+                The onanistic alias of<see cref="T:FowlFever.Conjugal.Annotations.CollectiveNounAttribute"/>.
+            </summary>
+            <seealso cref="T:FowlFever.Conjugal.Annotations.CollectiveNounAttribute"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Annotations.TermOfVeneryAttribute.#ctor(System.String,FowlFever.Conjugal.Countability)">
+            <inheritdoc/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Annotations.TermOfVeneryAttribute.#ctor(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Annotations.TermOfVeneryAttribute.#ctor(System.String,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Annotations.TermOfVeneryAttribute.#ctor(System.String,System.String,FowlFever.Conjugal.Countability)">
+            <inheritdoc/>
+        </member>
+        <member name="T:FowlFever.Conjugal.Annotations.UncountableAttribute">
+            <summary>
+                Equivalent to [<see cref="T:FowlFever.Conjugal.Annotations.CountabilityAttribute"/>(<see
+                    cref="F:FowlFever.Conjugal.Countability.Uncountable"/>)]
+            </summary>
+            <seealso cref="T:FowlFever.Conjugal.Annotations.CountabilityAttribute"/>
+            <seealso cref="T:FowlFever.Conjugal.Annotations.CountableAttribute"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Annotations.UncountableAttribute.#ctor">
+            <inheritdoc cref="T:FowlFever.Conjugal.Annotations.UncountableAttribute"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.ConjugalExtensions">
+            <summary>
+                Extensions for
+                <see cref="T:FowlFever.Conjugal.IConjugal"/>
+            </summary>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalExtensions.FallbackUnitOfMeasure(FowlFever.Conjugal.IConjugal)">
+            <summary>
+                Returns the
+                <see cref="T:FowlFever.Conjugal.UnitOfMeasure"/>
+                if explicitly defined; otherwise,
+                attempts to find a suitable substitute, e.g.:
+                <ul>
+                    <li>
+                        <see cref="P:FowlFever.Conjugal.IConjugal.Abbreviation"/>
+                    </li>
+                    <li>
+                        <see cref="M:FowlFever.Conjugal.PlurableExtensions.ToPlurable(FowlFever.Conjugal.IPlurable)"/>
+                    </li>
+                </ul>
+            </summary>
+            <param name="conjugal">this
+                <see cref="T:FowlFever.Conjugal.IConjugal"/>
+            </param>
+            <returns>something resembling a
+                <see cref="T:FowlFever.Conjugal.UnitOfMeasure"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalExtensions.Quantify(FowlFever.Conjugal.IConjugal,System.Double)">
+            <summary>
+                Constructs a<see cref="T:FowlFever.Conjugal.QuanticString"/>...?
+            </summary>
+            <param name="conjugal"></param>
+            <param name="quantity"></param>
+            <returns></returns>
+        </member>
+        <member name="T:FowlFever.Conjugal.ConjugalStringExtensions">
+            <summary>
+                Vanilla
+                <see cref="T:System.String"/>
+                extension methods defined by<see cref="N:FowlFever.Conjugal"/>.
+            </summary>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalStringExtensions.PluralFromCountability(System.String,FowlFever.Conjugal.Countability)">
+            <summary>
+                Derives a
+                <see cref="P:FowlFever.Conjugal.IPlurable.Plural"/>
+                form using the provided<see cref="T:FowlFever.Conjugal.Countability"/>:
+                <ul>
+                    <li>
+                        <see cref="F:FowlFever.Conjugal.Countability.Countable"/>
+                        ->
+                        <see cref="M:Humanizer.InflectorExtensions.Pluralize(System.String,System.Boolean)"/>
+                    </li>
+                    <li>
+                        <see cref="F:FowlFever.Conjugal.Countability.Uncountable"/>
+                        ->
+                        <paramref name="singular"/>
+                    </li>
+                </ul>
+            </summary>
+            <param name="singular">a noun describing exactly one entity</param>
+            <param name="countability">a
+                <see cref="T:FowlFever.Conjugal.Countability"/>
+            </param>
+            <returns>a plural form of the
+                <paramref name="singular"/>
+                word
+            </returns>
+            <exception cref="T:System.NotImplementedException">if
+                <see cref="F:FowlFever.Conjugal.Countability.Collective"/>
+                is provided
+            </exception>
+            <exception cref="T:System.ComponentModel.InvalidEnumArgumentException">if an unknown
+                <see cref="T:FowlFever.Conjugal.Countability"/>
+                value is provided
+            </exception>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalStringExtensions.Plurablize(System.String,System.Boolean)">
+            <inheritdoc cref="M:FowlFever.Conjugal.Plurable.Humanized(System.String,System.Boolean)"/>
+            <seealso cref="M:FowlFever.Conjugal.Plurable.Humanized(System.String,System.Boolean)"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalStringExtensions.ApplyCase(System.String,System.Nullable{Humanizer.LetterCasing})">
+            <inheritdoc cref="M:Humanizer.CasingExtensions.ApplyCase(System.String,Humanizer.LetterCasing)"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.ConjugalTypeExtensions">
+            <summary>
+                Gets
+                <see cref="T:FowlFever.Conjugal.IConjugal"/>
+                values from<see cref="N:FowlFever.Conjugal.Annotations"/>.
+            </summary>
+            <remarks>
+                <a href="https://stackoverflow.com/questions/144833/most-useful-attributes">Most Useful Attributes"</a>
+            </remarks>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalTypeExtensions.IsProperNoun(System.Type)">
+            <param name="type">this
+                <see cref="T:System.Type"/>
+            </param>
+            <returns>the value of<see cref="T:FowlFever.Conjugal.Annotations.ProperNounAttribute"/>.
+                <see cref="F:FowlFever.Conjugal.Annotations.ProperNounAttribute.IsProperNoun"/>
+                if set; otherwise, false
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalTypeExtensions.Lemma(System.Type)">
+            <summary>
+                Gets the <a href="https://en.wikipedia.org/wiki/Lemma_(morphology)">lemma</a> of this class:
+                <ul>
+                    <li>If
+                        <see cref="T:FowlFever.Conjugal.Annotations.LemmaAttribute"/>
+                        is present, returns
+                        <see cref="M:FowlFever.Conjugal.ConjugalTypeExtensions.GetAnnotatedLemma(System.Reflection.MemberInfo)"/>
+                    </li>
+                    <li>Otherwise, returns
+                        <see cref="M:FowlFever.Conjugal.ConjugalTypeExtensions.GetFallbackLemma(System.Type)"/>
+                    </li>
+                </ul>
+            </summary>
+            <param name="type">this
+                <see cref="T:System.Type"/>
+            </param>
+            <returns>
+                <see cref="M:FowlFever.Conjugal.ConjugalTypeExtensions.GetAnnotatedLemma(System.Reflection.MemberInfo)"/>
+                or<see cref="M:FowlFever.Conjugal.ConjugalTypeExtensions.GetFallbackLemma(System.Type)"/>, with
+                <see cref="M:FowlFever.Conjugal.ConjugalTypeExtensions.PreferredCasing(System.Type)"/>
+                applied
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalTypeExtensions.GetAnnotatedLemma(System.Reflection.MemberInfo)">
+            <param name="type">this
+                <see cref="T:System.Type"/>
+            </param>
+            <returns>the explicitly annotated<see cref="F:FowlFever.Conjugal.Annotations.LemmaAttribute.Lemma"/>, if it
+                exists
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalTypeExtensions.GetFallbackLemma(System.Type)">
+            <param name="type">this
+                <see cref="T:System.Type"/>
+            </param>
+            <returns>fallback value for
+                <see cref="M:FowlFever.Conjugal.ConjugalTypeExtensions.Lemma(System.Type)"/>
+                when
+                <see cref="M:FowlFever.Conjugal.ConjugalTypeExtensions.GetAnnotatedLemma(System.Reflection.MemberInfo)"/>
+                is not defined
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalTypeExtensions.Countability(System.Type)">
+            <param name="type">this
+                <see cref="T:System.Type"/>
+            </param>
+            <returns>the<see cref="T:FowlFever.Conjugal.Annotations.CountabilityAttribute"/>.<see
+                    cref="F:FowlFever.Conjugal.Annotations.CountabilityAttribute.Countability"/>, if set
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalTypeExtensions.Singular(System.Type)">
+            <param name="type">this
+                <see cref="T:System.Type"/>
+            </param>
+            <returns>the<see cref="T:FowlFever.Conjugal.Annotations.SingularAttribute"/>.<see
+                    cref="F:FowlFever.Conjugal.Annotations.SingularAttribute.Singular"/>, if set; otherwise, the
+                <see cref="M:FowlFever.Conjugal.ConjugalTypeExtensions.Lemma(System.Type)"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalTypeExtensions.Pluralize(System.Type,System.Nullable{System.Int32})">
+            <summary>
+                Gets <b>either</b> the
+                <see cref="!:IConjugal.Plural"/>
+                <b>or</b>
+                <see cref="!:IConjugal.Singular"/>
+                form of the given<see cref="T:System.Type"/>,
+                based on the given<see cref="!:quantity"/>.
+            </summary>
+            <remarks>0 is considered a
+                <b>plural<paramref name="quantity"/>!
+                </b>
+            </remarks>
+            <param name="type">this
+                <see cref="T:System.Type"/>
+            </param>
+            <param name="quantity">the actual quantity of items, to decide whether the
+                <see cref="!:IConjugal.Plural"/>
+                or
+                <see cref="!:IConjugal.Singular"/>
+                should be used. If not set, the
+                <see cref="!:IConjugal.Plural"/>
+                will be returned
+            </param>
+            <returns>either the
+                <see cref="!:IConjugal.Singular"/>
+                or
+                <see cref="!:IConjugal.Plural"/>
+            </returns>
+            <seealso
+                    cref="M:FowlFever.Conjugal.PlurableExtensions.Pluralize(FowlFever.Conjugal.IPlurable,System.Nullable{System.Int32})"/>
+            <seealso
+                    cref="M:FowlFever.Conjugal.PlurableExtensions.Pluralize(FowlFever.Conjugal.IPlurable,System.Nullable{System.Double})"/>
+            <seealso
+                    cref="M:FowlFever.Conjugal.ConjugalTypeExtensions.Pluralize(System.Type,System.Nullable{System.Int32})"/>
+            <seealso
+                    cref="M:FowlFever.Conjugal.ConjugalTypeExtensions.Pluralize(System.Type,System.Nullable{System.Double})"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalTypeExtensions.Pluralize(System.Type,System.Nullable{System.Double})">
+            <inheritdoc
+                    cref="M:FowlFever.Conjugal.ConjugalTypeExtensions.Pluralize(System.Type,System.Nullable{System.Int32})"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalTypeExtensions.Plural(System.Type)">
+            <param name="type"></param>
+            <returns>the value of the<see cref="T:FowlFever.Conjugal.Annotations.PluralAttribute"/>, if set; otherwise,
+                <see cref="M:Humanizer.InflectorExtensions.Pluralize(System.String,System.Boolean)"/>s the
+                <see cref="M:FowlFever.Conjugal.ConjugalTypeExtensions.Singular(System.Type)"/>
+                form via<see cref="N:Humanizer"/>.
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalTypeExtensions.NounalVerb(System.Type)">
+            <param name="type"></param>
+            <remarks>Not sure when I'd actually use this, to be honest.</remarks>
+            <returns>the value of the<see cref="T:FowlFever.Conjugal.Annotations.NounalVerbAttribute"/>, if set;
+                otherwise
+                <see cref="M:FowlFever.Conjugal.ConjugalTypeExtensions.Lemma(System.Type)"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalTypeExtensions.UnitOfMeasure(System.Type)">
+            <param name="type">this
+                <see cref="T:System.Type"/>
+            </param>
+            <returns><see cref="T:FowlFever.Conjugal.Annotations.UnitOfMeasureAttribute"/>.<see
+                    cref="F:FowlFever.Conjugal.Annotations.UnitOfMeasureAttribute.UnitOfMeasure"/>, if present
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalTypeExtensions.Abbreviation(System.Type)">
+            <param name="type">this
+                <see cref="T:System.Type"/>
+            </param>
+            <returns><see cref="T:FowlFever.Conjugal.Annotations.AbbreviationAttribute"/>.
+                <see cref="P:FowlFever.Conjugal.Annotations.PlurableWrapperAttribute.Value"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalTypeExtensions.Abbreviate(System.Type,System.Nullable{System.Int32})">
+            <param name="type">this
+                <paramref name="type"/>
+            </param>
+            <param name="quantity">a quantity, used to decide between the<see
+                    cref="M:FowlFever.Conjugal.ConjugalTypeExtensions.Abbreviation(System.Type)"/>'s
+                <see cref="P:FowlFever.Conjugal.IPlurable.Singular"/>
+                and
+                <see cref="P:FowlFever.Conjugal.IPlurable.Plural"/>
+                forms
+            </param>
+            <returns>this type's pluralized<see
+                    cref="M:FowlFever.Conjugal.ConjugalTypeExtensions.Abbreviation(System.Type)"/>, if present;
+                otherwise,
+                <c>null</c>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalTypeExtensions.PreferredCasing(System.Type)">
+            <summary>
+                Gets the default
+                <see cref="T:Humanizer.LetterCasing"/>
+                for this<see cref="T:System.Type"/>,
+                either from an explicitly set<see cref="T:FowlFever.Conjugal.Annotations.PreferredCasingAttribute"/>,
+                or derived from<see cref="M:FowlFever.Conjugal.ConjugalTypeExtensions.IsProperNoun(System.Type)"/>,
+                or <c>null</c>.
+            </summary>
+            <param name="type">this
+                <see cref="T:System.Type"/>
+            </param>
+            <returns><see cref="T:FowlFever.Conjugal.Annotations.PreferredCasingAttribute"/>.
+                <see cref="F:FowlFever.Conjugal.Annotations.PreferredCasingAttribute.Casing"/>
+                >
+                <see cref="M:FowlFever.Conjugal.ConjugalTypeExtensions.IsProperNoun(System.Type)"/>
+                >
+                <c>null</c>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalTypeExtensions.Quantify(System.Type,System.Int32)">
+            <summary>
+                Retrieves a new
+                <see cref="T:FowlFever.Conjugal.Conjugation"/>
+                for this
+                <see cref="T:System.Type"/>
+                and uses it to<see
+                    cref="M:FowlFever.Conjugal.ConjugalExtensions.Quantify(FowlFever.Conjugal.IConjugal,System.Double)"/>
+                .
+            </summary>
+            <param name="type">this
+                <see cref="T:System.Type"/>
+            </param>
+            <param name="quantity">the desired
+                <see cref="F:FowlFever.Conjugal.QuanticString.Quantity"/>
+            </param>
+            <returns>a new
+                <see cref="T:FowlFever.Conjugal.QuanticString"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalTypeExtensions.Quantify(System.Type,System.Double)">
+            <inheritdoc cref="M:FowlFever.Conjugal.ConjugalTypeExtensions.Quantify(System.Type,System.Int32)"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.ConjugalTypeExtensions.CollectiveNoun(System.Type)">
+            <param name="type"></param>
+            <returns><see cref="T:FowlFever.Conjugal.Annotations.CollectiveNounAttribute"/>.
+                <see cref="P:FowlFever.Conjugal.Annotations.PlurableWrapperAttribute.Value"/>
+            </returns>
+        </member>
+        <member name="T:FowlFever.Conjugal.Conjugation`1">
+            <inheritdoc/>
+            <summary>
+                Grabs all of the
+                <see cref="T:FowlFever.Conjugal.IConjugal"/>
+                information from the<see cref="F:FowlFever.Conjugal.Conjugation`1.ConjugalType"/>'s<see
+                    cref="T:FowlFever.Conjugal.Annotations.ConjugalAttribute"/>s.
+            </summary>
+            <remarks>
+                This is a <c>struct</c> instead of a <c>class</c> to sort of "fake" instantiating it:
+                all of the instance members refer to the static
+                <see cref="F:FowlFever.Conjugal.Conjugation`1.ConjugalType"/>
+                /<see cref="F:FowlFever.Conjugal.Conjugation`1.TypelessConjugation"/>,
+                so there's no need to "really" instantiate it.
+                Instead, we can use <c>default</c> for everything.
+            </remarks>
+            <typeparam name="T">the
+                <see cref="T:System.Type"/>
+                being conjugated
+            </typeparam>
+        </member>
+        <member name="F:FowlFever.Conjugal.Conjugation`1.ConjugalType">
+            <summary>
+                This<see cref="T:FowlFever.Conjugal.Conjugation"/>'s
+                <typeparamref name="T"/>
+                <see cref="T:System.Type"/>.
+            </summary>
+        </member>
+        <member name="F:FowlFever.Conjugal.Conjugation`1.TypelessConjugation">
+            <summary>
+                A
+                <see cref="T:System.Lazy`1"/>
+                <see cref="T:FowlFever.Conjugal.Conjugation"/>
+                of this
+                <see cref="F:FowlFever.Conjugal.Conjugation`1.ConjugalType"/>
+            </summary>
+            <remarks>
+                <see cref="T:System.Lazy`1"/>
+                probably isn't necessary, but it probably doesn't <i>hurt</i>, right?
+            </remarks>
+        </member>
+        <member name="T:FowlFever.Conjugal.Conjugation">
+            <inheritdoc/>
+            <summary>
+                Contains all of the
+                <see cref="T:FowlFever.Conjugal.IConjugal"/>
+                forms of a<see cref="T:System.Type"/>.
+            </summary>
+        </member>
+        <member name="F:FowlFever.Conjugal.Conjugation.ConjugalType">
+            <summary>
+                The
+                <see cref="T:System.Type"/>
+                that was conjugated.
+            </summary>
+        </member>
+        <member name="M:FowlFever.Conjugal.Conjugation.#ctor(System.Type)">
+            <inheritdoc cref="T:FowlFever.Conjugal.Conjugation"/>
+            <exception cref="T:System.ArgumentNullException">if
+                <paramref name="conjugalType"/>
+                is
+                <c>null</c>
+            </exception>
+        </member>
+        <member name="T:FowlFever.Conjugal.Countability">
+            <summary>
+                Enumerates types of <a href="https://en.wikipedia.org/wiki/Count_noun">grammatic countability</a>.
+            </summary>
+        </member>
+        <member name="F:FowlFever.Conjugal.Countability.Countable">
+            <remarks>
+                <a href="https://en.wikipedia.org/wiki/Count_noun">Wikipedia - Count noun</a>
+            </remarks>
+        </member>
+        <member name="F:FowlFever.Conjugal.Countability.Uncountable">
+            <remarks>Also known as a <a href="https://en.wikipedia.org/wiki/Mass_noun">mass noun</a>.
+            </remarks>
+        </member>
+        <member name="F:FowlFever.Conjugal.Countability.Collective">
+            <remarks>
+                <a href="https://en.wikipedia.org/wiki/Collective_noun">Wikipedia - Collective noun</a>
+            </remarks>
+            <summary>
+                TODO: Wikipedia groups this with
+                <see cref="F:FowlFever.Conjugal.Countability.Countable"/>
+                and<see cref="F:FowlFever.Conjugal.Countability.Uncountable"/>, but does it make sense to include it as
+                a value of<see cref="T:FowlFever.Conjugal.Countability"/>? Wikipedia does note British vs. Freedom
+                english often consider
+                <see cref="F:FowlFever.Conjugal.Countability.Collective"/>
+                nouns to have different
+                <see cref="T:FowlFever.Conjugal.Countability"/>
+                from one another...
+            </summary>
+            <seealso cref="T:FowlFever.Conjugal.Annotations.CollectiveNounAttribute"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.CountabilityExtensions">
+            <inheritdoc cref="T:FowlFever.Conjugal.Countability"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.CountabilityExtensions.ApplyToSingular(FowlFever.Conjugal.Countability,System.String)">
+            <summary>
+                Gets the plural form of
+                <paramref name="singular"/>
+                according to this<see cref="T:FowlFever.Conjugal.Countability"/>.
+            </summary>
+            <remarks>
+                This is literally the commutative inverse of<see
+                    cref="M:FowlFever.Conjugal.ConjugalStringExtensions.PluralFromCountability(System.String,FowlFever.Conjugal.Countability)"/>
+                .
+            </remarks>
+            <param name="countability">this
+                <see cref="T:FowlFever.Conjugal.Countability"/>
+            </param>
+            <param name="singular">a
+                <see cref="P:FowlFever.Conjugal.IPlurable.Singular"/>
+                form
+            </param>
+            <returns>the
+                <see cref="P:FowlFever.Conjugal.IPlurable.Plural"/>
+                form of the
+                <paramref name="singular"/>
+                input
+            </returns>
+        </member>
+        <member name="T:FowlFever.Conjugal.IConjugal">
+            <summary>
+                Indicates that this object can be <a href="https://en.wikipedia.org/wiki/Inflection">inflected</a>.
+            </summary>
+            <remarks>
+                I realize that <a href="https://en.wikipedia.org/wiki/Inflection">inflection</a> is is a superset of
+                <a href="https://en.wikipedia.org/wiki/Grammatical_conjugation">conjugation</a>
+                and <a href="https://en.wikipedia.org/wiki/Declension">declension</a>, and therefore a more
+                traditionally accurate name would be
+                <a href="https://en.wiktionary.org/wiki/inflective#Adjective">
+                    <c>IInflective</c>
+                </a>
+                . I also realize that <a href="https://en.wiktionary.org/wiki/conjugatable">"conjugatable"</a> is the
+                traditionally correct term, rather than <a href="https://en.wiktionary.org/wiki/conjugal#Adjective">
+                "conjugal"</a>.
+                I disagree.
+
+                Reasons include:
+                <ul>
+                    <li>
+                        <c>IInflective</c>
+                        would start with two <c>I</c>s.
+                    </li>
+                    <li>"Conjugal" sounds much better than "conjugatable".</li>
+                    <li>"Conjugatable" isn't long enough to be fun to say.</li>
+                    <li>
+                        <a href="https://en.wikipedia.org/wiki/Conjugation">"Conjugation"</a>
+                        is a superset of both <a href="https://en.wikipedia.org/wiki/Inflection">inflection</a>
+                        <i>and</i>
+                        <a href="https://en.wikipedia.org/wiki/Grammatical_conjugation">grammatical conjugation</a>.
+                        (This makes conjugation a "set that contains itself," but for some reason I can't find the
+                        correct term for that...)
+                    </li>
+                    <li>
+                        <a href="https://en.wikipedia.org/wiki/Inflection">Inflection</a>
+                        is <a href="https://en.wikipedia.org/wiki/Jargon">jargon</a>; <a
+                            href="https://en.wikipedia.org/wiki/Conjugation">conjugation
+                    </a> is a <a href="https://en.wikipedia.org/wiki/Concept">concept</a>.
+                    </li>
+                    <li>"Conjugal" is a <a href="https://en.wiktionary.org/wiki/double_entendre#Noun">double
+                        entendre</a>.
+                    </li>
+                </ul>
+            </remarks>
+        </member>
+        <member name="P:FowlFever.Conjugal.IConjugal.Lemma">
+            <summary>
+                The canonical form of this entity.
+            </summary>
+            <remarks>
+                Usually singular, but not always.
+            </remarks>
+        </member>
+        <member name="P:FowlFever.Conjugal.IConjugal.IsProperNoun">
+            <summary>
+                Whether this entity is important enough to be capitalized; usually because it is a specific instance of
+                a <a href="https://en.wikipedia.org/wiki/Class_(philosophy)">class</a>.
+            </summary>
+            <remarks>
+                <a href="https://en.wikipedia.org/wiki/Proper_and_common_nouns">Wikipedia - Proper and common nouns</a>
+            </remarks>
+        </member>
+        <member name="P:FowlFever.Conjugal.IConjugal.NounalVerb">
+            <summary>
+                A noun used as a verb.
+            </summary>
+            <example>
+                <ul>
+                    <b>
+                        <a href="https://en.wiktionary.org/wiki/polymorphism">Polymorphic</a>
+                    </b>
+                    <li>
+                        <a href="https://en.wiktionary.org/wiki/friend#Noun">friend (noun)</a>
+                        <i>(a being treated with affection)</i>
+                    </li>
+                    <li>
+                        <a href="https://en.wiktionary.org/wiki/friend#Verb">friend (verb)</a>
+                        <i>(to consider something as a <a href="https://en.wiktionary.org/wiki/friend#Noun">friend
+                            (noun)</a>)
+                        </i>
+                    </li>
+                </ul>
+                <ul>
+                    <b>
+                        <a href="https://en.wiktionary.org/wiki/locative">Locative</a>
+                    </b>
+                    <li>
+                        <a href="https://en.wiktionary.org/wiki/bed#Noun">bed (noun)</a>
+                        <i>(a place for sleeping)</i>
+                    </li>
+                    <li>
+                        <a href="https://en.wiktionary.org/wiki/bed#Verb">bed (verb)</a>
+                        <i>(to <a href="https://en.wiktionary.org/wiki/canoodle">canoodle</a> in a <a
+                                href="https://en.wiktionary.org/wiki/bed#Noun">bed (noun)</a>)
+                        </i>
+                    </li>
+                </ul>
+                <ul>
+                    <b>
+                        <a href="https://en.wiktionary.org/wiki/instrumental#English">Instrumental</a>
+                    </b>
+                    <li>
+                        <a href="https://en.wiktionary.org/wiki/peg#Noun">peg (noun)></a>
+                        <i>(a cylindrical object used to fasten or as a bearing between objects)</i>
+                    </li>
+                    <li>
+                        <a href="https://en.wiktionary.org/wiki/peg#Verb">peg (verb)</a>
+                        <i>(to fasten with a <a href="https://en.wiktionary.org/wiki/dildo">peg (noun)</a>)
+                        </i>
+                    </li>
+                </ul>
+            </example>
+        </member>
+        <member name="P:FowlFever.Conjugal.IConjugal.UnitOfMeasure">
+            <summary>
+                A name and, optionally, a symbol used to denote a measurement of this<see
+                    cref="T:FowlFever.Conjugal.IConjugal"/>, e.g. "dollar" and "$".
+            </summary>
+        </member>
+        <member name="P:FowlFever.Conjugal.IConjugal.PreferredCasing">
+            <summary>
+                The preferred
+                <see cref="T:Humanizer.LetterCasing"/>
+                to use when rendering this<see cref="T:FowlFever.Conjugal.IConjugal"/>.
+            </summary>
+        </member>
+        <member name="P:FowlFever.Conjugal.IConjugal.Abbreviation">
+            <summary>
+                A shortened version of this<see cref="T:FowlFever.Conjugal.IConjugal"/>'s<see
+                    cref="P:FowlFever.Conjugal.IConjugal.Lemma"/>.
+            </summary>
+            <remarks>
+                The
+                <see cref="P:FowlFever.Conjugal.IConjugal.Abbreviation"/>
+                can be used as a fallback for the
+                <see cref="P:FowlFever.Conjugal.IConjugal.UnitOfMeasure"/>
+                when building a<see cref="T:FowlFever.Conjugal.QuanticString"/>.
+            </remarks>
+            <example>
+                An
+                <see cref="P:FowlFever.Conjugal.IConjugal.Abbreviation"/>
+                can be a shortened string (<b>minutes</b> -> <b>min.</b>) or an acronym (<b>kilometers</b> -> <b>km</b>).
+            </example>
+        </member>
+        <member name="T:FowlFever.Conjugal.Internal.Span3">
+            <summary>
+                A helper to group together multiple<see cref="T:System.ReadOnlySpan`1"/>s.
+            </summary>
+        </member>
+        <member name="M:FowlFever.Conjugal.Internal.SpanHelpers.Write``1(System.Span{``0},System.ReadOnlySpan{``0},System.Int32@,System.Boolean)">
+            <summary>
+                Helps you "fill" a
+                <see cref="T:System.Span`1"/>
+                with stuff.
+            </summary>
+            <param name="span"></param>
+            <param name="toAppend"></param>
+            <param name="position"></param>
+            <param name="shouldValidatePosition"></param>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Internal.SpanHelpers.WriteJoin``1(System.Span{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.Int32@,System.Boolean)">
+            <summary>
+                Equivalent to
+                <see cref="M:FowlFever.Conjugal.Internal.SpanHelpers.Write``1(System.Span{``0},System.ReadOnlySpan{``0},System.Int32@,System.Boolean)"/>
+                but with an optional
+                <paramref name="joiner"/>
+                applied if
+                <paramref name="position"/> &gt; 0 and
+                <see cref="!:source"/>
+                is not<see cref="P:System.ReadOnlySpan`1.Empty"/>.
+            </summary>
+            <param name="destination"></param>
+            <param name="source"></param>
+            <param name="joiner"></param>
+            <param name="position"></param>
+            <param name="shouldValidatePosition"></param>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Internal.SpanHelpers.Fill``1(System.Span{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.Boolean)">
+            <summary>
+                Combines a bunch of<see cref="T:System.ReadOnlySpan`1"/>s into one pre-allocated<see
+                    cref="T:System.Span`1"/>.
+            </summary>
+            <param name="destination">the
+                <see cref="T:System.Span`1"/>
+                that will contain all of the stuff
+            </param>
+            <param name="a">stuff</param>
+            <param name="b">stuff</param>
+            <param name="c">stuff</param>
+            <param name="d">stuff</param>
+            <param name="e">stuff</param>
+            <param name="f">stuff</param>
+            <param name="g">stuff</param>
+            <param name="h">stuff</param>
+            <param name="requireExactSize">if <c>true</c>, then the
+                <paramref name="destination"/>
+                <b>must</b> be the exact same size as all of the stuff
+            </param>
+            <typeparam name="T">the type of the stuff</typeparam>
+            <returns>the
+                <paramref name="destination"/>
+                <see cref="T:System.Span`1"/>, for method chaining
+            </returns>
+            <exception cref="T:System.ArgumentException">if
+                <paramref name="requireExactSize"/>
+                == <c>true</c> and the
+                <paramref name="destination"/>
+                isn't <b>exactly</b> the right size
+            </exception>
+        </member>
+        <member name="M:FowlFever.Conjugal.Internal.SpanHelpers.FillJoin``1(System.Span{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.Boolean)">
+            <inheritdoc
+                    cref="M:FowlFever.Conjugal.Internal.SpanHelpers.Fill``1(System.Span{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.ReadOnlySpan{``0},System.Boolean)"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.IPhysicalQuantity`1">
+            <summary>
+                An extremely simple interface for representing <a
+                    href="https://en.wikipedia.org/wiki/Physical_quantity">physical quantities</a>,
+                which are <a href="https://en.wikipedia.org/wiki/Quantity">quantities</a> paired with <a
+                    href="https://en.wikipedia.org/wiki/Unit_of_measurement">units of measure</a>.
+            </summary>
+        </member>
+        <member name="T:FowlFever.Conjugal.IPhysicalQuantity">
+            <inheritdoc cref="T:FowlFever.Conjugal.IPhysicalQuantity`1"/>
+        </member>
+        <member name="T:FowlFever.Conjugal.IPlurable">
+            <summary>
+                Joins together a
+                <see cref="P:FowlFever.Conjugal.IPlurable.Singular"/>
+                and a
+                <see cref="P:FowlFever.Conjugal.IPlurable.Plural"/>
+                form explicitly.
+            </summary>
+        </member>
+        <member name="P:FowlFever.Conjugal.IPlurable.Singular">
+            <summary>
+                The <a href="https://en.wikipedia.org/wiki/Grammatical_number">grammatical number</a> for exactly one
+                entity.
+            </summary>
+        </member>
+        <member name="P:FowlFever.Conjugal.IPlurable.Plural">
+            <summary>
+                The <a href="https://en.wikipedia.org/wiki/Grammatical_number">grammatical number</a> for multiple
+                entities.
+            </summary>
+            <remarks>
+                <a href="https://en.wikipedia.org/wiki/Plural">Wikipedia - Plural</a>
+            </remarks>
+        </member>
+        <member name="P:FowlFever.Conjugal.IPlurable.Countability">
+            <summary>
+                Describes how this<see cref="T:FowlFever.Conjugal.IPlurable"/>'s
+                <see cref="P:FowlFever.Conjugal.IPlurable.Plural"/>
+                is derived from its<see cref="P:FowlFever.Conjugal.IPlurable.Singular"/>, i.e.,
+                how it is affected by <a href="https://en.wikipedia.org/wiki/Grammatical_number">grammatical number</a>.
+            </summary>
+        </member>
+        <member name="T:FowlFever.Conjugal.LetterCasingExtensions">
+            <inheritdoc cref="T:Humanizer.LetterCasing"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.LetterCasingExtensions.ApplyTo(Humanizer.LetterCasing,System.String)">
+            <summary>
+                Equivalent to
+                <see cref="M:Humanizer.CasingExtensions.ApplyCase(System.String,Humanizer.LetterCasing)"/>
+                with the parameter order swapped.
+            </summary>
+            <param name="casing">this
+                <see cref="T:Humanizer.LetterCasing"/>
+            </param>
+            <param name="str">the
+                <see cref="T:System.String"/>
+                to which we will
+                <see cref="M:Humanizer.CasingExtensions.ApplyCase(System.String,Humanizer.LetterCasing)"/>
+            </param>
+            <returns>a new
+                <see cref="T:System.String"/>
+                in this
+                <see cref="T:Humanizer.LetterCasing"/>
+            </returns>
+        </member>
+        <member name="T:FowlFever.Conjugal.Nymy.Hyponymy">
+            <summary>
+                Represents the <a href="https://en.wikipedia.org/wiki/Ontology">ontologic</a> relationship of <a
+                    href="https://en.wikipedia.org/wiki/Hyponymy_and_hypernymy">hyponymy and hypernymy</a>.
+            </summary>
+            <remarks>
+                According to <a href="https://en.wikipedia.org/wiki/Hyponymy_and_hypernymy#Etymology">Wikipedia</a>,
+                "hyponymy" is the "neutral term" for both <a
+                    href="https://en.wikipedia.org/wiki/Hyponymy_and_hypernymy">hyponymy and hypernymy</a>.
+            </remarks>
+        </member>
+        <member name="F:FowlFever.Conjugal.Nymy.Hyponymy.Hyponym">
+            <summary>
+                Something that is <b>more specific</b> than something else.
+            </summary>
+            <example>
+                <ul>
+                    <li>"square" is a
+                        <see cref="F:FowlFever.Conjugal.Nymy.Hyponymy.Hyponym"/>
+                        of "rectangle".
+                    </li>
+                    <li>"red", "blue", and "green" are<see cref="F:FowlFever.Conjugal.Nymy.Hyponymy.Hyponym"/>s of
+                        "color".
+                    </li>
+                </ul>
+            </example>
+        </member>
+        <member name="F:FowlFever.Conjugal.Nymy.Hyponymy.Hypernym">
+            <summary>
+                Something that is <b>less specific</b> than something else.
+            </summary>
+            <example>
+                <ul>
+                    <li>"rectangle" is a
+                        <see cref="F:FowlFever.Conjugal.Nymy.Hyponymy.Hypernym"/>
+                        of "square".
+                    </li>
+                    <li>"color", "primary color", and "<a
+                            href="https://en.wikipedia.org/wiki/Primary_color#Additive_mixing_of_light">additive
+                        color</a>" are<see cref="F:FowlFever.Conjugal.Nymy.Hyponymy.Hypernym"/>s of "red", "green", and
+                        "blue".
+                    </li>
+                </ul>
+            </example>
+        </member>
+        <member name="T:FowlFever.Conjugal.Nymy.Meronymy">
+            <summary>
+                Represents <a href="https://en.wikipedia.org/wiki/Meronymy_and_holonymy">meronymy and holonymy</a>, aka
+                "part" and "whole".
+            </summary>
+            <remarks>
+                Not to be confused with <a href="https://en.wikipedia.org/wiki/Mereology">mereology</a> to be confused
+                with <a href="https://en.wikipedia.org/wiki/Mariology">Mariology</a>, the study of <a
+                    href="https://en.wikipedia.org/wiki/Mario">Mario</a>.
+            </remarks>
+        </member>
+        <member name="F:FowlFever.Conjugal.Nymy.Meronymy.Meronym">
+            <summary>
+                Represents a <b>part</b> of something else.
+            </summary>
+        </member>
+        <member name="F:FowlFever.Conjugal.Nymy.Meronymy.Holonym">
+            <summary>
+                Represents a something that has parts.
+                <p/>
+                TODO: Does "🧙 is a
+                <see cref="F:FowlFever.Conjugal.Nymy.Meronymy.Holonym"/>
+                of 🔮" imply that 🧙 is composed <b>exclusively</b> of 🔮s?
+                TODO: Does "🧙‍ is a
+                <see cref="F:FowlFever.Conjugal.Nymy.Meronymy.Holonym"/>
+                of 🔮" imply that 🧙 is a "complete whole"?
+            </summary>
+        </member>
+        <member name="T:FowlFever.Conjugal.Plurable">
+            <summary>
+                A simple struct implementing<see cref="T:FowlFever.Conjugal.IPlurable"/>.
+            </summary>
+            <remarks>📎 An alternative name could be "IPluric"</remarks>
+        </member>
+        <member name="P:FowlFever.Conjugal.Plurable.Singular">
+            <inheritdoc/>
+        </member>
+        <member name="P:FowlFever.Conjugal.Plurable.Plural">
+            <inheritdoc/>
+        </member>
+        <member name="P:FowlFever.Conjugal.Plurable.Countability">
+            <inheritdoc/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Plurable.#ctor(System.String,System.String,System.Nullable{FowlFever.Conjugal.Countability})">
+            <summary>
+                Constructs a new
+                <see cref="T:FowlFever.Conjugal.Plurable"/>
+                with the given values.
+            </summary>
+            <param name="singular">the
+                <see cref="P:FowlFever.Conjugal.Plurable.Singular"/>
+                form
+            </param>
+            <param name="plural">the
+                <see cref="P:FowlFever.Conjugal.Plurable.Plural"/>
+                form
+            </param>
+            <param name="countability">the<see cref="P:FowlFever.Conjugal.Plurable.Countability"/>. If omitted, then we
+                <see cref="M:FowlFever.Conjugal.Plurable.InferCountability(System.String,System.String)"/>
+                instead
+            </param>
+        </member>
+        <member name="M:FowlFever.Conjugal.Plurable.#ctor(System.String,FowlFever.Conjugal.Countability)">
+            <summary>
+                Constructs a new<see cref="T:FowlFever.Conjugal.Plurable"/>, inferring the
+                <see cref="P:FowlFever.Conjugal.Plurable.Plural"/>
+                form via<see
+                    cref="M:FowlFever.Conjugal.ConjugalStringExtensions.PluralFromCountability(System.String,FowlFever.Conjugal.Countability)"/>
+                .
+            </summary>
+            <param name="singular">the
+                <see cref="P:FowlFever.Conjugal.Plurable.Singular"/>
+                form
+            </param>
+            <param name="countability">the
+                <see cref="P:FowlFever.Conjugal.Plurable.Countability"/>
+                to use with
+                <see cref="M:FowlFever.Conjugal.ConjugalStringExtensions.PluralFromCountability(System.String,FowlFever.Conjugal.Countability)"/>
+            </param>
+        </member>
+        <member name="M:FowlFever.Conjugal.Plurable.InferCountability(System.String,System.String)">
+            <summary>
+                Infers a
+                <see cref="T:FowlFever.Conjugal.Countability"/>
+                value based on the given
+                <see cref="P:FowlFever.Conjugal.Plurable.Singular"/>
+                and
+                <see cref="P:FowlFever.Conjugal.Plurable.Plural"/>
+                forms.
+            </summary>
+            <remarks>Intended as a fallback for when a
+                <see cref="T:FowlFever.Conjugal.Plurable"/>
+                is constructed without an explicit
+                <see cref="P:FowlFever.Conjugal.Plurable.Countability"/>
+            </remarks>
+            <param name="singular">the
+                <see cref="P:FowlFever.Conjugal.Plurable.Singular"/>
+                form
+            </param>
+            <param name="plural">the
+                <see cref="P:FowlFever.Conjugal.Plurable.Plural"/>
+                form
+            </param>
+            <returns>an inferred
+                <see cref="T:FowlFever.Conjugal.Countability"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Plurable.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="M:FowlFever.Conjugal.Plurable.op_Implicit(System.String)~FowlFever.Conjugal.Plurable">
+            <summary>
+                Implicitly casts a single
+                <see cref="T:System.String"/>
+                into an
+                <see cref="F:FowlFever.Conjugal.Countability.Uncountable"/>
+                <see cref="T:FowlFever.Conjugal.Plurable"/>.
+            </summary>
+            <param name="word">a single
+                <see cref="T:System.String"/>
+            </param>
+            <returns>an
+                <see cref="F:FowlFever.Conjugal.Countability.Uncountable"/>
+                <see cref="T:FowlFever.Conjugal.Plurable"/>
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Plurable.op_Implicit(System.ValueTuple{System.String,System.String})~FowlFever.Conjugal.Plurable">
+            <summary>
+                A <see cref="F:FowlFever.Conjugal.Affixing.AffixFlavor.Duplifix">fancy-schmancy</see> way to construct a
+                <see cref="T:FowlFever.Conjugal.Plurable"/>
+                from a tuple
+            </summary>
+            <example>
+                This allows users to pass values as either
+                <see cref="F:FowlFever.Conjugal.Countability.Uncountable"/>
+                strings or
+                <see cref="T:FowlFever.Conjugal.Plurable"/>
+                instances without
+                interrupting the code with constructors or<see
+                    cref="M:FowlFever.Conjugal.Plurable.Uncountable(System.String)"/>.
+                <br/>
+                <code>
+                    new UnitOfMeasure("quid"); // 0 quid 1 quid 2 quid
+                    new UnitOfMeasure(("fathom", "fathoms")); // 0 fathoms 1 fathom 60_000 fathoms
+                    Brother.Abbreviation = ("bro", "bros."); // 0 bros. 1 bro 4 bros.
+                </code>
+            </example>
+            <param name="singularAndPlural">a tuple containing both the
+                <see cref="P:FowlFever.Conjugal.Plurable.Singular"/>
+                and
+                <see cref="P:FowlFever.Conjugal.Plurable.Plural"/>
+                words,
+                <b>in that order</b>
+            </param>
+            <returns></returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Plurable.Uncountable(System.String)">
+            <summary>
+                Constructs a new
+                <see cref="F:FowlFever.Conjugal.Countability.Uncountable"/>
+                <see cref="T:FowlFever.Conjugal.Plurable"/>
+                (i.e. the
+                <see cref="P:FowlFever.Conjugal.Plurable.Singular"/>
+                and
+                <see cref="P:FowlFever.Conjugal.Plurable.Plural"/>
+                forms are the same).
+            </summary>
+            <param name="singularAndPlural">the
+                <see cref="T:System.String"/>
+                used as <b>both</b> the
+                <see cref="P:FowlFever.Conjugal.Plurable.Singular"/>
+                and
+                <see cref="P:FowlFever.Conjugal.Plurable.Plural"/>
+                forms
+            </param>
+            <returns>a new
+                <see cref="T:FowlFever.Conjugal.Plurable"/>
+                instance
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Plurable.Of(System.String,System.String,System.Nullable{FowlFever.Conjugal.Countability})">
+            <summary>
+                Constructs a <a href="https://en.wikipedia.org/wiki/Syntactic_sugar">sugary</a> new<see
+                    cref="T:FowlFever.Conjugal.Plurable"/>.
+            </summary>
+            <param name="singular">the
+                <see cref="P:FowlFever.Conjugal.Plurable.Singular"/>
+                form
+            </param>
+            <param name="plural">the
+                <see cref="P:FowlFever.Conjugal.Plurable.Plural"/>
+                form
+            </param>
+            <param name="countability">an explicit<see cref="T:FowlFever.Conjugal.Countability"/>.
+                <br/>If omitted, we
+                <see cref="M:FowlFever.Conjugal.Plurable.InferCountability(System.String,System.String)"/>
+                instead.
+            </param>
+            <returns>a new
+                <see cref="T:FowlFever.Conjugal.Plurable"/>
+                instance
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Plurable.Of(System.String,FowlFever.Conjugal.Countability)">
+            <summary>
+                Constructs a new<see cref="T:FowlFever.Conjugal.Plurable"/>, where the
+                <see cref="P:FowlFever.Conjugal.Plurable.Plural"/>
+                form is inferred via<see
+                    cref="M:FowlFever.Conjugal.ConjugalStringExtensions.PluralFromCountability(System.String,FowlFever.Conjugal.Countability)"/>
+                .
+            </summary>
+            <param name="singular">the
+                <see cref="P:FowlFever.Conjugal.Plurable.Singular"/>
+                form
+            </param>
+            <param name="countability">a
+                <see cref="P:FowlFever.Conjugal.Plurable.Countability"/>
+            </param>
+            <returns>a new
+                <see cref="T:FowlFever.Conjugal.Plurable"/>
+                instance
+            </returns>
+        </member>
+        <member name="M:FowlFever.Conjugal.Plurable.Humanized(System.String,System.Boolean)">
+            <summary>
+                Returns a
+                <see cref="T:FowlFever.Conjugal.Plurable"/>
+                using a given
+                <paramref name="singular"/>
+                and<see cref="N:Humanizer"/>'s<see
+                    cref="M:Humanizer.InflectorExtensions.Pluralize(System.String,System.Boolean)"/>.
+            </summary>
+            <param name="singular">the original word being pluralized (which is usually singular)</param>
+            <param name="isKnownToBeSingular">passed as the
+                <paramref name="isKnownToBeSingular"/>
+                parameter in
+                <see cref="M:Humanizer.InflectorExtensions.Pluralize(System.String,System.Boolean)"/>
+            </param>
+            <returns>a new
+                <see cref="T:FowlFever.Conjugal.Plurable"/>
+            </returns>
+        </member>
+        <member name="T:FowlFever.Conjugal.PlurableExtensions">
+            <summary>
+                Extensions for
+                <see cref="T:FowlFever.Conjugal.IPlurable"/>
+            </summary>
+        </member>
+        <member name="M:FowlFever.Conjugal.PlurableExtensions.Pluralize(FowlFever.Conjugal.IPlurable,System.Nullable{System.Int32})">
+            <summary>
+                Gets <b>either</b> the
+                <see cref="!:IConjugal.Plural"/>
+                <b>or</b>
+                <see cref="!:IConjugal.Singular"/>
+                form of the given<see cref="T:System.Type"/>,
+                based on the given<see cref="!:quantity"/>.
+            </summary>
+            <remarks>0 is considered a
+                <b>plural<paramref name="quantity"/>!
+                </b>
+            </remarks>
+            <param name="plurable">this
+                <see cref="T:FowlFever.Conjugal.IPlurable"/>
+                instance
+            </param>
+            <param name="quantity">the actual quantity of items, to decide whether the
+                <see cref="!:IConjugal.Plural"/>
+                or
+                <see cref="!:IConjugal.Singular"/>
+                should be used. If not set, the
+                <see cref="!:IConjugal.Plural"/>
+                will be returned
+            </param>
+            <returns>either the
+                <see cref="!:IConjugal.Singular"/>
+                or
+                <see cref="!:IConjugal.Plural"/>
+            </returns>
+            <seealso
+                    cref="M:FowlFever.Conjugal.PlurableExtensions.Pluralize(FowlFever.Conjugal.IPlurable,System.Nullable{System.Int32})"/>
+            <seealso
+                    cref="M:FowlFever.Conjugal.PlurableExtensions.Pluralize(FowlFever.Conjugal.IPlurable,System.Nullable{System.Double})"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.PlurableExtensions.Pluralize(FowlFever.Conjugal.IPlurable,System.Nullable{System.Double})">
+            <inheritdoc
+                    cref="M:FowlFever.Conjugal.PlurableExtensions.Pluralize(FowlFever.Conjugal.IPlurable,System.Nullable{System.Int32})"/>
+        </member>
+        <member name="M:FowlFever.Conjugal.PlurableExtensions.ToPlurable(FowlFever.Conjugal.IPlurable)">
+            <param name="plurable">this
+                <see cref="T:FowlFever.Conjugal.IPlurable"/>
+            </param>
+            <returns>this
+                <see cref="T:FowlFever.Conjugal.IPlurable"/>
+                implementation as a concrete<see cref="T:FowlFever.Conjugal.Plurable"/>.
+            </returns>
+        </member>
+        <member name="T:FowlFever.Conjugal.QuanticString">
+            <summary>
+                A struct for formatting <a href="https://en.wikipedia.org/wiki/Physical_quantity">physical
+                quantities</a>.
+            </summary>
+            <remarks>TODO: maybe use fancy number<see cref="T:System.IFormatProvider"/>s instead of<see
+                    cref="F:FowlFever.Conjugal.QuanticString.DecimalPlaces"/>?
+            </remarks>
+        </member>
+        <member name="T:FowlFever.Conjugal.UnitOfMeasure">
+            <summary>
+                Represents the <b>formatting information</b> for a <a
+                    href="https://en.wikipedia.org/wiki/Unit_of_measurement">unit of measurement</a>.
+            </summary>
+        </member>
+    </members>
+</doc>
