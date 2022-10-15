@@ -7,12 +7,21 @@ Sketchbook/*
 # You *can* place credentials in this file instead of typing them into the command line
 unity_credentials.json
 
+# =======================
+# == UPDATE 10/11/2022 ==
+# =======================
+# Using `NuGetCleaner.ps1` or `Nuget.psm1` -> `Remove-DuplicateNugets` should be a better solution to this problem than the `.gitignore` file was, which is silent and therefore very surprising. 
+
 # NuGet packages embedded inside of the BrandonUtils package (which...I think works?)
 # Specifically, the first line excludes all of the different "lib" folders,
-# and then the second line explicitly re-includes `netstandard2.0`.
+# and then the second line explicitly re-includes `netstandard2.*` -
+# which should include `netstandard2.0` and `netstandard2.1`.
+#
 # This is in order to:
 #   - Not include multiple DLLs with the same name, which NuGet otherwise would download (i.e. one for standard 2.0, one for .net 4.X, etc.)
-#   - Make sure the `netstandard2.0` folder, and all of the related .meta files, ARE still included,
-#     because the .meta files include the "amdef"-like import settings for each `.dll`.
-NuGet/*/lib/*/
-!NuGet/*/lib/netstandard2.0
+#   - Make sure the `netstandard2.0`/`1` folder, and all of the related .meta files, ARE still included,
+#     because the .meta files include the "asmdef"-like import settings for each `.dll`.
+#
+# Note that whenever you make any changes with the `.dll` files you should run `NuGetCleaner.ps1` to ensure that only the `.netstandard2.1` files are included.
+#NuGet/*/lib/*/
+#!NuGet/*/lib/netstandard2.*
